@@ -1,0 +1,12 @@
+#[link(name = "geom",
+       vers = "0.1")];
+#[crate_type = "lib"];
+
+use std;
+
+mod matrix;
+mod point;
+mod rect;
+mod size;
+
+

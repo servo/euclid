@@ -1,0 +1,25 @@
+VPATH=%VPATH%
+
+CC ?= gcc
+CXX ?= g++
+CXXFLAGS ?=
+AR ?= ar
+RUSTC ?= rustc
+RUSTFLAGS ?=
+
+RUST_SRC=$(shell find $(VPATH)/. -type f -name '*.rs')
+
+.PHONE: all
+all:	librustgeom.dummy
+
+%.o:	%.c
+	$(CC) $< -o $@ -c $(CFLAGS)
+
+librustgeom.dummy: geom.rc $(RUST_SRC)
+	$(RUSTC) $(RUSTFLAGS) $< -o $@
+	touch $@
+
+.PHONY: clean
+clean:
+	rm -f *.o *.a *.so *.dylib *.dll *.dummy
+
