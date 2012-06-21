@@ -31,8 +31,9 @@ class Matrix4<T:copy fuzzy_eq Num> {
     }
 }
 
-fn ortho<T:copy fuzzy_eq Num>(left: T, right: T, bottom: T, top: T, near: T,
-                              far: T) -> Matrix4<T> {
+fn ortho<T:copy fuzzy_eq Num>(left: T, right: T, bottom: T, top: T, near: T, far: T)
+                           -> Matrix4<T> {
+
     let two = left.from_int(2);
     let one = left.from_int(1);
     let zero = left.from_int(0);
@@ -46,6 +47,14 @@ fn ortho<T:copy fuzzy_eq Num>(left: T, right: T, bottom: T, top: T, near: T,
                 zero, two.div(top.sub(bottom)), zero, zero,
                 zero, zero, minus_two.div(far.sub(near)), zero,
                 tx, ty, tz, one);
+}
+
+fn identity<T:copy fuzzy_eq Num>(_0: T) -> Matrix4<T> {
+    let _1 = zero.from_int(1);
+    ret Matrix4(_1, _0, _0, _0,
+                _0, _1, _0, _0,
+                _0, _0, _1, _0,
+                _0, _0, _0, _1);
 }
 
 #[test]
