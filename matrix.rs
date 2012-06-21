@@ -50,7 +50,7 @@ fn ortho<T:copy fuzzy_eq Num>(left: T, right: T, bottom: T, top: T, near: T, far
 }
 
 fn identity<T:copy fuzzy_eq Num>(_0: T) -> Matrix4<T> {
-    let _1 = zero.from_int(1);
+    let _1 = _0.from_int(1);
     ret Matrix4(_1, _0, _0, _0,
                 _0, _1, _0, _0,
                 _0, _0, _1, _0,
