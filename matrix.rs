@@ -29,6 +29,15 @@ class Matrix4<T:copy fuzzy_eq Num> {
         self.m41.fuzzy_eq(other.m41) && self.m42.fuzzy_eq(other.m42) &&
         self.m43.fuzzy_eq(other.m43) && self.m44.fuzzy_eq(other.m44)
     }
+
+    fn to_array() -> [T] {
+        ret [
+            self.m11, self.m12, self.m13, self.m14,
+            self.m21, self.m22, self.m23, self.m24,
+            self.m31, self.m32, self.m33, self.m34,
+            self.m41, self.m42, self.m43, self.m44
+        ];
+    }
 }
 
 fn ortho<T:copy fuzzy_eq Num>(left: T, right: T, bottom: T, top: T, near: T, far: T)
