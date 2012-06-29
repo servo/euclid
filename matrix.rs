@@ -30,13 +30,20 @@ class Matrix4<T:copy fuzzy_eq Num> {
         self.m43.fuzzy_eq(other.m43) && self.m44.fuzzy_eq(other.m44)
     }
 
-    fn to_array() -> [T] {
+    fn mul_s(&&x: T) -> Matrix4<T> {
+        ret Matrix4(self.m11.mul(x), self.m12.mul(x), self.m13.mul(x), self.m14.mul(x),
+                    self.m21.mul(x), self.m22.mul(x), self.m23.mul(x), self.m24.mul(x),
+                    self.m31.mul(x), self.m32.mul(x), self.m33.mul(x), self.m34.mul(x),
+                    self.m41.mul(x), self.m42.mul(x), self.m43.mul(x), self.m44.mul(x));
+    }
+
+    pure fn to_array() -> [T]/~ {
         ret [
             self.m11, self.m12, self.m13, self.m14,
             self.m21, self.m22, self.m23, self.m24,
             self.m31, self.m32, self.m33, self.m34,
             self.m41, self.m42, self.m43, self.m44
-        ];
+        ]/~;
     }
 }
 
