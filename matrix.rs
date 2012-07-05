@@ -1,6 +1,6 @@
-import float::num;
 import std::cmp::fuzzy_eq;
 import Num = num::num;
+import float::num;
 
 class Matrix4<T:copy fuzzy_eq Num> {
     let m11: T; let m12: T; let m13: T; let m14: T;
