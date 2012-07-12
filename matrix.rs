@@ -36,13 +36,13 @@ class Matrix4<T:copy fuzzy_eq Num> {
                     self.m41.mul(x), self.m42.mul(x), self.m43.mul(x), self.m44.mul(x));
     }
 
-    pure fn to_array() -> [T]/~ {
-        ret [
+    pure fn to_array() -> ~[T] {
+        ret ~[
             self.m11, self.m12, self.m13, self.m14,
             self.m21, self.m22, self.m23, self.m24,
             self.m31, self.m32, self.m33, self.m34,
             self.m41, self.m42, self.m43, self.m44
-        ]/~;
+        ];
     }
 }
 
