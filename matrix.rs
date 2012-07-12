@@ -36,7 +36,14 @@ class Matrix4<T:copy fuzzy_eq Num> {
                     self.m41.mul(x), self.m42.mul(x), self.m43.mul(x), self.m44.mul(x));
     }
 
-    pure fn to_array() -> ~[T] {
+    fn scale(&&x: T, &&y: T, &&z: T) -> Matrix4<T> {
+        ret Matrix4(self.m11.mul(x), self.m12,        self.m13,        self.m14,
+                    self.m21,        self.m22.mul(y), self.m23,        self.m24,
+                    self.m31,        self.m32,        self.m33.mul(z), self.m34,
+                    self.m41,        self.m42,        self.m43,        self.m44);
+    }
+
+    pure fn to_array() -> [T]/~ {
         ret ~[
             self.m11, self.m12, self.m13, self.m14,
             self.m21, self.m22, self.m23, self.m24,
@@ -46,7 +53,7 @@ class Matrix4<T:copy fuzzy_eq Num> {
     }
 }
 
-fn ortho<T:copy fuzzy_eq Num>(left: T, right: T, bottom: T, top: T, near: T, far: T)
+fn ortho<T:copy fuzzy_eq Num>(+left: T, +right: T, +bottom: T, +top: T, +near: T, +far: T)
                            -> Matrix4<T> {
 
     let two = left.from_int(2);
