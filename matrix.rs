@@ -1,7 +1,7 @@
 import std::cmp::fuzzy_eq;
 import Num = num::num;
 
-pure fn Mat4<T:copy fuzzy_eq Num>(m11: T, m12: T, m13: T, m14: T,
+pure fn Matrix4<T:copy fuzzy_eq Num>(m11: T, m12: T, m13: T, m14: T,
                                      m21: T, m22: T, m23: T, m24: T,
                                      m31: T, m32: T, m33: T, m34: T,
                                      m41: T, m42: T, m43: T, m44: T)
@@ -33,7 +33,7 @@ struct Matrix4<T:copy fuzzy_eq Num> {
     }
 
     pure fn mul(&&m: Matrix4<T>) -> Matrix4<T> {
-        return Mat4(m.m11.mul(self.m11).add(m.m12.mul(self.m21))
+        return Matrix4(m.m11.mul(self.m11).add(m.m12.mul(self.m21))
                                           .add(m.m13.mul(self.m31))
                                           .add(m.m14.mul(self.m41)),
                        m.m11.mul(self.m12).add(m.m12.mul(self.m22))
@@ -84,14 +84,14 @@ struct Matrix4<T:copy fuzzy_eq Num> {
     }
 
     pure fn mul_s(&&x: T) -> Matrix4<T> {
-        return Mat4(self.m11.mul(x), self.m12.mul(x), self.m13.mul(x), self.m14.mul(x),
+        return Matrix4(self.m11.mul(x), self.m12.mul(x), self.m13.mul(x), self.m14.mul(x),
                        self.m21.mul(x), self.m22.mul(x), self.m23.mul(x), self.m24.mul(x),
                        self.m31.mul(x), self.m32.mul(x), self.m33.mul(x), self.m34.mul(x),
                        self.m41.mul(x), self.m42.mul(x), self.m43.mul(x), self.m44.mul(x));
     }
 
     pure fn scale(&&x: T, &&y: T, &&z: T) -> Matrix4<T> {
-        return Mat4(self.m11.mul(x), self.m12,        self.m13,        self.m14,
+        return Matrix4(self.m11.mul(x), self.m12,        self.m13,        self.m14,
                        self.m21,        self.m22.mul(y), self.m23,        self.m24,
                        self.m31,        self.m32,        self.m33.mul(z), self.m34,
                        self.m41,        self.m42,        self.m43,        self.m44);
@@ -109,7 +109,7 @@ struct Matrix4<T:copy fuzzy_eq Num> {
     pure fn translate(&&x: T, &&y: T, &&z: T) -> Matrix4<T> {
         let _0 = x.from_int(0);
         let _1 = x.from_int(1);
-        let matrix = Mat4(_1, _0, _0, _0,
+        let matrix = Matrix4(_1, _0, _0, _0,
                              _0, _1, _0, _0,
                              _0, _0, _1, _0,
                               x,  y,  z, _1);
@@ -130,7 +130,7 @@ fn ortho<T:copy fuzzy_eq Num>(+left: T, +right: T, +bottom: T, +top: T, +near: T
     let ty = top.add(bottom).div(top.sub(bottom)).neg();
     let tz = far.add(near).div(far.sub(near)).neg();
 
-    return Mat4(two.div(right.sub(left)), zero, zero, zero,
+    return Matrix4(two.div(right.sub(left)), zero, zero, zero,
                    zero, two.div(top.sub(bottom)), zero, zero,
                    zero, zero, minus_two.div(far.sub(near)), zero,
                    tx, ty, tz, one);
@@ -138,7 +138,7 @@ fn ortho<T:copy fuzzy_eq Num>(+left: T, +right: T, +bottom: T, +top: T, +near: T
 
 fn identity<T:copy fuzzy_eq Num>(_0: T) -> Matrix4<T> {
     let _1 = _0.from_int(1);
-    return Mat4(_1, _0, _0, _0,
+    return Matrix4(_1, _0, _0, _0,
                    _0, _1, _0, _0,
                    _0, _0, _1, _0,
                    _0, _0, _0, _1);
@@ -149,7 +149,7 @@ fn test_ortho() {
     let (left, right, bottom, top) = (0.0, 1.0, 0.1, 1.0);
     let (near, far) = (-1.0, 1.0);
     let result = ortho(left, right, bottom, top, near, far);
-    let expected = Mat4(2.0,  0.0,         0.0,  0.0,
+    let expected = Matrix4(2.0,  0.0,         0.0,  0.0,
                            0.0,  2.22222222,  0.0,  0.0,
                            0.0,  0.0,         -1.0, 0.0,
                            -1.0, -1.22222222, -0.0, 1.0);
