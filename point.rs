@@ -1,6 +1,6 @@
-import num::num;
+import num::Num;
 
-class Point2D<T:copy num> {
+class Point2D<T:copy Num> {
     let x: T;
     let y: T;
 

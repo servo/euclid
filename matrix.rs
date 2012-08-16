@@ -1,5 +1,5 @@
 import std::cmp::fuzzy_eq;
-import Num = num::num;
+import num::Num;
 
 pure fn Matrix4<T:copy fuzzy_eq Num>(m11: T, m12: T, m13: T, m14: T,
                                      m21: T, m22: T, m23: T, m24: T,
