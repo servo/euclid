@@ -1,6 +1,6 @@
 import num::Num;
 
-class Size2D<T:copy Num> {
+struct Size2D<T:copy Num> {
     let width: T;
     let height: T;
 

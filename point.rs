@@ -1,6 +1,6 @@
 import num::Num;
 
-class Point2D<T:copy Num> {
+struct Point2D<T:copy Num> {
     let x: T;
     let y: T;
 
