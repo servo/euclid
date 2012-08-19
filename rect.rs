@@ -2,7 +2,7 @@ import num::Num;
 import point::Point2D;
 import size::Size2D;
 
-class Rect<T:copy Num> {
+struct Rect<T:copy Num> {
     let origin: Point2D<T>;
     let size: Size2D<T>;
 
