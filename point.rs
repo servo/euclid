@@ -1,4 +1,5 @@
 import num::Num;
+import cmp::Eq;
 
 struct Point2D<T:copy Num> {
     let x: T;
@@ -10,3 +11,8 @@ struct Point2D<T:copy Num> {
     }
 }
 
+impl<T: copy Num Eq> Point2D<T>: Eq {
+    pure fn eq(&&other: Point2D<T>) -> bool {
+        self.x == other.x && self.y == other.y
+    }
+}

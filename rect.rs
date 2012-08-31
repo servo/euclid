@@ -1,6 +1,7 @@
 import num::Num;
 import point::Point2D;
 import size::Size2D;
+import cmp::Eq;
 
 struct Rect<T:copy Num> {
     let origin: Point2D<T>;
@@ -12,3 +13,8 @@ struct Rect<T:copy Num> {
     }
 }
 
+impl<T: copy Num Eq> Rect<T>: Eq {
+    pure fn eq(&&other: Rect<T>) -> bool {
+        self.origin == other.origin && self.size == other.size
+    }
+}
