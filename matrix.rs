@@ -22,14 +22,14 @@ struct Matrix4<T:copy FuzzyEq Num> {
     let m41: T; let m42: T; let m43: T; let m44: T;
 
     pure fn fuzzy_eq(&&other: Matrix4<T>) -> bool {
-        self.m11.fuzzy_eq(other.m11) && self.m12.fuzzy_eq(other.m12) &&
-        self.m13.fuzzy_eq(other.m13) && self.m14.fuzzy_eq(other.m14) &&
-        self.m21.fuzzy_eq(other.m21) && self.m22.fuzzy_eq(other.m22) &&
-        self.m23.fuzzy_eq(other.m23) && self.m24.fuzzy_eq(other.m24) &&
-        self.m31.fuzzy_eq(other.m31) && self.m32.fuzzy_eq(other.m32) &&
-        self.m33.fuzzy_eq(other.m33) && self.m34.fuzzy_eq(other.m34) &&
-        self.m41.fuzzy_eq(other.m41) && self.m42.fuzzy_eq(other.m42) &&
-        self.m43.fuzzy_eq(other.m43) && self.m44.fuzzy_eq(other.m44)
+        self.m11.fuzzy_eq(&other.m11) && self.m12.fuzzy_eq(&other.m12) &&
+        self.m13.fuzzy_eq(&other.m13) && self.m14.fuzzy_eq(&other.m14) &&
+        self.m21.fuzzy_eq(&other.m21) && self.m22.fuzzy_eq(&other.m22) &&
+        self.m23.fuzzy_eq(&other.m23) && self.m24.fuzzy_eq(&other.m24) &&
+        self.m31.fuzzy_eq(&other.m31) && self.m32.fuzzy_eq(&other.m32) &&
+        self.m33.fuzzy_eq(&other.m33) && self.m34.fuzzy_eq(&other.m34) &&
+        self.m41.fuzzy_eq(&other.m41) && self.m42.fuzzy_eq(&other.m42) &&
+        self.m43.fuzzy_eq(&other.m43) && self.m44.fuzzy_eq(&other.m44)
     }
 
     pure fn mul(&&m: Matrix4<T>) -> Matrix4<T> {
