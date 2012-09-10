@@ -1,7 +1,7 @@
 import std::cmp::FuzzyEq;
 import num::Num;
 
-pure fn Matrix4<T:copy FuzzyEq Num>(m11: T, m12: T, m13: T, m14: T,
+pure fn Matrix4<T:Copy FuzzyEq Num>(m11: T, m12: T, m13: T, m14: T,
                                     m21: T, m22: T, m23: T, m24: T,
                                     m31: T, m32: T, m33: T, m34: T,
                                     m41: T, m42: T, m43: T, m44: T)
@@ -15,11 +15,11 @@ pure fn Matrix4<T:copy FuzzyEq Num>(m11: T, m12: T, m13: T, m14: T,
     }
 }
 
-struct Matrix4<T:copy FuzzyEq Num> {
-    let m11: T; let m12: T; let m13: T; let m14: T;
-    let m21: T; let m22: T; let m23: T; let m24: T;
-    let m31: T; let m32: T; let m33: T; let m34: T;
-    let m41: T; let m42: T; let m43: T; let m44: T;
+struct Matrix4<T:Copy FuzzyEq Num> {
+    m11: T, m12: T, m13: T, m14: T,
+    m21: T, m22: T, m23: T, m24: T,
+    m31: T, m32: T, m33: T, m34: T,
+    m41: T, m42: T, m43: T, m44: T,
 
     pure fn fuzzy_eq(&&other: Matrix4<T>) -> bool {
         self.m11.fuzzy_eq(&other.m11) && self.m12.fuzzy_eq(&other.m12) &&
@@ -118,7 +118,7 @@ struct Matrix4<T:copy FuzzyEq Num> {
     }
 }
 
-fn ortho<T:copy FuzzyEq Num>(+left: T, +right: T, +bottom: T, +top: T, +near: T, +far: T)
+fn ortho<T:Copy FuzzyEq Num>(+left: T, +right: T, +bottom: T, +top: T, +near: T, +far: T)
                           -> Matrix4<T> {
 
     let two: T = num::from_int(2);
@@ -136,7 +136,7 @@ fn ortho<T:copy FuzzyEq Num>(+left: T, +right: T, +bottom: T, +top: T, +near: T,
                    tx, ty, tz, one);
 }
 
-fn identity<T:copy FuzzyEq Num>(_0: T) -> Matrix4<T> {
+fn identity<T:Copy FuzzyEq Num>(_0: T) -> Matrix4<T> {
     let _1 = num::from_int(1);
     return Matrix4(_1, _0, _0, _0,
                    _0, _1, _0, _0,
