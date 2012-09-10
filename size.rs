@@ -6,7 +6,7 @@ struct Size2D<T:Copy Num> {
     height: T
 }
 
-fn Size2D_<T: Copy Num>(width: T, height: T) -> Size2D<T> {
+fn Size2D<T: Copy Num>(width: T, height: T) -> Size2D<T> {
     return Size2D {
         width: width,
         height: height

@@ -6,7 +6,7 @@ struct Point2D<T:Copy Num> {
     y: T
 }
 
-fn Point2D_<T: Copy Num>(x: T, y: T) -> Point2D<T> {
+fn Point2D<T: Copy Num>(x: T, y: T) -> Point2D<T> {
     return Point2D {x: x, y: y}
 }
 
