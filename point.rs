@@ -1,5 +1,5 @@
-import num::Num;
-import cmp::Eq;
+use num::Num;
+use cmp::Eq;
 
 struct Point2D<T:Copy Num> {
     x: T,

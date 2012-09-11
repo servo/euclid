@@ -1,5 +1,5 @@
-import std::cmp::FuzzyEq;
-import num::Num;
+use std::cmp::FuzzyEq;
+use num::Num;
 
 pure fn Matrix4<T:Copy FuzzyEq Num>(m11: T, m12: T, m13: T, m14: T,
                                     m21: T, m22: T, m23: T, m24: T,
@@ -20,7 +20,9 @@ struct Matrix4<T:Copy FuzzyEq Num> {
     m21: T, m22: T, m23: T, m24: T,
     m31: T, m32: T, m33: T, m34: T,
     m41: T, m42: T, m43: T, m44: T,
+}
 
+impl<T:Copy FuzzyEq Num> Matrix4<T> {
     pure fn fuzzy_eq(&&other: Matrix4<T>) -> bool {
         self.m11.fuzzy_eq(&other.m11) && self.m12.fuzzy_eq(&other.m12) &&
         self.m13.fuzzy_eq(&other.m13) && self.m14.fuzzy_eq(&other.m14) &&

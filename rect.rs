@@ -1,7 +1,7 @@
-import num::Num;
-import point::Point2D;
-import size::Size2D;
-import cmp::Eq;
+use num::Num;
+use point::Point2D;
+use size::Size2D;
+use cmp::Eq;
 
 struct Rect<T:Copy Num> {
     origin: Point2D<T>,
