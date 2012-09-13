@@ -2,7 +2,7 @@
        vers = "0.1")];
 #[crate_type = "lib"];
 
-use std;
+extern mod std;
 
 mod matrix;
 mod point;
