@@ -12,20 +12,20 @@ pure fn Point2D<T: Copy Num>(x: T, y: T) -> Point2D<T> {
 
 
 impl<T: Copy Num> Point2D<T> {
-    pure fn add(&&other: &Point2D<T>) -> Point2D<T> {
-        Point2D(self.x + other.x, self.y + other.y)
+    pure fn add(other: &Point2D<T>) -> Point2D<T> {
+        Point2D(self.x.add(other.x), self.y.add(other.y))
     }
-    pure fn sub(&&other: &Point2D<T>) -> Point2D<T> {
-        Point2D(self.x - other.x, self.y - other.y)
+    pure fn sub(other: &Point2D<T>) -> Point2D<T> {
+        Point2D(self.x.sub(other.x), self.y.sub(other.y))
     }
 }
 
 impl<T: Copy Num Eq> Point2D<T>: Eq {
-    pure fn eq(&&other: Point2D<T>) -> bool {
+    pure fn eq(other: &Point2D<T>) -> bool {
         self.x == other.x && self.y == other.y
     }
 
-    pure fn ne(&&other: Point2D<T>) -> bool {
+    pure fn ne(other: &Point2D<T>) -> bool {
         !self.eq(other)
     }
 }
