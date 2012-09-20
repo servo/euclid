@@ -10,7 +10,7 @@ struct Rect<T:Copy Num> {
 
 }
 
-fn Rect<T:Copy Num>(origin: Point2D<T>, size: Size2D<T>) -> Rect<T> {
+pure fn Rect<T:Copy Num>(origin: Point2D<T>, size: Size2D<T>) -> Rect<T> {
     return Rect {
         origin: copy origin,
         size: copy size
@@ -18,7 +18,7 @@ fn Rect<T:Copy Num>(origin: Point2D<T>, size: Size2D<T>) -> Rect<T> {
 }
 
 impl<T: Copy Num Ord> Rect<T> {
-    pure fn intersects(&&other: Rect<T>) -> bool {
+    pure fn intersects(&&other: &Rect<T>) -> bool {
         self.origin.x < other.origin.x + other.size.width  &&
        other.origin.x <  self.origin.x +  self.size.width  &&
         self.origin.y < other.origin.y + other.size.height &&
@@ -27,7 +27,7 @@ impl<T: Copy Num Ord> Rect<T> {
 }
 
 impl<T: Copy Num Ord> Rect<T> {
-    fn intersection(&&other: Rect<T>) -> Option<Rect<T>> {
+    pure fn intersection(&&other: &Rect<T>) -> Option<Rect<T>> {
         if !self.intersects(other) { return None }
 
         Some(Rect(Point2D(max(self.origin.x, other.origin.x),
@@ -39,7 +39,7 @@ impl<T: Copy Num Ord> Rect<T> {
         ))
     }
 
-    fn union(&&other: Rect<T>) -> Rect<T> {
+    pure fn union(&&other: &Rect<T>) -> Rect<T> {
         Rect {
             origin: Point2D(min(self.origin.x, other.origin.x),
                             min(self.origin.y, other.origin.y)),
@@ -52,7 +52,7 @@ impl<T: Copy Num Ord> Rect<T> {
 }
 
 impl<T: Copy Num> Rect<T> {
-    fn move_by(&&other: Point2D<T>) -> Rect<T> {
+    pure fn translate(&&other: &Point2D<T>) -> Rect<T> {
         Rect {
             origin: Point2D(self.origin.x + other.x,
                             self.origin.y + other.y),
