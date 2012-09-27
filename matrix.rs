@@ -1,11 +1,11 @@
 use std::cmp::FuzzyEq;
 use num::Num;
 
-pure fn Matrix4<T:Copy FuzzyEq Num>(m11: T, m12: T, m13: T, m14: T,
-                                    m21: T, m22: T, m23: T, m24: T,
-                                    m31: T, m32: T, m33: T, m34: T,
-                                    m41: T, m42: T, m43: T, m44: T)
-                                 -> Matrix4<T> {
+pub pure fn Matrix4<T:Copy FuzzyEq Num>(m11: T, m12: T, m13: T, m14: T,
+                                        m21: T, m22: T, m23: T, m24: T,
+                                        m31: T, m32: T, m33: T, m34: T,
+                                        m41: T, m42: T, m43: T, m44: T)
+                                     -> Matrix4<T> {
 
     Matrix4 {
         m11: m11, m12: m12, m13: m13, m14: m14,
@@ -15,7 +15,7 @@ pure fn Matrix4<T:Copy FuzzyEq Num>(m11: T, m12: T, m13: T, m14: T,
     }
 }
 
-struct Matrix4<T:Copy FuzzyEq Num> {
+pub struct Matrix4<T:Copy FuzzyEq Num> {
     m11: T, m12: T, m13: T, m14: T,
     m21: T, m22: T, m23: T, m24: T,
     m31: T, m32: T, m33: T, m34: T,
@@ -35,68 +35,68 @@ impl<T:Copy FuzzyEq Num> Matrix4<T> {
     }
 
     pure fn mul(&&m: Matrix4<T>) -> Matrix4<T> {
-        return Matrix4(m.m11.mul(self.m11).add(m.m12.mul(self.m21))
-                                          .add(m.m13.mul(self.m31))
-                                          .add(m.m14.mul(self.m41)),
-                       m.m11.mul(self.m12).add(m.m12.mul(self.m22))
-                                          .add(m.m13.mul(self.m32))
-                                          .add(m.m14.mul(self.m42)),
-                       m.m11.mul(self.m13).add(m.m12.mul(self.m23))
-                                          .add(m.m13.mul(self.m33))
-                                          .add(m.m14.mul(self.m43)),
-                       m.m11.mul(self.m14).add(m.m12.mul(self.m24))
-                                          .add(m.m13.mul(self.m34))
-                                          .add(m.m14.mul(self.m44)),
-                       m.m21.mul(self.m11).add(m.m22.mul(self.m21))
-                                          .add(m.m23.mul(self.m31))
-                                          .add(m.m24.mul(self.m41)),
-                       m.m21.mul(self.m12).add(m.m22.mul(self.m22))
-                                          .add(m.m23.mul(self.m32))
-                                          .add(m.m24.mul(self.m42)),
-                       m.m21.mul(self.m13).add(m.m22.mul(self.m23))
-                                          .add(m.m23.mul(self.m33))
-                                          .add(m.m24.mul(self.m43)),
-                       m.m21.mul(self.m14).add(m.m22.mul(self.m24))
-                                          .add(m.m23.mul(self.m34))
-                                          .add(m.m24.mul(self.m44)),
-                       m.m31.mul(self.m11).add(m.m32.mul(self.m21))
-                                          .add(m.m33.mul(self.m31))
-                                          .add(m.m34.mul(self.m41)),
-                       m.m31.mul(self.m12).add(m.m32.mul(self.m22))
-                                          .add(m.m33.mul(self.m32))
-                                          .add(m.m34.mul(self.m42)),
-                       m.m31.mul(self.m13).add(m.m32.mul(self.m23))
-                                          .add(m.m33.mul(self.m33))
-                                          .add(m.m34.mul(self.m43)),
-                       m.m31.mul(self.m14).add(m.m32.mul(self.m24))
-                                          .add(m.m33.mul(self.m34))
-                                          .add(m.m34.mul(self.m44)),
-                       m.m41.mul(self.m11).add(m.m42.mul(self.m21))
-                                          .add(m.m43.mul(self.m31))
-                                          .add(m.m44.mul(self.m41)),
-                       m.m41.mul(self.m12).add(m.m42.mul(self.m22))
-                                          .add(m.m43.mul(self.m32))
-                                          .add(m.m44.mul(self.m42)),
-                       m.m41.mul(self.m13).add(m.m42.mul(self.m23))
-                                          .add(m.m43.mul(self.m33))
-                                          .add(m.m44.mul(self.m43)),
-                       m.m41.mul(self.m14).add(m.m42.mul(self.m24))
-                                          .add(m.m43.mul(self.m34))
-                                          .add(m.m44.mul(self.m44)));
+        return Matrix4(m.m11.mul(&self.m11).add(&m.m12.mul(&self.m21))
+                                           .add(&m.m13.mul(&self.m31))
+                                           .add(&m.m14.mul(&self.m41)),
+                       m.m11.mul(&self.m12).add(&m.m12.mul(&self.m22))
+                                           .add(&m.m13.mul(&self.m32))
+                                           .add(&m.m14.mul(&self.m42)),
+                       m.m11.mul(&self.m13).add(&m.m12.mul(&self.m23))
+                                           .add(&m.m13.mul(&self.m33))
+                                           .add(&m.m14.mul(&self.m43)),
+                       m.m11.mul(&self.m14).add(&m.m12.mul(&self.m24))
+                                           .add(&m.m13.mul(&self.m34))
+                                           .add(&m.m14.mul(&self.m44)),
+                       m.m21.mul(&self.m11).add(&m.m22.mul(&self.m21))
+                                           .add(&m.m23.mul(&self.m31))
+                                           .add(&m.m24.mul(&self.m41)),
+                       m.m21.mul(&self.m12).add(&m.m22.mul(&self.m22))
+                                           .add(&m.m23.mul(&self.m32))
+                                           .add(&m.m24.mul(&self.m42)),
+                       m.m21.mul(&self.m13).add(&m.m22.mul(&self.m23))
+                                           .add(&m.m23.mul(&self.m33))
+                                           .add(&m.m24.mul(&self.m43)),
+                       m.m21.mul(&self.m14).add(&m.m22.mul(&self.m24))
+                                           .add(&m.m23.mul(&self.m34))
+                                           .add(&m.m24.mul(&self.m44)),
+                       m.m31.mul(&self.m11).add(&m.m32.mul(&self.m21))
+                                           .add(&m.m33.mul(&self.m31))
+                                           .add(&m.m34.mul(&self.m41)),
+                       m.m31.mul(&self.m12).add(&m.m32.mul(&self.m22))
+                                           .add(&m.m33.mul(&self.m32))
+                                           .add(&m.m34.mul(&self.m42)),
+                       m.m31.mul(&self.m13).add(&m.m32.mul(&self.m23))
+                                           .add(&m.m33.mul(&self.m33))
+                                           .add(&m.m34.mul(&self.m43)),
+                       m.m31.mul(&self.m14).add(&m.m32.mul(&self.m24))
+                                           .add(&m.m33.mul(&self.m34))
+                                           .add(&m.m34.mul(&self.m44)),
+                       m.m41.mul(&self.m11).add(&m.m42.mul(&self.m21))
+                                           .add(&m.m43.mul(&self.m31))
+                                           .add(&m.m44.mul(&self.m41)),
+                       m.m41.mul(&self.m12).add(&m.m42.mul(&self.m22))
+                                           .add(&m.m43.mul(&self.m32))
+                                           .add(&m.m44.mul(&self.m42)),
+                       m.m41.mul(&self.m13).add(&m.m42.mul(&self.m23))
+                                           .add(&m.m43.mul(&self.m33))
+                                           .add(&m.m44.mul(&self.m43)),
+                       m.m41.mul(&self.m14).add(&m.m42.mul(&self.m24))
+                                           .add(&m.m43.mul(&self.m34))
+                                           .add(&m.m44.mul(&self.m44)));
     }
 
     pure fn mul_s(&&x: T) -> Matrix4<T> {
-        return Matrix4(self.m11.mul(x), self.m12.mul(x), self.m13.mul(x), self.m14.mul(x),
-                       self.m21.mul(x), self.m22.mul(x), self.m23.mul(x), self.m24.mul(x),
-                       self.m31.mul(x), self.m32.mul(x), self.m33.mul(x), self.m34.mul(x),
-                       self.m41.mul(x), self.m42.mul(x), self.m43.mul(x), self.m44.mul(x));
+        return Matrix4(self.m11.mul(&x), self.m12.mul(&x), self.m13.mul(&x), self.m14.mul(&x),
+                       self.m21.mul(&x), self.m22.mul(&x), self.m23.mul(&x), self.m24.mul(&x),
+                       self.m31.mul(&x), self.m32.mul(&x), self.m33.mul(&x), self.m34.mul(&x),
+                       self.m41.mul(&x), self.m42.mul(&x), self.m43.mul(&x), self.m44.mul(&x));
     }
 
     pure fn scale(&&x: T, &&y: T, &&z: T) -> Matrix4<T> {
-        return Matrix4(self.m11.mul(x), self.m12,        self.m13,        self.m14,
-                       self.m21,        self.m22.mul(y), self.m23,        self.m24,
-                       self.m31,        self.m32,        self.m33.mul(z), self.m34,
-                       self.m41,        self.m42,        self.m43,        self.m44);
+        return Matrix4(self.m11.mul(&x), self.m12,         self.m13,         self.m14,
+                       self.m21,         self.m22.mul(&y), self.m23,         self.m24,
+                       self.m31,         self.m32,         self.m33.mul(&z), self.m34,
+                       self.m41,         self.m42,         self.m43,         self.m44);
     }
 
     pure fn to_array() -> ~[T] {
@@ -120,25 +120,25 @@ impl<T:Copy FuzzyEq Num> Matrix4<T> {
     }
 }
 
-fn ortho<T:Copy FuzzyEq Num>(+left: T, +right: T, +bottom: T, +top: T, +near: T, +far: T)
-                          -> Matrix4<T> {
+pub fn ortho<T:Copy FuzzyEq Num>(+left: T, +right: T, +bottom: T, +top: T, +near: T, +far: T)
+                              -> Matrix4<T> {
 
     let two: T = num::from_int(2);
     let one: T = num::from_int(1);
     let zero: T = num::from_int(0);
     let minus_two: T = num::from_int(-2);
 
-    let tx = right.add(left).div(right.sub(left)).neg();
-    let ty = top.add(bottom).div(top.sub(bottom)).neg();
-    let tz = far.add(near).div(far.sub(near)).neg();
+    let tx = right.add(&left).div(&right.sub(&left)).neg();
+    let ty = top.add(&bottom).div(&top.sub(&bottom)).neg();
+    let tz = far.add(&near).div(&far.sub(&near)).neg();
 
-    return Matrix4(two.div(right.sub(left)), zero, zero, zero,
-                   zero, two.div(top.sub(bottom)), zero, zero,
-                   zero, zero, minus_two.div(far.sub(near)), zero,
+    return Matrix4(two.div(&right.sub(&left)), zero, zero, zero,
+                   zero, two.div(&top.sub(&bottom)), zero, zero,
+                   zero, zero, minus_two.div(&far.sub(&near)), zero,
                    tx, ty, tz, one);
 }
 
-fn identity<T:Copy FuzzyEq Num>(_0: T) -> Matrix4<T> {
+pub fn identity<T:Copy FuzzyEq Num>(_0: T) -> Matrix4<T> {
     let _1 = num::from_int(1);
     return Matrix4(_1, _0, _0, _0,
                    _0, _1, _0, _0,
@@ -147,7 +147,7 @@ fn identity<T:Copy FuzzyEq Num>(_0: T) -> Matrix4<T> {
 }
 
 #[test]
-fn test_ortho() {
+pub fn test_ortho() {
     let (left, right, bottom, top) = (0.0, 1.0, 0.1, 1.0);
     let (near, far) = (-1.0, 1.0);
     let result = ortho(left, right, bottom, top, near, far);

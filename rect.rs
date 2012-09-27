@@ -3,14 +3,13 @@ use point::Point2D;
 use size::Size2D;
 use cmp::{Eq, Ord};
 
-
-struct Rect<T:Copy Num> {
+pub struct Rect<T:Copy Num> {
     origin: Point2D<T>,
     size: Size2D<T>
 
 }
 
-pure fn Rect<T:Copy Num>(origin: Point2D<T>, size: Size2D<T>) -> Rect<T> {
+pub pure fn Rect<T:Copy Num>(origin: Point2D<T>, size: Size2D<T>) -> Rect<T> {
     return Rect {
         origin: copy origin,
         size: copy size
@@ -19,10 +18,10 @@ pure fn Rect<T:Copy Num>(origin: Point2D<T>, size: Size2D<T>) -> Rect<T> {
 
 impl<T: Copy Num Ord> Rect<T> {
     pure fn intersects(&&other: &Rect<T>) -> bool {
-        self.origin.x < other.origin.x.add(other.size.width) &&
-       other.origin.x <  self.origin.x.add(self.size.width) &&
-        self.origin.y < other.origin.y.add(other.size.height) &&
-       other.origin.y <  self.origin.y.add(self.size.height)
+        self.origin.x < other.origin.x.add(&other.size.width) &&
+       other.origin.x <  self.origin.x.add(&self.size.width) &&
+        self.origin.y < other.origin.y.add(&other.size.height) &&
+       other.origin.y <  self.origin.y.add(&self.size.height)
     }
 }
 
@@ -32,10 +31,10 @@ impl<T: Copy Num Ord> Rect<T> {
 
         Some(Rect(Point2D(max(self.origin.x, other.origin.x),
                             max(self.origin.y, other.origin.y)),
-                  Size2D(min(self.origin.x.add(self.size.width),
-                            other.origin.x.add(other.size.width)),
-                         min(self.origin.y.add(self.size.height),
-                            other.origin.y.add(other.size.height)))
+                  Size2D(min(self.origin.x.add(&self.size.width),
+                            other.origin.x.add(&other.size.width)),
+                         min(self.origin.y.add(&self.size.height),
+                            other.origin.y.add(&other.size.height)))
         ))
     }
 
@@ -43,10 +42,10 @@ impl<T: Copy Num Ord> Rect<T> {
         Rect {
             origin: Point2D(min(self.origin.x, other.origin.x),
                             min(self.origin.y, other.origin.y)),
-            size: Size2D(max(self.origin.x.add(self.size.width),
-                            other.origin.x.add(other.size.width)),
-                         max(self.origin.y.add(self.size.height),
-                            other.origin.y.add(other.size.height)))
+            size: Size2D(max(self.origin.x.add(&self.size.width),
+                            other.origin.x.add(&other.size.width)),
+                         max(self.origin.y.add(&self.size.height),
+                            other.origin.y.add(&other.size.height)))
         }
     }
 }
@@ -54,8 +53,8 @@ impl<T: Copy Num Ord> Rect<T> {
 impl<T: Copy Num> Rect<T> {
     pure fn translate(other: &Point2D<T>) -> Rect<T> {
         Rect {
-            origin: Point2D(self.origin.x.add(other.x),
-                            self.origin.y.add(other.y)),
+            origin: Point2D(self.origin.x.add(&other.x),
+                            self.origin.y.add(&other.y)),
             size: copy self.size
         }
     }
@@ -70,10 +69,10 @@ impl<T: Copy Num Eq> Rect<T>: Eq {
     }
 }
 
-pure fn min<T: Copy Num Ord>(x: T, y: T) -> T {
+pub pure fn min<T: Copy Num Ord>(x: T, y: T) -> T {
     if x <= y { x } else { y }
 }
 
-pure fn max<T: Copy Num Ord>(x: T, y: T) -> T {
+pub pure fn max<T: Copy Num Ord>(x: T, y: T) -> T {
     if x >= y { x } else { y }
 }

@@ -1,12 +1,12 @@
 use num::Num;
 use cmp::Eq;
 
-struct Size2D<T:Copy Num> {
+pub struct Size2D<T:Copy Num> {
     width: T,
     height: T
 }
 
-pure fn Size2D<T: Copy Num>(width: T, height: T) -> Size2D<T> {
+pub pure fn Size2D<T: Copy Num>(width: T, height: T) -> Size2D<T> {
     return Size2D {
         width: width,
         height: height
@@ -14,7 +14,7 @@ pure fn Size2D<T: Copy Num>(width: T, height: T) -> Size2D<T> {
 }
 
 impl<T:Copy Num> Size2D<T> {
-    pure fn area() -> T { self.width.mul(self.height) }
+    pure fn area() -> T { self.width.mul(&self.height) }
 }
 
 impl<T: Copy Num Eq> Size2D<T>: Eq {

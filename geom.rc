@@ -4,9 +4,9 @@
 
 extern mod std;
 
-mod matrix;
-mod point;
-mod rect;
-mod size;
+pub mod matrix;
+pub mod point;
+pub mod rect;
+pub mod size;
 
 
