@@ -23,7 +23,7 @@ pub struct Matrix4<T:Copy FuzzyEq Num> {
 }
 
 impl<T:Copy FuzzyEq Num> Matrix4<T> {
-    pure fn fuzzy_eq(&&other: Matrix4<T>) -> bool {
+    pure fn fuzzy_eq(other: &Matrix4<T>) -> bool {
         self.m11.fuzzy_eq(&other.m11) && self.m12.fuzzy_eq(&other.m12) &&
         self.m13.fuzzy_eq(&other.m13) && self.m14.fuzzy_eq(&other.m14) &&
         self.m21.fuzzy_eq(&other.m21) && self.m22.fuzzy_eq(&other.m22) &&
@@ -34,7 +34,7 @@ impl<T:Copy FuzzyEq Num> Matrix4<T> {
         self.m43.fuzzy_eq(&other.m43) && self.m44.fuzzy_eq(&other.m44)
     }
 
-    pure fn mul(&&m: Matrix4<T>) -> Matrix4<T> {
+    pure fn mul(m: &Matrix4<T>) -> Matrix4<T> {
         return Matrix4(m.m11.mul(&self.m11).add(&m.m12.mul(&self.m21))
                                            .add(&m.m13.mul(&self.m31))
                                            .add(&m.m14.mul(&self.m41)),
@@ -85,18 +85,18 @@ impl<T:Copy FuzzyEq Num> Matrix4<T> {
                                            .add(&m.m44.mul(&self.m44)));
     }
 
-    pure fn mul_s(&&x: T) -> Matrix4<T> {
-        return Matrix4(self.m11.mul(&x), self.m12.mul(&x), self.m13.mul(&x), self.m14.mul(&x),
-                       self.m21.mul(&x), self.m22.mul(&x), self.m23.mul(&x), self.m24.mul(&x),
-                       self.m31.mul(&x), self.m32.mul(&x), self.m33.mul(&x), self.m34.mul(&x),
-                       self.m41.mul(&x), self.m42.mul(&x), self.m43.mul(&x), self.m44.mul(&x));
+    pure fn mul_s(x: &T) -> Matrix4<T> {
+        return Matrix4(self.m11.mul(x), self.m12.mul(x), self.m13.mul(x), self.m14.mul(x),
+                       self.m21.mul(x), self.m22.mul(x), self.m23.mul(x), self.m24.mul(x),
+                       self.m31.mul(x), self.m32.mul(x), self.m33.mul(x), self.m34.mul(x),
+                       self.m41.mul(x), self.m42.mul(x), self.m43.mul(x), self.m44.mul(x));
     }
 
-    pure fn scale(&&x: T, &&y: T, &&z: T) -> Matrix4<T> {
-        return Matrix4(self.m11.mul(&x), self.m12,         self.m13,         self.m14,
-                       self.m21,         self.m22.mul(&y), self.m23,         self.m24,
-                       self.m31,         self.m32,         self.m33.mul(&z), self.m34,
-                       self.m41,         self.m42,         self.m43,         self.m44);
+    pure fn scale(x: &T, y: &T, z: &T) -> Matrix4<T> {
+        return Matrix4(self.m11.mul(x), self.m12,        self.m13,        self.m14,
+                       self.m21,        self.m22.mul(y), self.m23,        self.m24,
+                       self.m31,        self.m32,        self.m33.mul(z), self.m34,
+                       self.m41,        self.m42,        self.m43,        self.m44);
     }
 
     pure fn to_array() -> ~[T] {
@@ -108,19 +108,19 @@ impl<T:Copy FuzzyEq Num> Matrix4<T> {
         ];
     }
 
-    pure fn translate(&&x: T, &&y: T, &&z: T) -> Matrix4<T> {
+    pure fn translate(x: &T, y: &T, z: &T) -> Matrix4<T> {
         let _0 = num::from_int(0);
         let _1 = num::from_int(1);
         let matrix = Matrix4(_1, _0, _0, _0,
                              _0, _1, _0, _0,
                              _0, _0, _1, _0,
-                              x,  y,  z, _1);
+                             *x, *y, *z, _1);
 
-        return self.mul(matrix);
+        return self.mul(&matrix);
     }
 }
 
-pub fn ortho<T:Copy FuzzyEq Num>(+left: T, +right: T, +bottom: T, +top: T, +near: T, +far: T)
+pub fn ortho<T:Copy FuzzyEq Num>(left: T, right: T, bottom: T, top: T, near: T, far: T)
                               -> Matrix4<T> {
 
     let two: T = num::from_int(2);
@@ -156,6 +156,6 @@ pub fn test_ortho() {
                            0.0,  0.0,         -1.0, 0.0,
                            -1.0, -1.22222222, -0.0, 1.0);
     #debug("result=%? expected=%?", result, expected);
-    assert result.fuzzy_eq(expected);
+    assert result.fuzzy_eq(&expected);
 }
 

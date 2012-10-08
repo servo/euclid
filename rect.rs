@@ -17,7 +17,7 @@ pub pure fn Rect<T:Copy Num>(origin: Point2D<T>, size: Size2D<T>) -> Rect<T> {
 }
 
 impl<T: Copy Num Ord> Rect<T> {
-    pure fn intersects(&&other: &Rect<T>) -> bool {
+    pure fn intersects(other: &Rect<T>) -> bool {
         self.origin.x < other.origin.x.add(&other.size.width) &&
        other.origin.x <  self.origin.x.add(&self.size.width) &&
         self.origin.y < other.origin.y.add(&other.size.height) &&
