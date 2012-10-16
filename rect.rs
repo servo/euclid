@@ -76,3 +76,32 @@ pub pure fn min<T: Copy Num Ord>(x: T, y: T) -> T {
 pub pure fn max<T: Copy Num Ord>(x: T, y: T) -> T {
     if x >= y { x } else { y }
 }
+
+#[test]
+fn test_min_max() {
+    assert min(0, 1) == 0;
+    assert min(-1.0, 0.0) == -1.0;
+
+    assert max(0, 1) == 1;
+    assert max(-1.0, 0.0) == 0.0;
+}
+
+#[test]
+fn test_translate() {
+    let p = Rect(Point2D(0, 0), Size2D(50, 40));
+    let pp = p.translate(&Point2D(10,15));
+
+    assert pp.size.width == 50;
+    assert pp.size.height == 40;
+    assert pp.origin.x == 10;
+    assert pp.origin.y == 15;
+
+
+    let r = Rect(Point2D(-10, -5), Size2D(50, 40));
+    let rr = r.translate(&Point2D(0,-10));
+
+    assert rr.size.width == 50;
+    assert rr.size.height == 40;
+    assert rr.origin.x == -10;
+    assert rr.origin.y == -15;
+}
