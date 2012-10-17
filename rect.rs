@@ -39,13 +39,17 @@ impl<T: Copy Num Ord> Rect<T> {
     }
 
     pure fn union(other: &Rect<T>) -> Rect<T> {
+        let upper_left = Point2D(min(self.origin.x, other.origin.x),
+                                 min(self.origin.y, other.origin.y));
+        
+        let lower_right = Point2D(max(self.origin.x + self.size.width,
+                                      other.origin.x + other.size.width),
+                                  max(self.origin.y + self.size.height,
+                                      other.origin.y + other.size.height));
+        
         Rect {
-            origin: Point2D(min(self.origin.x, other.origin.x),
-                            min(self.origin.y, other.origin.y)),
-            size: Size2D(max(self.origin.x.add(&self.size.width),
-                            other.origin.x.add(&other.size.width)),
-                         max(self.origin.y.add(&self.size.height),
-                            other.origin.y.add(&other.size.height)))
+            origin: upper_left,
+            size: Size2D(lower_right.x - upper_left.x, lower_right.y - upper_left.y)
         }
     }
 }
@@ -104,4 +108,25 @@ fn test_translate() {
     assert rr.size.height == 40;
     assert rr.origin.x == -10;
     assert rr.origin.y == -15;
+}
+
+#[test]
+fn test_union() {
+    let p = Rect(Point2D(0,0), Size2D(50, 40));
+    let q = Rect(Point2D(20,20), Size2D(5, 5));
+    let r = Rect(Point2D(-15, -30), Size2D(200, 15));
+    let s = Rect(Point2D(20, -15), Size2D(250, 200));
+
+    let pq = p.union(&q);
+    assert pq.origin == Point2D(0, 0);
+    assert pq.size == Size2D(50, 40);
+
+    let pr = p.union(&r);
+    assert pr.origin == Point2D(-15, -30);
+    assert pr.size == Size2D(200, 70);
+
+    let ps = p.union(&s);
+    assert ps.origin == Point2D(0, -15);
+    assert ps.size == Size2D(270, 200);
+
 }
