@@ -109,7 +109,6 @@ fn test_translate() {
     assert rr.origin.x == -10;
     assert rr.origin.y == -15;
 }
-<<<<<<< HEAD
 
 #[test]
 fn test_union() {
@@ -131,5 +130,3 @@ fn test_union() {
     assert ps.size == Size2D(270, 200);
 
 }
-=======
->>>>>>> Update for newest Rust
