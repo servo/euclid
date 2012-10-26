@@ -5,6 +5,7 @@
 extern mod std;
 
 pub mod matrix;
+pub mod matrix2d;
 pub mod point;
 pub mod rect;
 pub mod size;
