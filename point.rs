@@ -21,11 +21,11 @@ impl<T: Copy Num> Point2D<T> {
 }
 
 impl<T: Copy Num Eq> Point2D<T>: Eq {
-    pure fn eq(other: &Point2D<T>) -> bool {
+    pure fn eq(&self, other: &Point2D<T>) -> bool {
         self.x == other.x && self.y == other.y
     }
 
-    pure fn ne(other: &Point2D<T>) -> bool {
+    pure fn ne(&self, other: &Point2D<T>) -> bool {
         !self.eq(other)
     }
 }

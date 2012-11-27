@@ -65,10 +65,10 @@ impl<T: Copy Num> Rect<T> {
 }
 
 impl<T: Copy Num Eq> Rect<T>: Eq {
-    pure fn eq(other: &Rect<T>) -> bool {
+    pure fn eq(&self, other: &Rect<T>) -> bool {
         self.origin == other.origin && self.size == other.size
     }
-    pure fn ne(other: &Rect<T>) -> bool {
+    pure fn ne(&self, other: &Rect<T>) -> bool {
         !self.eq(other)
     }
 }

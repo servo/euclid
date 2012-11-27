@@ -18,10 +18,10 @@ impl<T:Copy Num> Size2D<T> {
 }
 
 impl<T: Copy Num Eq> Size2D<T>: Eq {
-    pure fn eq(other: &Size2D<T>) -> bool {
+    pure fn eq(&self, other: &Size2D<T>) -> bool {
         self.width == other.width && self.height == other.height
     }
-    pure fn ne(other: &Size2D<T>) -> bool {
+    pure fn ne(&self, other: &Size2D<T>) -> bool {
         !self.eq(other)
     }
 }
