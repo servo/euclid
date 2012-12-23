@@ -109,8 +109,8 @@ impl<T:Copy FuzzyEq Num> Matrix4<T> {
     }
 
     pure fn translate(x: &T, y: &T, z: &T) -> Matrix4<T> {
-        let _0 = num::from_int(0);
-        let _1 = num::from_int(1);
+        let _0 = Num::from_int(0);
+        let _1 = Num::from_int(1);
         let matrix = Matrix4(_1, _0, _0, _0,
                              _0, _1, _0, _0,
                              _0, _0, _1, _0,
@@ -123,10 +123,10 @@ impl<T:Copy FuzzyEq Num> Matrix4<T> {
 pub fn ortho<T:Copy FuzzyEq Num>(left: T, right: T, bottom: T, top: T, near: T, far: T)
                               -> Matrix4<T> {
 
-    let two: T = num::from_int(2);
-    let one: T = num::from_int(1);
-    let zero: T = num::from_int(0);
-    let minus_two: T = num::from_int(-2);
+    let two: T = Num::from_int(2);
+    let one: T = Num::from_int(1);
+    let zero: T = Num::from_int(0);
+    let minus_two: T = Num::from_int(-2);
 
     let tx = right.add(&left).div(&right.sub(&left)).neg();
     let ty = top.add(&bottom).div(&top.sub(&bottom)).neg();
@@ -139,7 +139,7 @@ pub fn ortho<T:Copy FuzzyEq Num>(left: T, right: T, bottom: T, top: T, near: T, 
 }
 
 pub fn identity<T:Copy FuzzyEq Num>(_0: T) -> Matrix4<T> {
-    let _1 = num::from_int(1);
+    let _1 = Num::from_int(1);
     return Matrix4(_1, _0, _0, _0,
                    _0, _1, _0, _0,
                    _0, _0, _1, _0,

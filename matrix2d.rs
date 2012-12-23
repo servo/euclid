@@ -18,8 +18,8 @@ pub impl<T:Copy FuzzyEq Num> Matrix2D<T> {
     }
 
     pure fn translate(x: &T, y: &T) -> Matrix2D<T> {
-        let _0 = num::from_int(0);
-        let _1 = num::from_int(1);
+        let _0 = Num::from_int(0);
+        let _1 = Num::from_int(1);
         let matrix = Matrix2D::new(_1, _0,
                                    _0, _1,
                                    *x, *y);
@@ -27,8 +27,8 @@ pub impl<T:Copy FuzzyEq Num> Matrix2D<T> {
     }
 
     static fn identity() -> Matrix2D<T> {
-        let _0 = num::from_int(0);
-        let _1 = num::from_int(1);
+        let _0 = Num::from_int(0);
+        let _1 = Num::from_int(1);
         return Matrix2D::new(_1, _0,
                              _0, _1,
                              _0, _0);
