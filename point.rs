@@ -1,7 +1,7 @@
 use num::Num;
 use cmp::Eq;
 
-pub struct Point2D<T:Copy Num> {
+pub struct Point2D<T> {
     x: T,
     y: T
 }

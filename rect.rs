@@ -3,7 +3,7 @@ use point::Point2D;
 use size::Size2D;
 use cmp::{Eq, Ord};
 
-pub struct Rect<T:Copy Num> {
+pub struct Rect<T> {
     origin: Point2D<T>,
     size: Size2D<T>
 

@@ -1,7 +1,7 @@
 use num::Num;
 use cmp::Eq;
 
-pub struct Size2D<T:Copy Num> {
+pub struct Size2D<T> {
     width: T,
     height: T
 }
