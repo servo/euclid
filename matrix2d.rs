@@ -7,7 +7,7 @@ pub struct Matrix2D<T> {
     m31: T, m32: T
 }
 
-pub impl<T:Copy + FuzzyEq<Matrix2D<T>> + Num> Matrix2D<T> {
+pub impl<T:Copy + FuzzyEq<T> + Num> Matrix2D<T> {
     static pure fn new(m11: T, m12: T, m21: T, m22: T, m31: T, m32: T) -> Matrix2D<T> {
         Matrix2D {
             m11: move m11, m12: move m12,
