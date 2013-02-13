@@ -1,27 +1,19 @@
-use num::Num;
 use cmp::Eq;
 
+#[deriving_eq]
 pub struct Size2D<T> {
     width: T,
     height: T
 }
 
-pub pure fn Size2D<T: Copy Num>(width: T, height: T) -> Size2D<T> {
+pub pure fn Size2D<T: Copy>(width: T, height: T) -> Size2D<T> {
     return Size2D {
         width: width,
         height: height
     }
 }
 
-impl<T:Copy Num> Size2D<T> {
-    pure fn area() -> T { self.width.mul(&self.height) }
+impl<T:Copy + Mul<T,T>> Size2D<T> {
+    pure fn area() -> T { self.width * self.height }
 }
 
-impl<T: Copy Num Eq> Size2D<T>: Eq {
-    pure fn eq(&self, other: &Size2D<T>) -> bool {
-        self.width == other.width && self.height == other.height
-    }
-    pure fn ne(&self, other: &Size2D<T>) -> bool {
-        !self.eq(other)
-    }
-}
