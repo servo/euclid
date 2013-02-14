@@ -62,9 +62,9 @@ impl<T:Add<T,T> + Copy + FuzzyEq<T> + Mul<T,T> + One + Zero> Matrix4<T> {
 
     pure fn scale(&self, x: T, y: T, z: T) -> Matrix4<T> {
         Matrix4(self.m11 * x, self.m12,     self.m13,     self.m14,
-                self.m21,     self.m22 * x, self.m23,     self.m24,
-                self.m31,     self.m32,     self.m33 * x, self.m34,
-                self.m41,     self.m42,     self.m43,     self.m44 * x)
+                self.m21,     self.m22 * y, self.m23,     self.m24,
+                self.m31,     self.m32,     self.m33 * z, self.m34,
+                self.m41,     self.m42,     self.m43,     self.m44)
     }
 
     pure fn to_array() -> [T * 16] {
