@@ -88,7 +88,7 @@ impl<T:Add<T,T> + Copy + FuzzyEq<T> + Mul<T,T> + One + Zero> Matrix4<T> {
 }
 
 pub fn ortho<T:Add<T,T> + Copy + Div<T,T> + FuzzyEq<T> + Mul<T,T> + Neg<T> + NumCast + One +
-               Sub<T,T> Zero>
+               Sub<T,T> + Zero>
         (left: T,
          right: T,
          bottom: T,
