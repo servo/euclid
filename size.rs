@@ -1,4 +1,4 @@
-use cmp::Eq;
+use core::cmp::Eq;
 
 #[deriving_eq]
 pub struct Size2D<T> {
@@ -13,7 +13,7 @@ pub pure fn Size2D<T: Copy>(width: T, height: T) -> Size2D<T> {
     }
 }
 
-impl<T:Copy + Mul<T,T>> Size2D<T> {
-    pure fn area() -> T { self.width * self.height }
+pub impl<T:Copy + Mul<T,T>> Size2D<T> {
+    pure fn area(&self) -> T { self.width * self.height }
 }
 

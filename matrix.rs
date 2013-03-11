@@ -1,5 +1,5 @@
 use std::cmp::FuzzyEq;
-use num::{NumCast, One, Zero, cast};
+use core::num::{NumCast, One, Zero, cast};
 
 pub pure fn Matrix4<T:Add<T,T> + Copy + FuzzyEq<T> + Mul<T,T> + One + Zero>(
         m11: T, m12: T, m13: T, m14: T,
@@ -22,7 +22,7 @@ pub struct Matrix4<T> {
     m41: T, m42: T, m43: T, m44: T,
 }
 
-impl<T:Add<T,T> + Copy + FuzzyEq<T> + Mul<T,T> + One + Zero> Matrix4<T> {
+pub impl<T:Add<T,T> + Copy + FuzzyEq<T> + Mul<T,T> + One + Zero> Matrix4<T> {
     pure fn fuzzy_eq(&self, other: &Matrix4<T>) -> bool {
         self.m11.fuzzy_eq(&other.m11) && self.m12.fuzzy_eq(&other.m12) &&
         self.m13.fuzzy_eq(&other.m13) && self.m14.fuzzy_eq(&other.m14) &&
@@ -67,7 +67,7 @@ impl<T:Add<T,T> + Copy + FuzzyEq<T> + Mul<T,T> + One + Zero> Matrix4<T> {
                 self.m41,     self.m42,     self.m43,     self.m44)
     }
 
-    pure fn to_array() -> [T * 16] {
+    pure fn to_array(&self) -> [T * 16] {
         [
             self.m11, self.m12, self.m13, self.m14,
             self.m21, self.m22, self.m23, self.m24,
@@ -76,7 +76,7 @@ impl<T:Add<T,T> + Copy + FuzzyEq<T> + Mul<T,T> + One + Zero> Matrix4<T> {
         ]
     }
 
-    pure fn translate(x: T, y: T, z: T) -> Matrix4<T> {
+    pure fn translate(&self, x: T, y: T, z: T) -> Matrix4<T> {
         let (_0, _1) = (Zero::zero(), One::one());
         let matrix = Matrix4(_1, _0, _0, _0,
                              _0, _1, _0, _0,

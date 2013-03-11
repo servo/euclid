@@ -1,6 +1,6 @@
 use point::Point2D;
 use size::Size2D;
-use cmp::{Eq, Ord};
+use core::cmp::{Eq, Ord};
 
 #[deriving_eq]
 pub struct Rect<T> {
@@ -17,15 +17,15 @@ pub pure fn Rect<T:Copy + Ord + Add<T,T> + Sub<T,T>>(origin: Point2D<T>,
     }
 }
 
-impl<T: Copy + Ord + Add<T,T> + Sub<T,T>> Rect<T> {
-    pure fn intersects(other: &Rect<T>) -> bool {
+pub impl<T: Copy + Ord + Add<T,T> + Sub<T,T>> Rect<T> {
+    pure fn intersects(&self, other: &Rect<T>) -> bool {
         self.origin.x < other.origin.x + other.size.width &&
        other.origin.x <  self.origin.x + self.size.width &&
         self.origin.y < other.origin.y + other.size.height &&
        other.origin.y <  self.origin.y + self.size.height
     }
 
-    pure fn intersection(other: &Rect<T>) -> Option<Rect<T>> {
+    pure fn intersection(&self, other: &Rect<T>) -> Option<Rect<T>> {
         if !self.intersects(other) {
             return None;
         }
@@ -38,7 +38,7 @@ impl<T: Copy + Ord + Add<T,T> + Sub<T,T>> Rect<T> {
                              other.origin.y + other.size.height))))
     }
 
-    pure fn union(other: &Rect<T>) -> Rect<T> {
+    pure fn union(&self, other: &Rect<T>) -> Rect<T> {
         let upper_left = Point2D(min(self.origin.x, other.origin.x),
                                  min(self.origin.y, other.origin.y));
         
@@ -53,7 +53,7 @@ impl<T: Copy + Ord + Add<T,T> + Sub<T,T>> Rect<T> {
         }
     }
 
-    pure fn translate(other: &Point2D<T>) -> Rect<T> {
+    pure fn translate(&self, other: &Point2D<T>) -> Rect<T> {
         Rect {
             origin: Point2D(self.origin.x + other.x, self.origin.y + other.y),
             size: copy self.size

@@ -1,5 +1,5 @@
 use std::cmp::FuzzyEq;
-use num::{One, Zero};
+use core::num::{One, Zero};
 
 pub struct Matrix2D<T> {
     m11: T, m12: T,
