@@ -128,6 +128,6 @@ pub fn test_ortho() {
                            0.0,  0.0,         -1.0, 0.0,
                            -1.0, -1.22222222, -0.0, 1.0);
     debug!("result=%? expected=%?", result, expected);
-    assert result.fuzzy_eq(&expected);
+    fail_unless!(result.fuzzy_eq(&expected));
 }
 

@@ -1,4 +1,3 @@
-use std::cmp::FuzzyEq;
 use core::num::{One, Zero};
 
 pub struct Matrix2D<T> {
