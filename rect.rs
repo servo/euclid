@@ -2,15 +2,15 @@ use point::Point2D;
 use size::Size2D;
 use core::cmp::{Eq, Ord};
 
-#[deriving_eq]
+#[deriving(Eq)]
 pub struct Rect<T> {
     origin: Point2D<T>,
     size: Size2D<T>,
 }
 
-pub pure fn Rect<T:Copy + Ord + Add<T,T> + Sub<T,T>>(origin: Point2D<T>,
-                                                     size: Size2D<T>)
-                                                  -> Rect<T> {
+pub fn Rect<T:Copy + Ord + Add<T,T> + Sub<T,T>>(origin: Point2D<T>,
+                                                size: Size2D<T>)
+        -> Rect<T> {
     return Rect {
         origin: copy origin,
         size: copy size
@@ -18,14 +18,14 @@ pub pure fn Rect<T:Copy + Ord + Add<T,T> + Sub<T,T>>(origin: Point2D<T>,
 }
 
 pub impl<T: Copy + Ord + Add<T,T> + Sub<T,T>> Rect<T> {
-    pure fn intersects(&self, other: &Rect<T>) -> bool {
+    fn intersects(&self, other: &Rect<T>) -> bool {
         self.origin.x < other.origin.x + other.size.width &&
        other.origin.x <  self.origin.x + self.size.width &&
         self.origin.y < other.origin.y + other.size.height &&
        other.origin.y <  self.origin.y + self.size.height
     }
 
-    pure fn intersection(&self, other: &Rect<T>) -> Option<Rect<T>> {
+    fn intersection(&self, other: &Rect<T>) -> Option<Rect<T>> {
         if !self.intersects(other) {
             return None;
         }
@@ -38,7 +38,7 @@ pub impl<T: Copy + Ord + Add<T,T> + Sub<T,T>> Rect<T> {
                              other.origin.y + other.size.height))))
     }
 
-    pure fn union(&self, other: &Rect<T>) -> Rect<T> {
+    fn union(&self, other: &Rect<T>) -> Rect<T> {
         let upper_left = Point2D(min(self.origin.x, other.origin.x),
                                  min(self.origin.y, other.origin.y));
         
@@ -53,7 +53,7 @@ pub impl<T: Copy + Ord + Add<T,T> + Sub<T,T>> Rect<T> {
         }
     }
 
-    pure fn translate(&self, other: &Point2D<T>) -> Rect<T> {
+    fn translate(&self, other: &Point2D<T>) -> Rect<T> {
         Rect {
             origin: Point2D(self.origin.x + other.x, self.origin.y + other.y),
             size: copy self.size
@@ -61,11 +61,11 @@ pub impl<T: Copy + Ord + Add<T,T> + Sub<T,T>> Rect<T> {
     }
 }
 
-pub pure fn min<T:Copy + Ord>(x: T, y: T) -> T {
+pub fn min<T:Copy + Ord>(x: T, y: T) -> T {
     if x <= y { x } else { y }
 }
 
-pub pure fn max<T:Copy + Ord>(x: T, y: T) -> T {
+pub fn max<T:Copy + Ord>(x: T, y: T) -> T {
     if x >= y { x } else { y }
 }
 

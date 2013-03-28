@@ -1,7 +1,7 @@
 use std::cmp::FuzzyEq;
 use core::num::{NumCast, One, Zero, cast};
 
-pub pure fn Matrix4<T:Add<T,T> + Copy + FuzzyEq<T> + Mul<T,T> + One + Zero>(
+pub fn Matrix4<T:Add<T,T> + Copy + FuzzyEq<T> + Mul<T,T> + One + Zero>(
         m11: T, m12: T, m13: T, m14: T,
         m21: T, m22: T, m23: T, m24: T,
         m31: T, m32: T, m33: T, m34: T,
@@ -23,7 +23,7 @@ pub struct Matrix4<T> {
 }
 
 pub impl<T:Add<T,T> + Copy + FuzzyEq<T> + Mul<T,T> + One + Zero> Matrix4<T> {
-    pure fn fuzzy_eq(&self, other: &Matrix4<T>) -> bool {
+    fn fuzzy_eq(&self, other: &Matrix4<T>) -> bool {
         self.m11.fuzzy_eq(&other.m11) && self.m12.fuzzy_eq(&other.m12) &&
         self.m13.fuzzy_eq(&other.m13) && self.m14.fuzzy_eq(&other.m14) &&
         self.m21.fuzzy_eq(&other.m21) && self.m22.fuzzy_eq(&other.m22) &&
@@ -34,7 +34,7 @@ pub impl<T:Add<T,T> + Copy + FuzzyEq<T> + Mul<T,T> + One + Zero> Matrix4<T> {
         self.m43.fuzzy_eq(&other.m43) && self.m44.fuzzy_eq(&other.m44)
     }
 
-    pure fn mul(&self, m: &Matrix4<T>) -> Matrix4<T> {
+    fn mul(&self, m: &Matrix4<T>) -> Matrix4<T> {
         Matrix4(m.m11*self.m11 + m.m12*self.m21 + m.m13*self.m31 + m.m14*self.m41,
                 m.m11*self.m12 + m.m12*self.m22 + m.m13*self.m32 + m.m14*self.m42,
                 m.m11*self.m13 + m.m12*self.m23 + m.m13*self.m33 + m.m14*self.m43,
@@ -53,21 +53,21 @@ pub impl<T:Add<T,T> + Copy + FuzzyEq<T> + Mul<T,T> + One + Zero> Matrix4<T> {
                 m.m41*self.m14 + m.m42*self.m24 + m.m43*self.m34 + m.m44*self.m44)
     }
 
-    pure fn mul_s(&self, x: T) -> Matrix4<T> {
+    fn mul_s(&self, x: T) -> Matrix4<T> {
         Matrix4(self.m11 * x, self.m12 * x, self.m13 * x, self.m14 * x,
                 self.m21 * x, self.m22 * x, self.m23 * x, self.m24 * x,
                 self.m31 * x, self.m32 * x, self.m33 * x, self.m34 * x,
                 self.m41 * x, self.m42 * x, self.m43 * x, self.m44 * x)
     }
 
-    pure fn scale(&self, x: T, y: T, z: T) -> Matrix4<T> {
+    fn scale(&self, x: T, y: T, z: T) -> Matrix4<T> {
         Matrix4(self.m11 * x, self.m12,     self.m13,     self.m14,
                 self.m21,     self.m22 * y, self.m23,     self.m24,
                 self.m31,     self.m32,     self.m33 * z, self.m34,
                 self.m41,     self.m42,     self.m43,     self.m44)
     }
 
-    pure fn to_array(&self) -> [T * 16] {
+    fn to_array(&self) -> [T, ..16] {
         [
             self.m11, self.m12, self.m13, self.m14,
             self.m21, self.m22, self.m23, self.m24,
@@ -76,7 +76,7 @@ pub impl<T:Add<T,T> + Copy + FuzzyEq<T> + Mul<T,T> + One + Zero> Matrix4<T> {
         ]
     }
 
-    pure fn translate(&self, x: T, y: T, z: T) -> Matrix4<T> {
+    fn translate(&self, x: T, y: T, z: T) -> Matrix4<T> {
         let (_0, _1) = (Zero::zero(), One::one());
         let matrix = Matrix4(_1, _0, _0, _0,
                              _0, _1, _0, _0,
