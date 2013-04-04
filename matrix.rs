@@ -1,5 +1,5 @@
 use std::cmp::FuzzyEq;
-use core::num::{NumCast, One, Zero, cast};
+use core::num::{NumCast, One, Zero};
 
 pub fn Matrix4<T:Add<T,T> + Copy + FuzzyEq<T> + Mul<T,T> + One + Zero>(
         m11: T, m12: T, m13: T, m14: T,
@@ -128,6 +128,6 @@ pub fn test_ortho() {
                            0.0,  0.0,         -1.0, 0.0,
                            -1.0, -1.22222222, -0.0, 1.0);
     debug!("result=%? expected=%?", result, expected);
-    fail_unless!(result.fuzzy_eq(&expected));
+    assert!(result.fuzzy_eq(&expected));
 }
 
