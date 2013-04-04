@@ -71,11 +71,11 @@ pub fn max<T:Copy + Ord>(x: T, y: T) -> T {
 
 #[test]
 fn test_min_max() {
-    fail_unless!(min(0, 1) == 0);
-    fail_unless!(min(-1.0, 0.0) == -1.0);
+    assert!(min(0, 1) == 0);
+    assert!(min(-1.0, 0.0) == -1.0);
 
-    fail_unless!(max(0, 1) == 1);
-    fail_unless!(max(-1.0, 0.0) == 0.0);
+    assert!(max(0, 1) == 1);
+    assert!(max(-1.0, 0.0) == 0.0);
 }
 
 #[test]
@@ -83,19 +83,19 @@ fn test_translate() {
     let p = Rect(Point2D(0, 0), Size2D(50, 40));
     let pp = p.translate(&Point2D(10,15));
 
-    fail_unless!(pp.size.width == 50);
-    fail_unless!(pp.size.height == 40);
-    fail_unless!(pp.origin.x == 10);
-    fail_unless!(pp.origin.y == 15);
+    assert!(pp.size.width == 50);
+    assert!(pp.size.height == 40);
+    assert!(pp.origin.x == 10);
+    assert!(pp.origin.y == 15);
 
 
     let r = Rect(Point2D(-10, -5), Size2D(50, 40));
     let rr = r.translate(&Point2D(0,-10));
 
-    fail_unless!(rr.size.width == 50);
-    fail_unless!(rr.size.height == 40);
-    fail_unless!(rr.origin.x == -10);
-    fail_unless!(rr.origin.y == -15);
+    assert!(rr.size.width == 50);
+    assert!(rr.size.height == 40);
+    assert!(rr.origin.x == -10);
+    assert!(rr.origin.y == -15);
 }
 
 #[test]
@@ -106,15 +106,15 @@ fn test_union() {
     let s = Rect(Point2D(20, -15), Size2D(250, 200));
 
     let pq = p.union(&q);
-    fail_unless!(pq.origin == Point2D(0, 0));
-    fail_unless!(pq.size == Size2D(50, 40));
+    assert!(pq.origin == Point2D(0, 0));
+    assert!(pq.size == Size2D(50, 40));
 
     let pr = p.union(&r);
-    fail_unless!(pr.origin == Point2D(-15, -30));
-    fail_unless!(pr.size == Size2D(200, 70));
+    assert!(pr.origin == Point2D(-15, -30));
+    assert!(pr.size == Size2D(200, 70));
 
     let ps = p.union(&s);
-    fail_unless!(ps.origin == Point2D(0, -15));
-    fail_unless!(ps.size == Size2D(270, 200));
+    assert!(ps.origin == Point2D(0, -15));
+    assert!(ps.size == Size2D(270, 200));
 
 }
