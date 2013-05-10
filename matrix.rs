@@ -7,10 +7,10 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use std::cmp::FuzzyEq;
+use core::cmp::ApproxEq;
 use core::num::{NumCast, One, Zero};
 
-pub fn Matrix4<T:Add<T,T> + Copy + FuzzyEq<T> + Mul<T,T> + One + Zero>(
+pub fn Matrix4<T:Add<T,T> + Copy + ApproxEq<T> + Mul<T,T> + One + Zero>(
         m11: T, m12: T, m13: T, m14: T,
         m21: T, m22: T, m23: T, m24: T,
         m31: T, m32: T, m33: T, m34: T,
@@ -31,16 +31,16 @@ pub struct Matrix4<T> {
     m41: T, m42: T, m43: T, m44: T,
 }
 
-pub impl<T:Add<T,T> + Copy + FuzzyEq<T> + Mul<T,T> + One + Zero> Matrix4<T> {
-    fn fuzzy_eq(&self, other: &Matrix4<T>) -> bool {
-        self.m11.fuzzy_eq(&other.m11) && self.m12.fuzzy_eq(&other.m12) &&
-        self.m13.fuzzy_eq(&other.m13) && self.m14.fuzzy_eq(&other.m14) &&
-        self.m21.fuzzy_eq(&other.m21) && self.m22.fuzzy_eq(&other.m22) &&
-        self.m23.fuzzy_eq(&other.m23) && self.m24.fuzzy_eq(&other.m24) &&
-        self.m31.fuzzy_eq(&other.m31) && self.m32.fuzzy_eq(&other.m32) &&
-        self.m33.fuzzy_eq(&other.m33) && self.m34.fuzzy_eq(&other.m34) &&
-        self.m41.fuzzy_eq(&other.m41) && self.m42.fuzzy_eq(&other.m42) &&
-        self.m43.fuzzy_eq(&other.m43) && self.m44.fuzzy_eq(&other.m44)
+pub impl<T:Add<T,T> + Copy + ApproxEq<T> + Mul<T,T> + One + Zero> Matrix4<T> {
+    fn approx_eq(&self, other: &Matrix4<T>) -> bool {
+        self.m11.approx_eq(&other.m11) && self.m12.approx_eq(&other.m12) &&
+        self.m13.approx_eq(&other.m13) && self.m14.approx_eq(&other.m14) &&
+        self.m21.approx_eq(&other.m21) && self.m22.approx_eq(&other.m22) &&
+        self.m23.approx_eq(&other.m23) && self.m24.approx_eq(&other.m24) &&
+        self.m31.approx_eq(&other.m31) && self.m32.approx_eq(&other.m32) &&
+        self.m33.approx_eq(&other.m33) && self.m34.approx_eq(&other.m34) &&
+        self.m41.approx_eq(&other.m41) && self.m42.approx_eq(&other.m42) &&
+        self.m43.approx_eq(&other.m43) && self.m44.approx_eq(&other.m44)
     }
 
     fn mul(&self, m: &Matrix4<T>) -> Matrix4<T> {
@@ -96,7 +96,7 @@ pub impl<T:Add<T,T> + Copy + FuzzyEq<T> + Mul<T,T> + One + Zero> Matrix4<T> {
     }
 }
 
-pub fn ortho<T:Add<T,T> + Copy + Quot<T,T> + FuzzyEq<T> + Mul<T,T> + Neg<T> + NumCast + One +
+pub fn ortho<T:Add<T,T> + Copy + Div<T,T> + ApproxEq<T> + Mul<T,T> + Neg<T> + NumCast + One +
                Sub<T,T> + Zero>
         (left: T,
          right: T,
@@ -119,7 +119,7 @@ pub fn ortho<T:Add<T,T> + Copy + Quot<T,T> + FuzzyEq<T> + Mul<T,T> + Neg<T> + Nu
             tx,                  ty,                  tz,                 _1)
 }
 
-pub fn identity<T:Add<T,T> + Copy + FuzzyEq<T> + Mul<T,T> + One + Zero>() -> Matrix4<T> {
+pub fn identity<T:Add<T,T> + Copy + ApproxEq<T> + Mul<T,T> + One + Zero>() -> Matrix4<T> {
     let (_0, _1) = (Zero::zero(), One::one());
     Matrix4(_1, _0, _0, _0,
             _0, _1, _0, _0,
@@ -137,6 +137,6 @@ pub fn test_ortho() {
                            0.0,  0.0,         -1.0, 0.0,
                            -1.0, -1.22222222, -0.0, 1.0);
     debug!("result=%? expected=%?", result, expected);
-    assert!(result.fuzzy_eq(&expected));
+    assert!(result.approx_eq(&expected));
 }
 
