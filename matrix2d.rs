@@ -7,7 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use core::num::{One, Zero};
+use std::num::{One, Zero};
 
 pub struct Matrix2D<T> {
     m11: T, m12: T,
@@ -15,8 +15,8 @@ pub struct Matrix2D<T> {
     m31: T, m32: T
 }
 
-pub impl<T:Add<T,T> + Copy + Mul<T,T> + One + Zero> Matrix2D<T> {
-    fn new(m11: T, m12: T, m21: T, m22: T, m31: T, m32: T) -> Matrix2D<T> {
+impl<T:Add<T,T> + Clone + Mul<T,T> + One + Zero> Matrix2D<T> {
+    pub fn new(m11: T, m12: T, m21: T, m22: T, m31: T, m32: T) -> Matrix2D<T> {
         Matrix2D {
             m11: m11, m12: m12,
             m21: m21, m22: m22,
@@ -24,7 +24,7 @@ pub impl<T:Add<T,T> + Copy + Mul<T,T> + One + Zero> Matrix2D<T> {
         }
     }
 
-    fn mul(&self, m: &Matrix2D<T>) -> Matrix2D<T> {
+    pub fn mul(&self, m: &Matrix2D<T>) -> Matrix2D<T> {
         Matrix2D::new(m.m11*self.m11 + m.m12*self.m21,
                       m.m11*self.m12 + m.m12*self.m22,
                       m.m21*self.m11 + m.m22*self.m21,
@@ -33,32 +33,32 @@ pub impl<T:Add<T,T> + Copy + Mul<T,T> + One + Zero> Matrix2D<T> {
                       m.m31*self.m12 + m.m32*self.m22 + self.m32)
     } 
 
-    fn translate(&self, x: T, y: T) -> Matrix2D<T> {
-         let (_0, _1) = (Zero::zero(), One::one());
-         let matrix = Matrix2D::new(_1, _0,
-                                    _0, _1,
+    pub fn translate(&self, x: T, y: T) -> Matrix2D<T> {
+         let (_0, _1): (T, T) = (Zero::zero(), One::one());
+         let matrix = Matrix2D::new(_1.clone(), _0.clone(),
+                                    _0.clone(), _1.clone(),
                                     x, y);
         return self.mul(&matrix);
     }
 
-    fn scale(&self, x: T, y: T) -> Matrix2D<T> {
-        Matrix2D::new(self.m11 * x, self.m12,
-                      self.m21,     self.m22 * y,
-                      self.m31,     self.m32)
+    pub fn scale(&self, x: T, y: T) -> Matrix2D<T> {
+        Matrix2D::new(self.m11 * x,     self.m12.clone(),
+                      self.m21.clone(), self.m22 * y,
+                      self.m31.clone(), self.m32.clone())
     }
 
-    fn identity() -> Matrix2D<T> {
-        let (_0, _1) = (Zero::zero(), One::one());
-        return Matrix2D::new(_1, _0,
-                             _0, _1,
-                             _0, _0);
+    pub fn identity() -> Matrix2D<T> {
+        let (_0, _1): (T, T) = (Zero::zero(), One::one());
+        return Matrix2D::new(_1.clone(), _0.clone(),
+                             _0.clone(), _1.clone(),
+                             _0.clone(), _0.clone());
     }
         
-    fn to_array(&self) -> [T, ..6] {
+    pub fn to_array(&self) -> [T, ..6] {
         [
-            self.m11, self.m12,
-            self.m21, self.m22,
-            self.m31, self.m32
+            self.m11.clone(), self.m12.clone(),
+            self.m21.clone(), self.m22.clone(),
+            self.m31.clone(), self.m32.clone()
         ]
     } 
 

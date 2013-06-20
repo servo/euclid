@@ -7,10 +7,11 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use core::cmp::ApproxEq;
-use core::num::{NumCast, One, Zero};
+use std::cmp::ApproxEq;
+use std::num;
+use std::num::{NumCast, One, Zero};
 
-pub fn Matrix4<T:Add<T,T> + Copy + ApproxEq<T> + Mul<T,T> + One + Zero>(
+pub fn Matrix4<T:Add<T,T> + Clone + ApproxEq<T> + Mul<T,T> + One + Zero>(
         m11: T, m12: T, m13: T, m14: T,
         m21: T, m22: T, m23: T, m24: T,
         m31: T, m32: T, m33: T, m34: T,
@@ -31,8 +32,8 @@ pub struct Matrix4<T> {
     m41: T, m42: T, m43: T, m44: T,
 }
 
-pub impl<T:Add<T,T> + Copy + ApproxEq<T> + Mul<T,T> + One + Zero> Matrix4<T> {
-    fn approx_eq(&self, other: &Matrix4<T>) -> bool {
+impl<T:Add<T,T> + Clone + ApproxEq<T> + Mul<T,T> + One + Zero> Matrix4<T> {
+    pub fn approx_eq(&self, other: &Matrix4<T>) -> bool {
         self.m11.approx_eq(&other.m11) && self.m12.approx_eq(&other.m12) &&
         self.m13.approx_eq(&other.m13) && self.m14.approx_eq(&other.m14) &&
         self.m21.approx_eq(&other.m21) && self.m22.approx_eq(&other.m22) &&
@@ -43,7 +44,7 @@ pub impl<T:Add<T,T> + Copy + ApproxEq<T> + Mul<T,T> + One + Zero> Matrix4<T> {
         self.m43.approx_eq(&other.m43) && self.m44.approx_eq(&other.m44)
     }
 
-    fn mul(&self, m: &Matrix4<T>) -> Matrix4<T> {
+    pub fn mul(&self, m: &Matrix4<T>) -> Matrix4<T> {
         Matrix4(m.m11*self.m11 + m.m12*self.m21 + m.m13*self.m31 + m.m14*self.m41,
                 m.m11*self.m12 + m.m12*self.m22 + m.m13*self.m32 + m.m14*self.m42,
                 m.m11*self.m13 + m.m12*self.m23 + m.m13*self.m33 + m.m14*self.m43,
@@ -62,41 +63,41 @@ pub impl<T:Add<T,T> + Copy + ApproxEq<T> + Mul<T,T> + One + Zero> Matrix4<T> {
                 m.m41*self.m14 + m.m42*self.m24 + m.m43*self.m34 + m.m44*self.m44)
     }
 
-    fn mul_s(&self, x: T) -> Matrix4<T> {
+    pub fn mul_s(&self, x: T) -> Matrix4<T> {
         Matrix4(self.m11 * x, self.m12 * x, self.m13 * x, self.m14 * x,
                 self.m21 * x, self.m22 * x, self.m23 * x, self.m24 * x,
                 self.m31 * x, self.m32 * x, self.m33 * x, self.m34 * x,
                 self.m41 * x, self.m42 * x, self.m43 * x, self.m44 * x)
     }
 
-    fn scale(&self, x: T, y: T, z: T) -> Matrix4<T> {
-        Matrix4(self.m11 * x, self.m12,     self.m13,     self.m14,
-                self.m21,     self.m22 * y, self.m23,     self.m24,
-                self.m31,     self.m32,     self.m33 * z, self.m34,
-                self.m41,     self.m42,     self.m43,     self.m44)
+    pub fn scale(&self, x: T, y: T, z: T) -> Matrix4<T> {
+        Matrix4(self.m11 * x,     self.m12.clone(), self.m13.clone(), self.m14.clone(),
+                self.m21.clone(), self.m22 * y,     self.m23.clone(), self.m24.clone(),
+                self.m31.clone(), self.m32.clone(), self.m33 * z,     self.m34.clone(),
+                self.m41.clone(), self.m42.clone(), self.m43.clone(), self.m44.clone())
     }
 
-    fn to_array(&self) -> [T, ..16] {
+    pub fn to_array(&self) -> [T, ..16] {
         [
-            self.m11, self.m12, self.m13, self.m14,
-            self.m21, self.m22, self.m23, self.m24,
-            self.m31, self.m32, self.m33, self.m34,
-            self.m41, self.m42, self.m43, self.m44
+            self.m11.clone(), self.m12.clone(), self.m13.clone(), self.m14.clone(),
+            self.m21.clone(), self.m22.clone(), self.m23.clone(), self.m24.clone(),
+            self.m31.clone(), self.m32.clone(), self.m33.clone(), self.m34.clone(),
+            self.m41.clone(), self.m42.clone(), self.m43.clone(), self.m44.clone()
         ]
     }
 
-    fn translate(&self, x: T, y: T, z: T) -> Matrix4<T> {
-        let (_0, _1) = (Zero::zero(), One::one());
-        let matrix = Matrix4(_1, _0, _0, _0,
-                             _0, _1, _0, _0,
-                             _0, _0, _1, _0,
-                             x,  y,  z,  _1);
+    pub fn translate(&self, x: T, y: T, z: T) -> Matrix4<T> {
+        let (_0, _1): (T, T) = (Zero::zero(), One::one());
+        let matrix = Matrix4(_1.clone(), _0.clone(), _0.clone(), _0.clone(),
+                             _0.clone(), _1.clone(), _0.clone(), _0.clone(),
+                             _0.clone(), _0.clone(), _1.clone(), _0.clone(),
+                             x,  y,  z,  _1.clone());
 
         return self.mul(&matrix);
     }
 }
 
-pub fn ortho<T:Add<T,T> + Copy + Div<T,T> + ApproxEq<T> + Mul<T,T> + Neg<T> + NumCast + One +
+pub fn ortho<T:Add<T,T> + Clone + Div<T,T> + ApproxEq<T> + Mul<T,T> + Neg<T> + NumCast + One +
                Sub<T,T> + Zero>
         (left: T,
          right: T,
@@ -113,18 +114,18 @@ pub fn ortho<T:Add<T,T> + Copy + Div<T,T> + ApproxEq<T> + Mul<T,T> + Neg<T> + Nu
     let ty = -((top + bottom) / (top - bottom));
     let tz = -((far + near) / (far - near));
 
-    Matrix4(_2 / (right - left), _0,                  _0,                 _0,
-            _0,                  _2 / (top - bottom), _0,                 _0,
-            _0,                  _0,                  -_2 / (far - near), _0,
-            tx,                  ty,                  tz,                 _1)
+    Matrix4(_2 / (right - left), _0.clone(),          _0.clone(),         _0.clone(),
+            _0.clone(),          _2 / (top - bottom), _0.clone(),         _0.clone(),
+            _0.clone(),          _0.clone(),          -_2 / (far - near), _0.clone(),
+            tx,                  ty,                  tz,                 _1.clone())
 }
 
-pub fn identity<T:Add<T,T> + Copy + ApproxEq<T> + Mul<T,T> + One + Zero>() -> Matrix4<T> {
-    let (_0, _1) = (Zero::zero(), One::one());
-    Matrix4(_1, _0, _0, _0,
-            _0, _1, _0, _0,
-            _0, _0, _1, _0,
-            _0, _0, _0, _1)
+pub fn identity<T:Add<T,T> + Clone + ApproxEq<T> + Mul<T,T> + One + Zero>() -> Matrix4<T> {
+    let (_0, _1): (T, T) = (Zero::zero(), One::one());
+    Matrix4(_1.clone(), _0.clone(), _0.clone(), _0.clone(),
+            _0.clone(), _1.clone(), _0.clone(), _0.clone(),
+            _0.clone(), _0.clone(), _1.clone(), _0.clone(),
+            _0.clone(), _0.clone(), _0.clone(), _1.clone())
 }
 
 #[test]

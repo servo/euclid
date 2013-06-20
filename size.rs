@@ -7,22 +7,22 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use core::cmp::Eq;
+use std::cmp::Eq;
 
-#[deriving(Eq)]
+#[deriving(Eq, Clone)]
 pub struct Size2D<T> {
     width: T,
     height: T
 }
 
-pub fn Size2D<T: Copy>(width: T, height: T) -> Size2D<T> {
+pub fn Size2D<T: Clone>(width: T, height: T) -> Size2D<T> {
     return Size2D {
         width: width,
         height: height
     }
 }
 
-pub impl<T:Copy + Mul<T,T>> Size2D<T> {
-    fn area(&self) -> T { self.width * self.height }
+impl<T:Clone + Mul<T,T>> Size2D<T> {
+    pub fn area(&self) -> T { self.width * self.height }
 }
 

@@ -9,47 +9,47 @@
 
 use point::Point2D;
 use size::Size2D;
-use core::cmp::{Eq, Ord};
+use std::cmp::{Eq, Ord};
 
-#[deriving(Eq)]
+#[deriving(Eq, Clone)]
 pub struct Rect<T> {
     origin: Point2D<T>,
     size: Size2D<T>,
 }
 
-pub fn Rect<T:Copy + Ord + Add<T,T> + Sub<T,T>>(origin: Point2D<T>,
-                                                size: Size2D<T>)
+pub fn Rect<T:Clone + Ord + Add<T,T> + Sub<T,T>>(origin: Point2D<T>,
+                                                 size: Size2D<T>)
         -> Rect<T> {
     return Rect {
-        origin: copy origin,
-        size: copy size
+        origin: origin,
+        size: size
     }
 }
 
-pub impl<T: Copy + Ord + Add<T,T> + Sub<T,T>> Rect<T> {
-    fn intersects(&self, other: &Rect<T>) -> bool {
+impl<T: Clone + Ord + Add<T,T> + Sub<T,T>> Rect<T> {
+    pub fn intersects(&self, other: &Rect<T>) -> bool {
         self.origin.x < other.origin.x + other.size.width &&
        other.origin.x <  self.origin.x + self.size.width &&
         self.origin.y < other.origin.y + other.size.height &&
        other.origin.y <  self.origin.y + self.size.height
     }
 
-    fn intersection(&self, other: &Rect<T>) -> Option<Rect<T>> {
+    pub fn intersection(&self, other: &Rect<T>) -> Option<Rect<T>> {
         if !self.intersects(other) {
             return None;
         }
 
-        Some(Rect(Point2D(max(self.origin.x, other.origin.x),
-                          max(self.origin.y, other.origin.y)),
+        Some(Rect(Point2D(max(self.origin.x.clone(), other.origin.x.clone()),
+                          max(self.origin.y.clone(), other.origin.y.clone())),
                   Size2D(min(self.origin.x + self.size.width,
                              other.origin.x + other.size.width),
                          min(self.origin.y + self.size.height,
                              other.origin.y + other.size.height))))
     }
 
-    fn union(&self, other: &Rect<T>) -> Rect<T> {
-        let upper_left = Point2D(min(self.origin.x, other.origin.x),
-                                 min(self.origin.y, other.origin.y));
+    pub fn union(&self, other: &Rect<T>) -> Rect<T> {
+        let upper_left = Point2D(min(self.origin.x.clone(), other.origin.x.clone()),
+                                 min(self.origin.y.clone(), other.origin.y.clone()));
         
         let lower_right = Point2D(max(self.origin.x + self.size.width,
                                       other.origin.x + other.size.width),
@@ -57,24 +57,24 @@ pub impl<T: Copy + Ord + Add<T,T> + Sub<T,T>> Rect<T> {
                                       other.origin.y + other.size.height));
         
         Rect {
-            origin: upper_left,
+            origin: upper_left.clone(),
             size: Size2D(lower_right.x - upper_left.x, lower_right.y - upper_left.y)
         }
     }
 
-    fn translate(&self, other: &Point2D<T>) -> Rect<T> {
+    pub fn translate(&self, other: &Point2D<T>) -> Rect<T> {
         Rect {
             origin: Point2D(self.origin.x + other.x, self.origin.y + other.y),
-            size: copy self.size
+            size: self.size.clone()
         }
     }
 }
 
-pub fn min<T:Copy + Ord>(x: T, y: T) -> T {
+pub fn min<T:Clone + Ord>(x: T, y: T) -> T {
     if x <= y { x } else { y }
 }
 
-pub fn max<T:Copy + Ord>(x: T, y: T) -> T {
+pub fn max<T:Clone + Ord>(x: T, y: T) -> T {
     if x >= y { x } else { y }
 }
 
