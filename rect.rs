@@ -39,12 +39,16 @@ impl<T: Clone + Ord + Add<T,T> + Sub<T,T>> Rect<T> {
             return None;
         }
 
-        Some(Rect(Point2D(max(self.origin.x.clone(), other.origin.x.clone()),
-                          max(self.origin.y.clone(), other.origin.y.clone())),
-                  Size2D(min(self.origin.x + self.size.width,
-                             other.origin.x + other.size.width),
-                         min(self.origin.y + self.size.height,
-                             other.origin.y + other.size.height))))
+        let upper_left = Point2D(max(self.origin.x.clone(), other.origin.x.clone()),
+                                 max(self.origin.y.clone(), other.origin.y.clone()));
+        
+        let lower_right = Point2D(min(self.origin.x + self.size.width,
+                                      other.origin.x + other.size.width),
+                                  min(self.origin.y + self.size.height,
+                                      other.origin.y + other.size.height));
+            
+        Some(Rect(upper_left.clone(), Size2D(lower_right.x - upper_left.x,
+                                             lower_right.y - upper_left.y)))
     }
 
     pub fn union(&self, other: &Rect<T>) -> Rect<T> {
@@ -126,4 +130,26 @@ fn test_union() {
     assert!(ps.origin == Point2D(0, -15));
     assert!(ps.size == Size2D(270, 200));
 
+}
+
+#[test]
+fn test_intersection() {
+    let p = Rect(Point2D(0, 0), Size2D(10, 20));
+    let q = Rect(Point2D(5, 15), Size2D(10, 10));
+    let r = Rect(Point2D(-5, -5), Size2D(8, 8));
+
+    let pq = p.intersection(&q);
+    assert!(pq.is_some());
+    let pq = pq.get();
+    assert!(pq.origin == Point2D(5, 15));
+    assert!(pq.size == Size2D(5, 5));
+    
+    let pr = p.intersection(&r);
+    assert!(pr.is_some());
+    let pr = pr.get();
+    assert!(pr.origin == Point2D(0, 0));
+    assert!(pr.size == Size2D(3, 3));
+
+    let qr = q.intersection(&r);
+    assert!(qr.is_none());
 }
