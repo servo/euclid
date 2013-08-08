@@ -22,7 +22,7 @@ pub struct SideOffsets2D<T> {
     left: T,
 }
 
-impl<T:Num> SideOffsets2D<T> {
+impl<T> SideOffsets2D<T> {
     pub fn new(top: T, right: T, bottom: T, left: T) -> SideOffsets2D<T> {
         SideOffsets2D {
             top: top,
@@ -31,7 +31,9 @@ impl<T:Num> SideOffsets2D<T> {
             left: left,
         }
     }
+}
 
+impl<T:Num> SideOffsets2D<T> {
     pub fn horizontal(&self) -> T {
         self.left + self.right
     }
