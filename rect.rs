@@ -140,13 +140,13 @@ fn test_intersection() {
 
     let pq = p.intersection(&q);
     assert!(pq.is_some());
-    let pq = pq.get();
+    let pq = pq.unwrap();
     assert!(pq.origin == Point2D(5, 15));
     assert!(pq.size == Size2D(5, 5));
     
     let pr = p.intersection(&r);
     assert!(pr.is_some());
-    let pr = pr.get();
+    let pr = pr.unwrap();
     assert!(pr.origin == Point2D(0, 0));
     assert!(pr.size == Size2D(3, 3));
 
