@@ -20,7 +20,7 @@ librustgeom.dummy: geom.rc $(RUST_SRC)
 	touch $@
 
 rustgeom-test: geom.rc $(RUST_SRC)
-	$(RUSTC) $(RUSTFLAGS) $< --out-dir . --test
+	$(RUSTC) $(RUSTFLAGS) $< -o $@ --test
 
 check: rustgeom-test
 	./rustgeom-test
