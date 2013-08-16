@@ -16,11 +16,11 @@ all:	librustgeom.dummy
 	$(CC) $< -o $@ -c $(CFLAGS)
 
 librustgeom.dummy: geom.rc $(RUST_SRC)
-	$(RUSTC) $(RUSTFLAGS) $< -o $@
+	$(RUSTC) $(RUSTFLAGS) $< --out-dir .
 	touch $@
 
 rustgeom-test: geom.rc $(RUST_SRC)
-	$(RUSTC) $(RUSTFLAGS) $< -o $@ --test
+	$(RUSTC) $(RUSTFLAGS) $< --out-dir . --test
 
 check: rustgeom-test
 	./rustgeom-test
