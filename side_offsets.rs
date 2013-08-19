@@ -33,6 +33,12 @@ impl<T> SideOffsets2D<T> {
     }
 }
 
+impl<T:Clone> SideOffsets2D<T> {
+    pub fn new_all_same(all: T) -> SideOffsets2D<T> {
+        SideOffsets2D::new(all.clone(), all.clone(), all.clone(), all.clone())
+    }
+}
+
 impl<T:Num> SideOffsets2D<T> {
     pub fn horizontal(&self) -> T {
         self.left + self.right
