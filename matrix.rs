@@ -106,7 +106,7 @@ pub fn ortho<T:Add<T,T> + Clone + Div<T,T> + ApproxEq<T> + Mul<T,T> + Neg<T> + N
          near: T,
          far: T)
       -> Matrix4<T> {
-    let _2: T = num::cast(2);
+    let _2: T = num::cast(2).unwrap();
     let _1: T = One::one();
     let _0: T = Zero::zero();
 
