@@ -7,10 +7,18 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+use std::fmt;
+
 #[deriving(Eq, Clone)]
 pub struct Point2D<T> {
     x: T,
     y: T
+}
+
+impl<T: fmt::Default> fmt::Default for Point2D<T> {
+    fn fmt(obj: &Point2D<T>, f: &mut fmt::Formatter) {
+        write!(f.buf, "({},{})", obj.x, obj.y);
+    }
 }
 
 pub fn Point2D<T:Clone>(x: T, y: T) -> Point2D<T> {
