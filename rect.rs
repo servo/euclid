@@ -10,11 +10,18 @@
 use point::Point2D;
 use size::Size2D;
 use std::cmp::{Eq, Ord};
+use std::fmt;
 
 #[deriving(Eq, Clone)]
 pub struct Rect<T> {
     origin: Point2D<T>,
     size: Size2D<T>,
+}
+
+impl<T: fmt::Default> fmt::Default for Rect<T> {
+   fn fmt(obj: &Rect<T>, f: &mut fmt::Formatter) {
+        write!(f.buf, "Rect({} at {})", obj.size, obj.origin);
+    }
 }
 
 pub fn Rect<T:Clone + Ord + Add<T,T> + Sub<T,T>>(origin: Point2D<T>,

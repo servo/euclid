@@ -8,11 +8,18 @@
 // except according to those terms.
 
 use std::cmp::Eq;
+use std::fmt;
 
 #[deriving(Eq, Clone)]
 pub struct Size2D<T> {
     width: T,
     height: T
+}
+
+impl<T: fmt::Default> fmt::Default for Size2D<T> {
+    fn fmt(obj: &Size2D<T>, f: &mut fmt::Formatter) {
+        write!(f.buf, "{}×{}", obj.width, obj.height);
+    }
 }
 
 pub fn Size2D<T: Clone>(width: T, height: T) -> Size2D<T> {
