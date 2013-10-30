@@ -27,6 +27,7 @@ pub fn Rect<T:Clone + Ord + Add<T,T> + Sub<T,T>>(origin: Point2D<T>,
 }
 
 impl<T: Clone + Ord + Add<T,T> + Sub<T,T>> Rect<T> {
+    #[inline]
     pub fn intersects(&self, other: &Rect<T>) -> bool {
         self.origin.x < other.origin.x + other.size.width &&
        other.origin.x <  self.origin.x + self.size.width &&
@@ -34,6 +35,7 @@ impl<T: Clone + Ord + Add<T,T> + Sub<T,T>> Rect<T> {
        other.origin.y <  self.origin.y + self.size.height
     }
 
+    #[inline]
     pub fn intersection(&self, other: &Rect<T>) -> Option<Rect<T>> {
         if !self.intersects(other) {
             return None;
@@ -51,6 +53,7 @@ impl<T: Clone + Ord + Add<T,T> + Sub<T,T>> Rect<T> {
                                              lower_right.y - upper_left.y)))
     }
 
+    #[inline]
     pub fn union(&self, other: &Rect<T>) -> Rect<T> {
         let upper_left = Point2D(min(self.origin.x.clone(), other.origin.x.clone()),
                                  min(self.origin.y.clone(), other.origin.y.clone()));
@@ -66,6 +69,7 @@ impl<T: Clone + Ord + Add<T,T> + Sub<T,T>> Rect<T> {
         }
     }
 
+    #[inline]
     pub fn translate(&self, other: &Point2D<T>) -> Rect<T> {
         Rect {
             origin: Point2D(self.origin.x + other.x, self.origin.y + other.y),
