@@ -12,7 +12,7 @@ use size::Size2D;
 use std::cmp::{Eq, Ord};
 use std::fmt;
 
-#[deriving(Eq, Clone)]
+#[deriving(Clone, Decodable, Encodable, Eq)]
 pub struct Rect<T> {
     origin: Point2D<T>,
     size: Size2D<T>,

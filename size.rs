@@ -10,7 +10,7 @@
 use std::cmp::Eq;
 use std::fmt;
 
-#[deriving(Eq, Clone)]
+#[deriving(Clone, Decodable, Encodable, Eq)]
 pub struct Size2D<T> {
     width: T,
     height: T

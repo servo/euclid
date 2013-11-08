@@ -11,6 +11,7 @@
        vers = "0.1")];
 #[crate_type = "lib"];
 
+extern mod extra;
 extern mod std;
 
 pub use matrix::Matrix4;
