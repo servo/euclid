@@ -9,7 +9,7 @@
 
 use std::fmt;
 
-#[deriving(Eq, Clone)]
+#[deriving(Clone, Decodable, Encodable, Eq)]
 pub struct Point2D<T> {
     x: T,
     y: T
