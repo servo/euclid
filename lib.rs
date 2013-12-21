@@ -7,7 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#[link(name = "geom", vers = "0.1")];
+#[crate_id = "github.com/mozilla-servo/rust-geom#geom:0.1"];
 
 extern mod extra;
 extern mod std;
