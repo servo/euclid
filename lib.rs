@@ -9,8 +9,9 @@
 
 #[crate_id = "github.com/mozilla-servo/rust-geom#geom:0.1"];
 
-extern mod extra;
-extern mod std;
+extern crate extra;
+extern crate serialize;
+extern crate std;
 
 pub use matrix::Matrix4;
 pub use matrix2d::Matrix2D;
@@ -19,6 +20,7 @@ pub use rect::Rect;
 pub use side_offsets::SideOffsets2D;
 pub use size::Size2D;
 
+pub mod approxeq;
 pub mod matrix;
 pub mod matrix2d;
 pub mod point;

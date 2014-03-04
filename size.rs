@@ -16,9 +16,9 @@ pub struct Size2D<T> {
     height: T
 }
 
-impl<T: fmt::Default> fmt::Default for Size2D<T> {
-    fn fmt(obj: &Size2D<T>, f: &mut fmt::Formatter) {
-        write!(f.buf, "{}×{}", obj.width, obj.height);
+impl<T: fmt::Show> fmt::Show for Size2D<T> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f.buf, "{}×{}", self.width, self.height)
     }
 }
 

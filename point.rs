@@ -15,9 +15,9 @@ pub struct Point2D<T> {
     y: T
 }
 
-impl<T: fmt::Default> fmt::Default for Point2D<T> {
-    fn fmt(obj: &Point2D<T>, f: &mut fmt::Formatter) {
-        write!(f.buf, "({},{})", obj.x, obj.y);
+impl<T: fmt::Show> fmt::Show for Point2D<T> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result{
+        write!(f.buf, "({},{})", self.x, self.y)
     }
 }
 
