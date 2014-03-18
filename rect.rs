@@ -18,9 +18,9 @@ pub struct Rect<T> {
     size: Size2D<T>,
 }
 
-impl<T: fmt::Default> fmt::Default for Rect<T> {
-   fn fmt(obj: &Rect<T>, f: &mut fmt::Formatter) {
-        write!(f.buf, "Rect({} at {})", obj.size, obj.origin);
+impl<T: fmt::Show> fmt::Show for Rect<T> {
+   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result{
+        write!(f.buf, "Rect({} at {})", self.size, self.origin)
     }
 }
 

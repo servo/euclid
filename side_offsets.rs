@@ -49,6 +49,17 @@ impl<T:Num> SideOffsets2D<T> {
     }
 }
 
+impl<T:Num> Add<SideOffsets2D<T>, SideOffsets2D<T>> for SideOffsets2D<T> {
+    fn add(&self, other: &SideOffsets2D<T>) -> SideOffsets2D<T> {
+        SideOffsets2D {
+            top: self.top + other.top,
+            right: self.right + other.right,
+            bottom: self.bottom + other.bottom,
+            left: self.left + other.left,
+        }
+    }
+}
+
 impl<T:Num> Zero for SideOffsets2D<T> {
     fn zero() -> SideOffsets2D<T> {
         SideOffsets2D {
@@ -63,4 +74,3 @@ impl<T:Num> Zero for SideOffsets2D<T> {
         self.top.is_zero() && self.right.is_zero() && self.bottom.is_zero() && self.left.is_zero()
     }
 }
-
