@@ -9,7 +9,7 @@ RUST_SRC=$(shell find $(VPATH)/. -type f -name '*.rs')
 all:    libgeom.dummy
 
 libgeom.dummy: lib.rs $(RUST_SRC)
-	$(RUSTC) $(RUSTFLAGS) $< --crate-type=lib --out-dir .
+	$(RUSTC) $(RUSTFLAGS) $< --out-dir .
 	touch $@
 
 geom-test: lib.rs $(RUST_SRC)
