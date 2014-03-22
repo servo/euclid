@@ -9,7 +9,9 @@
 
 #[crate_id = "github.com/mozilla-servo/rust-geom#geom:0.1"];
 
-extern crate extra;
+#[feature(phase)];
+#[phase(syntax, link)] extern crate log;
+
 extern crate serialize;
 extern crate std;
 
