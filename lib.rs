@@ -8,6 +8,9 @@
 // except according to those terms.
 
 #[crate_id = "github.com/mozilla-servo/rust-geom#geom:0.1"];
+#[crate_type = "lib"];
+#[crate_type = "dylib"];
+#[crate_type = "rlib"];
 
 #[feature(phase)];
 #[phase(syntax, link)] extern crate log;
