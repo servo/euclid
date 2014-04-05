@@ -26,10 +26,10 @@ pub fn Matrix4<T:Add<T,T> + Clone + ApproxEq<T> + Mul<T,T> + One + Zero>(
 }
 
 pub struct Matrix4<T> {
-    m11: T, m12: T, m13: T, m14: T,
-    m21: T, m22: T, m23: T, m24: T,
-    m31: T, m32: T, m33: T, m34: T,
-    m41: T, m42: T, m43: T, m44: T,
+    pub m11: T, pub m12: T, pub m13: T, pub m14: T,
+    pub m21: T, pub m22: T, pub m23: T, pub m24: T,
+    pub m31: T, pub m32: T, pub m33: T, pub m34: T,
+    pub m41: T, pub m42: T, pub m43: T, pub m44: T,
 }
 
 impl<T:Add<T,T> + Clone + ApproxEq<T> + Mul<T,T> + One + Zero> Matrix4<T> {

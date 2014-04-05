@@ -14,8 +14,8 @@ use std::fmt;
 
 #[deriving(Clone, Decodable, Encodable, Eq)]
 pub struct Rect<T> {
-    origin: Point2D<T>,
-    size: Size2D<T>,
+    pub origin: Point2D<T>,
+    pub size: Size2D<T>,
 }
 
 impl<T: fmt::Show> fmt::Show for Rect<T> {

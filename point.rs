@@ -11,8 +11,8 @@ use std::fmt;
 
 #[deriving(Clone, Decodable, Encodable, Eq)]
 pub struct Point2D<T> {
-    x: T,
-    y: T
+    pub x: T,
+    pub y: T
 }
 
 impl<T: fmt::Show> fmt::Show for Point2D<T> {
