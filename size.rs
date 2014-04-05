@@ -12,8 +12,8 @@ use std::fmt;
 
 #[deriving(Clone, Decodable, Encodable, Eq)]
 pub struct Size2D<T> {
-    width: T,
-    height: T
+    pub width: T,
+    pub height: T
 }
 
 impl<T: fmt::Show> fmt::Show for Size2D<T> {
