@@ -7,14 +7,15 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#[crate_id = "github.com/mozilla-servo/rust-geom#geom:0.1"];
-#[crate_type = "lib"];
-#[crate_type = "dylib"];
-#[crate_type = "rlib"];
+#![crate_id = "github.com/mozilla-servo/rust-geom#geom:0.1"]
+#![crate_type = "lib"]
+#![crate_type = "dylib"]
+#![crate_type = "rlib"]
 
-#[feature(phase)];
-#[phase(syntax, link)] extern crate log;
+#![feature(phase)]
 
+#[phase(syntax, link)]
+extern crate log;
 extern crate serialize;
 extern crate std;
 
