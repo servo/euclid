@@ -16,10 +16,10 @@ use std::num::Zero;
 /// and margins in CSS.
 #[deriving(Clone, Eq)]
 pub struct SideOffsets2D<T> {
-    top: T,
-    right: T,
-    bottom: T,
-    left: T,
+    pub top: T,
+    pub right: T,
+    pub bottom: T,
+    pub left: T,
 }
 
 impl<T> SideOffsets2D<T> {
