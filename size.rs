@@ -10,7 +10,7 @@
 use std::cmp::Eq;
 use std::fmt;
 
-#[deriving(Clone, Decodable, Encodable, Eq)]
+#[deriving(Clone, Decodable, Default, Encodable, Eq)]
 pub struct Size2D<T> {
     pub width: T,
     pub height: T
@@ -19,6 +19,12 @@ pub struct Size2D<T> {
 impl<T: fmt::Show> fmt::Show for Size2D<T> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f.buf, "{}×{}", self.width, self.height)
+    }
+}
+
+impl<T:Clone + Add<T,T>> Add<Size2D<T>, Size2D<T>> for Size2D<T> {
+    fn add(&self, other: &Size2D<T>) -> Size2D<T> {
+        Size2D(self.width + other.width, self.height + other.height)
     }
 }
 

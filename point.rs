@@ -9,7 +9,7 @@
 
 use std::fmt;
 
-#[deriving(Clone, Decodable, Encodable, Eq)]
+#[deriving(Clone, Decodable, Default, Encodable, Eq)]
 pub struct Point2D<T> {
     pub x: T,
     pub y: T
@@ -21,12 +21,12 @@ impl<T: fmt::Show> fmt::Show for Point2D<T> {
     }
 }
 
-pub fn Point2D<T:Clone>(x: T, y: T) -> Point2D<T> {
+pub fn Point2D<T>(x: T, y: T) -> Point2D<T> {
     Point2D {x: x, y: y}
 }
 
 
-impl<T:Clone + Add<T,T>> Add<Point2D<T>, Point2D<T>> for Point2D<T> {
+impl<T:Add<T,T>> Add<Point2D<T>, Point2D<T>> for Point2D<T> {
     fn add(&self, other: &Point2D<T>) -> Point2D<T> {
         Point2D(self.x + other.x, self.y + other.y)
     }
