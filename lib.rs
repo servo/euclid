@@ -12,18 +12,22 @@
 #![crate_type = "dylib"]
 #![crate_type = "rlib"]
 
-#![feature(phase)]
+#![feature(asm, phase, simd)]
 
 #[phase(syntax, link)]
 extern crate log;
 extern crate serialize;
 extern crate std;
 
+extern crate rand;
+extern crate test;
+
 pub use matrix::Matrix4;
 pub use matrix2d::Matrix2D;
 pub use point::Point2D;
 pub use rect::Rect;
 pub use side_offsets::SideOffsets2D;
+pub use side_offsets::SideOffsets2DSimdI32;
 pub use size::Size2D;
 
 pub mod approxeq;
