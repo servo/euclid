@@ -12,7 +12,7 @@ use size::Size2D;
 use std::cmp::{Eq, Ord};
 use std::fmt;
 
-#[deriving(Clone, Decodable, Encodable, Eq)]
+#[deriving(Clone, Decodable, Default, Encodable, Eq)]
 pub struct Rect<T> {
     pub origin: Point2D<T>,
     pub size: Size2D<T>,
@@ -24,8 +24,7 @@ impl<T: fmt::Show> fmt::Show for Rect<T> {
     }
 }
 
-pub fn Rect<T:Clone + Ord + Add<T,T> + Sub<T,T>>(origin: Point2D<T>,
-                                                 size: Size2D<T>)
+pub fn Rect<T:Ord + Add<T,T> + Sub<T,T>>(origin: Point2D<T>, size: Size2D<T>)
         -> Rect<T> {
     return Rect {
         origin: origin,
@@ -33,7 +32,7 @@ pub fn Rect<T:Clone + Ord + Add<T,T> + Sub<T,T>>(origin: Point2D<T>,
     }
 }
 
-impl<T: Clone + Ord + Add<T,T> + Sub<T,T>> Rect<T> {
+impl<T:Clone + Ord + Add<T,T> + Sub<T,T>> Rect<T> {
     #[inline]
     pub fn intersects(&self, other: &Rect<T>) -> bool {
         self.origin.x < other.origin.x + other.size.width &&

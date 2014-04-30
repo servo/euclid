@@ -10,11 +10,9 @@
 //! A group of side offsets, which correspond to top/left/bottom/right for borders, padding,
 //! and margins in CSS.
 
-use std::num::Zero;
-
 /// A group of side offsets, which correspond to top/left/bottom/right for borders, padding,
 /// and margins in CSS.
-#[deriving(Clone, Eq)]
+#[deriving(Clone, Default, Eq, Zero)]
 pub struct SideOffsets2D<T> {
     pub top: T,
     pub right: T,
@@ -49,7 +47,7 @@ impl<T:Num> SideOffsets2D<T> {
     }
 }
 
-impl<T:Num> Add<SideOffsets2D<T>, SideOffsets2D<T>> for SideOffsets2D<T> {
+impl<T:Add<T,T>> Add<SideOffsets2D<T>, SideOffsets2D<T>> for SideOffsets2D<T> {
     fn add(&self, other: &SideOffsets2D<T>) -> SideOffsets2D<T> {
         SideOffsets2D {
             top: self.top + other.top,
@@ -60,17 +58,3 @@ impl<T:Num> Add<SideOffsets2D<T>, SideOffsets2D<T>> for SideOffsets2D<T> {
     }
 }
 
-impl<T:Num> Zero for SideOffsets2D<T> {
-    fn zero() -> SideOffsets2D<T> {
-        SideOffsets2D {
-            top: Zero::zero(),
-            right: Zero::zero(),
-            bottom: Zero::zero(),
-            left: Zero::zero(),
-        }
-    }
-
-    fn is_zero(&self) -> bool {
-        self.top.is_zero() && self.right.is_zero() && self.bottom.is_zero() && self.left.is_zero()
-    }
-}
