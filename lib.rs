@@ -12,7 +12,7 @@
 #![crate_type = "dylib"]
 #![crate_type = "rlib"]
 
-#![feature(phase, simd)]
+#![feature(asm, phase, simd)]
 
 #[phase(syntax, link)]
 extern crate log;
