@@ -74,3 +74,66 @@ impl<T:Num> Zero for SideOffsets2D<T> {
         self.top.is_zero() && self.right.is_zero() && self.bottom.is_zero() && self.left.is_zero()
     }
 }
+
+/// A SIMD enabled version of SideOffsets2D specialized for i32.
+#[deriving(Clone, Eq)]
+#[simd]
+pub struct SideOffsets2DSimdI32 {
+    pub top: i32,
+    pub bottom: i32,
+    pub right: i32,
+    pub left: i32,
+}
+
+impl SideOffsets2DSimdI32 {
+    pub fn new(top: i32, right: i32, bottom: i32, left: i32) -> SideOffsets2DSimdI32 {
+        SideOffsets2DSimdI32 {
+            top: top,
+            bottom: bottom,
+            right: right,
+            left: left,
+        }
+    }
+}
+
+impl SideOffsets2DSimdI32 {
+    pub fn new_all_same(all: i32) -> SideOffsets2DSimdI32 {
+        SideOffsets2DSimdI32::new(all.clone(), all.clone(), all.clone(), all.clone())
+    }
+}
+
+impl SideOffsets2DSimdI32 {
+    pub fn horizontal(&self) -> i32 {
+        self.left + self.right
+    }
+
+    pub fn vertical(&self) -> i32 {
+        self.top + self.bottom
+    }
+}
+
+impl Add<SideOffsets2DSimdI32, SideOffsets2DSimdI32> for SideOffsets2DSimdI32 {
+    fn add(&self, other: &SideOffsets2DSimdI32) -> SideOffsets2DSimdI32 {
+        SideOffsets2DSimdI32 {
+            top: self.top + other.top,
+            right: self.right + other.right,
+            bottom: self.bottom + other.bottom,
+            left: self.left + other.left,
+        }
+    }
+}
+
+impl Zero for SideOffsets2DSimdI32 {
+    fn zero() -> SideOffsets2DSimdI32 {
+        SideOffsets2DSimdI32 {
+            top: Zero::zero(),
+            bottom: Zero::zero(),
+            right: Zero::zero(),
+            left: Zero::zero(),
+        }
+    }
+
+    fn is_zero(&self) -> bool {
+        self.top.is_zero() && self.right.is_zero() && self.bottom.is_zero() && self.left.is_zero()
+    }
+}
