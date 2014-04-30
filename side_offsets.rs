@@ -114,12 +114,7 @@ impl SideOffsets2DSimdI32 {
 
 impl Add<SideOffsets2DSimdI32, SideOffsets2DSimdI32> for SideOffsets2DSimdI32 {
     fn add(&self, other: &SideOffsets2DSimdI32) -> SideOffsets2DSimdI32 {
-        SideOffsets2DSimdI32 {
-            top: self.top + other.top,
-            right: self.right + other.right,
-            bottom: self.bottom + other.bottom,
-            left: self.left + other.left,
-        }
+        *self + *other // Use SIMD addition
     }
 }
 
@@ -195,5 +190,25 @@ mod bench {
     fn bench_is_zero(bh: &mut BenchHarness) {
         let mut rng = XorShiftRng::new().unwrap();
         bh.iter(|| rng.gen::<SideOffsets2DSimdI32>().is_zero())
+    }
+
+    #[bench]
+    fn bench_naive_add(bh: &mut BenchHarness) {
+        fn add(x: &SideOffsets2DSimdI32, y: &SideOffsets2DSimdI32) -> SideOffsets2DSimdI32 {
+            SideOffsets2DSimdI32 {
+                top: x.top + y.top,
+                right: x.right + y.right,
+                bottom: x.bottom + y.bottom,
+                left: x.left + y.left,
+            }
+        }
+        let mut rng = XorShiftRng::new().unwrap();
+        bh.iter(|| add(&rng.gen::<SideOffsets2DSimdI32>(), &rng.gen::<SideOffsets2DSimdI32>()))
+    }
+
+    #[bench]
+    fn bench_add(bh: &mut BenchHarness) {
+        let mut rng = XorShiftRng::new().unwrap();
+        bh.iter(|| rng.gen::<SideOffsets2DSimdI32>() + rng.gen::<SideOffsets2DSimdI32>())
     }
 }
