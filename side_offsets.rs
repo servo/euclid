@@ -86,6 +86,7 @@ pub struct SideOffsets2DSimdI32 {
 }
 
 impl SideOffsets2DSimdI32 {
+    #[inline]
     pub fn new(top: i32, right: i32, bottom: i32, left: i32) -> SideOffsets2DSimdI32 {
         SideOffsets2DSimdI32 {
             top: top,
@@ -97,28 +98,33 @@ impl SideOffsets2DSimdI32 {
 }
 
 impl SideOffsets2DSimdI32 {
+    #[inline]
     pub fn new_all_same(all: i32) -> SideOffsets2DSimdI32 {
         SideOffsets2DSimdI32::new(all.clone(), all.clone(), all.clone(), all.clone())
     }
 }
 
 impl SideOffsets2DSimdI32 {
+    #[inline]
     pub fn horizontal(&self) -> i32 {
         self.left + self.right
     }
 
+    #[inline]
     pub fn vertical(&self) -> i32 {
         self.top + self.bottom
     }
 }
 
 impl Add<SideOffsets2DSimdI32, SideOffsets2DSimdI32> for SideOffsets2DSimdI32 {
+    #[inline]
     fn add(&self, other: &SideOffsets2DSimdI32) -> SideOffsets2DSimdI32 {
         *self + *other // Use SIMD addition
     }
 }
 
 impl Zero for SideOffsets2DSimdI32 {
+    #[inline]
     fn zero() -> SideOffsets2DSimdI32 {
         SideOffsets2DSimdI32 {
             top: Zero::zero(),
@@ -129,6 +135,7 @@ impl Zero for SideOffsets2DSimdI32 {
     }
 
     #[cfg(not(target_arch = "x86"), not(target_arch = "x86_64"))]
+    #[inline]
     fn is_zero(&self) -> bool {
         self.top.is_zero() && self.right.is_zero() && self.bottom.is_zero() && self.left.is_zero()
     }
