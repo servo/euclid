@@ -7,6 +7,8 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+use length::Length;
+
 use point::Point2D;
 use size::Size2D;
 use std::cmp::{Eq, Ord};
@@ -177,3 +179,20 @@ fn test_intersection() {
     let qr = q.intersection(&r);
     assert!(qr.is_none());
 }
+
+// Convenient aliases for Rect with typed units
+//
+pub type TypedRect<Unit, T> = Rect<Length<Unit, T>>;
+
+impl<Unit, T: Clone> Rect<Length<Unit, T>> {
+    /// Drop the units, preserving only the numeric value.
+    pub fn to_untyped(&self) -> Rect<T> {
+        Rect(self.origin.to_untyped(), self.size.to_untyped())
+    }
+
+    /// Tag a unitless value with units.
+    pub fn from_untyped(r: &Rect<T>) -> TypedRect<Unit, T> {
+        Rect(Point2D::from_untyped(&r.origin), Size2D::from_untyped(&r.size))
+    }
+}
+
