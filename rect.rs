@@ -11,6 +11,7 @@ use point::Point2D;
 use size::Size2D;
 use std::cmp::{Eq, Ord};
 use std::fmt;
+use std::num::Zero;
 
 #[deriving(Clone, Decodable, Encodable, Eq)]
 pub struct Rect<T> {
@@ -84,6 +85,20 @@ impl<T: Clone + Ord + Add<T,T> + Sub<T,T>> Rect<T> {
         }
     }
 }
+
+impl<T:Clone + Zero> Rect<T> {
+    pub fn zero() -> Rect<T> {
+        Rect {
+            origin: Zero::zero(),
+            size: Size2D::zero(),
+        }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.size.is_empty()
+    }
+}
+
 
 pub fn min<T:Clone + Ord>(x: T, y: T) -> T {
     if x <= y { x } else { y }
