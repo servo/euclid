@@ -20,7 +20,7 @@ pub struct Rect<T> {
 }
 
 impl<T: fmt::Show> fmt::Show for Rect<T> {
-   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result{
+   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f.buf, "Rect({} at {})", self.size, self.origin)
     }
 }
@@ -28,7 +28,7 @@ impl<T: fmt::Show> fmt::Show for Rect<T> {
 pub fn Rect<T:Clone + Ord + Add<T,T> + Sub<T,T>>(origin: Point2D<T>,
                                                  size: Size2D<T>)
         -> Rect<T> {
-    return Rect {
+    Rect {
         origin: origin,
         size: size
     }

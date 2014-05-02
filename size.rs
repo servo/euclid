@@ -24,7 +24,7 @@ impl<T: fmt::Show> fmt::Show for Size2D<T> {
 }
 
 pub fn Size2D<T: Clone>(width: T, height: T) -> Size2D<T> {
-    return Size2D {
+    Size2D {
         width: width,
         height: height
     }
