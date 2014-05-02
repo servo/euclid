@@ -24,14 +24,14 @@ impl<T: fmt::Show> fmt::Show for Size2D<T> {
 }
 
 pub fn Size2D<T: Clone>(width: T, height: T) -> Size2D<T> {
-    return Size2D {
+    Size2D {
         width: width,
         height: height
     }
 }
 
-impl<T:Clone + Mul<T,T>> Size2D<T> {
-    pub fn area(&self) -> T { self.width * self.height }
+impl<T:Clone + Mul<T,U>, U> Size2D<T> {
+    pub fn area(&self) -> U { self.width * self.height }
 }
 
 impl<T:Clone + Zero> Size2D<T> {
