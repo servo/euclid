@@ -25,9 +25,7 @@ impl<T: fmt::Show> fmt::Show for Rect<T> {
     }
 }
 
-pub fn Rect<T:Clone + Ord + Add<T,T> + Sub<T,T>>(origin: Point2D<T>,
-                                                 size: Size2D<T>)
-        -> Rect<T> {
+pub fn Rect<T:Clone>(origin: Point2D<T>, size: Size2D<T>) -> Rect<T> {
     Rect {
         origin: origin,
         size: size

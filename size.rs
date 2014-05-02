@@ -30,8 +30,8 @@ pub fn Size2D<T: Clone>(width: T, height: T) -> Size2D<T> {
     }
 }
 
-impl<T:Clone + Mul<T,T>> Size2D<T> {
-    pub fn area(&self) -> T { self.width * self.height }
+impl<T:Clone + Mul<T,U>, U> Size2D<T> {
+    pub fn area(&self) -> U { self.width * self.height }
 }
 
 impl<T:Clone + Zero> Size2D<T> {
