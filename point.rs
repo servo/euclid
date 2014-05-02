@@ -8,11 +8,22 @@
 // except according to those terms.
 
 use std::fmt;
+use std::num::Zero;
 
 #[deriving(Clone, Decodable, Encodable, Eq)]
 pub struct Point2D<T> {
     pub x: T,
     pub y: T
+}
+
+impl<T: Zero + Clone> Zero for Point2D<T> {
+    fn zero() -> Point2D<T> {
+        Point2D { x: Zero::zero(), y: Zero::zero() }
+    }
+
+    fn is_zero(&self) -> bool {
+        self.x.is_zero() && self.y.is_zero()
+    }
 }
 
 impl<T: fmt::Show> fmt::Show for Point2D<T> {

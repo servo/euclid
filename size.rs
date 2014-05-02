@@ -9,6 +9,7 @@
 
 use std::cmp::Eq;
 use std::fmt;
+use std::num::Zero;
 
 #[deriving(Clone, Decodable, Encodable, Eq)]
 pub struct Size2D<T> {
@@ -33,3 +34,15 @@ impl<T:Clone + Mul<T,T>> Size2D<T> {
     pub fn area(&self) -> T { self.width * self.height }
 }
 
+impl<T:Clone + Zero> Size2D<T> {
+    pub fn zero() -> Size2D<T> {
+        Size2D {
+            width: Zero::zero(),
+            height: Zero::zero(),
+        }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.width.is_zero() || self.height.is_zero()
+    }
+}
