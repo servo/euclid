@@ -108,6 +108,20 @@ pub fn max<T:Clone + Ord>(x: T, y: T) -> T {
     if x >= y { x } else { y }
 }
 
+impl<Scale, T0: Mul<Scale, T1>, T1: Clone> Mul<Scale, Rect<T1>> for Rect<T0> {
+    #[inline]
+    fn mul(&self, scale: &Scale) -> Rect<T1> {
+        Rect(self.origin * *scale, self.size * *scale)
+    }
+}
+
+impl<Scale, T0: Div<Scale, T1>, T1: Clone> Div<Scale, Rect<T1>> for Rect<T0> {
+    #[inline]
+    fn div(&self, scale: &Scale) -> Rect<T1> {
+        Rect(self.origin / *scale, self.size / *scale)
+    }
+}
+
 // Convenient aliases for Rect with typed units
 pub type TypedRect<Unit, T> = Rect<Length<Unit, T>>;
 
@@ -120,6 +134,27 @@ impl<Unit, T: Clone> Rect<Length<Unit, T>> {
     /// Tag a unitless value with units.
     pub fn from_untyped(r: &Rect<T>) -> TypedRect<Unit, T> {
         Rect(Point2D::from_untyped(&r.origin), Size2D::from_untyped(&r.size))
+    }
+}
+
+impl<Unit, T0: NumCast + Clone, T1: NumCast + Clone> Rect<Length<Unit, T0>> {
+    /// Cast from one numeric representation to another, preserving the units.
+    pub fn cast(&self) -> Option<Rect<Length<Unit, T1>>> {
+        match (self.origin.cast(), self.size.cast()) {
+            (Some(origin), Some(size)) => Some(Rect(origin, size)),
+            _ => None
+        }
+    }
+}
+
+// Convenience functions for common casts
+impl<Unit, T: NumCast + Clone> Rect<Length<Unit, T>> {
+    pub fn as_f32(&self) -> Rect<Length<Unit, f32>> {
+        self.cast().unwrap()
+    }
+
+    pub fn as_uint(&self) -> Rect<Length<Unit, uint>> {
+        self.cast().unwrap()
     }
 }
 
