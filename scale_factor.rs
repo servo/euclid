@@ -25,7 +25,7 @@
 /// let l0: Length<Inch, f32> = Length(12.0);
 /// let l1: Length<Mm, f32> = one_foot * mm_per_inch;
 /// ```
-#[deriving(Clone, Decodable, Encodable, Eq)]
+#[deriving(Clone, Decodable, Encodable)]
 pub struct ScaleFactor<Src, Dst>(pub f32);
 
 // *scale
@@ -66,4 +66,11 @@ impl<Src, Dst> Sub<ScaleFactor<Src, Dst>, ScaleFactor<Src, Dst>> for ScaleFactor
     fn sub(&self, other: &ScaleFactor<Src, Dst>) -> ScaleFactor<Src, Dst> {
         ScaleFactor(**self - **other)
     }
+}
+
+// FIXME: Switch to `deriving(Eq)` after this Rust issue is fixed:
+// https://github.com/mozilla/rust/issues/7671
+
+impl<Src, Dst> Eq for ScaleFactor<Src, Dst> {
+    fn eq(&self, other: &ScaleFactor<Src, Dst>) -> bool { (**self).eq(&**other) }
 }
