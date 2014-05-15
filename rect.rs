@@ -108,6 +108,21 @@ pub fn max<T:Clone + Ord>(x: T, y: T) -> T {
     if x >= y { x } else { y }
 }
 
+// Convenient aliases for Rect with typed units
+pub type TypedRect<Unit, T> = Rect<Length<Unit, T>>;
+
+impl<Unit, T: Clone> Rect<Length<Unit, T>> {
+    /// Drop the units, preserving only the numeric value.
+    pub fn to_untyped(&self) -> Rect<T> {
+        Rect(self.origin.to_untyped(), self.size.to_untyped())
+    }
+
+    /// Tag a unitless value with units.
+    pub fn from_untyped(r: &Rect<T>) -> TypedRect<Unit, T> {
+        Rect(Point2D::from_untyped(&r.origin), Size2D::from_untyped(&r.size))
+    }
+}
+
 #[test]
 fn test_min_max() {
     assert!(min(0, 1) == 0);
@@ -169,7 +184,7 @@ fn test_intersection() {
     let pq = pq.unwrap();
     assert!(pq.origin == Point2D(5, 15));
     assert!(pq.size == Size2D(5, 5));
-    
+
     let pr = p.intersection(&r);
     assert!(pr.is_some());
     let pr = pr.unwrap();
@@ -179,20 +194,3 @@ fn test_intersection() {
     let qr = q.intersection(&r);
     assert!(qr.is_none());
 }
-
-// Convenient aliases for Rect with typed units
-//
-pub type TypedRect<Unit, T> = Rect<Length<Unit, T>>;
-
-impl<Unit, T: Clone> Rect<Length<Unit, T>> {
-    /// Drop the units, preserving only the numeric value.
-    pub fn to_untyped(&self) -> Rect<T> {
-        Rect(self.origin.to_untyped(), self.size.to_untyped())
-    }
-
-    /// Tag a unitless value with units.
-    pub fn from_untyped(r: &Rect<T>) -> TypedRect<Unit, T> {
-        Rect(Point2D::from_untyped(&r.origin), Size2D::from_untyped(&r.size))
-    }
-}
-
