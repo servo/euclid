@@ -10,7 +10,7 @@
 
 use scale_factor::ScaleFactor;
 
-use std::num::cast;
+use std::num::{cast, Zero};
 
 /// A one-dimensional distance, with value represented by `T` and unit of measurement `Unit`.
 ///
@@ -23,7 +23,7 @@ use std::num::cast;
 ///
 /// You can multiply a Length by a `scale_factor::ScaleFactor` to convert it from one unit to
 /// another.  See the ScaleFactor docs for an example.
-#[deriving(Decodable, Encodable, Zero)]
+#[deriving(Decodable, Encodable, Show)]
 pub struct Length<Unit, T>(pub T);
 
 // *length
@@ -72,7 +72,7 @@ impl<Unit, T0: NumCast + Clone, T1: NumCast + Clone> Length<Unit, T0> {
     }
 }
 
-// FIXME: Switch to `deriving(Clone, Eq, Ord)` after this Rust issue is fixed:
+// FIXME: Switch to `deriving(Clone, Eq, Ord, Zero)` after this Rust issue is fixed:
 // https://github.com/mozilla/rust/issues/7671
 
 impl<Unit, T: Clone> Clone for Length<Unit, T> {
@@ -96,4 +96,62 @@ impl<Unit, T: TotalEq> TotalEq for Length<Unit, T> {}
 
 impl<Unit, T: TotalOrd> TotalOrd for Length<Unit, T> {
     fn cmp(&self, other: &Length<Unit, T>) -> Ordering { (**self).cmp(&**other) }
+}
+
+impl<Unit, T: Zero> Zero for Length<Unit, T> {
+    fn zero() -> Length<Unit, T> {
+        Length(Zero::zero())
+    }
+
+    fn is_zero(&self) -> bool {
+        (**self).is_zero()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Length;
+    use scale_factor::ScaleFactor;
+    use std::num::Zero;
+
+    #[deriving(Show)]
+    enum Inch {}
+    #[deriving(Show)]
+    enum Mm {}
+
+    #[test]
+    fn test_length() {
+        let mm_per_inch: ScaleFactor<Inch, Mm> = ScaleFactor(25.4);
+
+        let one_foot: Length<Inch, f32> = Length(12.0);
+        let two_feet = one_foot + one_foot;
+        let zero_feet = one_foot - one_foot;
+
+        assert_eq!(*one_foot, 12.0);
+        assert_eq!(*two_feet, 24.0);
+        assert!(zero_feet.is_zero());
+
+        assert!(one_foot == one_foot);
+        assert!(two_feet != one_foot);
+
+        assert!(zero_feet <  one_foot);
+        assert!(zero_feet <= one_foot);
+        assert!(two_feet  >  one_foot);
+        assert!(two_feet  >= one_foot);
+
+        assert!(  two_feet <= two_feet);
+        assert!(  two_feet >= two_feet);
+        assert!(!(two_feet >  two_feet));
+        assert!(!(two_feet <  two_feet));
+
+        let one_foot_in_mm: Length<Mm, f32> = one_foot * mm_per_inch;
+
+        assert_eq!(*one_foot_in_mm, 304.8);
+
+        let back_to_inches: Length<Inch, f32> = one_foot_in_mm / mm_per_inch;
+        assert_eq!(one_foot, back_to_inches);
+
+        let int_foot: Length<Inch, int> = one_foot.cast().unwrap();
+        assert_eq!(*int_foot, 12);
+    }
 }

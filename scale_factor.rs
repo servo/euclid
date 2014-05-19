@@ -22,8 +22,8 @@
 ///
 /// let mm_per_inch: ScaleFactor<Inch, Mm> = ScaleFactor(25.4);
 ///
-/// let l0: Length<Inch, f32> = Length(12.0);
-/// let l1: Length<Mm, f32> = one_foot * mm_per_inch;
+/// let one_foot: Length<Inch, f32> = Length(12.0);
+/// let one_foot_in_mm: Length<Mm, f32> = one_foot * mm_per_inch;
 /// ```
 #[deriving(Clone, Decodable, Encodable)]
 pub struct ScaleFactor<Src, Dst>(pub f32);
