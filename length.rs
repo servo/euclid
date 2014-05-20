@@ -14,9 +14,9 @@ use std::num::{cast, Zero};
 
 /// A one-dimensional distance, with value represented by `T` and unit of measurement `Unit`.
 ///
-/// `T` can be any numerical type, for example a primitive type like uint64 or f32.
+/// `T` can be any numeric type, for example a primitive type like u64 or f32.
 ///
-/// `Unit` is not used in the representation of a Length value. It is used only at compile-time
+/// `Unit` is not used in the representation of a Length value. It is used only at compile time
 /// to ensure that a Length stored with one unit is converted explicitly before being used in an
 /// expression that requires a different unit.  It may be a type without values, such as an empty
 /// enum.
