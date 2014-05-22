@@ -28,19 +28,16 @@
 #[deriving(Clone, Decodable, Encodable)]
 pub struct ScaleFactor<Src, Dst>(pub f32);
 
-// *scale
-impl<Src, Dst> Deref<f32> for ScaleFactor<Src, Dst> {
-    fn deref<'a>(&'a self) -> &'a f32 {
-        match *self {
-            ScaleFactor(ref x) => x
+impl<Src, Dst> ScaleFactor<Src, Dst> {
+    pub fn get(self) -> f32 {
+        match self {
+            ScaleFactor(x) => x
         }
     }
-}
 
-impl<Src, Dst> ScaleFactor<Src, Dst> {
     /// The inverse ScaleFactor (1.0 / self).
     pub fn inv(&self) -> ScaleFactor<Dst, Src> {
-        ScaleFactor(1.0 / **self)
+        ScaleFactor(1.0 / self.get())
     }
 }
 
@@ -48,7 +45,7 @@ impl<Src, Dst> ScaleFactor<Src, Dst> {
 impl<A,B,C> Mul<ScaleFactor<B, C>, ScaleFactor<A, C>> for ScaleFactor<A, B> {
     #[inline]
     fn mul(&self, other: &ScaleFactor<B, C>) -> ScaleFactor<A, C> {
-        ScaleFactor(**self * **other)
+        ScaleFactor(self.get() * other.get())
     }
 }
 
@@ -56,7 +53,7 @@ impl<A,B,C> Mul<ScaleFactor<B, C>, ScaleFactor<A, C>> for ScaleFactor<A, B> {
 impl<Src, Dst> Add<ScaleFactor<Src, Dst>, ScaleFactor<Src, Dst>> for ScaleFactor<Src, Dst> {
     #[inline]
     fn add(&self, other: &ScaleFactor<Src, Dst>) -> ScaleFactor<Src, Dst> {
-        ScaleFactor(**self + **other)
+        ScaleFactor(self.get() + other.get())
     }
 }
 
@@ -64,7 +61,7 @@ impl<Src, Dst> Add<ScaleFactor<Src, Dst>, ScaleFactor<Src, Dst>> for ScaleFactor
 impl<Src, Dst> Sub<ScaleFactor<Src, Dst>, ScaleFactor<Src, Dst>> for ScaleFactor<Src, Dst> {
     #[inline]
     fn sub(&self, other: &ScaleFactor<Src, Dst>) -> ScaleFactor<Src, Dst> {
-        ScaleFactor(**self - **other)
+        ScaleFactor(self.get() - other.get())
     }
 }
 
@@ -72,5 +69,7 @@ impl<Src, Dst> Sub<ScaleFactor<Src, Dst>, ScaleFactor<Src, Dst>> for ScaleFactor
 // https://github.com/mozilla/rust/issues/7671
 
 impl<Src, Dst> Eq for ScaleFactor<Src, Dst> {
-    fn eq(&self, other: &ScaleFactor<Src, Dst>) -> bool { (**self).eq(&**other) }
+    fn eq(&self, other: &ScaleFactor<Src, Dst>) -> bool {
+        self.get().eq(&other.get())
+    }
 }

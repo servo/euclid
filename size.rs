@@ -74,7 +74,7 @@ pub fn TypedSize2D<Unit, T: Clone>(width: T, height: T) -> TypedSize2D<Unit, T> 
 impl<Unit, T: Clone> Size2D<Length<Unit, T>> {
     /// Drop the units, preserving only the numeric value.
     pub fn to_untyped(&self) -> Size2D<T> {
-        Size2D((*(self.width)).clone(), (*(self.height)).clone())
+        Size2D(self.width.get(), self.height.get())
     }
 
     /// Tag a unitless value with units.

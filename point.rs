@@ -76,7 +76,7 @@ pub fn TypedPoint2D<Unit, T: Clone>(x: T, y: T) -> TypedPoint2D<Unit, T> {
 impl<Unit, T: Clone> Point2D<Length<Unit, T>> {
     /// Drop the units, preserving only the numeric value.
     pub fn to_untyped(&self) -> Point2D<T> {
-        Point2D((*(self.x)).clone(), (*(self.y)).clone())
+        Point2D(self.x.get(), self.y.get())
     }
 
     /// Tag a unitless value with units.

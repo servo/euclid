@@ -26,49 +26,48 @@ use std::num::{cast, Zero};
 #[deriving(Decodable, Encodable, Show)]
 pub struct Length<Unit, T>(pub T);
 
-// *length
-impl<Unit, T> Deref<T> for Length<Unit, T> {
-    fn deref<'a>(&'a self) -> &'a T {
+impl<Unit, T: Clone> Length<Unit, T> {
+    pub fn get(&self) -> T {
         match *self {
-            Length(ref x) => x
+            Length(ref x) => x.clone()
         }
     }
 }
 
 // length + length
-impl<U, T: Add<T, T>> Add<Length<U, T>, Length<U, T>> for Length<U, T> {
+impl<U, T: Clone + Add<T, T>> Add<Length<U, T>, Length<U, T>> for Length<U, T> {
     fn add(&self, other: &Length<U, T>) -> Length<U, T> {
-        Length(**self + **other)
+        Length(self.get() + other.get())
     }
 }
 
 // length - length
-impl<U, T: Sub<T, T>> Sub<Length<U, T>, Length<U, T>> for Length<U, T> {
+impl<U, T: Clone + Sub<T, T>> Sub<Length<U, T>, Length<U, T>> for Length<U, T> {
     fn sub(&self, other: &Length<U, T>) -> Length<U, T> {
-        Length(**self - **other)
+        Length(self.get() - other.get())
     }
 }
 
 // length * scaleFactor
-impl<Src, Dst, T: Mul<f32, T>> Mul<ScaleFactor<Src, Dst>, Length<Dst, T>> for Length<Src, T> {
+impl<Src, Dst, T: Clone + Mul<f32, T>> Mul<ScaleFactor<Src, Dst>, Length<Dst, T>> for Length<Src, T> {
     #[inline]
     fn mul(&self, scale: &ScaleFactor<Src, Dst>) -> Length<Dst, T> {
-        Length(**self * **scale)
+        Length(self.get() * scale.get())
     }
 }
 
 // length / scaleFactor
-impl<Src, Dst, T: Div<f32, T>> Div<ScaleFactor<Src, Dst>, Length<Src, T>> for Length<Dst, T> {
+impl<Src, Dst, T: Clone + Div<f32, T>> Div<ScaleFactor<Src, Dst>, Length<Src, T>> for Length<Dst, T> {
     #[inline]
     fn div(&self, scale: &ScaleFactor<Src, Dst>) -> Length<Src, T> {
-        Length(**self / **scale)
+        Length(self.get() / scale.get())
     }
 }
 
 impl<Unit, T0: NumCast + Clone, T1: NumCast + Clone> Length<Unit, T0> {
     /// Cast from one numeric representation to another, preserving the units.
     pub fn cast(&self) -> Option<Length<Unit, T1>> {
-        cast((**self).clone()).map(|x| Length(x))
+        cast(self.get()).map(|x| Length(x))
     }
 }
 
@@ -77,34 +76,34 @@ impl<Unit, T0: NumCast + Clone, T1: NumCast + Clone> Length<Unit, T0> {
 
 impl<Unit, T: Clone> Clone for Length<Unit, T> {
     fn clone(&self) -> Length<Unit, T> {
-        Length((**self).clone())
+        Length(self.get())
     }
 }
 
-impl<Unit, T: Eq> Eq for Length<Unit, T> {
-    fn eq(&self, other: &Length<Unit, T>) -> bool { (**self).eq(&**other) }
+impl<Unit, T: Clone + Eq> Eq for Length<Unit, T> {
+    fn eq(&self, other: &Length<Unit, T>) -> bool { self.get().eq(&other.get()) }
 }
 
-impl<Unit, T: Ord> Ord for Length<Unit, T> {
-    fn lt(&self, other: &Length<Unit, T>) -> bool { (**self).lt(&**other) }
-    fn le(&self, other: &Length<Unit, T>) -> bool { (**self).le(&**other) }
-    fn gt(&self, other: &Length<Unit, T>) -> bool { (**self).gt(&**other) }
-    fn ge(&self, other: &Length<Unit, T>) -> bool { (**self).ge(&**other) }
+impl<Unit, T: Clone + Ord> Ord for Length<Unit, T> {
+    fn lt(&self, other: &Length<Unit, T>) -> bool { self.get().lt(&other.get()) }
+    fn le(&self, other: &Length<Unit, T>) -> bool { self.get().le(&other.get()) }
+    fn gt(&self, other: &Length<Unit, T>) -> bool { self.get().gt(&other.get()) }
+    fn ge(&self, other: &Length<Unit, T>) -> bool { self.get().ge(&other.get()) }
 }
 
-impl<Unit, T: TotalEq> TotalEq for Length<Unit, T> {}
+impl<Unit, T: Clone + TotalEq> TotalEq for Length<Unit, T> {}
 
-impl<Unit, T: TotalOrd> TotalOrd for Length<Unit, T> {
-    fn cmp(&self, other: &Length<Unit, T>) -> Ordering { (**self).cmp(&**other) }
+impl<Unit, T: Clone + TotalOrd> TotalOrd for Length<Unit, T> {
+    fn cmp(&self, other: &Length<Unit, T>) -> Ordering { self.get().cmp(&other.get()) }
 }
 
-impl<Unit, T: Zero> Zero for Length<Unit, T> {
+impl<Unit, T: Clone + Zero> Zero for Length<Unit, T> {
     fn zero() -> Length<Unit, T> {
         Length(Zero::zero())
     }
 
     fn is_zero(&self) -> bool {
-        (**self).is_zero()
+        self.get().is_zero()
     }
 }
 
@@ -127,8 +126,8 @@ mod tests {
         let two_feet = one_foot + one_foot;
         let zero_feet = one_foot - one_foot;
 
-        assert_eq!(*one_foot, 12.0);
-        assert_eq!(*two_feet, 24.0);
+        assert_eq!(one_foot.get(), 12.0);
+        assert_eq!(two_feet.get(), 24.0);
         assert!(zero_feet.is_zero());
 
         assert!(one_foot == one_foot);
@@ -146,12 +145,12 @@ mod tests {
 
         let one_foot_in_mm: Length<Mm, f32> = one_foot * mm_per_inch;
 
-        assert_eq!(*one_foot_in_mm, 304.8);
+        assert_eq!(one_foot_in_mm, Length(304.8));
 
         let back_to_inches: Length<Inch, f32> = one_foot_in_mm / mm_per_inch;
         assert_eq!(one_foot, back_to_inches);
 
         let int_foot: Length<Inch, int> = one_foot.cast().unwrap();
-        assert_eq!(*int_foot, 12);
+        assert_eq!(int_foot.get(), 12);
     }
 }
