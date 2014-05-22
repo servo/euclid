@@ -49,17 +49,17 @@ impl<U, T: Clone + Sub<T, T>> Sub<Length<U, T>, Length<U, T>> for Length<U, T> {
 }
 
 // length * scaleFactor
-impl<Src, Dst, T: Clone + Mul<f32, T>> Mul<ScaleFactor<Src, Dst>, Length<Dst, T>> for Length<Src, T> {
+impl<Src, Dst, T: Clone + Mul<T, T>> Mul<ScaleFactor<Src, Dst, T>, Length<Dst, T>> for Length<Src, T> {
     #[inline]
-    fn mul(&self, scale: &ScaleFactor<Src, Dst>) -> Length<Dst, T> {
+    fn mul(&self, scale: &ScaleFactor<Src, Dst, T>) -> Length<Dst, T> {
         Length(self.get() * scale.get())
     }
 }
 
 // length / scaleFactor
-impl<Src, Dst, T: Clone + Div<f32, T>> Div<ScaleFactor<Src, Dst>, Length<Src, T>> for Length<Dst, T> {
+impl<Src, Dst, T: Clone + Div<T, T>> Div<ScaleFactor<Src, Dst, T>, Length<Src, T>> for Length<Dst, T> {
     #[inline]
-    fn div(&self, scale: &ScaleFactor<Src, Dst>) -> Length<Src, T> {
+    fn div(&self, scale: &ScaleFactor<Src, Dst, T>) -> Length<Src, T> {
         Length(self.get() / scale.get())
     }
 }
@@ -120,7 +120,7 @@ mod tests {
 
     #[test]
     fn test_length() {
-        let mm_per_inch: ScaleFactor<Inch, Mm> = ScaleFactor(25.4);
+        let mm_per_inch: ScaleFactor<Inch, Mm, f32> = ScaleFactor(25.4);
 
         let one_foot: Length<Inch, f32> = Length(12.0);
         let two_feet = one_foot + one_foot;
