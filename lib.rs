@@ -31,10 +31,12 @@ pub use side_offsets::SideOffsets2DSimdI32;
 pub use size::Size2D;
 
 pub mod approxeq;
+pub mod length;
 pub mod matrix;
 pub mod matrix2d;
 pub mod point;
 pub mod rect;
+pub mod scale_factor;
 pub mod side_offsets;
 pub mod size;
 

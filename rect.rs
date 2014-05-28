@@ -7,6 +7,8 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+use length::Length;
+
 use point::Point2D;
 use size::Size2D;
 use std::cmp::{Eq, Ord};
@@ -106,6 +108,56 @@ pub fn max<T:Clone + Ord>(x: T, y: T) -> T {
     if x >= y { x } else { y }
 }
 
+impl<Scale, T0: Mul<Scale, T1>, T1: Clone> Mul<Scale, Rect<T1>> for Rect<T0> {
+    #[inline]
+    fn mul(&self, scale: &Scale) -> Rect<T1> {
+        Rect(self.origin * *scale, self.size * *scale)
+    }
+}
+
+impl<Scale, T0: Div<Scale, T1>, T1: Clone> Div<Scale, Rect<T1>> for Rect<T0> {
+    #[inline]
+    fn div(&self, scale: &Scale) -> Rect<T1> {
+        Rect(self.origin / *scale, self.size / *scale)
+    }
+}
+
+// Convenient aliases for Rect with typed units
+pub type TypedRect<Unit, T> = Rect<Length<Unit, T>>;
+
+impl<Unit, T: Clone> Rect<Length<Unit, T>> {
+    /// Drop the units, preserving only the numeric value.
+    pub fn to_untyped(&self) -> Rect<T> {
+        Rect(self.origin.to_untyped(), self.size.to_untyped())
+    }
+
+    /// Tag a unitless value with units.
+    pub fn from_untyped(r: &Rect<T>) -> TypedRect<Unit, T> {
+        Rect(Point2D::from_untyped(&r.origin), Size2D::from_untyped(&r.size))
+    }
+}
+
+impl<Unit, T0: NumCast + Clone, T1: NumCast + Clone> Rect<Length<Unit, T0>> {
+    /// Cast from one numeric representation to another, preserving the units.
+    pub fn cast(&self) -> Option<Rect<Length<Unit, T1>>> {
+        match (self.origin.cast(), self.size.cast()) {
+            (Some(origin), Some(size)) => Some(Rect(origin, size)),
+            _ => None
+        }
+    }
+}
+
+// Convenience functions for common casts
+impl<Unit, T: NumCast + Clone> Rect<Length<Unit, T>> {
+    pub fn as_f32(&self) -> Rect<Length<Unit, f32>> {
+        self.cast().unwrap()
+    }
+
+    pub fn as_uint(&self) -> Rect<Length<Unit, uint>> {
+        self.cast().unwrap()
+    }
+}
+
 #[test]
 fn test_min_max() {
     assert!(min(0, 1) == 0);
@@ -167,7 +219,7 @@ fn test_intersection() {
     let pq = pq.unwrap();
     assert!(pq.origin == Point2D(5, 15));
     assert!(pq.size == Size2D(5, 5));
-    
+
     let pr = p.intersection(&r);
     assert!(pr.is_some());
     let pr = pr.unwrap();
