@@ -25,6 +25,7 @@ pub fn Matrix4<T:Add<T,T> + Clone + ApproxEq<T> + Mul<T,T> + One + Zero>(
     }
 }
 
+#[deriving(Show)]
 pub struct Matrix4<T> {
     pub m11: T, pub m12: T, pub m13: T, pub m14: T,
     pub m21: T, pub m22: T, pub m23: T, pub m24: T,
@@ -137,7 +138,7 @@ pub fn test_ortho() {
                            0.0,  2.22222222,  0.0,  0.0,
                            0.0,  0.0,         -1.0, 0.0,
                            -1.0, -1.22222222, -0.0, 1.0);
-    debug!("result={:?} expected={:?}", result, expected);
+    debug!("result={} expected={}", result, expected);
     assert!(result.approx_eq(&expected));
 }
 
