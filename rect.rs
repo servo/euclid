@@ -23,7 +23,7 @@ pub struct Rect<T> {
 
 impl<T: fmt::Show> fmt::Show for Rect<T> {
    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f.buf, "Rect({} at {})", self.size, self.origin)
+        write!(f, "Rect({} at {})", self.size, self.origin)
     }
 }
 

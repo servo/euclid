@@ -30,7 +30,7 @@ impl<T: Zero + Clone> Zero for Point2D<T> {
 
 impl<T: fmt::Show> fmt::Show for Point2D<T> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f.buf, "({},{})", self.x, self.y)
+        write!(f, "({},{})", self.x, self.y)
     }
 }
 
