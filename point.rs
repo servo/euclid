@@ -12,7 +12,7 @@ use length::Length;
 use std::fmt;
 use std::num::Zero;
 
-#[deriving(Clone, Decodable, Encodable, Eq)]
+#[deriving(Clone, Decodable, Encodable, PartialEq)]
 pub struct Point2D<T> {
     pub x: T,
     pub y: T

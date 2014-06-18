@@ -71,7 +71,7 @@ impl<Unit, T0: NumCast + Clone, T1: NumCast + Clone> Length<Unit, T0> {
     }
 }
 
-// FIXME: Switch to `deriving(Clone, Eq, Ord, Zero)` after this Rust issue is fixed:
+// FIXME: Switch to `deriving(Clone, PartialEq, PartialOrd, Zero)` after this Rust issue is fixed:
 // https://github.com/mozilla/rust/issues/7671
 
 impl<Unit, T: Clone> Clone for Length<Unit, T> {
@@ -80,20 +80,20 @@ impl<Unit, T: Clone> Clone for Length<Unit, T> {
     }
 }
 
-impl<Unit, T: Clone + Eq> Eq for Length<Unit, T> {
+impl<Unit, T: Clone + PartialEq> PartialEq for Length<Unit, T> {
     fn eq(&self, other: &Length<Unit, T>) -> bool { self.get().eq(&other.get()) }
 }
 
-impl<Unit, T: Clone + Ord> Ord for Length<Unit, T> {
+impl<Unit, T: Clone + PartialOrd> PartialOrd for Length<Unit, T> {
     fn lt(&self, other: &Length<Unit, T>) -> bool { self.get().lt(&other.get()) }
     fn le(&self, other: &Length<Unit, T>) -> bool { self.get().le(&other.get()) }
     fn gt(&self, other: &Length<Unit, T>) -> bool { self.get().gt(&other.get()) }
     fn ge(&self, other: &Length<Unit, T>) -> bool { self.get().ge(&other.get()) }
 }
 
-impl<Unit, T: Clone + TotalEq> TotalEq for Length<Unit, T> {}
+impl<Unit, T: Clone + Eq> Eq for Length<Unit, T> {}
 
-impl<Unit, T: Clone + TotalOrd> TotalOrd for Length<Unit, T> {
+impl<Unit, T: Clone + Ord> Ord for Length<Unit, T> {
     fn cmp(&self, other: &Length<Unit, T>) -> Ordering { self.get().cmp(&other.get()) }
 }
 
