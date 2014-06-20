@@ -134,13 +134,12 @@ impl Zero for SideOffsets2DSimdI32 {
         }
     }
 
-    #[cfg(not(target_arch = "x86"), not(target_arch = "x86_64"))]
+    #[cfg(not(target_arch = "x86_64"))]
     #[inline]
     fn is_zero(&self) -> bool {
         self.top.is_zero() && self.right.is_zero() && self.bottom.is_zero() && self.left.is_zero()
     }
 
-    #[cfg(target_arch = "x86")]
     #[cfg(target_arch = "x86_64")]
     #[inline]
     fn is_zero(&self) -> bool {
