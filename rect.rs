@@ -11,11 +11,11 @@ use length::Length;
 
 use point::Point2D;
 use size::Size2D;
-use std::cmp::{Eq, Ord};
+use std::cmp::{PartialEq, PartialOrd};
 use std::fmt;
 use std::num::Zero;
 
-#[deriving(Clone, Decodable, Encodable, Eq)]
+#[deriving(Clone, Decodable, Encodable, PartialEq)]
 pub struct Rect<T> {
     pub origin: Point2D<T>,
     pub size: Size2D<T>,
@@ -34,7 +34,7 @@ pub fn Rect<T:Clone>(origin: Point2D<T>, size: Size2D<T>) -> Rect<T> {
     }
 }
 
-impl<T: Clone + Ord + Add<T,T> + Sub<T,T>> Rect<T> {
+impl<T: Clone + PartialOrd + Add<T,T> + Sub<T,T>> Rect<T> {
     #[inline]
     pub fn intersects(&self, other: &Rect<T>) -> bool {
         self.origin.x < other.origin.x + other.size.width &&
@@ -100,11 +100,11 @@ impl<T:Clone + Zero> Rect<T> {
 }
 
 
-pub fn min<T:Clone + Ord>(x: T, y: T) -> T {
+pub fn min<T:Clone + PartialOrd>(x: T, y: T) -> T {
     if x <= y { x } else { y }
 }
 
-pub fn max<T:Clone + Ord>(x: T, y: T) -> T {
+pub fn max<T:Clone + PartialOrd>(x: T, y: T) -> T {
     if x >= y { x } else { y }
 }
 

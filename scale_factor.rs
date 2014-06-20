@@ -80,10 +80,10 @@ impl<Src, Dst, T0: NumCast + Clone, T1: NumCast + Clone> ScaleFactor<Src, Dst, T
     }
 }
 
-// FIXME: Switch to `deriving(Eq, Clone)` after this Rust issue is fixed:
+// FIXME: Switch to `deriving(PartialEq, Clone)` after this Rust issue is fixed:
 // https://github.com/mozilla/rust/issues/7671
 
-impl<Src, Dst, T: Clone + Eq> Eq for ScaleFactor<Src, Dst, T> {
+impl<Src, Dst, T: Clone + PartialEq> PartialEq for ScaleFactor<Src, Dst, T> {
     fn eq(&self, other: &ScaleFactor<Src, Dst, T>) -> bool {
         self.get().eq(&other.get())
     }

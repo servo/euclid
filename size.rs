@@ -9,11 +9,11 @@
 
 use length::Length;
 
-use std::cmp::Eq;
+use std::cmp::PartialEq;
 use std::fmt;
 use std::num::Zero;
 
-#[deriving(Clone, Decodable, Encodable, Eq)]
+#[deriving(Clone, Decodable, Encodable, PartialEq)]
 pub struct Size2D<T> {
     pub width: T,
     pub height: T
