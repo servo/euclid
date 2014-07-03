@@ -84,6 +84,12 @@ impl<T: Clone + PartialOrd + Add<T,T> + Sub<T,T>> Rect<T> {
             size: self.size.clone()
         }
     }
+
+    #[inline]
+    pub fn contains(&self, other: &Point2D<T>) -> bool {
+        self.origin.x <= other.x && other.x <= self.origin.x + self.size.width &&
+        self.origin.y <= other.y && other.y <= self.origin.y + self.size.height
+    }
 }
 
 impl<T:Clone + Zero> Rect<T> {
@@ -228,4 +234,34 @@ fn test_intersection() {
 
     let qr = q.intersection(&r);
     assert!(qr.is_none());
+}
+
+#[test]
+fn test_contains() {
+    let r = Rect(Point2D(-20, 15), Size2D(100, 200));
+
+    assert!(r.contains(&Point2D(0, 50)));
+    assert!(r.contains(&Point2D(-10, 200)));
+
+    // The `contains` method is inclusive of the edges.
+    assert!(r.contains(&Point2D(-20, 15)));
+    assert!(r.contains(&Point2D(80, 15)));
+    assert!(r.contains(&Point2D(80, 215)));
+    assert!(r.contains(&Point2D(-20, 215)));
+
+    // Points beyond the top-left corner.
+    assert!(!r.contains(&Point2D(-25, 15)));
+    assert!(!r.contains(&Point2D(-15, 10)));
+
+    // Points beyond the top-right corner.
+    assert!(!r.contains(&Point2D(85, 20)));
+    assert!(!r.contains(&Point2D(75, 10)));
+
+    // Points beyond the bottom-right corner.
+    assert!(!r.contains(&Point2D(85, 210)));
+    assert!(!r.contains(&Point2D(75, 220)));
+
+    // Points beyond the bottom-left corner.
+    assert!(!r.contains(&Point2D(-25, 210)));
+    assert!(!r.contains(&Point2D(-15, 220)));
 }
