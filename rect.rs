@@ -87,8 +87,8 @@ impl<T: Clone + PartialOrd + Add<T,T> + Sub<T,T>> Rect<T> {
 
     #[inline]
     pub fn contains(&self, other: &Point2D<T>) -> bool {
-        self.origin.x <= other.x && other.x <= self.origin.x + self.size.width &&
-        self.origin.y <= other.y && other.y <= self.origin.y + self.size.height
+        self.origin.x <= other.x && other.x < self.origin.x + self.size.width &&
+        self.origin.y <= other.y && other.y < self.origin.y + self.size.height
     }
 }
 
@@ -243,11 +243,12 @@ fn test_contains() {
     assert!(r.contains(&Point2D(0, 50)));
     assert!(r.contains(&Point2D(-10, 200)));
 
-    // The `contains` method is inclusive of the edges.
+    // The `contains` method is inclusive of the top/left edges, but not the
+    // bottom/right edges.
     assert!(r.contains(&Point2D(-20, 15)));
-    assert!(r.contains(&Point2D(80, 15)));
-    assert!(r.contains(&Point2D(80, 215)));
-    assert!(r.contains(&Point2D(-20, 215)));
+    assert!(!r.contains(&Point2D(80, 15)));
+    assert!(!r.contains(&Point2D(80, 215)));
+    assert!(!r.contains(&Point2D(-20, 215)));
 
     // Points beyond the top-left corner.
     assert!(!r.contains(&Point2D(-25, 15)));
