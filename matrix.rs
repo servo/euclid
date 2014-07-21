@@ -107,7 +107,7 @@ pub fn ortho<T:Add<T,T> + Clone + Div<T,T> + ApproxEq<T> + Mul<T,T> + Neg<T> + N
          near: T,
          far: T)
       -> Matrix4<T> {
-    let _2: T = num::cast(2).unwrap();
+    let _2: T = num::cast(2u).unwrap();
     let _1: T = One::one();
     let _0: T = Zero::zero();
 
@@ -131,8 +131,8 @@ pub fn identity<T:Add<T,T> + Clone + ApproxEq<T> + Mul<T,T> + One + Zero>() -> M
 
 #[test]
 pub fn test_ortho() {
-    let (left, right, bottom, top) = (0.0, 1.0, 0.1, 1.0);
-    let (near, far) = (-1.0, 1.0);
+    let (left, right, bottom, top) = (0.0f32, 1.0f32, 0.1f32, 1.0f32);
+    let (near, far) = (-1.0f32, 1.0f32);
     let result = ortho(left, right, bottom, top, near, far);
     let expected = Matrix4(2.0,  0.0,         0.0,  0.0,
                            0.0,  2.22222222,  0.0,  0.0,

@@ -85,10 +85,9 @@ impl<Unit, T: Clone + PartialEq> PartialEq for Length<Unit, T> {
 }
 
 impl<Unit, T: Clone + PartialOrd> PartialOrd for Length<Unit, T> {
-    fn lt(&self, other: &Length<Unit, T>) -> bool { self.get().lt(&other.get()) }
-    fn le(&self, other: &Length<Unit, T>) -> bool { self.get().le(&other.get()) }
-    fn gt(&self, other: &Length<Unit, T>) -> bool { self.get().gt(&other.get()) }
-    fn ge(&self, other: &Length<Unit, T>) -> bool { self.get().ge(&other.get()) }
+    fn partial_cmp(&self, other: &Length<Unit, T>) -> Option<Ordering> {
+        self.get().partial_cmp(&other.get())
+    }
 }
 
 impl<Unit, T: Clone + Eq> Eq for Length<Unit, T> {}
