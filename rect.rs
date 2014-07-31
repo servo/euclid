@@ -166,16 +166,16 @@ impl<Unit, T: NumCast + Clone> Rect<Length<Unit, T>> {
 
 #[test]
 fn test_min_max() {
-    assert!(min(0, 1) == 0);
-    assert!(min(-1.0, 0.0) == -1.0);
+    assert!(min(0u32, 1u32) == 0u32);
+    assert!(min(-1.0f32, 0.0f32) == -1.0f32);
 
-    assert!(max(0, 1) == 1);
-    assert!(max(-1.0, 0.0) == 0.0);
+    assert!(max(0u32, 1u32) == 1u32);
+    assert!(max(-1.0f32, 0.0f32) == 0.0f32);
 }
 
 #[test]
 fn test_translate() {
-    let p = Rect(Point2D(0, 0), Size2D(50, 40));
+    let p = Rect(Point2D(0u32, 0u32), Size2D(50u32, 40u32));
     let pp = p.translate(&Point2D(10,15));
 
     assert!(pp.size.width == 50);
@@ -184,7 +184,7 @@ fn test_translate() {
     assert!(pp.origin.y == 15);
 
 
-    let r = Rect(Point2D(-10, -5), Size2D(50, 40));
+    let r = Rect(Point2D(-10i32, -5i32), Size2D(50i32, 40i32));
     let rr = r.translate(&Point2D(0,-10));
 
     assert!(rr.size.width == 50);
@@ -195,10 +195,10 @@ fn test_translate() {
 
 #[test]
 fn test_union() {
-    let p = Rect(Point2D(0,0), Size2D(50, 40));
-    let q = Rect(Point2D(20,20), Size2D(5, 5));
-    let r = Rect(Point2D(-15, -30), Size2D(200, 15));
-    let s = Rect(Point2D(20, -15), Size2D(250, 200));
+    let p = Rect(Point2D(0i32, 0i32), Size2D(50i32, 40i32));
+    let q = Rect(Point2D(20i32 ,20i32), Size2D(5i32, 5i32));
+    let r = Rect(Point2D(-15i32, -30i32), Size2D(200i32, 15i32));
+    let s = Rect(Point2D(20i32, -15i32), Size2D(250i32, 200i32));
 
     let pq = p.union(&q);
     assert!(pq.origin == Point2D(0, 0));
@@ -216,9 +216,9 @@ fn test_union() {
 
 #[test]
 fn test_intersection() {
-    let p = Rect(Point2D(0, 0), Size2D(10, 20));
-    let q = Rect(Point2D(5, 15), Size2D(10, 10));
-    let r = Rect(Point2D(-5, -5), Size2D(8, 8));
+    let p = Rect(Point2D(0i32, 0i32), Size2D(10i32, 20i32));
+    let q = Rect(Point2D(5i32, 15i32), Size2D(10i32, 10i32));
+    let r = Rect(Point2D(-5i32, -5i32), Size2D(8i32, 8i32));
 
     let pq = p.intersection(&q);
     assert!(pq.is_some());
@@ -238,7 +238,7 @@ fn test_intersection() {
 
 #[test]
 fn test_contains() {
-    let r = Rect(Point2D(-20, 15), Size2D(100, 200));
+    let r = Rect(Point2D(-20i32, 15i32), Size2D(100i32, 200i32));
 
     assert!(r.contains(&Point2D(0, 50)));
     assert!(r.contains(&Point2D(-10, 200)));
