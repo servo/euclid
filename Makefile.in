@@ -21,7 +21,7 @@ geom-test: src/lib.rs $(RUST_SRC)
 .PHONY: doc
 doc: $(RUSTDOC_TARGET)/geom/index.html
 
-$(RUSTDOC_TARGET)/geom/index.html: lib.rs $(RUST_SRC)
+$(RUSTDOC_TARGET)/geom/index.html: src/lib.rs $(RUST_SRC)
 	$(RUSTDOC) $(RUSTDOC_FLAGS) $< -o $(RUSTDOC_TARGET)
 
 .PHONY: check
