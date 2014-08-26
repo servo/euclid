@@ -4,8 +4,3 @@ name = "geom"
 version = "0.1.0"
 authors = ["The Servo Project Developers"]
 
-[[lib]]
-
-name = "geom"
-crate-type = ["rlib"]
-
