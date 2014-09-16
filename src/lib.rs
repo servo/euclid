@@ -15,7 +15,6 @@
 #[phase(plugin, link)]
 extern crate log;
 extern crate serialize;
-extern crate std;
 
 extern crate rand;
 extern crate test;
