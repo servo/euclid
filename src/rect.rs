@@ -44,33 +44,49 @@ impl<T: Clone + PartialOrd + Add<T,T> + Sub<T,T>> Rect<T> {
     }
 
     #[inline]
+    pub fn max_x(&self) -> T {
+        self.origin.x + self.size.width
+    }
+
+    #[inline]
+    pub fn min_x(&self) -> T {
+        self.origin.x.clone()
+    }
+
+    #[inline]
+    pub fn max_y(&self) -> T {
+        self.origin.y + self.size.height
+    }
+
+    #[inline]
+    pub fn min_y(&self) -> T {
+        self.origin.y.clone()
+    }
+
+    #[inline]
     pub fn intersection(&self, other: &Rect<T>) -> Option<Rect<T>> {
         if !self.intersects(other) {
             return None;
         }
 
-        let upper_left = Point2D(max(self.origin.x.clone(), other.origin.x.clone()),
-                                 max(self.origin.y.clone(), other.origin.y.clone()));
-        
-        let lower_right = Point2D(min(self.origin.x + self.size.width,
-                                      other.origin.x + other.size.width),
-                                  min(self.origin.y + self.size.height,
-                                      other.origin.y + other.size.height));
-            
+        let upper_left = Point2D(max(self.min_x(), other.min_x()),
+                                 max(self.min_y(), other.min_y()));
+
+        let lower_right = Point2D(min(self.max_x(), other.max_x()),
+                                  min(self.max_y(), other.max_y()));
+
         Some(Rect(upper_left.clone(), Size2D(lower_right.x - upper_left.x,
                                              lower_right.y - upper_left.y)))
     }
 
     #[inline]
     pub fn union(&self, other: &Rect<T>) -> Rect<T> {
-        let upper_left = Point2D(min(self.origin.x.clone(), other.origin.x.clone()),
-                                 min(self.origin.y.clone(), other.origin.y.clone()));
-        
-        let lower_right = Point2D(max(self.origin.x + self.size.width,
-                                      other.origin.x + other.size.width),
-                                  max(self.origin.y + self.size.height,
-                                      other.origin.y + other.size.height));
-        
+        let upper_left = Point2D(min(self.min_x(), other.min_x()),
+                                 min(self.min_y(), other.min_y()));
+
+        let lower_right = Point2D(max(self.max_x(), other.max_x()),
+                                  max(self.max_y(), other.max_y()));
+
         Rect {
             origin: upper_left.clone(),
             size: Size2D(lower_right.x - upper_left.x, lower_right.y - upper_left.y)
@@ -89,6 +105,16 @@ impl<T: Clone + PartialOrd + Add<T,T> + Sub<T,T>> Rect<T> {
     pub fn contains(&self, other: &Point2D<T>) -> bool {
         self.origin.x <= other.x && other.x < self.origin.x + self.size.width &&
         self.origin.y <= other.y && other.y < self.origin.y + self.size.height
+    }
+}
+
+impl<Scale, T: Clone + Mul<Scale,T>> Rect<T> {
+    #[inline]
+    pub fn scale(&self, x: Scale, y: Scale) -> Rect<T> {
+        Rect {
+            origin: Point2D { x: self.origin.x * x, y: self.origin.y * y},
+            size: Size2D { width: self.size.width * x, height: self.size.height * y}
+        }
     }
 }
 
@@ -265,4 +291,38 @@ fn test_contains() {
     // Points beyond the bottom-left corner.
     assert!(!r.contains(&Point2D(-25, 210)));
     assert!(!r.contains(&Point2D(-15, 220)));
+}
+
+#[test]
+fn test_scale() {
+    let p = Rect(Point2D(0u32, 0u32), Size2D(50u32, 40u32));
+    let pp = p.scale(10, 15);
+
+    assert!(pp.size.width == 500);
+    assert!(pp.size.height == 600);
+    assert!(pp.origin.x == 0);
+    assert!(pp.origin.y == 0);
+
+    let r = Rect(Point2D(-10i32, -5i32), Size2D(50i32, 40i32));
+    let rr = r.scale(1, 20);
+
+    assert!(rr.size.width == 50);
+    assert!(rr.size.height == 800);
+    assert!(rr.origin.x == -10);
+    assert!(rr.origin.y == -100);
+}
+
+#[test]
+fn test_min_max_x_y() {
+    let p = Rect(Point2D(0u32, 0u32), Size2D(50u32, 40u32));
+    assert!(p.max_y() == 40);
+    assert!(p.min_y() == 0);
+    assert!(p.max_x() == 50);
+    assert!(p.min_x() == 0);
+
+    let r = Rect(Point2D(-10i32, -5i32), Size2D(50i32, 40i32));
+    assert!(r.max_y() == 35);
+    assert!(r.min_y() == -5);
+    assert!(r.max_x() == 40);
+    assert!(r.min_x() == -10);
 }
