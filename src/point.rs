@@ -58,6 +58,13 @@ impl<T:Clone + Sub<T,T>> Sub<Point2D<T>, Point2D<T>> for Point2D<T> {
     }
 }
 
+impl <T:Clone + Neg<T>> Neg<Point2D<T>> for Point2D<T> {
+    #[inline]
+    fn neg(&self) -> Point2D<T> {
+        Point2D(-self.x, -self.y)
+    }
+}
+
 impl<Scale, T0: Mul<Scale, T1>, T1: Clone> Mul<Scale, Point2D<T1>> for Point2D<T0> {
     #[inline]
     fn mul(&self, scale: &Scale) -> Point2D<T1> {
