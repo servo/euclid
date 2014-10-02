@@ -64,6 +64,14 @@ impl<Src, Dst, T: Clone + Div<T, T>> Div<ScaleFactor<Src, Dst, T>, Length<Src, T
     }
 }
 
+// -length
+impl <U, T:Clone + Neg<T>> Neg<Length<U, T>> for Length<U, T> {
+    #[inline]
+    fn neg(&self) -> Length<U, T> {
+        Length(-self.get())
+    }
+}
+
 impl<Unit, T0: NumCast + Clone, T1: NumCast + Clone> Length<Unit, T0> {
     /// Cast from one numeric representation to another, preserving the units.
     pub fn cast(&self) -> Option<Length<Unit, T1>> {
@@ -151,5 +159,15 @@ mod tests {
 
         let int_foot: Length<Inch, int> = one_foot.cast().unwrap();
         assert_eq!(int_foot.get(), 12);
+
+        let negative_one_foot = -one_foot;
+        assert_eq!(negative_one_foot.get(), -12.0);
+
+        let negative_two_feet = -two_feet;
+        assert_eq!(negative_two_feet.get(), -24.0);
+
+        let zero_feet: Length<Inch, f32> = Length(0.0);
+        let negative_zero_feet = -zero_feet;
+        assert_eq!(negative_zero_feet.get(), 0.0);
     }
 }
