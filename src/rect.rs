@@ -106,6 +106,14 @@ impl<T: Clone + PartialOrd + Add<T,T> + Sub<T,T>> Rect<T> {
         self.origin.x <= other.x && other.x < self.origin.x + self.size.width &&
         self.origin.y <= other.y && other.y < self.origin.y + self.size.height
     }
+
+    #[inline]
+    pub fn inflate(&self, width: T, height: T) -> Rect<T> {
+        Rect {
+            origin: Point2D(self.origin.x - width, self.origin.y - height),
+            size: Size2D(self.size.width + width + width, self.size.height + height + height),
+        }
+    }
 }
 
 impl<Scale, T: Clone + Mul<Scale,T>> Rect<T> {
@@ -310,6 +318,25 @@ fn test_scale() {
     assert!(rr.size.height == 800);
     assert!(rr.origin.x == -10);
     assert!(rr.origin.y == -100);
+}
+
+#[test]
+fn test_inflate() {
+    let p = Rect(Point2D(0i32, 0i32), Size2D(10i32, 10i32));
+    let pp = p.inflate(10, 20);
+
+    assert!(pp.size.width == 30);
+    assert!(pp.size.height == 50);
+    assert!(pp.origin.x == -10);
+    assert!(pp.origin.y == -20);
+
+    let r = Rect(Point2D(0i32, 0i32), Size2D(10i32, 20i32));
+    let rr = r.inflate(-2, -5);
+
+    assert!(rr.size.width == 6);
+    assert!(rr.size.height == 10);
+    assert!(rr.origin.x == 2);
+    assert!(rr.origin.y == 5);
 }
 
 #[test]
