@@ -19,10 +19,12 @@ use std::num::{cast, One};
 /// may be types without values, such as empty enums.  For example:
 ///
 /// ```rust
+/// use geom::scale_factor::ScaleFactor;
+/// use geom::length::Length;
 /// enum Mm {};
 /// enum Inch {};
 ///
-/// let mm_per_inch: ScaleFactor<Inch, Mm> = ScaleFactor(25.4);
+/// let mm_per_inch: ScaleFactor<Inch, Mm, f32> = ScaleFactor(25.4);
 ///
 /// let one_foot: Length<Inch, f32> = Length(12.0);
 /// let one_foot_in_mm: Length<Mm, f32> = one_foot * mm_per_inch;
