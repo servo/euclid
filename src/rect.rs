@@ -64,6 +64,11 @@ impl<T: Clone + PartialOrd + Add<T,T> + Sub<T,T>> Rect<T> {
     }
 
     #[inline]
+    pub fn max_point(&self) -> Point2D<T> {
+        Point2D(self.max_x(), self.max_y())
+    }
+
+    #[inline]
     pub fn intersection(&self, other: &Rect<T>) -> Option<Rect<T>> {
         if !self.intersects(other) {
             return None;
