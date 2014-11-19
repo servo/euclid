@@ -1,4 +1,4 @@
-// Copyright 2013 The Servo Project Developers. See the COPYRIGHT
+// Copyright 2013-2014 The Servo Project Developers. See the COPYRIGHT
 // file at the top-level directory of this distribution.
 //
 // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
@@ -7,6 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+use std::num::Float;
 
 /// Trait for testing approximate equality
 pub trait ApproxEq<Eps> {

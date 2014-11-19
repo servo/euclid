@@ -1,4 +1,4 @@
-// Copyright 2013 The Servo Project Developers. See the COPYRIGHT
+// Copyright 2013-2014 The Servo Project Developers. See the COPYRIGHT
 // file at the top-level directory of this distribution.
 //
 // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
@@ -10,7 +10,7 @@
 //! A group of side offsets, which correspond to top/left/bottom/right for borders, padding,
 //! and margins in CSS.
 
-use std::num::Zero;
+use std::num::{Num, Zero};
 
 /// A group of side offsets, which correspond to top/left/bottom/right for borders, padding,
 /// and margins in CSS.

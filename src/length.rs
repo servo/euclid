@@ -10,7 +10,7 @@
 
 use scale_factor::ScaleFactor;
 
-use std::num::{cast, Zero};
+use std::num::{cast, NumCast, Zero};
 
 /// A one-dimensional distance, with value represented by `T` and unit of measurement `Unit`.
 ///
