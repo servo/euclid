@@ -1,4 +1,4 @@
-// Copyright 2013 The Servo Project Developers. See the COPYRIGHT
+// Copyright 2013-2014 The Servo Project Developers. See the COPYRIGHT
 // file at the top-level directory of this distribution.
 //
 // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
@@ -13,7 +13,7 @@ use point::Point2D;
 use size::Size2D;
 use std::cmp::{PartialEq, PartialOrd};
 use std::fmt;
-use std::num::Zero;
+use std::num::{NumCast, Zero};
 
 #[deriving(Clone, Decodable, Encodable, PartialEq)]
 pub struct Rect<T> {
