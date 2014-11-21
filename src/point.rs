@@ -46,6 +46,12 @@ impl<T:Clone + Add<T,T>> Add<Point2D<T>, Point2D<T>> for Point2D<T> {
     }
 }
 
+impl<T:Clone + Add<T,T>> Add<Size2D<T>, Point2D<T>> for Point2D<T> {
+    fn add(&self, other: &Size2D<T>) -> Point2D<T> {
+        Point2D(self.x + other.width, self.y + other.height)
+    }
+}
+
 impl<T: Add<T, T>> Point2D<T> {
     pub fn add_size(&self, other: &Size2D<T>) -> Point2D<T> {
         Point2D { x: self.x + other.width, y: self.y + other.height }
