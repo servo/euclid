@@ -13,7 +13,7 @@ use point::Point2D;
 use size::Size2D;
 use std::cmp::{PartialEq, PartialOrd};
 use std::fmt;
-use std::num::Zero;
+use std::num::{NumCast, Zero};
 
 #[deriving(Clone, Decodable, Encodable, PartialEq)]
 pub struct Rect<T> {
