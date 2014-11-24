@@ -7,6 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+use std::num::Float;
 
 /// Trait for testing approximate equality
 pub trait ApproxEq<Eps> {

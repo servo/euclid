@@ -11,7 +11,7 @@ use length::Length;
 use size::Size2D;
 
 use std::fmt;
-use std::num::Zero;
+use std::num::{NumCast, Zero};
 
 #[deriving(Clone, Decodable, Encodable, Eq, Hash, PartialEq)]
 pub struct Point2D<T> {

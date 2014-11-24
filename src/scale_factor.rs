@@ -8,7 +8,7 @@
 // except according to those terms.
 //! A type-checked scaling factor between units.
 
-use std::num::{cast, One};
+use std::num::{NumCast, cast, One};
 
 /// A scaling factor between two different units of measurement.
 ///

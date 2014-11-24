@@ -11,7 +11,7 @@ use length::Length;
 
 use std::cmp::PartialEq;
 use std::fmt;
-use std::num::Zero;
+use std::num::{NumCast, Zero};
 
 #[deriving(Clone, Decodable, Encodable, PartialEq)]
 pub struct Size2D<T> {
