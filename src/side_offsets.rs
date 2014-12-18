@@ -40,7 +40,7 @@ impl<T:Clone> SideOffsets2D<T> {
     }
 }
 
-impl<T:Num> SideOffsets2D<T> {
+impl<T> SideOffsets2D<T> where T: Add<T,T> {
     pub fn horizontal(&self) -> T {
         self.left + self.right
     }
