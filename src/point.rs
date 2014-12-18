@@ -9,9 +9,10 @@
 
 use length::Length;
 use size::Size2D;
+use num::Zero;
 
 use std::fmt;
-use std::num::{NumCast, Zero};
+use std::num::NumCast;
 
 #[deriving(Clone, Decodable, Encodable, Eq, Hash, PartialEq)]
 pub struct Point2D<T> {
@@ -19,13 +20,9 @@ pub struct Point2D<T> {
     pub y: T
 }
 
-impl<T: Zero + Clone> Zero for Point2D<T> {
-    fn zero() -> Point2D<T> {
+impl<T: Zero> Point2D<T> {
+    pub fn zero() -> Point2D<T> {
         Point2D { x: Zero::zero(), y: Zero::zero() }
-    }
-
-    fn is_zero(&self) -> bool {
-        self.x.is_zero() && self.y.is_zero()
     }
 }
 
@@ -35,7 +32,7 @@ impl<T: fmt::Show> fmt::Show for Point2D<T> {
     }
 }
 
-pub fn Point2D<T:Clone>(x: T, y: T) -> Point2D<T> {
+pub fn Point2D<T>(x: T, y: T) -> Point2D<T> {
     Point2D {x: x, y: y}
 }
 

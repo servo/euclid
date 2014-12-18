@@ -9,8 +9,9 @@
 //! A one-dimensional length, tagged with its units.
 
 use scale_factor::ScaleFactor;
+use num::Zero;
 
-use std::num::{NumCast, cast, Zero};
+use std::num::{NumCast, cast};
 
 /// A one-dimensional distance, with value represented by `T` and unit of measurement `Unit`.
 ///
@@ -104,13 +105,9 @@ impl<Unit, T: Clone + Ord> Ord for Length<Unit, T> {
     fn cmp(&self, other: &Length<Unit, T>) -> Ordering { self.get().cmp(&other.get()) }
 }
 
-impl<Unit, T: Clone + Zero> Zero for Length<Unit, T> {
+impl<Unit, T: Zero> Zero for Length<Unit, T> {
     fn zero() -> Length<Unit, T> {
         Length(Zero::zero())
-    }
-
-    fn is_zero(&self) -> bool {
-        self.get().is_zero()
     }
 }
 

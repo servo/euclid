@@ -8,12 +8,13 @@
 // except according to those terms.
 
 use length::Length;
+use num::Zero;
 
 use point::Point2D;
 use size::Size2D;
-use std::cmp::{PartialEq, PartialOrd};
+use std::cmp::PartialOrd;
 use std::fmt;
-use std::num::{NumCast, Zero};
+use std::num::NumCast;
 
 #[deriving(Clone, Decodable, Encodable, PartialEq)]
 pub struct Rect<T> {
@@ -126,16 +127,16 @@ impl<Scale, T: Clone + Mul<Scale,T>> Rect<T> {
     }
 }
 
-impl<T:Clone + Zero> Rect<T> {
+impl<T: PartialEq + Zero> Rect<T> {
     pub fn zero() -> Rect<T> {
         Rect {
-            origin: Zero::zero(),
+            origin: Point2D::zero(),
             size: Size2D::zero(),
         }
     }
 
     pub fn is_empty(&self) -> bool {
-        self.size.is_empty()
+        self.size == Size2D::zero()
     }
 }
 

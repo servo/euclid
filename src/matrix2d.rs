@@ -7,7 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use std::num::{One, Zero};
+use num::{One, Zero};
 
 pub struct Matrix2D<T> {
     m11: T, m12: T,
@@ -31,7 +31,7 @@ impl<T:Add<T,T> + Clone + Mul<T,T> + One + Zero> Matrix2D<T> {
                       m.m21*self.m12 + m.m22*self.m22,
                       m.m31*self.m11 + m.m32*self.m21 + self.m31,
                       m.m31*self.m12 + m.m32*self.m22 + self.m32)
-    } 
+    }
 
     pub fn translate(&self, x: T, y: T) -> Matrix2D<T> {
          let (_0, _1): (T, T) = (Zero::zero(), One::one());
@@ -53,14 +53,13 @@ impl<T:Add<T,T> + Clone + Mul<T,T> + One + Zero> Matrix2D<T> {
                              _0.clone(), _1.clone(),
                              _0.clone(), _0.clone());
     }
-        
+
     pub fn to_array(&self) -> [T, ..6] {
         [
             self.m11.clone(), self.m12.clone(),
             self.m21.clone(), self.m22.clone(),
             self.m31.clone(), self.m32.clone()
         ]
-    } 
-
+    }
 }
 
