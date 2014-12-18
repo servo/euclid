@@ -10,7 +10,8 @@
 //! A group of side offsets, which correspond to top/left/bottom/right for borders, padding,
 //! and margins in CSS.
 
-use std::num::{Num, NumCast, Zero};
+use num::Zero;
+use std::num::Num;
 
 /// A group of side offsets, which correspond to top/left/bottom/right for borders, padding,
 /// and margins in CSS.
@@ -60,18 +61,14 @@ impl<T:Num> Add<SideOffsets2D<T>, SideOffsets2D<T>> for SideOffsets2D<T> {
     }
 }
 
-impl<T:Num> Zero for SideOffsets2D<T> {
-    fn zero() -> SideOffsets2D<T> {
+impl<T: Zero> SideOffsets2D<T> {
+    pub fn zero() -> SideOffsets2D<T> {
         SideOffsets2D {
             top: Zero::zero(),
             right: Zero::zero(),
             bottom: Zero::zero(),
             left: Zero::zero(),
         }
-    }
-
-    fn is_zero(&self) -> bool {
-        self.top.is_zero() && self.right.is_zero() && self.bottom.is_zero() && self.left.is_zero()
     }
 }
 
@@ -123,26 +120,26 @@ impl Add<SideOffsets2DSimdI32, SideOffsets2DSimdI32> for SideOffsets2DSimdI32 {
     }
 }
 
-impl Zero for SideOffsets2DSimdI32 {
+impl SideOffsets2DSimdI32 {
     #[inline]
-    fn zero() -> SideOffsets2DSimdI32 {
+    pub fn zero() -> SideOffsets2DSimdI32 {
         SideOffsets2DSimdI32 {
-            top: Zero::zero(),
-            bottom: Zero::zero(),
-            right: Zero::zero(),
-            left: Zero::zero(),
+            top: 0,
+            bottom: 0,
+            right: 0,
+            left: 0,
         }
     }
 
     #[cfg(not(target_arch = "x86_64"))]
     #[inline]
-    fn is_zero(&self) -> bool {
-        self.top.is_zero() && self.right.is_zero() && self.bottom.is_zero() && self.left.is_zero()
+    pub fn is_zero(&self) -> bool {
+        self.top == 0 && self.right == 0 && self.bottom == 0 && self.left == 0
     }
 
     #[cfg(target_arch = "x86_64")]
     #[inline]
-    fn is_zero(&self) -> bool {
+    pub fn is_zero(&self) -> bool {
         let is_zero: bool;
         unsafe {
             asm! {

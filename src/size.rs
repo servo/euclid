@@ -8,10 +8,10 @@
 // except according to those terms.
 
 use length::Length;
+use num::Zero;
 
-use std::cmp::PartialEq;
 use std::fmt;
-use std::num::{NumCast, Zero};
+use std::num::NumCast;
 
 #[deriving(Clone, Decodable, Encodable, PartialEq)]
 pub struct Size2D<T> {
@@ -36,16 +36,12 @@ impl<T:Clone + Mul<T,U>, U> Size2D<T> {
     pub fn area(&self) -> U { self.width * self.height }
 }
 
-impl<T:Clone + Zero> Size2D<T> {
+impl<T: Zero> Size2D<T> {
     pub fn zero() -> Size2D<T> {
         Size2D {
             width: Zero::zero(),
             height: Zero::zero(),
         }
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.width.is_zero() || self.height.is_zero()
     }
 }
 

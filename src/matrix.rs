@@ -8,8 +8,10 @@
 // except according to those terms.
 
 use approxeq::ApproxEq;
+use num::{One, Zero};
+
 use std::num;
-use std::num::{NumCast, One, Zero};
+use std::num::NumCast;
 
 pub fn Matrix4<T:Add<T,T> + Clone + ApproxEq<T> + Mul<T,T> + One + Zero>(
         m11: T, m12: T, m13: T, m14: T,
