@@ -115,6 +115,11 @@ impl<T: Clone + PartialOrd + Add<T,T> + Sub<T,T>> Rect<T> {
             size: Size2D(self.size.width + width + width, self.size.height + height + height),
         }
     }
+
+    #[inline]
+    pub fn translate_by_size(&self, size: &Size2D<T>) -> Rect<T> {
+        Rect(Point2D(self.origin.x + size.width, self.origin.y + size.height), self.size.clone())
+    }
 }
 
 impl<Scale, T: Clone + Mul<Scale,T>> Rect<T> {
