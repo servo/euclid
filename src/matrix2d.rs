@@ -8,6 +8,9 @@
 // except according to those terms.
 
 use num::{One, Zero};
+use point::Point2D;
+use rect::Rect;
+use size::Size2D;
 use std::ops::{Add, Mul};
 
 #[derive(Clone, Copy)]
@@ -62,6 +65,40 @@ impl<T:Add<T, Output=T> + Copy + Clone + Mul<T, Output=T> + One + Zero> Matrix2D
             self.m21.clone(), self.m22.clone(),
             self.m31.clone(), self.m32.clone()
         ]
+    }
+
+    /// Returns the given point transformed by this matrix.
+    #[inline]
+    pub fn transform_point(&self, point: &Point2D<T>) -> Point2D<T> {
+        Point2D(point.x * self.m11 + point.y * self.m21 + self.m31,
+                point.x * self.m12 + point.y * self.m22 + self.m32)
+    }
+
+    /// Returns a rectangle that encompasses the result of transforming the given rectangle by this
+    /// matrix.
+    #[inline]
+    pub fn transform_rect(&self, rect: &Rect<T>) -> Rect<T> {
+        let top_left = self.transform_point(&rect.origin);
+        let top_right = self.transform_point(&rect.top_right());
+        let bottom_left = self.transform_point(&rect.bottom_left());
+        let bottom_right = self.transform_point(&rect.bottom_right());
+        let (mut min_x, mut min_y) = (top_left.x.clone(), top_left.y.clone());
+        let (mut max_x, mut max_y) = (min_x.clone(), min_y.clone());
+        for point in [ top_right, bottom_left, bottom_right ].iter() {
+            if point.x < min_x {
+                min_x = point.x.clone()
+            }
+            if point.x > max_x {
+                max_x = point.x.clone()
+            }
+            if point.y < min_y {
+                min_y = point.y.clone()
+            }
+            if point.y > max_y {
+                max_y = point.y.clone()
+            }
+        }
+        Rect(Point2D(min_x.clone(), min_y.clone()), Size2D(max_x - min_x, max_y - min_y))
     }
 }
 
