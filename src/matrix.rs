@@ -27,7 +27,7 @@ pub fn Matrix4<T:Add<T,T> + Clone + ApproxEq<T> + Mul<T,T> + One + Zero>(
     }
 }
 
-#[deriving(Show)]
+#[deriving(Show, Copy)]
 pub struct Matrix4<T> {
     pub m11: T, pub m12: T, pub m13: T, pub m14: T,
     pub m21: T, pub m22: T, pub m23: T, pub m24: T,

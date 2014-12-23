@@ -13,7 +13,7 @@ use num::Zero;
 use std::fmt;
 use std::num::NumCast;
 
-#[deriving(Clone, Decodable, Encodable, PartialEq)]
+#[deriving(Clone, Copy, Decodable, Encodable, PartialEq)]
 pub struct Size2D<T> {
     pub width: T,
     pub height: T

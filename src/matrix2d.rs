@@ -9,6 +9,7 @@
 
 use num::{One, Zero};
 
+#[deriving(Copy)]
 pub struct Matrix2D<T> {
     m11: T, m12: T,
     m21: T, m22: T,
