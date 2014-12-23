@@ -118,6 +118,21 @@ impl<T: Copy + Clone + PartialOrd + Add<T, Output=T> + Sub<T, Output=T>> Rect<T>
     }
 
     #[inline]
+    pub fn top_right(&self) -> Point2D<T> {
+        Point2D(self.max_x(), self.origin.y.clone())
+    }
+
+    #[inline]
+    pub fn bottom_left(&self) -> Point2D<T> {
+        Point2D(self.origin.x.clone(), self.max_y())
+    }
+
+    #[inline]
+    pub fn bottom_right(&self) -> Point2D<T> {
+        Point2D(self.max_x(), self.max_y())
+    }
+
+    #[inline]
     pub fn translate_by_size(&self, size: &Size2D<T>) -> Rect<T> {
         Rect(Point2D(self.origin.x + size.width, self.origin.y + size.height), self.size.clone())
     }
