@@ -24,7 +24,7 @@ use std::num::{NumCast, cast};
 ///
 /// You can multiply a Length by a `scale_factor::ScaleFactor` to convert it from one unit to
 /// another.  See the ScaleFactor docs for an example.
-#[deriving(Decodable, Encodable, Show)]
+#[deriving(Copy, Decodable, Encodable, Show)]
 pub struct Length<Unit, T>(pub T);
 
 impl<Unit, T: Clone> Length<Unit, T> {

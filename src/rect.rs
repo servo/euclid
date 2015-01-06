@@ -16,7 +16,7 @@ use std::cmp::PartialOrd;
 use std::fmt;
 use std::num::NumCast;
 
-#[deriving(Clone, Decodable, Encodable, PartialEq)]
+#[deriving(Clone, Copy, Decodable, Encodable, PartialEq)]
 pub struct Rect<T> {
     pub origin: Point2D<T>,
     pub size: Size2D<T>,

@@ -14,7 +14,7 @@ use num::Zero;
 use std::fmt;
 use std::num::NumCast;
 
-#[deriving(Clone, Decodable, Encodable, Eq, Hash, PartialEq)]
+#[deriving(Clone, Copy, Decodable, Encodable, Eq, Hash, PartialEq)]
 pub struct Point2D<T> {
     pub x: T,
     pub y: T

@@ -30,7 +30,7 @@ use std::num::{NumCast, cast};
 /// let one_foot: Length<Inch, f32> = Length(12.0);
 /// let one_foot_in_mm: Length<Mm, f32> = one_foot * mm_per_inch;
 /// ```
-#[deriving(Decodable, Encodable, Show)]
+#[deriving(Copy, Decodable, Encodable, Show)]
 pub struct ScaleFactor<Src, Dst, T>(pub T);
 
 impl<Src, Dst, T: Clone> ScaleFactor<Src, Dst, T> {
