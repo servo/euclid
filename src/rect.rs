@@ -15,6 +15,7 @@ use size::Size2D;
 use std::cmp::PartialOrd;
 use std::fmt;
 use std::num::NumCast;
+use std::ops::{Add, Sub, Mul, Div};
 
 #[deriving(Clone, Copy, Decodable, Encodable, PartialEq)]
 pub struct Rect<T> {

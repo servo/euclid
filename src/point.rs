@@ -13,6 +13,7 @@ use num::Zero;
 
 use std::fmt;
 use std::num::NumCast;
+use std::ops::{Add, Neg, Mul, Sub, Div};
 
 #[deriving(Clone, Copy, Decodable, Encodable, Eq, Hash, PartialEq)]
 pub struct Point2D<T> {

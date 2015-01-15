@@ -12,6 +12,7 @@ use num::{One, Zero};
 
 use std::num;
 use std::num::NumCast;
+use std::ops::{Add, Mul, Div, Neg, Sub};
 
 pub fn Matrix4<T:Add<T,T> + Clone + ApproxEq<T> + Mul<T,T> + One + Zero>(
         m11: T, m12: T, m13: T, m14: T,
@@ -80,7 +81,7 @@ impl<T:Add<T,T> + Clone + ApproxEq<T> + Mul<T,T> + One + Zero> Matrix4<T> {
                 self.m41.clone(), self.m42.clone(), self.m43.clone(), self.m44.clone())
     }
 
-    pub fn to_array(&self) -> [T, ..16] {
+    pub fn to_array(&self) -> [T; 16] {
         [
             self.m11.clone(), self.m12.clone(), self.m13.clone(), self.m14.clone(),
             self.m21.clone(), self.m22.clone(), self.m23.clone(), self.m24.clone(),

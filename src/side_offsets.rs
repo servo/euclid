@@ -11,7 +11,7 @@
 //! and margins in CSS.
 
 use num::Zero;
-use std::num::Num;
+use std::ops::Add;
 
 /// A group of side offsets, which correspond to top/left/bottom/right for borders, padding,
 /// and margins in CSS.
@@ -50,7 +50,7 @@ impl<T> SideOffsets2D<T> where T: Add<T,T> {
     }
 }
 
-impl<T:Num> Add<SideOffsets2D<T>, SideOffsets2D<T>> for SideOffsets2D<T> {
+impl<T> Add<SideOffsets2D<T>, SideOffsets2D<T>> for SideOffsets2D<T> {
     fn add(&self, other: &SideOffsets2D<T>) -> SideOffsets2D<T> {
         SideOffsets2D {
             top: self.top + other.top,

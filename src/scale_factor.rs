@@ -10,6 +10,7 @@
 
 use num::One;
 use std::num::{NumCast, cast};
+use std::ops::{Add, Mul, Sub, Neg, Div};
 
 /// A scaling factor between two different units of measurement.
 ///

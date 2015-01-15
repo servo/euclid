@@ -10,9 +10,9 @@
 #![crate_name = "geom"]
 #![crate_type = "rlib"]
 
-#![feature(asm, phase, simd)]
+#![feature(asm, simd)]
 
-#[phase(plugin, link)]
+#[macro_use]
 extern crate log;
 extern crate serialize;
 

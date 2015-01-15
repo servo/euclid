@@ -12,6 +12,8 @@ use scale_factor::ScaleFactor;
 use num::Zero;
 
 use std::num::{NumCast, cast};
+use std::cmp::Ordering;
+use std::ops::{Add, Sub, Mul, Div, Neg};
 
 /// A one-dimensional distance, with value represented by `T` and unit of measurement `Unit`.
 ///

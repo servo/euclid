@@ -12,6 +12,7 @@ use num::Zero;
 
 use std::fmt;
 use std::num::NumCast;
+use std::ops::{Mul, Div};
 
 #[deriving(Clone, Copy, Decodable, Encodable, PartialEq)]
 pub struct Size2D<T> {
