@@ -15,7 +15,7 @@ use std::fmt;
 use std::num::NumCast;
 use std::ops::{Add, Neg, Mul, Sub, Div};
 
-#[deriving(Clone, Copy, Decodable, Encodable, Eq, Hash, PartialEq)]
+#[derive(Clone, Copy, RustcDecodable, RustcEncodable, Eq, Hash, PartialEq)]
 pub struct Point2D<T> {
     pub x: T,
     pub y: T
@@ -52,7 +52,7 @@ impl<T:Clone + Add<T, Output=T>> Add<Size2D<T>> for Point2D<T> {
     }
 }
 
-impl<T: Add<T, Output=T>> Point2D<T> {
+impl<T: Copy + Add<T, Output=T>> Point2D<T> {
     pub fn add_size(&self, other: &Size2D<T>) -> Point2D<T> {
         Point2D { x: self.x + other.width, y: self.y + other.height }
     }
@@ -73,21 +73,19 @@ impl <T:Clone + Neg<Output=T>> Neg for Point2D<T> {
     }
 }
 
-#[old_impl_check]
-impl<Scale, T0: Mul<Scale>, T1: Clone> Mul<Scale> for Point2D<T0> {
+impl<Scale: Copy, T0: Mul<Scale, Output=T1>, T1: Clone> Mul<Scale> for Point2D<T0> {
     type Output = Point2D<T1>;
     #[inline]
     fn mul(self, scale: Scale) -> Point2D<T1> {
-        Point2D(self.x * *scale, self.y * *scale)
+        Point2D(self.x * scale, self.y * scale)
     }
 }
 
-#[old_impl_check]
-impl<Scale, T0: Div<Scale>, T1: Clone> Div<Scale> for Point2D<T0> {
+impl<Scale: Copy, T0: Div<Scale, Output=T1>, T1: Clone> Div<Scale> for Point2D<T0> {
     type Output = Point2D<T1>;
     #[inline]
     fn div(self, scale: Scale) -> Point2D<T1> {
-        Point2D(self.x / *scale, self.y / *scale)
+        Point2D(self.x / scale, self.y / scale)
     }
 }
 

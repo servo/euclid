@@ -28,7 +28,7 @@ pub fn Matrix4<T:Add<T, Output=T> + Clone + ApproxEq<T> + Mul<T, Output=T> + One
     }
 }
 
-#[deriving(Show, Copy)]
+#[derive(Show, Copy)]
 pub struct Matrix4<T> {
     pub m11: T, pub m12: T, pub m13: T, pub m14: T,
     pub m21: T, pub m22: T, pub m23: T, pub m24: T,
@@ -36,7 +36,7 @@ pub struct Matrix4<T> {
     pub m41: T, pub m42: T, pub m43: T, pub m44: T,
 }
 
-impl<T:Add<T, Output=T> + Clone + ApproxEq<T> + Mul<T, Output=T> + One + Zero> Matrix4<T> {
+impl<T:Add<T, Output=T> + Copy + Clone + ApproxEq<T> + Mul<T, Output=T> + One + Zero> Matrix4<T> {
     pub fn approx_eq(&self, other: &Matrix4<T>) -> bool {
         self.m11.approx_eq(&other.m11) && self.m12.approx_eq(&other.m12) &&
         self.m13.approx_eq(&other.m13) && self.m14.approx_eq(&other.m14) &&
@@ -101,7 +101,7 @@ impl<T:Add<T, Output=T> + Clone + ApproxEq<T> + Mul<T, Output=T> + One + Zero> M
     }
 }
 
-pub fn ortho<T:Add<T, Output=T> + Clone + Div<T, Output=T> + ApproxEq<T> + Mul<T, Output=T> + Neg<Output=T> + NumCast + One +
+pub fn ortho<T:Add<T, Output=T> + Copy + Clone + Div<T, Output=T> + ApproxEq<T> + Mul<T, Output=T> + Neg<Output=T> + NumCast + One +
                Sub<T, Output=T> + Zero>
         (left: T,
          right: T,

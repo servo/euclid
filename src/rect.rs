@@ -17,7 +17,7 @@ use std::fmt;
 use std::num::NumCast;
 use std::ops::{Add, Sub, Mul, Div};
 
-#[deriving(Clone, Copy, Decodable, Encodable, PartialEq)]
+#[derive(Clone, Copy, RustcDecodable, RustcEncodable, PartialEq)]
 pub struct Rect<T> {
     pub origin: Point2D<T>,
     pub size: Size2D<T>,
@@ -25,7 +25,7 @@ pub struct Rect<T> {
 
 impl<T: fmt::Show> fmt::Show for Rect<T> {
    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Rect({} at {})", self.size, self.origin)
+        write!(f, "Rect({:?} at {:?})", self.size, self.origin)
     }
 }
 
@@ -36,7 +36,7 @@ pub fn Rect<T:Clone>(origin: Point2D<T>, size: Size2D<T>) -> Rect<T> {
     }
 }
 
-impl<T: Clone + PartialOrd + Add<T> + Sub<T>> Rect<T> {
+impl<T: Copy + Clone + PartialOrd + Add<T, Output=T> + Sub<T, Output=T>> Rect<T> {
     #[inline]
     pub fn intersects(&self, other: &Rect<T>) -> bool {
         self.origin.x < other.origin.x + other.size.width &&
@@ -124,7 +124,7 @@ impl<T: Clone + PartialOrd + Add<T> + Sub<T>> Rect<T> {
 }
 
 #[old_impl_check]
-impl<Scale, T: Clone + Mul<Scale>> Rect<T> {
+impl<Scale: Copy, T: Copy + Clone + Mul<Scale, Output=T>> Rect<T> {
     #[inline]
     pub fn scale(&self, x: Scale, y: Scale) -> Rect<T> {
         Rect {
@@ -156,17 +156,19 @@ pub fn max<T:Clone + PartialOrd>(x: T, y: T) -> T {
     if x >= y { x } else { y }
 }
 
-impl<Scale, T0: Mul<Scale>> Mul<Scale> for Rect<T0> {
+impl<Scale: Copy, T0: Mul<Scale, Output=T1>, T1: Clone> Mul<Scale> for Rect<T0> {
+    type Output = Rect<T1>;
     #[inline]
-    fn mul<T1: Clone>(&self, scale: &Scale) -> Rect<T1> {
-        Rect(self.origin * *scale, self.size * *scale)
+    fn mul(self, scale: Scale) -> Rect<T1> {
+        Rect(self.origin * scale, self.size * scale)
     }
 }
 
-impl<Scale, T0: Div<Scale>> Div<Scale> for Rect<T0> {
+impl<Scale: Copy, T0: Div<Scale, Output=T1>, T1: Clone> Div<Scale> for Rect<T0> {
+    type Output = Rect<T1>;
     #[inline]
-    fn div<T1: Clone>(&self, scale: &Scale) -> Rect<T1> {
-        Rect(self.origin / *scale, self.size / *scale)
+    fn div(self, scale: Scale) -> Rect<T1> {
+        Rect(self.origin / scale, self.size / scale)
     }
 }
 

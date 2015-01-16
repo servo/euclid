@@ -14,7 +14,7 @@ use std::fmt;
 use std::num::NumCast;
 use std::ops::{Mul, Div};
 
-#[deriving(Clone, Copy, Decodable, Encodable, PartialEq)]
+#[derive(Clone, Copy, RustcDecodable, RustcEncodable, PartialEq)]
 pub struct Size2D<T> {
     pub width: T,
     pub height: T
@@ -22,7 +22,7 @@ pub struct Size2D<T> {
 
 impl<T: fmt::Show> fmt::Show for Size2D<T> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}×{}", self.width, self.height)
+        write!(f, "{:?}×{:?}", self.width, self.height)
     }
 }
 
@@ -33,8 +33,8 @@ pub fn Size2D<T: Clone>(width: T, height: T) -> Size2D<T> {
     }
 }
 
-impl<T:Clone + Mul<T>> Size2D<T> {
-    pub fn area<U>(&self) -> U { self.width * self.height }
+impl<T:Copy + Clone + Mul<T, Output=U>, U> Size2D<T> {
+    pub fn area(&self) -> U { self.width * self.height }
 }
 
 impl<T: Zero> Size2D<T> {
@@ -46,17 +46,19 @@ impl<T: Zero> Size2D<T> {
     }
 }
 
-impl<Scale, T0: Mul<Scale>> Mul<Scale> for Size2D<T0> {
+impl<Scale: Copy, T0: Mul<Scale, Output=T1>, T1: Clone> Mul<Scale> for Size2D<T0> {
+    type Output = Size2D<T1>;
     #[inline]
-    fn mul<T1: Clone>(&self, scale: &Scale) -> Size2D<T1> {
-        Size2D(self.width * *scale, self.height * *scale)
+    fn mul(self, scale: Scale) -> Size2D<T1> {
+        Size2D(self.width * scale, self.height * scale)
     }
 }
 
-impl<Scale, T0: Div<Scale>> Div<Scale> for Size2D<T0> {
+impl<Scale: Copy, T0: Div<Scale, Output=T1>, T1: Clone> Div<Scale> for Size2D<T0> {
+    type Output = Size2D<T1>;
     #[inline]
-    fn div<T1: Clone>(&self, scale: &Scale) -> Size2D<T1> {
-        Size2D(self.width / *scale, self.height / *scale)
+    fn div(self, scale: Scale) -> Size2D<T1> {
+        Size2D(self.width / scale, self.height / scale)
     }
 }
 

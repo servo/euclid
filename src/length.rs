@@ -26,7 +26,7 @@ use std::ops::{Add, Sub, Mul, Div, Neg};
 ///
 /// You can multiply a Length by a `scale_factor::ScaleFactor` to convert it from one unit to
 /// another.  See the ScaleFactor docs for an example.
-#[deriving(Copy, Decodable, Encodable, Show)]
+#[derive(Copy, RustcDecodable, RustcEncodable, Show)]
 pub struct Length<Unit, T>(pub T);
 
 impl<Unit, T: Clone> Length<Unit, T> {
@@ -87,7 +87,7 @@ impl<Unit, T0: NumCast + Clone> Length<Unit, T0> {
     }
 }
 
-// FIXME: Switch to `deriving(Clone, PartialEq, PartialOrd, Zero)` after this Rust issue is fixed:
+// FIXME: Switch to `derive(Clone, PartialEq, PartialOrd, Zero)` after this Rust issue is fixed:
 // https://github.com/mozilla/rust/issues/7671
 
 impl<Unit, T: Clone> Clone for Length<Unit, T> {
@@ -124,9 +124,9 @@ mod tests {
     use scale_factor::ScaleFactor;
     use std::num::Zero;
 
-    #[deriving(Show)]
+    #[derive(Show)]
     enum Inch {}
-    #[deriving(Show)]
+    #[derive(Show)]
     enum Mm {}
 
     #[test]
