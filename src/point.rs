@@ -29,7 +29,7 @@ impl<T: Zero> Point2D<T> {
 
 impl<T: fmt::Show> fmt::Show for Point2D<T> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "({},{})", self.x, self.y)
+        write!(f, "({:?},{:?})", self.x, self.y)
     }
 }
 
@@ -38,47 +38,55 @@ pub fn Point2D<T>(x: T, y: T) -> Point2D<T> {
 }
 
 
-impl<T:Clone + Add<T,T>> Add<Point2D<T>, Point2D<T>> for Point2D<T> {
-    fn add(&self, other: &Point2D<T>) -> Point2D<T> {
+impl<T:Clone + Add<T, Output=T>> Add for Point2D<T> {
+    type Output = Point2D<T>;
+    fn add(self, other: Point2D<T>) -> Point2D<T> {
         Point2D(self.x + other.x, self.y + other.y)
     }
 }
 
-impl<T:Clone + Add<T,T>> Add<Size2D<T>, Point2D<T>> for Point2D<T> {
-    fn add(&self, other: &Size2D<T>) -> Point2D<T> {
+impl<T:Clone + Add<T, Output=T>> Add<Size2D<T>> for Point2D<T> {
+    type Output = Point2D<T>;
+    fn add(self, other: Size2D<T>) -> Point2D<T> {
         Point2D(self.x + other.width, self.y + other.height)
     }
 }
 
-impl<T: Add<T, T>> Point2D<T> {
+impl<T: Add<T, Output=T>> Point2D<T> {
     pub fn add_size(&self, other: &Size2D<T>) -> Point2D<T> {
         Point2D { x: self.x + other.width, y: self.y + other.height }
     }
 }
 
-impl<T:Clone + Sub<T,T>> Sub<Point2D<T>, Point2D<T>> for Point2D<T> {
-    fn sub(&self, other: &Point2D<T>) -> Point2D<T> {
+impl<T:Clone + Sub<T, Output=T>> Sub for Point2D<T> {
+    type Output = Point2D<T>;
+    fn sub(self, other: Point2D<T>) -> Point2D<T> {
         Point2D(self.x - other.x, self.y - other.y)
     }
 }
 
-impl <T:Clone + Neg<T>> Neg<Point2D<T>> for Point2D<T> {
+impl <T:Clone + Neg<Output=T>> Neg for Point2D<T> {
+    type Output = Point2D<T>;
     #[inline]
-    fn neg(&self) -> Point2D<T> {
+    fn neg(self) -> Point2D<T> {
         Point2D(-self.x, -self.y)
     }
 }
 
-impl<Scale, T0: Mul<Scale, T1>, T1: Clone> Mul<Scale, Point2D<T1>> for Point2D<T0> {
+#[old_impl_check]
+impl<Scale, T0: Mul<Scale>, T1: Clone> Mul<Scale> for Point2D<T0> {
+    type Output = Point2D<T1>;
     #[inline]
-    fn mul(&self, scale: &Scale) -> Point2D<T1> {
+    fn mul(self, scale: Scale) -> Point2D<T1> {
         Point2D(self.x * *scale, self.y * *scale)
     }
 }
 
-impl<Scale, T0: Div<Scale, T1>, T1: Clone> Div<Scale, Point2D<T1>> for Point2D<T0> {
+#[old_impl_check]
+impl<Scale, T0: Div<Scale>, T1: Clone> Div<Scale> for Point2D<T0> {
+    type Output = Point2D<T1>;
     #[inline]
-    fn div(&self, scale: &Scale) -> Point2D<T1> {
+    fn div(self, scale: Scale) -> Point2D<T1> {
         Point2D(self.x / *scale, self.y / *scale)
     }
 }
@@ -103,9 +111,9 @@ impl<Unit, T: Clone> Point2D<Length<Unit, T>> {
     }
 }
 
-impl<Unit, T0: NumCast + Clone, T1: NumCast + Clone> Point2D<Length<Unit, T0>> {
+impl<Unit, T0: NumCast + Clone> Point2D<Length<Unit, T0>> {
     /// Cast from one numeric representation to another, preserving the units.
-    pub fn cast(&self) -> Option<Point2D<Length<Unit, T1>>> {
+    pub fn cast<T1: NumCast + Clone>(&self) -> Option<Point2D<Length<Unit, T1>>> {
         match (self.x.cast(), self.y.cast()) {
             (Some(x), Some(y)) => Some(Point2D(x, y)),
             _ => None
@@ -119,7 +127,7 @@ impl<Unit, T: NumCast + Clone> Point2D<Length<Unit, T>> {
         self.cast().unwrap()
     }
 
-    pub fn as_uint(&self) -> Point2D<Length<Unit, uint>> {
+    pub fn as_uint(&self) -> Point2D<Length<Unit, usize>> {
         self.cast().unwrap()
     }
 }

@@ -40,7 +40,7 @@ impl<T:Clone> SideOffsets2D<T> {
     }
 }
 
-impl<T> SideOffsets2D<T> where T: Add<T,T> {
+impl<T> SideOffsets2D<T> where T: Add<T> {
     pub fn horizontal(&self) -> T {
         self.left + self.right
     }
@@ -50,7 +50,7 @@ impl<T> SideOffsets2D<T> where T: Add<T,T> {
     }
 }
 
-impl<T> Add<SideOffsets2D<T>, SideOffsets2D<T>> for SideOffsets2D<T> {
+impl<T> Add for SideOffsets2D<T> {
     fn add(&self, other: &SideOffsets2D<T>) -> SideOffsets2D<T> {
         SideOffsets2D {
             top: self.top + other.top,
@@ -113,7 +113,7 @@ impl SideOffsets2DSimdI32 {
     }
 }
 
-impl Add<SideOffsets2DSimdI32, SideOffsets2DSimdI32> for SideOffsets2DSimdI32 {
+impl Add for SideOffsets2DSimdI32 {
     #[inline]
     fn add(&self, other: &SideOffsets2DSimdI32) -> SideOffsets2DSimdI32 {
         *self + *other // Use SIMD addition

@@ -36,7 +36,7 @@ pub fn Rect<T:Clone>(origin: Point2D<T>, size: Size2D<T>) -> Rect<T> {
     }
 }
 
-impl<T: Clone + PartialOrd + Add<T,T> + Sub<T,T>> Rect<T> {
+impl<T: Clone + PartialOrd + Add<T> + Sub<T>> Rect<T> {
     #[inline]
     pub fn intersects(&self, other: &Rect<T>) -> bool {
         self.origin.x < other.origin.x + other.size.width &&
@@ -123,7 +123,8 @@ impl<T: Clone + PartialOrd + Add<T,T> + Sub<T,T>> Rect<T> {
     }
 }
 
-impl<Scale, T: Clone + Mul<Scale,T>> Rect<T> {
+#[old_impl_check]
+impl<Scale, T: Clone + Mul<Scale>> Rect<T> {
     #[inline]
     pub fn scale(&self, x: Scale, y: Scale) -> Rect<T> {
         Rect {
@@ -155,16 +156,16 @@ pub fn max<T:Clone + PartialOrd>(x: T, y: T) -> T {
     if x >= y { x } else { y }
 }
 
-impl<Scale, T0: Mul<Scale, T1>, T1: Clone> Mul<Scale, Rect<T1>> for Rect<T0> {
+impl<Scale, T0: Mul<Scale>> Mul<Scale> for Rect<T0> {
     #[inline]
-    fn mul(&self, scale: &Scale) -> Rect<T1> {
+    fn mul<T1: Clone>(&self, scale: &Scale) -> Rect<T1> {
         Rect(self.origin * *scale, self.size * *scale)
     }
 }
 
-impl<Scale, T0: Div<Scale, T1>, T1: Clone> Div<Scale, Rect<T1>> for Rect<T0> {
+impl<Scale, T0: Div<Scale>> Div<Scale> for Rect<T0> {
     #[inline]
-    fn div(&self, scale: &Scale) -> Rect<T1> {
+    fn div<T1: Clone>(&self, scale: &Scale) -> Rect<T1> {
         Rect(self.origin / *scale, self.size / *scale)
     }
 }
@@ -184,9 +185,9 @@ impl<Unit, T: Clone> Rect<Length<Unit, T>> {
     }
 }
 
-impl<Unit, T0: NumCast + Clone, T1: NumCast + Clone> Rect<Length<Unit, T0>> {
+impl<Unit, T0: NumCast + Clone> Rect<Length<Unit, T0>> {
     /// Cast from one numeric representation to another, preserving the units.
-    pub fn cast(&self) -> Option<Rect<Length<Unit, T1>>> {
+    pub fn cast<T1: NumCast + Clone>(&self) -> Option<Rect<Length<Unit, T1>>> {
         match (self.origin.cast(), self.size.cast()) {
             (Some(origin), Some(size)) => Some(Rect(origin, size)),
             _ => None
@@ -200,7 +201,7 @@ impl<Unit, T: NumCast + Clone> Rect<Length<Unit, T>> {
         self.cast().unwrap()
     }
 
-    pub fn as_uint(&self) -> Rect<Length<Unit, uint>> {
+    pub fn as_uint(&self) -> Rect<Length<Unit, usize>> {
         self.cast().unwrap()
     }
 }
