@@ -12,8 +12,9 @@ use num::Zero;
 
 use std::fmt;
 use std::num::NumCast;
+use std::ops::{Mul, Div};
 
-#[deriving(Clone, Copy, Decodable, Encodable, PartialEq)]
+#[derive(Clone, Copy, RustcDecodable, RustcEncodable, PartialEq)]
 pub struct Size2D<T> {
     pub width: T,
     pub height: T
@@ -21,7 +22,7 @@ pub struct Size2D<T> {
 
 impl<T: fmt::Show> fmt::Show for Size2D<T> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}×{}", self.width, self.height)
+        write!(f, "{:?}×{:?}", self.width, self.height)
     }
 }
 
@@ -32,7 +33,7 @@ pub fn Size2D<T: Clone>(width: T, height: T) -> Size2D<T> {
     }
 }
 
-impl<T:Clone + Mul<T,U>, U> Size2D<T> {
+impl<T:Copy + Clone + Mul<T, Output=U>, U> Size2D<T> {
     pub fn area(&self) -> U { self.width * self.height }
 }
 
@@ -45,17 +46,19 @@ impl<T: Zero> Size2D<T> {
     }
 }
 
-impl<Scale, T0: Mul<Scale, T1>, T1: Clone> Mul<Scale, Size2D<T1>> for Size2D<T0> {
+impl<Scale: Copy, T0: Mul<Scale, Output=T1>, T1: Clone> Mul<Scale> for Size2D<T0> {
+    type Output = Size2D<T1>;
     #[inline]
-    fn mul(&self, scale: &Scale) -> Size2D<T1> {
-        Size2D(self.width * *scale, self.height * *scale)
+    fn mul(self, scale: Scale) -> Size2D<T1> {
+        Size2D(self.width * scale, self.height * scale)
     }
 }
 
-impl<Scale, T0: Div<Scale, T1>, T1: Clone> Div<Scale, Size2D<T1>> for Size2D<T0> {
+impl<Scale: Copy, T0: Div<Scale, Output=T1>, T1: Clone> Div<Scale> for Size2D<T0> {
+    type Output = Size2D<T1>;
     #[inline]
-    fn div(&self, scale: &Scale) -> Size2D<T1> {
-        Size2D(self.width / *scale, self.height / *scale)
+    fn div(self, scale: Scale) -> Size2D<T1> {
+        Size2D(self.width / scale, self.height / scale)
     }
 }
 
@@ -79,9 +82,9 @@ impl<Unit, T: Clone> Size2D<Length<Unit, T>> {
     }
 }
 
-impl<Unit, T0: NumCast + Clone, T1: NumCast + Clone> Size2D<Length<Unit, T0>> {
+impl<Unit, T0: NumCast + Clone> Size2D<Length<Unit, T0>> {
     /// Cast from one numeric representation to another, preserving the units.
-    pub fn cast(&self) -> Option<Size2D<Length<Unit, T1>>> {
+    pub fn cast<T1: NumCast + Clone>(&self) -> Option<Size2D<Length<Unit, T1>>> {
         match (self.width.cast(), self.height.cast()) {
             (Some(w), Some(h)) => Some(Size2D(w, h)),
             _ => None
@@ -95,7 +98,7 @@ impl<Unit, T: NumCast + Clone> Size2D<Length<Unit, T>> {
         self.cast().unwrap()
     }
 
-    pub fn as_uint(&self) -> Size2D<Length<Unit, uint>> {
+    pub fn as_uint(&self) -> Size2D<Length<Unit, usize>> {
         self.cast().unwrap()
     }
 }

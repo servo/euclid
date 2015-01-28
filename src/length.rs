@@ -12,6 +12,8 @@ use scale_factor::ScaleFactor;
 use num::Zero;
 
 use std::num::{NumCast, cast};
+use std::cmp::Ordering;
+use std::ops::{Add, Sub, Mul, Div, Neg};
 
 /// A one-dimensional distance, with value represented by `T` and unit of measurement `Unit`.
 ///
@@ -24,7 +26,7 @@ use std::num::{NumCast, cast};
 ///
 /// You can multiply a Length by a `scale_factor::ScaleFactor` to convert it from one unit to
 /// another.  See the ScaleFactor docs for an example.
-#[deriving(Copy, Decodable, Encodable, Show)]
+#[derive(Copy, RustcDecodable, RustcEncodable, Show)]
 pub struct Length<Unit, T>(pub T);
 
 impl<Unit, T: Clone> Length<Unit, T> {
@@ -36,51 +38,56 @@ impl<Unit, T: Clone> Length<Unit, T> {
 }
 
 // length + length
-impl<U, T: Clone + Add<T, T>> Add<Length<U, T>, Length<U, T>> for Length<U, T> {
-    fn add(&self, other: &Length<U, T>) -> Length<U, T> {
+impl<U, T: Clone + Add<T, Output=T>> Add for Length<U, T> {
+    type Output = Length<U, T>;
+    fn add(self, other: Length<U, T>) -> Length<U, T> {
         Length(self.get() + other.get())
     }
 }
 
 // length - length
-impl<U, T: Clone + Sub<T, T>> Sub<Length<U, T>, Length<U, T>> for Length<U, T> {
-    fn sub(&self, other: &Length<U, T>) -> Length<U, T> {
+impl<U, T: Clone + Sub<T, Output=T>> Sub<Length<U, T>> for Length<U, T> {
+    type Output = Length<U, T>;
+    fn sub(self, other: Length<U, T>) -> <Self as Sub>::Output {
         Length(self.get() - other.get())
     }
 }
 
 // length * scaleFactor
-impl<Src, Dst, T: Clone + Mul<T, T>> Mul<ScaleFactor<Src, Dst, T>, Length<Dst, T>> for Length<Src, T> {
+impl<Src, Dst, T: Clone + Mul<T, Output=T>> Mul<ScaleFactor<Src, Dst, T>> for Length<Src, T> {
+    type Output = Length<Dst, T>;
     #[inline]
-    fn mul(&self, scale: &ScaleFactor<Src, Dst, T>) -> Length<Dst, T> {
+    fn mul(self, scale: ScaleFactor<Src, Dst, T>) -> Length<Dst, T> {
         Length(self.get() * scale.get())
     }
 }
 
 // length / scaleFactor
-impl<Src, Dst, T: Clone + Div<T, T>> Div<ScaleFactor<Src, Dst, T>, Length<Src, T>> for Length<Dst, T> {
+impl<Src, Dst, T: Clone + Div<T, Output=T>> Div<ScaleFactor<Src, Dst, T>> for Length<Dst, T> {
+    type Output = Length<Src, T>;
     #[inline]
-    fn div(&self, scale: &ScaleFactor<Src, Dst, T>) -> Length<Src, T> {
+    fn div(self, scale: ScaleFactor<Src, Dst, T>) -> Length<Src, T> {
         Length(self.get() / scale.get())
     }
 }
 
 // -length
-impl <U, T:Clone + Neg<T>> Neg<Length<U, T>> for Length<U, T> {
+impl <U, T:Clone + Neg<Output=T>> Neg for Length<U, T> {
+    type Output = Length<U, T>;
     #[inline]
-    fn neg(&self) -> Length<U, T> {
+    fn neg(self) -> Length<U, T> {
         Length(-self.get())
     }
 }
 
-impl<Unit, T0: NumCast + Clone, T1: NumCast + Clone> Length<Unit, T0> {
+impl<Unit, T0: NumCast + Clone> Length<Unit, T0> {
     /// Cast from one numeric representation to another, preserving the units.
-    pub fn cast(&self) -> Option<Length<Unit, T1>> {
+    pub fn cast<T1: NumCast + Clone>(&self) -> Option<Length<Unit, T1>> {
         cast(self.get()).map(|x| Length(x))
     }
 }
 
-// FIXME: Switch to `deriving(Clone, PartialEq, PartialOrd, Zero)` after this Rust issue is fixed:
+// FIXME: Switch to `derive(Clone, PartialEq, PartialOrd, Zero)` after this Rust issue is fixed:
 // https://github.com/mozilla/rust/issues/7671
 
 impl<Unit, T: Clone> Clone for Length<Unit, T> {
@@ -117,9 +124,9 @@ mod tests {
     use scale_factor::ScaleFactor;
     use std::num::Zero;
 
-    #[deriving(Show)]
+    #[derive(Show)]
     enum Inch {}
-    #[deriving(Show)]
+    #[derive(Show)]
     enum Mm {}
 
     #[test]

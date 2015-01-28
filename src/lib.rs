@@ -10,11 +10,11 @@
 #![crate_name = "geom"]
 #![crate_type = "rlib"]
 
-#![feature(asm, phase, simd)]
+#![feature(asm, simd, old_impl_check)]
 
-#[phase(plugin, link)]
+#[macro_use]
 extern crate log;
-extern crate serialize;
+extern crate "serialize" as rustc_serialize;
 
 extern crate rand;
 extern crate test;

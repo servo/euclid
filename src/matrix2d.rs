@@ -8,15 +8,16 @@
 // except according to those terms.
 
 use num::{One, Zero};
+use std::ops::{Add, Mul};
 
-#[deriving(Clone, Copy)]
+#[derive(Clone, Copy)]
 pub struct Matrix2D<T> {
     m11: T, m12: T,
     m21: T, m22: T,
     m31: T, m32: T
 }
 
-impl<T:Add<T,T> + Clone + Mul<T,T> + One + Zero> Matrix2D<T> {
+impl<T:Add<T, Output=T> + Copy + Clone + Mul<T, Output=T> + One + Zero> Matrix2D<T> {
     pub fn new(m11: T, m12: T, m21: T, m22: T, m31: T, m32: T) -> Matrix2D<T> {
         Matrix2D {
             m11: m11, m12: m12,
@@ -55,7 +56,7 @@ impl<T:Add<T,T> + Clone + Mul<T,T> + One + Zero> Matrix2D<T> {
                              _0.clone(), _0.clone());
     }
 
-    pub fn to_array(&self) -> [T, ..6] {
+    pub fn to_array(&self) -> [T; 6] {
         [
             self.m11.clone(), self.m12.clone(),
             self.m21.clone(), self.m22.clone(),

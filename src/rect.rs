@@ -15,8 +15,9 @@ use size::Size2D;
 use std::cmp::PartialOrd;
 use std::fmt;
 use std::num::NumCast;
+use std::ops::{Add, Sub, Mul, Div};
 
-#[deriving(Clone, Copy, Decodable, Encodable, PartialEq)]
+#[derive(Clone, Copy, RustcDecodable, RustcEncodable, PartialEq)]
 pub struct Rect<T> {
     pub origin: Point2D<T>,
     pub size: Size2D<T>,
@@ -24,7 +25,7 @@ pub struct Rect<T> {
 
 impl<T: fmt::Show> fmt::Show for Rect<T> {
    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Rect({} at {})", self.size, self.origin)
+        write!(f, "Rect({:?} at {:?})", self.size, self.origin)
     }
 }
 
@@ -35,7 +36,7 @@ pub fn Rect<T:Clone>(origin: Point2D<T>, size: Size2D<T>) -> Rect<T> {
     }
 }
 
-impl<T: Clone + PartialOrd + Add<T,T> + Sub<T,T>> Rect<T> {
+impl<T: Copy + Clone + PartialOrd + Add<T, Output=T> + Sub<T, Output=T>> Rect<T> {
     #[inline]
     pub fn intersects(&self, other: &Rect<T>) -> bool {
         self.origin.x < other.origin.x + other.size.width &&
@@ -122,7 +123,8 @@ impl<T: Clone + PartialOrd + Add<T,T> + Sub<T,T>> Rect<T> {
     }
 }
 
-impl<Scale, T: Clone + Mul<Scale,T>> Rect<T> {
+#[old_impl_check]
+impl<Scale: Copy, T: Copy + Clone + Mul<Scale, Output=T>> Rect<T> {
     #[inline]
     pub fn scale(&self, x: Scale, y: Scale) -> Rect<T> {
         Rect {
@@ -154,17 +156,19 @@ pub fn max<T:Clone + PartialOrd>(x: T, y: T) -> T {
     if x >= y { x } else { y }
 }
 
-impl<Scale, T0: Mul<Scale, T1>, T1: Clone> Mul<Scale, Rect<T1>> for Rect<T0> {
+impl<Scale: Copy, T0: Mul<Scale, Output=T1>, T1: Clone> Mul<Scale> for Rect<T0> {
+    type Output = Rect<T1>;
     #[inline]
-    fn mul(&self, scale: &Scale) -> Rect<T1> {
-        Rect(self.origin * *scale, self.size * *scale)
+    fn mul(self, scale: Scale) -> Rect<T1> {
+        Rect(self.origin * scale, self.size * scale)
     }
 }
 
-impl<Scale, T0: Div<Scale, T1>, T1: Clone> Div<Scale, Rect<T1>> for Rect<T0> {
+impl<Scale: Copy, T0: Div<Scale, Output=T1>, T1: Clone> Div<Scale> for Rect<T0> {
+    type Output = Rect<T1>;
     #[inline]
-    fn div(&self, scale: &Scale) -> Rect<T1> {
-        Rect(self.origin / *scale, self.size / *scale)
+    fn div(self, scale: Scale) -> Rect<T1> {
+        Rect(self.origin / scale, self.size / scale)
     }
 }
 
@@ -183,9 +187,9 @@ impl<Unit, T: Clone> Rect<Length<Unit, T>> {
     }
 }
 
-impl<Unit, T0: NumCast + Clone, T1: NumCast + Clone> Rect<Length<Unit, T0>> {
+impl<Unit, T0: NumCast + Clone> Rect<Length<Unit, T0>> {
     /// Cast from one numeric representation to another, preserving the units.
-    pub fn cast(&self) -> Option<Rect<Length<Unit, T1>>> {
+    pub fn cast<T1: NumCast + Clone>(&self) -> Option<Rect<Length<Unit, T1>>> {
         match (self.origin.cast(), self.size.cast()) {
             (Some(origin), Some(size)) => Some(Rect(origin, size)),
             _ => None
@@ -199,7 +203,7 @@ impl<Unit, T: NumCast + Clone> Rect<Length<Unit, T>> {
         self.cast().unwrap()
     }
 
-    pub fn as_uint(&self) -> Rect<Length<Unit, uint>> {
+    pub fn as_uint(&self) -> Rect<Length<Unit, usize>> {
         self.cast().unwrap()
     }
 }

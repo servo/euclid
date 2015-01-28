@@ -10,6 +10,7 @@
 
 use num::One;
 use std::num::{NumCast, cast};
+use std::ops::{Add, Mul, Sub, Div};
 
 /// A scaling factor between two different units of measurement.
 ///
@@ -30,7 +31,7 @@ use std::num::{NumCast, cast};
 /// let one_foot: Length<Inch, f32> = Length(12.0);
 /// let one_foot_in_mm: Length<Mm, f32> = one_foot * mm_per_inch;
 /// ```
-#[deriving(Copy, Decodable, Encodable, Show)]
+#[derive(Copy, RustcDecodable, RustcEncodable, Show)]
 pub struct ScaleFactor<Src, Dst, T>(pub T);
 
 impl<Src, Dst, T: Clone> ScaleFactor<Src, Dst, T> {
@@ -41,7 +42,7 @@ impl<Src, Dst, T: Clone> ScaleFactor<Src, Dst, T> {
     }
 }
 
-impl<Src, Dst, T: Clone + One + Div<T, T>> ScaleFactor<Src, Dst, T> {
+impl<Src, Dst, T: Clone + One + Div<T, Output=T>> ScaleFactor<Src, Dst, T> {
     /// The inverse ScaleFactor (1.0 / self).
     pub fn inv(&self) -> ScaleFactor<Dst, Src, T> {
         let one: T = One::one();
@@ -50,40 +51,41 @@ impl<Src, Dst, T: Clone + One + Div<T, T>> ScaleFactor<Src, Dst, T> {
 }
 
 // scale0 * scale1
-impl<A, B, C, T: Clone + Mul<T,T>>
-Mul<ScaleFactor<B, C, T>, ScaleFactor<A, C, T>> for ScaleFactor<A, B, T> {
+impl<A, B, C, T: Clone + Mul<T, Output=T>>
+Mul<ScaleFactor<B, C, T>> for ScaleFactor<A, B, T> {
+    type Output = ScaleFactor<A, C, T>;
     #[inline]
-    fn mul(&self, other: &ScaleFactor<B, C, T>) -> ScaleFactor<A, C, T> {
+    fn mul(self, other: ScaleFactor<B, C, T>) -> ScaleFactor<A, C, T> {
         ScaleFactor(self.get() * other.get())
     }
 }
 
 // scale0 + scale1
-impl<Src, Dst, T: Clone + Add<T,T>>
-Add<ScaleFactor<Src, Dst, T>, ScaleFactor<Src, Dst, T>> for ScaleFactor<Src, Dst, T> {
+impl<Src, Dst, T: Clone + Add<T, Output=T>> Add for ScaleFactor<Src, Dst, T> {
+    type Output = ScaleFactor<Src, Dst, T>;
     #[inline]
-    fn add(&self, other: &ScaleFactor<Src, Dst, T>) -> ScaleFactor<Src, Dst, T> {
+    fn add(self, other: ScaleFactor<Src, Dst, T>) -> ScaleFactor<Src, Dst, T> {
         ScaleFactor(self.get() + other.get())
     }
 }
 
 // scale0 - scale1
-impl<Src, Dst, T: Clone + Sub<T,T>>
-Sub<ScaleFactor<Src, Dst, T>, ScaleFactor<Src, Dst, T>> for ScaleFactor<Src, Dst, T> {
+impl<Src, Dst, T: Clone + Sub<T, Output=T>> Sub for ScaleFactor<Src, Dst, T> {
+    type Output = ScaleFactor<Src, Dst, T>;
     #[inline]
-    fn sub(&self, other: &ScaleFactor<Src, Dst, T>) -> ScaleFactor<Src, Dst, T> {
+    fn sub(self, other: ScaleFactor<Src, Dst, T>) -> ScaleFactor<Src, Dst, T> {
         ScaleFactor(self.get() - other.get())
     }
 }
 
-impl<Src, Dst, T0: NumCast + Clone, T1: NumCast + Clone> ScaleFactor<Src, Dst, T0> {
+impl<Src, Dst, T0: NumCast + Clone> ScaleFactor<Src, Dst, T0> {
     /// Cast from one numeric representation to another, preserving the units.
-    pub fn cast(&self) -> Option<ScaleFactor<Src, Dst, T1>> {
+    pub fn cast<T1: NumCast + Clone>(&self) -> Option<ScaleFactor<Src, Dst, T1>> {
         cast(self.get()).map(|x| ScaleFactor(x))
     }
 }
 
-// FIXME: Switch to `deriving(PartialEq, Clone)` after this Rust issue is fixed:
+// FIXME: Switch to `derive(PartialEq, Clone)` after this Rust issue is fixed:
 // https://github.com/mozilla/rust/issues/7671
 
 impl<Src, Dst, T: Clone + PartialEq> PartialEq for ScaleFactor<Src, Dst, T> {
@@ -102,11 +104,11 @@ impl<Src, Dst, T: Clone> Clone for ScaleFactor<Src, Dst, T> {
 mod tests {
     use super::ScaleFactor;
 
-    #[deriving(Show)]
+    #[derive(Show)]
     enum Inch {}
-    #[deriving(Show)]
+    #[derive(Show)]
     enum Cm {}
-    #[deriving(Show)]
+    #[derive(Show)]
     enum Mm {}
 
     #[test]

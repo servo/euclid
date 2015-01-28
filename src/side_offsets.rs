@@ -11,11 +11,11 @@
 //! and margins in CSS.
 
 use num::Zero;
-use std::num::Num;
+use std::ops::Add;
 
 /// A group of side offsets, which correspond to top/left/bottom/right for borders, padding,
 /// and margins in CSS.
-#[deriving(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq)]
 pub struct SideOffsets2D<T> {
     pub top: T,
     pub right: T,
@@ -40,7 +40,7 @@ impl<T:Clone> SideOffsets2D<T> {
     }
 }
 
-impl<T> SideOffsets2D<T> where T: Add<T,T> {
+impl<T> SideOffsets2D<T> where T: Add<T, Output=T> + Copy {
     pub fn horizontal(&self) -> T {
         self.left + self.right
     }
@@ -50,8 +50,9 @@ impl<T> SideOffsets2D<T> where T: Add<T,T> {
     }
 }
 
-impl<T:Num> Add<SideOffsets2D<T>, SideOffsets2D<T>> for SideOffsets2D<T> {
-    fn add(&self, other: &SideOffsets2D<T>) -> SideOffsets2D<T> {
+impl<T: Add<T, Output=T>> Add for SideOffsets2D<T> {
+    type Output = SideOffsets2D<T>;
+    fn add(self, other: SideOffsets2D<T>) -> SideOffsets2D<T> {
         SideOffsets2D {
             top: self.top + other.top,
             right: self.right + other.right,
@@ -73,7 +74,7 @@ impl<T: Zero> SideOffsets2D<T> {
 }
 
 /// A SIMD enabled version of SideOffsets2D specialized for i32.
-#[deriving(Clone, Copy, PartialEq, Rand)]
+#[derive(Clone, Copy, PartialEq, Rand)]
 #[simd]
 pub struct SideOffsets2DSimdI32 {
     pub top: i32,
@@ -113,12 +114,13 @@ impl SideOffsets2DSimdI32 {
     }
 }
 
-impl Add<SideOffsets2DSimdI32, SideOffsets2DSimdI32> for SideOffsets2DSimdI32 {
+/*impl Add for SideOffsets2DSimdI32 {
+    type Output = SideOffsets2DSimdI32;
     #[inline]
-    fn add(&self, other: &SideOffsets2DSimdI32) -> SideOffsets2DSimdI32 {
-        *self + *other // Use SIMD addition
+    fn add(self, other: SideOffsets2DSimdI32) -> SideOffsets2DSimdI32 {
+        self + other // Use SIMD addition
     }
-}
+}*/
 
 impl SideOffsets2DSimdI32 {
     #[inline]
