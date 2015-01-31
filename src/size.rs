@@ -20,7 +20,7 @@ pub struct Size2D<T> {
     pub height: T
 }
 
-impl<T: fmt::Show> fmt::Show for Size2D<T> {
+impl<T: fmt::Debug> fmt::Debug for Size2D<T> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{:?}×{:?}", self.width, self.height)
     }
