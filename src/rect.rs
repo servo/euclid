@@ -123,10 +123,10 @@ impl<T: Copy + Clone + PartialOrd + Add<T, Output=T> + Sub<T, Output=T>> Rect<T>
     }
 }
 
-#[old_impl_check]
-impl<Scale: Copy, T: Copy + Clone + Mul<Scale, Output=T>> Rect<T> {
+impl<T> Rect<T> {
     #[inline]
-    pub fn scale(&self, x: Scale, y: Scale) -> Rect<T> {
+    pub fn scale<Scale: Copy>(&self, x: Scale, y: Scale) -> Rect<T>
+        where T: Copy + Clone + Mul<Scale, Output=T> {
         Rect {
             origin: Point2D { x: self.origin.x * x, y: self.origin.y * y},
             size: Size2D { width: self.size.width * x, height: self.size.height * y}
