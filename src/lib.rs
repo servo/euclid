@@ -10,7 +10,8 @@
 #![crate_name = "geom"]
 #![crate_type = "rlib"]
 
-#![feature(asm, simd, old_impl_check)]
+#![feature(asm, simd)]
+#![allow(unstable)]
 
 #[macro_use]
 extern crate log;
