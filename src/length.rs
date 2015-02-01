@@ -122,7 +122,7 @@ impl<Unit, T: Zero> Zero for Length<Unit, T> {
 mod tests {
     use super::Length;
     use scale_factor::ScaleFactor;
-    use std::num::Zero;
+    use num::Zero;
 
     #[derive(Debug)]
     enum Inch {}
@@ -139,7 +139,7 @@ mod tests {
 
         assert_eq!(one_foot.get(), 12.0);
         assert_eq!(two_feet.get(), 24.0);
-        assert!(zero_feet.is_zero());
+        assert_eq!(zero_feet.get(), 0.0);
 
         assert!(one_foot == one_foot);
         assert!(two_feet != one_foot);
