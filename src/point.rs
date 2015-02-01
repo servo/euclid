@@ -27,7 +27,7 @@ impl<T: Zero> Point2D<T> {
     }
 }
 
-impl<T: fmt::Show> fmt::Show for Point2D<T> {
+impl<T: fmt::Debug> fmt::Debug for Point2D<T> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "({:?},{:?})", self.x, self.y)
     }

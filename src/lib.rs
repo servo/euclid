@@ -11,7 +11,7 @@
 #![crate_type = "rlib"]
 
 #![feature(asm, simd)]
-#![allow(unstable)]
+#![feature(core, rustc_private, rand, hash, test)]
 
 #[macro_use]
 extern crate log;

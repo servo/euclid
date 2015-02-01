@@ -31,7 +31,7 @@ use std::ops::{Add, Mul, Sub, Div};
 /// let one_foot: Length<Inch, f32> = Length(12.0);
 /// let one_foot_in_mm: Length<Mm, f32> = one_foot * mm_per_inch;
 /// ```
-#[derive(Copy, RustcDecodable, RustcEncodable, Show)]
+#[derive(Copy, RustcDecodable, RustcEncodable, Debug)]
 pub struct ScaleFactor<Src, Dst, T>(pub T);
 
 impl<Src, Dst, T: Clone> ScaleFactor<Src, Dst, T> {
@@ -104,11 +104,11 @@ impl<Src, Dst, T: Clone> Clone for ScaleFactor<Src, Dst, T> {
 mod tests {
     use super::ScaleFactor;
 
-    #[derive(Show)]
+    #[derive(Debug)]
     enum Inch {}
-    #[derive(Show)]
+    #[derive(Debug)]
     enum Cm {}
-    #[derive(Show)]
+    #[derive(Debug)]
     enum Mm {}
 
     #[test]

@@ -26,7 +26,7 @@ use std::ops::{Add, Sub, Mul, Div, Neg};
 ///
 /// You can multiply a Length by a `scale_factor::ScaleFactor` to convert it from one unit to
 /// another.  See the ScaleFactor docs for an example.
-#[derive(Copy, RustcDecodable, RustcEncodable, Show)]
+#[derive(Copy, RustcDecodable, RustcEncodable, Debug)]
 pub struct Length<Unit, T>(pub T);
 
 impl<Unit, T: Clone> Length<Unit, T> {
@@ -124,9 +124,9 @@ mod tests {
     use scale_factor::ScaleFactor;
     use std::num::Zero;
 
-    #[derive(Show)]
+    #[derive(Debug)]
     enum Inch {}
-    #[derive(Show)]
+    #[derive(Debug)]
     enum Mm {}
 
     #[test]
