@@ -15,7 +15,7 @@
 
 #[macro_use]
 extern crate log;
-extern crate "serialize" as rustc_serialize;
+extern crate "rustc-serialize" as rustc_serialize;
 
 extern crate rand;
 extern crate test;
