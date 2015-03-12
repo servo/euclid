@@ -28,22 +28,12 @@ use std::marker::PhantomData;
 /// You can multiply a Length by a `scale_factor::ScaleFactor` to convert it from one unit to
 /// another.  See the ScaleFactor docs for an example.
 #[derive(Copy, RustcDecodable, RustcEncodable, Debug)]
-pub struct Length<Unit, T>(pub T, PhantomData<Dummy<Unit>>);
+pub struct Length<Unit, T>(pub T, PhantomData<Unit>);
 
 impl<Unit, T> Length<Unit, T> {
     pub fn new(x: T) -> Length<Unit, T> {
         Length(x, PhantomData)
     }
-}
-
-struct Dummy<T>(T);
-
-impl<T> ::rustc_serialize::Encodable for PhantomData<Dummy<T>> {
-    fn encode<S: ::rustc_serialize::Encoder>(&self, _s: &mut S) -> Result<(), S::Error> { Ok(()) }
-}
-
-impl<T> ::rustc_serialize::Decodable for PhantomData<Dummy<T>> {
-    fn decode<D: ::rustc_serialize::Decoder>(_d: &mut D) -> Result<PhantomData<Dummy<T>>, D::Error> { Ok(PhantomData) }
 }
 
 impl<Unit, T: Clone> Length<Unit, T> {

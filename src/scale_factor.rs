@@ -33,17 +33,7 @@ use std::marker::PhantomData;
 /// let one_foot_in_mm: Length<Mm, f32> = one_foot * mm_per_inch;
 /// ```
 #[derive(Copy, RustcDecodable, RustcEncodable, Debug)]
-pub struct ScaleFactor<Src, Dst, T>(pub T, PhantomData<Dummy<(Src, Dst)>>);
-
-struct Dummy<T>(T);
-
-impl<T> ::rustc_serialize::Encodable for PhantomData<Dummy<T>> {
-    fn encode<S: ::rustc_serialize::Encoder>(&self, _s: &mut S) -> Result<(), S::Error> { Ok(()) }
-}
-
-impl<T> ::rustc_serialize::Decodable for PhantomData<Dummy<T>> {
-    fn decode<D: ::rustc_serialize::Decoder>(_d: &mut D) -> Result<PhantomData<Dummy<T>>, D::Error> { Ok(PhantomData) }
-}
+pub struct ScaleFactor<Src, Dst, T>(pub T, PhantomData<(Src, Dst)>);
 
 impl<Src, Dst, T> ScaleFactor<Src, Dst, T> {
     pub fn new(x: T) -> ScaleFactor<Src, Dst, T> {

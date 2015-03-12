@@ -5,4 +5,4 @@ version = "0.1.0"
 authors = ["The Servo Project Developers"]
 
 [dependencies]
-rustc-serialize = "0.3"
+rustc-serialize = "0.3.2"
