@@ -28,7 +28,7 @@ impl<T: fmt::Debug> fmt::Debug for Size2D<T> {
 
 impl<T: fmt::Display> fmt::Display for Size2D<T> {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        write!(formatter, "({},{})", self.width, self.height);
+        write!(formatter, "({}x{})", self.width, self.height);
         Ok(())
     }
 }
