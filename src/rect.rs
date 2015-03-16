@@ -31,18 +31,7 @@ impl<T: fmt::Debug> fmt::Debug for Rect<T> {
 
 impl<T: fmt::Display> fmt::Display for Rect<T> {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        // Why this won't compile? rustc will say that neither Point2D or
-        // Size2D has Debug implemented!
-        //write!(f, "Rect(Size {:?} at Origin {:?})", self.size, self.origin)
-        let mut output = String::from_str("Display::Origin x = ");
-        output.push_str(&(self.origin.x.to_string()));
-        output.push_str("\ty = ");
-        output.push_str(&(self.origin.y.to_string()));
-        output.push_str("\tSize width = ");
-        output.push_str(&(self.size.width.to_string()));
-        output.push_str("\theight = ");
-        output.push_str(&(self.size.height.to_string()));
-        try!(formatter.write_str(output.as_slice()));
+        write!(formatter, "Rect(Size {} at Origin {})", self.size.to_string(), self.origin.to_string());
         Ok(())
     }
 }

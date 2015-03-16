@@ -10,7 +10,7 @@
 use length::Length;
 use num::Zero;
 
-use std::fmt;
+use std::fmt::{self, Formatter};
 use std::num::NumCast;
 use std::ops::{Mul, Div};
 
@@ -23,6 +23,13 @@ pub struct Size2D<T> {
 impl<T: fmt::Debug> fmt::Debug for Size2D<T> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{:?}×{:?}", self.width, self.height)
+    }
+}
+
+impl<T: fmt::Display> fmt::Display for Size2D<T> {
+    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        write!(formatter, "({},{})", self.width, self.height);
+        Ok(())
     }
 }
 
