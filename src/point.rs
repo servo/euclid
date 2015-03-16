@@ -11,7 +11,7 @@ use length::Length;
 use size::Size2D;
 use num::Zero;
 
-use std::fmt;
+use std::fmt::{self, Formatter};
 use std::num::NumCast;
 use std::ops::{Add, Neg, Mul, Sub, Div};
 
@@ -30,6 +30,13 @@ impl<T: Zero> Point2D<T> {
 impl<T: fmt::Debug> fmt::Debug for Point2D<T> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "({:?},{:?})", self.x, self.y)
+    }
+}
+
+impl<T: fmt::Display> fmt::Display for Point2D<T> {
+    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        write!(formatter, "({},{})", self.x, self.y);
+        Ok(())
     }
 }
 

@@ -13,7 +13,7 @@ use num::Zero;
 use point::Point2D;
 use size::Size2D;
 use std::cmp::PartialOrd;
-use std::fmt;
+use std::fmt::{self, Formatter};
 use std::num::NumCast;
 use std::ops::{Add, Sub, Mul, Div};
 
@@ -26,6 +26,13 @@ pub struct Rect<T> {
 impl<T: fmt::Debug> fmt::Debug for Rect<T> {
    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Rect({:?} at {:?})", self.size, self.origin)
+    }
+}
+
+impl<T: fmt::Display> fmt::Display for Rect<T> {
+    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        write!(formatter, "Rect({} at {})", self.size.to_string(), self.origin.to_string());
+        Ok(())
     }
 }
 
