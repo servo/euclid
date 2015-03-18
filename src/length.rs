@@ -14,6 +14,7 @@ use num::Zero;
 use std::num::{NumCast, cast};
 use std::cmp::Ordering;
 use std::ops::{Add, Sub, Mul, Div, Neg};
+use std::marker::PhantomData;
 
 /// A one-dimensional distance, with value represented by `T` and unit of measurement `Unit`.
 ///
@@ -27,13 +28,17 @@ use std::ops::{Add, Sub, Mul, Div, Neg};
 /// You can multiply a Length by a `scale_factor::ScaleFactor` to convert it from one unit to
 /// another.  See the ScaleFactor docs for an example.
 #[derive(Copy, RustcDecodable, RustcEncodable, Debug)]
-pub struct Length<Unit, T>(pub T);
+pub struct Length<Unit, T>(pub T, PhantomData<Unit>);
+
+impl<Unit, T> Length<Unit, T> {
+    pub fn new(x: T) -> Length<Unit, T> {
+        Length(x, PhantomData)
+    }
+}
 
 impl<Unit, T: Clone> Length<Unit, T> {
     pub fn get(&self) -> T {
-        match *self {
-            Length(ref x) => x.clone()
-        }
+        self.0.clone()
     }
 }
 
@@ -41,7 +46,7 @@ impl<Unit, T: Clone> Length<Unit, T> {
 impl<U, T: Clone + Add<T, Output=T>> Add for Length<U, T> {
     type Output = Length<U, T>;
     fn add(self, other: Length<U, T>) -> Length<U, T> {
-        Length(self.get() + other.get())
+        Length::new(self.get() + other.get())
     }
 }
 
@@ -49,7 +54,7 @@ impl<U, T: Clone + Add<T, Output=T>> Add for Length<U, T> {
 impl<U, T: Clone + Sub<T, Output=T>> Sub<Length<U, T>> for Length<U, T> {
     type Output = Length<U, T>;
     fn sub(self, other: Length<U, T>) -> <Self as Sub>::Output {
-        Length(self.get() - other.get())
+        Length::new(self.get() - other.get())
     }
 }
 
@@ -58,7 +63,7 @@ impl<Src, Dst, T: Clone + Mul<T, Output=T>> Mul<ScaleFactor<Src, Dst, T>> for Le
     type Output = Length<Dst, T>;
     #[inline]
     fn mul(self, scale: ScaleFactor<Src, Dst, T>) -> Length<Dst, T> {
-        Length(self.get() * scale.get())
+        Length::new(self.get() * scale.get())
     }
 }
 
@@ -67,7 +72,7 @@ impl<Src, Dst, T: Clone + Div<T, Output=T>> Div<ScaleFactor<Src, Dst, T>> for Le
     type Output = Length<Src, T>;
     #[inline]
     fn div(self, scale: ScaleFactor<Src, Dst, T>) -> Length<Src, T> {
-        Length(self.get() / scale.get())
+        Length::new(self.get() / scale.get())
     }
 }
 
@@ -76,14 +81,14 @@ impl <U, T:Clone + Neg<Output=T>> Neg for Length<U, T> {
     type Output = Length<U, T>;
     #[inline]
     fn neg(self) -> Length<U, T> {
-        Length(-self.get())
+        Length::new(-self.get())
     }
 }
 
 impl<Unit, T0: NumCast + Clone> Length<Unit, T0> {
     /// Cast from one numeric representation to another, preserving the units.
     pub fn cast<T1: NumCast + Clone>(&self) -> Option<Length<Unit, T1>> {
-        cast(self.get()).map(|x| Length(x))
+        cast(self.get()).map(Length::new)
     }
 }
 
@@ -92,7 +97,7 @@ impl<Unit, T0: NumCast + Clone> Length<Unit, T0> {
 
 impl<Unit, T: Clone> Clone for Length<Unit, T> {
     fn clone(&self) -> Length<Unit, T> {
-        Length(self.get())
+        Length::new(self.get())
     }
 }
 
@@ -114,7 +119,7 @@ impl<Unit, T: Clone + Ord> Ord for Length<Unit, T> {
 
 impl<Unit, T: Zero> Zero for Length<Unit, T> {
     fn zero() -> Length<Unit, T> {
-        Length(Zero::zero())
+        Length::new(Zero::zero())
     }
 }
 
@@ -133,7 +138,7 @@ mod tests {
     fn test_length() {
         let mm_per_inch: ScaleFactor<Inch, Mm, f32> = ScaleFactor(25.4);
 
-        let one_foot: Length<Inch, f32> = Length(12.0);
+        let one_foot: Length<Inch, f32> = Length::new(12.0);
         let two_feet = one_foot + one_foot;
         let zero_feet = one_foot - one_foot;
 
@@ -156,7 +161,7 @@ mod tests {
 
         let one_foot_in_mm: Length<Mm, f32> = one_foot * mm_per_inch;
 
-        assert_eq!(one_foot_in_mm, Length(304.8));
+        assert_eq!(one_foot_in_mm, Length::new(304.8));
 
         let back_to_inches: Length<Inch, f32> = one_foot_in_mm / mm_per_inch;
         assert_eq!(one_foot, back_to_inches);
@@ -170,7 +175,7 @@ mod tests {
         let negative_two_feet = -two_feet;
         assert_eq!(negative_two_feet.get(), -24.0);
 
-        let zero_feet: Length<Inch, f32> = Length(0.0);
+        let zero_feet: Length<Inch, f32> = Length::new(0.0);
         let negative_zero_feet = -zero_feet;
         assert_eq!(negative_zero_feet.get(), 0.0);
     }

@@ -101,7 +101,7 @@ impl<Scale: Copy, T0: Div<Scale, Output=T1>, T1: Clone> Div<Scale> for Point2D<T
 pub type TypedPoint2D<Unit, T> = Point2D<Length<Unit, T>>;
 
 pub fn TypedPoint2D<Unit, T: Clone>(x: T, y: T) -> TypedPoint2D<Unit, T> {
-    Point2D(Length(x), Length(y))
+    Point2D(Length::new(x), Length::new(y))
 }
 
 impl<Unit, T: Clone> Point2D<Length<Unit, T>> {
@@ -112,7 +112,7 @@ impl<Unit, T: Clone> Point2D<Length<Unit, T>> {
 
     /// Tag a unitless value with units.
     pub fn from_untyped(p: &Point2D<T>) -> TypedPoint2D<Unit, T> {
-        Point2D(Length(p.x.clone()), Length(p.y.clone()))
+        Point2D(Length::new(p.x.clone()), Length::new(p.y.clone()))
     }
 }
 

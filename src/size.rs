@@ -74,7 +74,7 @@ impl<Scale: Copy, T0: Div<Scale, Output=T1>, T1: Clone> Div<Scale> for Size2D<T0
 pub type TypedSize2D<Unit, T> = Size2D<Length<Unit, T>>;
 
 pub fn TypedSize2D<Unit, T: Clone>(width: T, height: T) -> TypedSize2D<Unit, T> {
-    Size2D(Length(width), Length(height))
+    Size2D(Length::new(width), Length::new(height))
 }
 
 impl<Unit, T: Clone> Size2D<Length<Unit, T>> {
@@ -85,7 +85,7 @@ impl<Unit, T: Clone> Size2D<Length<Unit, T>> {
 
     /// Tag a unitless value with units.
     pub fn from_untyped(p: &Size2D<T>) -> TypedSize2D<Unit, T> {
-        Size2D(Length(p.width.clone()), Length(p.height.clone()))
+        Size2D(Length::new(p.width.clone()), Length::new(p.height.clone()))
     }
 }
 

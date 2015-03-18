@@ -11,6 +11,7 @@
 use num::One;
 use std::num::{NumCast, cast};
 use std::ops::{Add, Mul, Sub, Div};
+use std::marker::PhantomData;
 
 /// A scaling factor between two different units of measurement.
 ///
@@ -32,13 +33,17 @@ use std::ops::{Add, Mul, Sub, Div};
 /// let one_foot_in_mm: Length<Mm, f32> = one_foot * mm_per_inch;
 /// ```
 #[derive(Copy, RustcDecodable, RustcEncodable, Debug)]
-pub struct ScaleFactor<Src, Dst, T>(pub T);
+pub struct ScaleFactor<Src, Dst, T>(pub T, PhantomData<(Src, Dst)>);
+
+impl<Src, Dst, T> ScaleFactor<Src, Dst, T> {
+    pub fn new(x: T) -> ScaleFactor<Src, Dst, T> {
+        ScaleFactor(x, PhantomData)
+    }
+}
 
 impl<Src, Dst, T: Clone> ScaleFactor<Src, Dst, T> {
     pub fn get(&self) -> T {
-        match *self {
-            ScaleFactor(ref x) => x.clone()
-        }
+        self.0.clone()
     }
 }
 
@@ -46,7 +51,7 @@ impl<Src, Dst, T: Clone + One + Div<T, Output=T>> ScaleFactor<Src, Dst, T> {
     /// The inverse ScaleFactor (1.0 / self).
     pub fn inv(&self) -> ScaleFactor<Dst, Src, T> {
         let one: T = One::one();
-        ScaleFactor(one / self.get())
+        ScaleFactor::new(one / self.get())
     }
 }
 
@@ -56,7 +61,7 @@ Mul<ScaleFactor<B, C, T>> for ScaleFactor<A, B, T> {
     type Output = ScaleFactor<A, C, T>;
     #[inline]
     fn mul(self, other: ScaleFactor<B, C, T>) -> ScaleFactor<A, C, T> {
-        ScaleFactor(self.get() * other.get())
+        ScaleFactor::new(self.get() * other.get())
     }
 }
 
@@ -65,7 +70,7 @@ impl<Src, Dst, T: Clone + Add<T, Output=T>> Add for ScaleFactor<Src, Dst, T> {
     type Output = ScaleFactor<Src, Dst, T>;
     #[inline]
     fn add(self, other: ScaleFactor<Src, Dst, T>) -> ScaleFactor<Src, Dst, T> {
-        ScaleFactor(self.get() + other.get())
+        ScaleFactor::new(self.get() + other.get())
     }
 }
 
@@ -74,14 +79,14 @@ impl<Src, Dst, T: Clone + Sub<T, Output=T>> Sub for ScaleFactor<Src, Dst, T> {
     type Output = ScaleFactor<Src, Dst, T>;
     #[inline]
     fn sub(self, other: ScaleFactor<Src, Dst, T>) -> ScaleFactor<Src, Dst, T> {
-        ScaleFactor(self.get() - other.get())
+        ScaleFactor::new(self.get() - other.get())
     }
 }
 
 impl<Src, Dst, T0: NumCast + Clone> ScaleFactor<Src, Dst, T0> {
     /// Cast from one numeric representation to another, preserving the units.
     pub fn cast<T1: NumCast + Clone>(&self) -> Option<ScaleFactor<Src, Dst, T1>> {
-        cast(self.get()).map(|x| ScaleFactor(x))
+        cast(self.get()).map(ScaleFactor::new)
     }
 }
 
@@ -96,7 +101,7 @@ impl<Src, Dst, T: Clone + PartialEq> PartialEq for ScaleFactor<Src, Dst, T> {
 
 impl<Src, Dst, T: Clone> Clone for ScaleFactor<Src, Dst, T> {
     fn clone(&self) -> ScaleFactor<Src, Dst, T> {
-        ScaleFactor(self.get())
+        ScaleFactor::new(self.get())
     }
 }
 
@@ -113,20 +118,20 @@ mod tests {
 
     #[test]
     fn test_scale_factor() {
-        let mm_per_inch: ScaleFactor<Inch, Mm, f32> = ScaleFactor(25.4);
-        let cm_per_mm: ScaleFactor<Mm, Cm, f32> = ScaleFactor(0.1);
+        let mm_per_inch: ScaleFactor<Inch, Mm, f32> = ScaleFactor::new(25.4);
+        let cm_per_mm: ScaleFactor<Mm, Cm, f32> = ScaleFactor::new(0.1);
 
         let mm_per_cm: ScaleFactor<Cm, Mm, f32> = cm_per_mm.inv();
         assert_eq!(mm_per_cm.get(), 10.0);
 
         let cm_per_inch: ScaleFactor<Inch, Cm, f32> = mm_per_inch * cm_per_mm;
-        assert_eq!(cm_per_inch, ScaleFactor(2.54));
+        assert_eq!(cm_per_inch, ScaleFactor::new(2.54));
 
-        let a: ScaleFactor<Inch, Inch, int> = ScaleFactor(2);
-        let b: ScaleFactor<Inch, Inch, int> = ScaleFactor(3);
+        let a: ScaleFactor<Inch, Inch, int> = ScaleFactor::new(2);
+        let b: ScaleFactor<Inch, Inch, int> = ScaleFactor::new(3);
         assert!(a != b);
         assert_eq!(a, a.clone());
-        assert_eq!(a + b, ScaleFactor(5));
-        assert_eq!(a - b, ScaleFactor(-1));
+        assert_eq!(a + b, ScaleFactor::new(5));
+        assert_eq!(a - b, ScaleFactor::new(-1));
     }
 }
