@@ -28,7 +28,7 @@ pub fn Matrix4<T:Add<T, Output=T> + Clone + ApproxEq<T> + Mul<T, Output=T> + One
     }
 }
 
-#[derive(Debug, Copy)]
+#[derive(Debug, Copy, Clone)]
 pub struct Matrix4<T> {
     pub m11: T, pub m12: T, pub m13: T, pub m14: T,
     pub m21: T, pub m22: T, pub m23: T, pub m24: T,
@@ -110,7 +110,7 @@ pub fn ortho<T:Add<T, Output=T> + Copy + Clone + Div<T, Output=T> + ApproxEq<T> 
          near: T,
          far: T)
       -> Matrix4<T> {
-    let _2: T = num::cast(2us).unwrap();
+    let _2: T = num::cast(2).unwrap();
     let _1: T = One::one();
     let _0: T = Zero::zero();
 

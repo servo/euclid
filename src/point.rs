@@ -35,8 +35,7 @@ impl<T: fmt::Debug> fmt::Debug for Point2D<T> {
 
 impl<T: fmt::Display> fmt::Display for Point2D<T> {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        write!(formatter, "({},{})", self.x, self.y);
-        Ok(())
+        write!(formatter, "({},{})", self.x, self.y)
     }
 }
 

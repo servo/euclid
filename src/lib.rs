@@ -10,12 +10,12 @@
 #![crate_name = "geom"]
 #![crate_type = "rlib"]
 
-#![feature(asm, simd)]
-#![feature(core, rustc_private, rand, hash, test)]
+#![feature(asm, simd, zero_one)]
+#![feature(core, rustc_private, test)]
 
 #[macro_use]
 extern crate log;
-extern crate "rustc-serialize" as rustc_serialize;
+extern crate rustc_serialize;
 
 extern crate rand;
 extern crate test;

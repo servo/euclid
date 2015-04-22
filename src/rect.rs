@@ -31,8 +31,7 @@ impl<T: fmt::Debug> fmt::Debug for Rect<T> {
 
 impl<T: fmt::Display> fmt::Display for Rect<T> {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        write!(formatter, "Rect({} at {})", self.size.to_string(), self.origin.to_string());
-        Ok(())
+        write!(formatter, "Rect({} at {})", self.size.to_string(), self.origin.to_string())
     }
 }
 

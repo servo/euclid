@@ -74,7 +74,7 @@ impl<T: Zero> SideOffsets2D<T> {
 }
 
 /// A SIMD enabled version of SideOffsets2D specialized for i32.
-#[derive(Clone, Copy, PartialEq, Rand)]
+#[derive(Clone, Copy, PartialEq)]
 #[simd]
 pub struct SideOffsets2DSimdI32 {
     pub top: i32,

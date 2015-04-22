@@ -7,7 +7,6 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use std::num::Float;
 
 /// Trait for testing approximate equality
 pub trait ApproxEq<Eps> {
@@ -40,7 +39,7 @@ impl ApproxEq<f64> for f64 {
     fn approx_eq(&self, other: &f64) -> bool {
         self.approx_eq_eps(other, &1.0e-6)
     }
-    
+
     #[inline]
     fn approx_eq_eps(&self, other: &f64, approx_epsilon: &f64) -> bool {
         (*self - *other).abs() < *approx_epsilon
