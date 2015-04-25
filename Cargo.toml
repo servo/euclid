@@ -7,3 +7,5 @@ authors = ["The Servo Project Developers"]
 [dependencies]
 rustc-serialize = "0.3.2"
 rand = "0.3.7"
+num = "0.1.24"
+log = "0.3.1"

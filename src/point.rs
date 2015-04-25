@@ -11,8 +11,8 @@ use length::Length;
 use size::Size2D;
 use num::Zero;
 
+use num_lib::NumCast;
 use std::fmt::{self, Formatter};
-use std::num::NumCast;
 use std::ops::{Add, Neg, Mul, Sub, Div};
 
 #[derive(Clone, Copy, RustcDecodable, RustcEncodable, Eq, Hash, PartialEq)]

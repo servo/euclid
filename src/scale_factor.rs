@@ -9,7 +9,8 @@
 //! A type-checked scaling factor between units.
 
 use num::One;
-use std::num::{NumCast, cast};
+
+use num_lib::NumCast;
 use std::ops::{Add, Mul, Sub, Div};
 use std::marker::PhantomData;
 
@@ -86,7 +87,7 @@ impl<Src, Dst, T: Clone + Sub<T, Output=T>> Sub for ScaleFactor<Src, Dst, T> {
 impl<Src, Dst, T0: NumCast + Clone> ScaleFactor<Src, Dst, T0> {
     /// Cast from one numeric representation to another, preserving the units.
     pub fn cast<T1: NumCast + Clone>(&self) -> Option<ScaleFactor<Src, Dst, T1>> {
-        cast(self.get()).map(ScaleFactor::new)
+        NumCast::from(self.get()).map(ScaleFactor::new)
     }
 }
 

@@ -10,8 +10,8 @@
 use length::Length;
 use num::Zero;
 
+use num_lib::NumCast;
 use std::fmt::{self, Formatter};
-use std::num::NumCast;
 use std::ops::{Mul, Div};
 
 #[derive(Clone, Copy, RustcDecodable, RustcEncodable, PartialEq)]

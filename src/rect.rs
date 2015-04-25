@@ -9,12 +9,12 @@
 
 use length::Length;
 use num::Zero;
-
 use point::Point2D;
 use size::Size2D;
+
+use num_lib::NumCast;
 use std::cmp::PartialOrd;
 use std::fmt::{self, Formatter};
-use std::num::NumCast;
 use std::ops::{Add, Sub, Mul, Div};
 
 #[derive(Clone, Copy, RustcDecodable, RustcEncodable, PartialEq)]

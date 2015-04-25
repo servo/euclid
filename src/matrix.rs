@@ -10,8 +10,7 @@
 use approxeq::ApproxEq;
 use num::{One, Zero};
 
-use std::num;
-use std::num::NumCast;
+use num_lib::NumCast;
 use std::ops::{Add, Mul, Div, Neg, Sub};
 
 pub fn Matrix4<T:Add<T, Output=T> + Clone + ApproxEq<T> + Mul<T, Output=T> + One + Zero>(
@@ -110,7 +109,7 @@ pub fn ortho<T:Add<T, Output=T> + Copy + Clone + Div<T, Output=T> + ApproxEq<T> 
          near: T,
          far: T)
       -> Matrix4<T> {
-    let _2: T = num::cast(2).unwrap();
+    let _2: T = NumCast::from(2).unwrap();
     let _1: T = One::one();
     let _0: T = Zero::zero();
 

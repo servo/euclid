@@ -10,8 +10,7 @@
 #![crate_name = "geom"]
 #![crate_type = "rlib"]
 
-#![feature(asm, simd, zero_one)]
-#![feature(core, rustc_private, test)]
+#![feature(asm, simd, zero_one, test)]
 
 #[macro_use]
 extern crate log;
@@ -19,6 +18,7 @@ extern crate rustc_serialize;
 
 extern crate rand;
 extern crate test;
+extern crate num as num_lib;
 
 pub use matrix::Matrix4;
 pub use matrix2d::Matrix2D;

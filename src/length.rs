@@ -11,7 +11,7 @@
 use scale_factor::ScaleFactor;
 use num::Zero;
 
-use std::num::{NumCast, cast};
+use num_lib::NumCast;
 use std::cmp::Ordering;
 use std::ops::{Add, Sub, Mul, Div, Neg};
 use std::marker::PhantomData;
@@ -88,7 +88,7 @@ impl <U, T:Clone + Neg<Output=T>> Neg for Length<U, T> {
 impl<Unit, T0: NumCast + Clone> Length<Unit, T0> {
     /// Cast from one numeric representation to another, preserving the units.
     pub fn cast<T1: NumCast + Clone>(&self) -> Option<Length<Unit, T1>> {
-        cast(self.get()).map(Length::new)
+        NumCast::from(self.get()).map(Length::new)
     }
 }
 
