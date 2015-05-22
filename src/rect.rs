@@ -42,7 +42,7 @@ pub fn Rect<T:Clone>(origin: Point2D<T>, size: Size2D<T>) -> Rect<T> {
     }
 }
 
-impl<T: Copy + Clone + PartialOrd + Add<T, Output=T> + Sub<T, Output=T>> Rect<T> {
+impl<T: Copy + Clone + PartialOrd + Add<T, Output=T> + Sub<T, Output=T> + Zero> Rect<T> {
     #[inline]
     pub fn intersects(&self, other: &Rect<T>) -> bool {
         self.origin.x < other.origin.x + other.size.width &&
@@ -89,6 +89,13 @@ impl<T: Copy + Clone + PartialOrd + Add<T, Output=T> + Sub<T, Output=T>> Rect<T>
 
     #[inline]
     pub fn union(&self, other: &Rect<T>) -> Rect<T> {
+        if self.size == Zero::zero() {
+            return *other
+        }
+        if other.size == Zero::zero() {
+            return *self
+        }
+
         let upper_left = Point2D(min(self.min_x(), other.min_x()),
                                  min(self.min_y(), other.min_y()));
 
