@@ -52,6 +52,15 @@ impl<T: Zero> Size2D<T> {
     }
 }
 
+impl<T: Zero> Zero for Size2D<T> {
+    fn zero() -> Size2D<T> {
+        Size2D {
+            width: Zero::zero(),
+            height: Zero::zero(),
+        }
+    }
+}
+
 impl<Scale: Copy, T0: Mul<Scale, Output=T1>, T1: Clone> Mul<Scale> for Size2D<T0> {
     type Output = Size2D<T1>;
     #[inline]
