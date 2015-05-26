@@ -8,6 +8,7 @@
 // except according to those terms.
 
 use approxeq::ApproxEq;
+use point::Point2D;
 use num::{One, Zero};
 
 use num_lib::NumCast;
@@ -78,6 +79,13 @@ impl<T:Add<T, Output=T> + Copy + Clone + ApproxEq<T> + Mul<T, Output=T> + One + 
                 self.m21.clone(), self.m22 * y,     self.m23.clone(), self.m24.clone(),
                 self.m31.clone(), self.m32.clone(), self.m33 * z,     self.m34.clone(),
                 self.m41.clone(), self.m42.clone(), self.m43.clone(), self.m44.clone())
+    }
+
+    /// Returns the given point transformed by this matrix.
+    #[inline]
+    pub fn transform_point(&self, p: &Point2D<T>) -> Point2D<T> {
+        Point2D(p.x * self.m11 + p.y * self.m21 + self.m41,
+                p.x * self.m12 + p.y * self.m22 + self.m42)
     }
 
     pub fn to_array(&self) -> [T; 16] {
