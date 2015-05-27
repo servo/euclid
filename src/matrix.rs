@@ -11,10 +11,9 @@ use approxeq::ApproxEq;
 use point::Point2D;
 use num::{One, Zero};
 
-use num_lib::NumCast;
-use std::ops::{Add, Mul, Div, Neg, Sub};
+use num_lib::{Float, NumCast};
 
-pub fn Matrix4<T:Add<T, Output=T> + Clone + ApproxEq<T> + Mul<T, Output=T> + One + Zero>(
+pub fn Matrix4<T: Float>(
         m11: T, m12: T, m13: T, m14: T,
         m21: T, m22: T, m23: T, m24: T,
         m31: T, m32: T, m33: T, m34: T,
@@ -36,7 +35,10 @@ pub struct Matrix4<T> {
     pub m41: T, pub m42: T, pub m43: T, pub m44: T,
 }
 
-impl<T:Add<T, Output=T> + Copy + Clone + ApproxEq<T> + Mul<T, Output=T> + One + Zero> Matrix4<T> {
+impl<T: Zero +
+        One +
+        ApproxEq<T> +
+        Float> Matrix4<T> {
     pub fn approx_eq(&self, other: &Matrix4<T>) -> bool {
         self.m11.approx_eq(&other.m11) && self.m12.approx_eq(&other.m12) &&
         self.m13.approx_eq(&other.m13) && self.m14.approx_eq(&other.m14) &&
@@ -106,10 +108,85 @@ impl<T:Add<T, Output=T> + Copy + Clone + ApproxEq<T> + Mul<T, Output=T> + One + 
 
         return self.mul(&matrix);
     }
+
+    /// Create a 3d translation matrix
+    pub fn create_translation(x: T, y: T, z: T) -> Matrix4<T> {
+        let (_0, _1): (T, T) = (Zero::zero(), One::one());
+        Matrix4(_1.clone(), _0.clone(), _0.clone(), _0.clone(),
+                _0.clone(), _1.clone(), _0.clone(), _0.clone(),
+                _0.clone(), _0.clone(), _1.clone(), _0.clone(),
+                         x,          y,          z, _1.clone())
+    }
+
+    /// Create a 3d scale matrix
+    pub fn create_scale(x: T, y: T, z: T) -> Matrix4<T> {
+        let (_0, _1): (T, T) = (Zero::zero(), One::one());
+        Matrix4(         x, _0.clone(), _0.clone(), _0.clone(),
+                _0.clone(),          y, _0.clone(), _0.clone(),
+                _0.clone(), _0.clone(),          z, _0.clone(),
+                _0.clone(), _0.clone(), _0.clone(), _1.clone())
+    }
+
+    /// Create a 3d rotation matrix from an angle / axis.
+    /// The supplied axis must be normalized.
+    pub fn create_rotation(x: T, y: T, z: T, theta: T) -> Matrix4<T> {
+        let _0: T = Zero::zero();
+        let _1: T = One::one();
+        let _2: T = NumCast::from(2).unwrap();
+        let _half: T = NumCast::from(0.5).unwrap();
+
+        let xx = x * x;
+        let yy = y * y;
+        let zz = z * z;
+
+        let half_theta = theta * _half;
+        let sc = half_theta.sin() * half_theta.cos();
+        let sq = half_theta.sin() * half_theta.sin();
+
+        Matrix4(
+            _1.clone() - _2.clone() * (yy + zz) * sq,
+            _2.clone() * (x * y * sq - z * sc),
+            _2.clone() * (x * z * sq + y * sc),
+            _0.clone(),
+
+            _2.clone() * (x * y * sq + z * sc),
+            _1.clone() - _2.clone() * (xx + zz) * sq,
+            _2.clone() * (y * z * sq - x * sc),
+            _0.clone(),
+
+            _2.clone() * (x * z * sq - y * sc),
+            _2.clone() * (y * z * sq + x * sc),
+            _1.clone() - _2.clone() * (xx + yy) * sq,
+            _0.clone(),
+
+            _0.clone(),
+            _0.clone(),
+            _0.clone(),
+            _1.clone()
+        )
+    }
+
+    /// Create a 2d skew matrix
+    pub fn create_skew(sx: T, sy: T) -> Matrix4<T> {
+        let (_0, _1): (T, T) = (Zero::zero(), One::one());
+        Matrix4(_1.clone(),         sx, _0.clone(), _0.clone(),
+                        sy, _1.clone(), _0.clone(), _0.clone(),
+                _0.clone(), _0.clone(), _1.clone(), _0.clone(),
+                _0.clone(), _0.clone(), _0.clone(), _1.clone())
+    }
+
+    /// Create a simple perspective projection matrix
+    pub fn create_perspective(d: T) -> Matrix4<T> {
+        let (_0, _1): (T, T) = (Zero::zero(), One::one());
+        Matrix4(_1.clone(), _0.clone(), _0.clone(), _0.clone(),
+                _0.clone(), _1.clone(), _0.clone(), _0.clone(),
+                _0.clone(), _0.clone(), _1.clone(), -_1.clone() / d,
+                _0.clone(), _0.clone(), _0.clone(), _1.clone())
+    }
 }
 
-pub fn ortho<T:Add<T, Output=T> + Copy + Clone + Div<T, Output=T> + ApproxEq<T> + Mul<T, Output=T> + Neg<Output=T> + NumCast + One +
-               Sub<T, Output=T> + Zero>
+// TODO(gw): Move ortho and identity into static functions of the Matrix type.
+pub fn ortho<T: Zero + One + Float>
         (left: T,
          right: T,
          bottom: T,
@@ -131,7 +208,7 @@ pub fn ortho<T:Add<T, Output=T> + Copy + Clone + Div<T, Output=T> + ApproxEq<T> 
             tx,                  ty,                  tz,                 _1.clone())
 }
 
-pub fn identity<T:Add<T, Output=T> + Clone + ApproxEq<T> + Mul<T, Output=T> + One + Zero>() -> Matrix4<T> {
+pub fn identity<T: Zero + One + Float>() -> Matrix4<T> {
     let (_0, _1): (T, T) = (Zero::zero(), One::one());
     Matrix4(_1.clone(), _0.clone(), _0.clone(), _0.clone(),
             _0.clone(), _1.clone(), _0.clone(), _0.clone(),
