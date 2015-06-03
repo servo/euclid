@@ -303,8 +303,9 @@ impl Matrix4 {
         )
     }
 
-    /// Create a 2d skew matrix
-    pub fn create_skew(sx: f32, sy: f32) -> Matrix4 {
+    /// https://drafts.csswg.org/css-transforms/#funcdef-skew
+    pub fn create_skew(alpha: f32, beta: f32) -> Matrix4 {
+        let (sx, sy) = (beta.tan(), alpha.tan());
         Matrix4::new(1.0,  sx, 0.0, 0.0,
                       sy, 1.0, 0.0, 0.0,
                      0.0, 0.0, 1.0, 0.0,
