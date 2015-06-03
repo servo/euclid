@@ -167,10 +167,11 @@ impl<T: Zero +
     }
 
     /// Create a 2d skew matrix
-    pub fn create_skew(sx: T, sy: T) -> Matrix4<T> {
+    /// http://dev.w3.org/csswg/css-transforms/#SkewDefined
+    pub fn create_skew(alpha: T, beta: T) -> Matrix4<T> {
         let (_0, _1): (T, T) = (Zero::zero(), One::one());
-        Matrix4(_1.clone(),         sx, _0.clone(), _0.clone(),
-                        sy, _1.clone(), _0.clone(), _0.clone(),
+        Matrix4(_1.clone(), beta.tan(), _0.clone(), _0.clone(),
+               alpha.tan(), _1.clone(), _0.clone(), _0.clone(),
                 _0.clone(), _0.clone(), _1.clone(), _0.clone(),
                 _0.clone(), _0.clone(), _0.clone(), _1.clone())
     }
