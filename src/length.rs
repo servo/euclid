@@ -136,11 +136,11 @@ mod tests {
 
     #[test]
     fn test_length() {
-        let mm_per_inch: ScaleFactor<Inch, Mm, f32> = ScaleFactor(25.4);
+        let mm_per_inch: ScaleFactor<Inch, Mm, f32> = ScaleFactor::new(25.4);
 
         let one_foot: Length<Inch, f32> = Length::new(12.0);
-        let two_feet = one_foot + one_foot;
-        let zero_feet = one_foot - one_foot;
+        let two_feet = one_foot.clone() + one_foot.clone();
+        let zero_feet = one_foot.clone() - one_foot.clone();
 
         assert_eq!(one_foot.get(), 12.0);
         assert_eq!(two_feet.get(), 24.0);
@@ -159,14 +159,14 @@ mod tests {
         assert!(!(two_feet >  two_feet));
         assert!(!(two_feet <  two_feet));
 
-        let one_foot_in_mm: Length<Mm, f32> = one_foot * mm_per_inch;
+        let one_foot_in_mm: Length<Mm, f32> = one_foot.clone() * mm_per_inch.clone();
 
         assert_eq!(one_foot_in_mm, Length::new(304.8));
 
         let back_to_inches: Length<Inch, f32> = one_foot_in_mm / mm_per_inch;
         assert_eq!(one_foot, back_to_inches);
 
-        let int_foot: Length<Inch, int> = one_foot.cast().unwrap();
+        let int_foot: Length<Inch, isize> = one_foot.cast().unwrap();
         assert_eq!(int_foot.get(), 12);
 
         let negative_one_foot = -one_foot;
