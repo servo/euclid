@@ -28,9 +28,9 @@ use std::marker::PhantomData;
 /// enum Mm {};
 /// enum Inch {};
 ///
-/// let mm_per_inch: ScaleFactor<Inch, Mm, f32> = ScaleFactor(25.4);
+/// let mm_per_inch: ScaleFactor<Inch, Mm, f32> = ScaleFactor::new(25.4);
 ///
-/// let one_foot: Length<Inch, f32> = Length(12.0);
+/// let one_foot: Length<Inch, f32> = Length::new(12.0);
 /// let one_foot_in_mm: Length<Mm, f32> = one_foot * mm_per_inch;
 /// ```
 #[derive(Copy, RustcDecodable, RustcEncodable, Debug)]
@@ -128,11 +128,11 @@ mod tests {
         let cm_per_inch: ScaleFactor<Inch, Cm, f32> = mm_per_inch * cm_per_mm;
         assert_eq!(cm_per_inch, ScaleFactor::new(2.54));
 
-        let a: ScaleFactor<Inch, Inch, int> = ScaleFactor::new(2);
-        let b: ScaleFactor<Inch, Inch, int> = ScaleFactor::new(3);
+        let a: ScaleFactor<Inch, Inch, isize> = ScaleFactor::new(2);
+        let b: ScaleFactor<Inch, Inch, isize> = ScaleFactor::new(3);
         assert!(a != b);
         assert_eq!(a, a.clone());
-        assert_eq!(a + b, ScaleFactor::new(5));
+        assert_eq!(a.clone() + b.clone(), ScaleFactor::new(5));
         assert_eq!(a - b, ScaleFactor::new(-1));
     }
 }
