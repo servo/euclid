@@ -3,6 +3,7 @@
 name = "geom"
 version = "0.1.0"
 authors = ["The Servo Project Developers"]
+documentation = "http://doc.servo.org/geom/"
 
 [dependencies]
 rustc-serialize = "0.3.2"
