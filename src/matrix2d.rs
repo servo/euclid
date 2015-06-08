@@ -105,6 +105,7 @@ impl<T:Add<T, Output=T> +
                 max_y = point.y.clone()
             }
         }
-        Rect(Point2D::new(min_x.clone(), min_y.clone()), Size2D::new(max_x - min_x, max_y - min_y))
+        Rect::new(Point2D::new(min_x.clone(), min_y.clone()),
+                  Size2D::new(max_x - min_x, max_y - min_y))
     }
 }
