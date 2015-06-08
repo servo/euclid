@@ -116,8 +116,8 @@ impl Matrix4 {
     /// Returns the given point transformed by this matrix.
     #[inline]
     pub fn transform_point(&self, p: &Point2D<f32>) -> Point2D<f32> {
-        Point2D(p.x * self.m11 + p.y * self.m21 + self.m41,
-                p.x * self.m12 + p.y * self.m22 + self.m42)
+        Point2D::new(p.x * self.m11 + p.y * self.m21 + self.m41,
+                     p.x * self.m12 + p.y * self.m22 + self.m42)
     }
 
     pub fn to_array(&self) -> [f32; 16] {

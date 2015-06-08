@@ -77,8 +77,8 @@ impl<T:Add<T, Output=T> +
     /// Returns the given point transformed by this matrix.
     #[inline]
     pub fn transform_point(&self, point: &Point2D<T>) -> Point2D<T> {
-        Point2D(point.x * self.m11 + point.y * self.m21 + self.m31,
-                point.x * self.m12 + point.y * self.m22 + self.m32)
+        Point2D::new(point.x * self.m11 + point.y * self.m21 + self.m31,
+                     point.x * self.m12 + point.y * self.m22 + self.m32)
     }
 
     /// Returns a rectangle that encompasses the result of transforming the given rectangle by this
@@ -105,7 +105,6 @@ impl<T:Add<T, Output=T> +
                 max_y = point.y.clone()
             }
         }
-        Rect(Point2D(min_x.clone(), min_y.clone()), Size2D(max_x - min_x, max_y - min_y))
+        Rect(Point2D::new(min_x.clone(), min_y.clone()), Size2D(max_x - min_x, max_y - min_y))
     }
 }
-
