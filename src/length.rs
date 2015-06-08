@@ -127,7 +127,6 @@ impl<Unit, T: Zero> Zero for Length<Unit, T> {
 mod tests {
     use super::Length;
     use scale_factor::ScaleFactor;
-    use num::Zero;
 
     #[derive(Debug)]
     enum Inch {}

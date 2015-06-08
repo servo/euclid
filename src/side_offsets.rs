@@ -159,7 +159,6 @@ impl SideOffsets2DSimdI32 {
 
 #[cfg(test)]
 mod tests {
-    use num::Zero;
     use super::SideOffsets2DSimdI32;
 
     #[test]
