@@ -33,6 +33,41 @@ pub struct Matrix4 {
 }
 
 impl Matrix4 {
+    pub fn ortho(left: f32, right: f32,
+                 bottom: f32, top: f32,
+                 near: f32, far: f32) -> Matrix4 {
+        let tx = -((right + left) / (right - left));
+        let ty = -((top + bottom) / (top - bottom));
+        let tz = -((far + near) / (far - near));
+
+        Matrix4(2.0 / (right - left),
+                0.0,
+                0.0,
+                0.0,
+
+                0.0,
+                2.0 / (top - bottom),
+                0.0,
+                0.0,
+
+                0.0,
+                0.0,
+                -2.0 / (far - near),
+                0.0,
+
+                tx,
+                ty,
+                tz,
+                1.0)
+    }
+
+    pub fn identity() -> Matrix4 {
+        Matrix4(1.0, 0.0, 0.0, 0.0,
+                0.0, 1.0, 0.0, 0.0,
+                0.0, 0.0, 1.0, 0.0,
+                0.0, 0.0, 0.0, 1.0)
+    }
+
     pub fn approx_eq(&self, other: &Matrix4) -> bool {
         self.m11.approx_eq(&other.m11) && self.m12.approx_eq(&other.m12) &&
         self.m13.approx_eq(&other.m13) && self.m14.approx_eq(&other.m14) &&
@@ -169,47 +204,11 @@ impl Matrix4 {
     }
 }
 
-// TODO(gw): Move ortho and identity into static functions of the Matrix type.
-pub fn ortho(left: f32, right: f32,
-             bottom: f32, top: f32,
-             near: f32, far: f32) -> Matrix4 {
-    let tx = -((right + left) / (right - left));
-    let ty = -((top + bottom) / (top - bottom));
-    let tz = -((far + near) / (far - near));
-
-    Matrix4(2.0 / (right - left),
-            0.0,
-            0.0,
-            0.0,
-
-            0.0,
-            2.0 / (top - bottom),
-            0.0,
-            0.0,
-
-            0.0,
-            0.0,
-            -2.0 / (far - near),
-            0.0,
-
-            tx,
-            ty,
-            tz,
-            1.0)
-}
-
-pub fn identity() -> Matrix4 {
-    Matrix4(1.0, 0.0, 0.0, 0.0,
-            0.0, 1.0, 0.0, 0.0,
-            0.0, 0.0, 1.0, 0.0,
-            0.0, 0.0, 0.0, 1.0)
-}
-
 #[test]
 pub fn test_ortho() {
     let (left, right, bottom, top) = (0.0f32, 1.0f32, 0.1f32, 1.0f32);
     let (near, far) = (-1.0f32, 1.0f32);
-    let result = ortho(left, right, bottom, top, near, far);
+    let result = Matrix4::ortho(left, right, bottom, top, near, far);
     let expected = Matrix4(2.0,  0.0,         0.0,  0.0,
                            0.0,  2.22222222,  0.0,  0.0,
                            0.0,  0.0,         -1.0, 0.0,
