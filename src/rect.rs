@@ -82,8 +82,8 @@ impl<T: Copy + Clone + PartialOrd + Add<T, Output=T> + Sub<T, Output=T> + Zero> 
         let lower_right = Point2D::new(min(self.max_x(), other.max_x()),
                                        min(self.max_y(), other.max_y()));
 
-        Some(Rect(upper_left.clone(), Size2D(lower_right.x - upper_left.x,
-                                             lower_right.y - upper_left.y)))
+        Some(Rect(upper_left.clone(), Size2D::new(lower_right.x - upper_left.x,
+                                                  lower_right.y - upper_left.y)))
     }
 
     #[inline]
@@ -103,7 +103,7 @@ impl<T: Copy + Clone + PartialOrd + Add<T, Output=T> + Sub<T, Output=T> + Zero> 
 
         Rect {
             origin: upper_left.clone(),
-            size: Size2D(lower_right.x - upper_left.x, lower_right.y - upper_left.y)
+            size: Size2D::new(lower_right.x - upper_left.x, lower_right.y - upper_left.y)
         }
     }
 
@@ -125,7 +125,7 @@ impl<T: Copy + Clone + PartialOrd + Add<T, Output=T> + Sub<T, Output=T> + Zero> 
     pub fn inflate(&self, width: T, height: T) -> Rect<T> {
         Rect {
             origin: Point2D::new(self.origin.x - width, self.origin.y - height),
-            size: Size2D(self.size.width + width + width, self.size.height + height + height),
+            size: Size2D::new(self.size.width + width + width, self.size.height + height + height),
         }
     }
 
@@ -247,7 +247,7 @@ fn test_min_max() {
 
 #[test]
 fn test_translate() {
-    let p = Rect(Point2D::new(0u32, 0u32), Size2D(50u32, 40u32));
+    let p = Rect(Point2D::new(0u32, 0u32), Size2D::new(50u32, 40u32));
     let pp = p.translate(&Point2D::new(10,15));
 
     assert!(pp.size.width == 50);
@@ -256,7 +256,7 @@ fn test_translate() {
     assert!(pp.origin.y == 15);
 
 
-    let r = Rect(Point2D::new(-10i32, -5i32), Size2D(50i32, 40i32));
+    let r = Rect(Point2D::new(-10i32, -5i32), Size2D::new(50i32, 40i32));
     let rr = r.translate(&Point2D::new(0,-10));
 
     assert!(rr.size.width == 50);
@@ -267,42 +267,42 @@ fn test_translate() {
 
 #[test]
 fn test_union() {
-    let p = Rect(Point2D::new(0i32, 0i32), Size2D(50i32, 40i32));
-    let q = Rect(Point2D::new(20i32 ,20i32), Size2D(5i32, 5i32));
-    let r = Rect(Point2D::new(-15i32, -30i32), Size2D(200i32, 15i32));
-    let s = Rect(Point2D::new(20i32, -15i32), Size2D(250i32, 200i32));
+    let p = Rect(Point2D::new(0i32, 0i32), Size2D::new(50i32, 40i32));
+    let q = Rect(Point2D::new(20i32 ,20i32), Size2D::new(5i32, 5i32));
+    let r = Rect(Point2D::new(-15i32, -30i32), Size2D::new(200i32, 15i32));
+    let s = Rect(Point2D::new(20i32, -15i32), Size2D::new(250i32, 200i32));
 
     let pq = p.union(&q);
     assert!(pq.origin == Point2D::new(0, 0));
-    assert!(pq.size == Size2D(50, 40));
+    assert!(pq.size == Size2D::new(50, 40));
 
     let pr = p.union(&r);
     assert!(pr.origin == Point2D::new(-15, -30));
-    assert!(pr.size == Size2D(200, 70));
+    assert!(pr.size == Size2D::new(200, 70));
 
     let ps = p.union(&s);
     assert!(ps.origin == Point2D::new(0, -15));
-    assert!(ps.size == Size2D(270, 200));
+    assert!(ps.size == Size2D::new(270, 200));
 
 }
 
 #[test]
 fn test_intersection() {
-    let p = Rect(Point2D::new(0i32, 0i32), Size2D(10i32, 20i32));
-    let q = Rect(Point2D::new(5i32, 15i32), Size2D(10i32, 10i32));
-    let r = Rect(Point2D::new(-5i32, -5i32), Size2D(8i32, 8i32));
+    let p = Rect(Point2D::new(0i32, 0i32), Size2D::new(10i32, 20i32));
+    let q = Rect(Point2D::new(5i32, 15i32), Size2D::new(10i32, 10i32));
+    let r = Rect(Point2D::new(-5i32, -5i32), Size2D::new(8i32, 8i32));
 
     let pq = p.intersection(&q);
     assert!(pq.is_some());
     let pq = pq.unwrap();
     assert!(pq.origin == Point2D::new(5, 15));
-    assert!(pq.size == Size2D(5, 5));
+    assert!(pq.size == Size2D::new(5, 5));
 
     let pr = p.intersection(&r);
     assert!(pr.is_some());
     let pr = pr.unwrap();
     assert!(pr.origin == Point2D::new(0, 0));
-    assert!(pr.size == Size2D(3, 3));
+    assert!(pr.size == Size2D::new(3, 3));
 
     let qr = q.intersection(&r);
     assert!(qr.is_none());
@@ -310,7 +310,7 @@ fn test_intersection() {
 
 #[test]
 fn test_contains() {
-    let r = Rect(Point2D::new(-20i32, 15i32), Size2D(100i32, 200i32));
+    let r = Rect(Point2D::new(-20i32, 15i32), Size2D::new(100i32, 200i32));
 
     assert!(r.contains(&Point2D::new(0, 50)));
     assert!(r.contains(&Point2D::new(-10, 200)));
@@ -341,7 +341,7 @@ fn test_contains() {
 
 #[test]
 fn test_scale() {
-    let p = Rect(Point2D::new(0u32, 0u32), Size2D(50u32, 40u32));
+    let p = Rect(Point2D::new(0u32, 0u32), Size2D::new(50u32, 40u32));
     let pp = p.scale(10, 15);
 
     assert!(pp.size.width == 500);
@@ -349,7 +349,7 @@ fn test_scale() {
     assert!(pp.origin.x == 0);
     assert!(pp.origin.y == 0);
 
-    let r = Rect(Point2D::new(-10i32, -5i32), Size2D(50i32, 40i32));
+    let r = Rect(Point2D::new(-10i32, -5i32), Size2D::new(50i32, 40i32));
     let rr = r.scale(1, 20);
 
     assert!(rr.size.width == 50);
@@ -360,7 +360,7 @@ fn test_scale() {
 
 #[test]
 fn test_inflate() {
-    let p = Rect(Point2D::new(0i32, 0i32), Size2D(10i32, 10i32));
+    let p = Rect(Point2D::new(0i32, 0i32), Size2D::new(10i32, 10i32));
     let pp = p.inflate(10, 20);
 
     assert!(pp.size.width == 30);
@@ -368,7 +368,7 @@ fn test_inflate() {
     assert!(pp.origin.x == -10);
     assert!(pp.origin.y == -20);
 
-    let r = Rect(Point2D::new(0i32, 0i32), Size2D(10i32, 20i32));
+    let r = Rect(Point2D::new(0i32, 0i32), Size2D::new(10i32, 20i32));
     let rr = r.inflate(-2, -5);
 
     assert!(rr.size.width == 6);
@@ -379,13 +379,13 @@ fn test_inflate() {
 
 #[test]
 fn test_min_max_x_y() {
-    let p = Rect(Point2D::new(0u32, 0u32), Size2D(50u32, 40u32));
+    let p = Rect(Point2D::new(0u32, 0u32), Size2D::new(50u32, 40u32));
     assert!(p.max_y() == 40);
     assert!(p.min_y() == 0);
     assert!(p.max_x() == 50);
     assert!(p.min_x() == 0);
 
-    let r = Rect(Point2D::new(-10i32, -5i32), Size2D(50i32, 40i32));
+    let r = Rect(Point2D::new(-10i32, -5i32), Size2D::new(50i32, 40i32));
     assert!(r.max_y() == 35);
     assert!(r.min_y() == -5);
     assert!(r.max_x() == 40);
