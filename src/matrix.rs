@@ -9,16 +9,13 @@
 
 use approxeq::ApproxEq;
 use point::Point2D;
-use num::{One, Zero};
 
-use num_lib::{Float, NumCast};
-
-pub fn Matrix4<T: Float>(
-        m11: T, m12: T, m13: T, m14: T,
-        m21: T, m22: T, m23: T, m24: T,
-        m31: T, m32: T, m33: T, m34: T,
-        m41: T, m42: T, m43: T, m44: T)
-     -> Matrix4<T> {
+pub fn Matrix4(
+        m11: f32, m12: f32, m13: f32, m14: f32,
+        m21: f32, m22: f32, m23: f32, m24: f32,
+        m31: f32, m32: f32, m33: f32, m34: f32,
+        m41: f32, m42: f32, m43: f32, m44: f32)
+     -> Matrix4 {
     Matrix4 {
         m11: m11, m12: m12, m13: m13, m14: m14,
         m21: m21, m22: m22, m23: m23, m24: m24,
@@ -28,18 +25,15 @@ pub fn Matrix4<T: Float>(
 }
 
 #[derive(Debug, Copy, Clone)]
-pub struct Matrix4<T> {
-    pub m11: T, pub m12: T, pub m13: T, pub m14: T,
-    pub m21: T, pub m22: T, pub m23: T, pub m24: T,
-    pub m31: T, pub m32: T, pub m33: T, pub m34: T,
-    pub m41: T, pub m42: T, pub m43: T, pub m44: T,
+pub struct Matrix4 {
+    pub m11: f32, pub m12: f32, pub m13: f32, pub m14: f32,
+    pub m21: f32, pub m22: f32, pub m23: f32, pub m24: f32,
+    pub m31: f32, pub m32: f32, pub m33: f32, pub m34: f32,
+    pub m41: f32, pub m42: f32, pub m43: f32, pub m44: f32,
 }
 
-impl<T: Zero +
-        One +
-        ApproxEq<T> +
-        Float> Matrix4<T> {
-    pub fn approx_eq(&self, other: &Matrix4<T>) -> bool {
+impl Matrix4 {
+    pub fn approx_eq(&self, other: &Matrix4) -> bool {
         self.m11.approx_eq(&other.m11) && self.m12.approx_eq(&other.m12) &&
         self.m13.approx_eq(&other.m13) && self.m14.approx_eq(&other.m14) &&
         self.m21.approx_eq(&other.m21) && self.m22.approx_eq(&other.m22) &&
@@ -50,7 +44,7 @@ impl<T: Zero +
         self.m43.approx_eq(&other.m43) && self.m44.approx_eq(&other.m44)
     }
 
-    pub fn mul(&self, m: &Matrix4<T>) -> Matrix4<T> {
+    pub fn mul(&self, m: &Matrix4) -> Matrix4 {
         Matrix4(m.m11*self.m11 + m.m12*self.m21 + m.m13*self.m31 + m.m14*self.m41,
                 m.m11*self.m12 + m.m12*self.m22 + m.m13*self.m32 + m.m14*self.m42,
                 m.m11*self.m13 + m.m12*self.m23 + m.m13*self.m33 + m.m14*self.m43,
@@ -69,151 +63,146 @@ impl<T: Zero +
                 m.m41*self.m14 + m.m42*self.m24 + m.m43*self.m34 + m.m44*self.m44)
     }
 
-    pub fn mul_s(&self, x: T) -> Matrix4<T> {
+    pub fn mul_s(&self, x: f32) -> Matrix4 {
         Matrix4(self.m11 * x, self.m12 * x, self.m13 * x, self.m14 * x,
                 self.m21 * x, self.m22 * x, self.m23 * x, self.m24 * x,
                 self.m31 * x, self.m32 * x, self.m33 * x, self.m34 * x,
                 self.m41 * x, self.m42 * x, self.m43 * x, self.m44 * x)
     }
 
-    pub fn scale(&self, x: T, y: T, z: T) -> Matrix4<T> {
-        Matrix4(self.m11 * x,     self.m12.clone(), self.m13.clone(), self.m14.clone(),
-                self.m21.clone(), self.m22 * y,     self.m23.clone(), self.m24.clone(),
-                self.m31.clone(), self.m32.clone(), self.m33 * z,     self.m34.clone(),
-                self.m41.clone(), self.m42.clone(), self.m43.clone(), self.m44.clone())
+    pub fn scale(&self, x: f32, y: f32, z: f32) -> Matrix4 {
+        Matrix4(self.m11 * x, self.m12,     self.m13,     self.m14,
+                self.m21    , self.m22 * y, self.m23,     self.m24,
+                self.m31    , self.m32,     self.m33 * z, self.m34,
+                self.m41    , self.m42,     self.m43,     self.m44)
     }
 
     /// Returns the given point transformed by this matrix.
     #[inline]
-    pub fn transform_point(&self, p: &Point2D<T>) -> Point2D<T> {
+    pub fn transform_point(&self, p: &Point2D<f32>) -> Point2D<f32> {
         Point2D(p.x * self.m11 + p.y * self.m21 + self.m41,
                 p.x * self.m12 + p.y * self.m22 + self.m42)
     }
 
-    pub fn to_array(&self) -> [T; 16] {
+    pub fn to_array(&self) -> [f32; 16] {
         [
-            self.m11.clone(), self.m12.clone(), self.m13.clone(), self.m14.clone(),
-            self.m21.clone(), self.m22.clone(), self.m23.clone(), self.m24.clone(),
-            self.m31.clone(), self.m32.clone(), self.m33.clone(), self.m34.clone(),
-            self.m41.clone(), self.m42.clone(), self.m43.clone(), self.m44.clone()
+            self.m11, self.m12, self.m13, self.m14,
+            self.m21, self.m22, self.m23, self.m24,
+            self.m31, self.m32, self.m33, self.m34,
+            self.m41, self.m42, self.m43, self.m44
         ]
     }
 
-    pub fn translate(&self, x: T, y: T, z: T) -> Matrix4<T> {
-        let (_0, _1): (T, T) = (Zero::zero(), One::one());
-        let matrix = Matrix4(_1.clone(), _0.clone(), _0.clone(), _0.clone(),
-                             _0.clone(), _1.clone(), _0.clone(), _0.clone(),
-                             _0.clone(), _0.clone(), _1.clone(), _0.clone(),
-                             x,  y,  z,  _1.clone());
+    pub fn translate(&self, x: f32, y: f32, z: f32) -> Matrix4 {
+        let matrix = Matrix4(1.0, 0.0, 0.0, 0.0,
+                             0.0, 1.0, 0.0, 0.0,
+                             0.0, 0.0, 1.0, 0.0,
+                               x,   y,   z, 1.0);
 
         return self.mul(&matrix);
     }
 
     /// Create a 3d translation matrix
-    pub fn create_translation(x: T, y: T, z: T) -> Matrix4<T> {
-        let (_0, _1): (T, T) = (Zero::zero(), One::one());
-        Matrix4(_1.clone(), _0.clone(), _0.clone(), _0.clone(),
-                _0.clone(), _1.clone(), _0.clone(), _0.clone(),
-                _0.clone(), _0.clone(), _1.clone(), _0.clone(),
-                         x,          y,          z, _1.clone())
+    pub fn create_translation(x: f32, y: f32, z: f32) -> Matrix4 {
+        Matrix4(1.0, 0.0, 0.0, 0.0,
+                0.0, 1.0, 0.0, 0.0,
+                0.0, 0.0, 1.0, 0.0,
+                  x,   y,   z, 1.0)
     }
 
     /// Create a 3d scale matrix
-    pub fn create_scale(x: T, y: T, z: T) -> Matrix4<T> {
-        let (_0, _1): (T, T) = (Zero::zero(), One::one());
-        Matrix4(         x, _0.clone(), _0.clone(), _0.clone(),
-                _0.clone(),          y, _0.clone(), _0.clone(),
-                _0.clone(), _0.clone(),          z, _0.clone(),
-                _0.clone(), _0.clone(), _0.clone(), _1.clone())
+    pub fn create_scale(x: f32, y: f32, z: f32) -> Matrix4 {
+        Matrix4(  x, 0.0, 0.0, 0.0,
+                0.0,   y, 0.0, 0.0,
+                0.0, 0.0,   z, 0.0,
+                0.0, 0.0, 0.0, 1.0)
     }
 
     /// Create a 3d rotation matrix from an angle / axis.
     /// The supplied axis must be normalized.
-    pub fn create_rotation(x: T, y: T, z: T, theta: T) -> Matrix4<T> {
-        let _0: T = Zero::zero();
-        let _1: T = One::one();
-        let _2: T = NumCast::from(2).unwrap();
-        let _half: T = NumCast::from(0.5).unwrap();
-
+    pub fn create_rotation(x: f32, y: f32, z: f32, theta: f32) -> Matrix4 {
         let xx = x * x;
         let yy = y * y;
         let zz = z * z;
 
-        let half_theta = theta * _half;
+        let half_theta = theta * 0.5;
         let sc = half_theta.sin() * half_theta.cos();
         let sq = half_theta.sin() * half_theta.sin();
 
         Matrix4(
-            _1.clone() - _2.clone() * (yy + zz) * sq,
-            _2.clone() * (x * y * sq - z * sc),
-            _2.clone() * (x * z * sq + y * sc),
-            _0.clone(),
+            1.0 - 2.0 * (yy + zz) * sq,
+            2.0 * (x * y * sq - z * sc),
+            2.0 * (x * z * sq + y * sc),
+            0.0,
 
-            _2.clone() * (x * y * sq + z * sc),
-            _1.clone() - _2.clone() * (xx + zz) * sq,
-            _2.clone() * (y * z * sq - x * sc),
-            _0.clone(),
+            2.0 * (x * y * sq + z * sc),
+            1.0 - 2.0 * (xx + zz) * sq,
+            2.0 * (y * z * sq - x * sc),
+            0.0,
 
-            _2.clone() * (x * z * sq - y * sc),
-            _2.clone() * (y * z * sq + x * sc),
-            _1.clone() - _2.clone() * (xx + yy) * sq,
-            _0.clone(),
+            2.0 * (x * z * sq - y * sc),
+            2.0 * (y * z * sq + x * sc),
+            1.0 - 2.0 * (xx + yy) * sq,
+            0.0,
 
-            _0.clone(),
-            _0.clone(),
-            _0.clone(),
-            _1.clone()
+            0.0,
+            0.0,
+            0.0,
+            1.0
         )
     }
 
     /// Create a 2d skew matrix
-    pub fn create_skew(sx: T, sy: T) -> Matrix4<T> {
-        let (_0, _1): (T, T) = (Zero::zero(), One::one());
-        Matrix4(_1.clone(),         sx, _0.clone(), _0.clone(),
-                        sy, _1.clone(), _0.clone(), _0.clone(),
-                _0.clone(), _0.clone(), _1.clone(), _0.clone(),
-                _0.clone(), _0.clone(), _0.clone(), _1.clone())
+    pub fn create_skew(sx: f32, sy: f32) -> Matrix4 {
+        Matrix4(1.0,  sx, 0.0, 0.0,
+                 sy, 1.0, 0.0, 0.0,
+                0.0, 0.0, 1.0, 0.0,
+                0.0, 0.0, 0.0, 1.0)
     }
 
     /// Create a simple perspective projection matrix
-    pub fn create_perspective(d: T) -> Matrix4<T> {
-        let (_0, _1): (T, T) = (Zero::zero(), One::one());
-        Matrix4(_1.clone(), _0.clone(), _0.clone(), _0.clone(),
-                _0.clone(), _1.clone(), _0.clone(), _0.clone(),
-                _0.clone(), _0.clone(), _1.clone(), -_1.clone() / d,
-                _0.clone(), _0.clone(), _0.clone(), _1.clone())
+    pub fn create_perspective(d: f32) -> Matrix4 {
+        Matrix4(1.0, 0.0, 0.0, 0.0,
+                0.0, 1.0, 0.0, 0.0,
+                0.0, 0.0, 1.0, -1.0 / d,
+                0.0, 0.0, 0.0, 1.0)
     }
 }
 
 // TODO(gw): Move ortho and identity into static functions of the Matrix type.
-pub fn ortho<T: Zero + One + Float>
-        (left: T,
-         right: T,
-         bottom: T,
-         top: T,
-         near: T,
-         far: T)
-      -> Matrix4<T> {
-    let _2: T = NumCast::from(2).unwrap();
-    let _1: T = One::one();
-    let _0: T = Zero::zero();
-
+pub fn ortho(left: f32, right: f32,
+             bottom: f32, top: f32,
+             near: f32, far: f32) -> Matrix4 {
     let tx = -((right + left) / (right - left));
     let ty = -((top + bottom) / (top - bottom));
     let tz = -((far + near) / (far - near));
 
-    Matrix4(_2 / (right - left), _0.clone(),          _0.clone(),         _0.clone(),
-            _0.clone(),          _2 / (top - bottom), _0.clone(),         _0.clone(),
-            _0.clone(),          _0.clone(),          -_2 / (far - near), _0.clone(),
-            tx,                  ty,                  tz,                 _1.clone())
+    Matrix4(2.0 / (right - left),
+            0.0,
+            0.0,
+            0.0,
+
+            0.0,
+            2.0 / (top - bottom),
+            0.0,
+            0.0,
+
+            0.0,
+            0.0,
+            -2.0 / (far - near),
+            0.0,
+
+            tx,
+            ty,
+            tz,
+            1.0)
 }
 
-pub fn identity<T: Zero + One + Float>() -> Matrix4<T> {
-    let (_0, _1): (T, T) = (Zero::zero(), One::one());
-    Matrix4(_1.clone(), _0.clone(), _0.clone(), _0.clone(),
-            _0.clone(), _1.clone(), _0.clone(), _0.clone(),
-            _0.clone(), _0.clone(), _1.clone(), _0.clone(),
-            _0.clone(), _0.clone(), _0.clone(), _1.clone())
+pub fn identity() -> Matrix4 {
+    Matrix4(1.0, 0.0, 0.0, 0.0,
+            0.0, 1.0, 0.0, 0.0,
+            0.0, 0.0, 1.0, 0.0,
+            0.0, 0.0, 0.0, 1.0)
 }
 
 #[test]
