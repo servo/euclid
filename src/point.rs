@@ -135,3 +135,62 @@ impl<Unit, T: NumCast + Clone> Point2D<Length<Unit, T>> {
         self.cast().unwrap()
     }
 }
+
+#[derive(Clone, Copy, RustcDecodable, RustcEncodable, Eq, Hash, PartialEq)]
+pub struct Point3D<T> {
+    pub x: T,
+    pub y: T,
+    pub z: T,
+}
+
+impl<T: Zero> Point3D<T> {
+    #[inline]
+    pub fn zero() -> Point3D<T> {
+        Point3D { x: Zero::zero(), y: Zero::zero(), z: Zero::zero() }
+    }
+}
+
+impl<T: fmt::Debug> fmt::Debug for Point3D<T> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "({:?},{:?},{:?})", self.x, self.y, self.z)
+    }
+}
+
+impl<T: fmt::Display> fmt::Display for Point3D<T> {
+    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        write!(formatter, "({},{},{})", self.x, self.y, self.z)
+    }
+}
+
+impl<T> Point3D<T> {
+    #[inline]
+    pub fn new(x: T, y: T, z: T) -> Point3D<T> {
+        Point3D {x: x, y: y, z: z}
+    }
+}
+
+impl<T:Clone + Add<T, Output=T>> Add for Point3D<T> {
+    type Output = Point3D<T>;
+    fn add(self, other: Point3D<T>) -> Point3D<T> {
+        Point3D::new(self.x + other.x,
+                     self.y + other.y,
+                     self.z + other.z)
+    }
+}
+
+impl<T:Clone + Sub<T, Output=T>> Sub for Point3D<T> {
+    type Output = Point3D<T>;
+    fn sub(self, other: Point3D<T>) -> Point3D<T> {
+        Point3D::new(self.x - other.x,
+                     self.y - other.y,
+                     self.z - other.z)
+    }
+}
+
+impl <T:Clone + Neg<Output=T>> Neg for Point3D<T> {
+    type Output = Point3D<T>;
+    #[inline]
+    fn neg(self) -> Point3D<T> {
+        Point3D::new(-self.x, -self.y, -self.z)
+    }
+}
