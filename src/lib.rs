@@ -22,7 +22,7 @@ extern crate num as num_lib;
 
 pub use matrix::Matrix4;
 pub use matrix2d::Matrix2D;
-pub use point::Point2D;
+pub use point::{Point2D, Point3D, Point4D};
 pub use rect::Rect;
 pub use side_offsets::SideOffsets2D;
 pub use side_offsets::SideOffsets2DSimdI32;

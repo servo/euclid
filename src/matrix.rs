@@ -8,10 +8,10 @@
 // except according to those terms.
 
 use approxeq::ApproxEq;
-use point::Point2D;
+use point::{Point2D, Point4D};
 
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Matrix4 {
     pub m11: f32, pub m12: f32, pub m13: f32, pub m14: f32,
     pub m21: f32, pub m22: f32, pub m23: f32, pub m24: f32,
@@ -118,6 +118,15 @@ impl Matrix4 {
     pub fn transform_point(&self, p: &Point2D<f32>) -> Point2D<f32> {
         Point2D::new(p.x * self.m11 + p.y * self.m21 + self.m41,
                      p.x * self.m12 + p.y * self.m22 + self.m42)
+    }
+
+    #[inline]
+    pub fn transform_point4d(&self, p: &Point4D<f32>) -> Point4D<f32> {
+        let x = p.x * self.m11 + p.y * self.m21 + p.z * self.m31 + self.m41;
+        let y = p.x * self.m12 + p.y * self.m22 + p.z * self.m32 + self.m42;
+        let z = p.x * self.m13 + p.y * self.m23 + p.z * self.m33 + self.m43;
+        let w = p.x * self.m14 + p.y * self.m24 + p.z * self.m34 + self.m44;
+        Point4D::new(x, y, z, w)
     }
 
     pub fn to_array(&self) -> [f32; 16] {
