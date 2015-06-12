@@ -32,10 +32,12 @@ impl<T: fmt::Display> fmt::Display for Size2D<T> {
     }
 }
 
-pub fn Size2D<T: Clone>(width: T, height: T) -> Size2D<T> {
-    Size2D {
-        width: width,
-        height: height
+impl<T: Clone> Size2D<T> {
+    pub fn new(width: T, height: T) -> Size2D<T> {
+        Size2D {
+            width: width,
+            height: height
+        }
     }
 }
 
@@ -65,7 +67,7 @@ impl<Scale: Copy, T0: Mul<Scale, Output=T1>, T1: Clone> Mul<Scale> for Size2D<T0
     type Output = Size2D<T1>;
     #[inline]
     fn mul(self, scale: Scale) -> Size2D<T1> {
-        Size2D(self.width * scale, self.height * scale)
+        Size2D::new(self.width * scale, self.height * scale)
     }
 }
 
@@ -73,7 +75,7 @@ impl<Scale: Copy, T0: Div<Scale, Output=T1>, T1: Clone> Div<Scale> for Size2D<T0
     type Output = Size2D<T1>;
     #[inline]
     fn div(self, scale: Scale) -> Size2D<T1> {
-        Size2D(self.width / scale, self.height / scale)
+        Size2D::new(self.width / scale, self.height / scale)
     }
 }
 
@@ -81,19 +83,19 @@ impl<Scale: Copy, T0: Div<Scale, Output=T1>, T1: Clone> Div<Scale> for Size2D<T0
 
 pub type TypedSize2D<Unit, T> = Size2D<Length<Unit, T>>;
 
-pub fn TypedSize2D<Unit, T: Clone>(width: T, height: T) -> TypedSize2D<Unit, T> {
-    Size2D(Length::new(width), Length::new(height))
-}
-
 impl<Unit, T: Clone> Size2D<Length<Unit, T>> {
+    pub fn typed(width: T, height: T) -> TypedSize2D<Unit, T> {
+        Size2D::new(Length::new(width), Length::new(height))
+    }
+
     /// Drop the units, preserving only the numeric value.
     pub fn to_untyped(&self) -> Size2D<T> {
-        Size2D(self.width.get(), self.height.get())
+        Size2D::new(self.width.get(), self.height.get())
     }
 
     /// Tag a unitless value with units.
     pub fn from_untyped(p: &Size2D<T>) -> TypedSize2D<Unit, T> {
-        Size2D(Length::new(p.width.clone()), Length::new(p.height.clone()))
+        Size2D::new(Length::new(p.width.clone()), Length::new(p.height.clone()))
     }
 }
 
@@ -101,7 +103,7 @@ impl<Unit, T0: NumCast + Clone> Size2D<Length<Unit, T0>> {
     /// Cast from one numeric representation to another, preserving the units.
     pub fn cast<T1: NumCast + Clone>(&self) -> Option<Size2D<Length<Unit, T1>>> {
         match (self.width.cast(), self.height.cast()) {
-            (Some(w), Some(h)) => Some(Size2D(w, h)),
+            (Some(w), Some(h)) => Some(Size2D::new(w, h)),
             _ => None
         }
     }
