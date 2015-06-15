@@ -8,7 +8,7 @@
 // except according to those terms.
 
 use approxeq::ApproxEq;
-use point::Point2D;
+use point::{Point2D, Point3D};
 
 
 #[derive(Debug, Copy, Clone)]
@@ -118,6 +118,17 @@ impl Matrix4 {
     pub fn transform_point(&self, p: &Point2D<f32>) -> Point2D<f32> {
         Point2D::new(p.x * self.m11 + p.y * self.m21 + self.m41,
                      p.x * self.m12 + p.y * self.m22 + self.m42)
+    }
+
+    /// Transform the 3d point, and perform perspective division.
+    #[inline]
+    pub fn transform_homogenous(&self, p: &Point3D<f32>) -> Point3D<f32> {
+        let x = p.x * self.m11 + p.y * self.m21 + p.z * self.m31 + self.m41;
+        let y = p.x * self.m12 + p.y * self.m22 + p.z * self.m32 + self.m42;
+        let z = p.x * self.m13 + p.y * self.m23 + p.z * self.m33 + self.m43;
+        let w = p.x * self.m14 + p.y * self.m24 + p.z * self.m34 + self.m44;
+        let inv_w = 1.0 / w;
+        Point3D::new(x * inv_w, y * inv_w, z * inv_w)
     }
 
     pub fn to_array(&self) -> [f32; 16] {
