@@ -2,7 +2,9 @@
 name = "euclid"
 version = "0.1.0"
 authors = ["The Servo Project Developers"]
+description = "Geometry primitives"
 documentation = "http://doc.servo.org/euclid/"
+license = "MIT / Apache-2.0"
 
 [dependencies]
 rustc-serialize = "0.3.2"
