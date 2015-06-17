@@ -1,9 +1,8 @@
 [package]
-
-name = "geom"
+name = "euclid"
 version = "0.1.0"
 authors = ["The Servo Project Developers"]
-documentation = "http://doc.servo.org/geom/"
+documentation = "http://doc.servo.org/euclid/"
 
 [dependencies]
 rustc-serialize = "0.3.2"

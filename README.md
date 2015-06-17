@@ -1,3 +1,5 @@
-# rust-geom
+# euclid
 
-[Documentation](http://doc.servo.org/geom/)
+This is a small library for geometric types.
+
+[Documentation](http://doc.servo.org/euclid/)
