@@ -11,7 +11,7 @@ use approxeq::ApproxEq;
 use point::{Point2D, Point4D};
 
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Matrix4 {
     pub m11: f32, pub m12: f32, pub m13: f32, pub m14: f32,
     pub m21: f32, pub m22: f32, pub m23: f32, pub m24: f32,

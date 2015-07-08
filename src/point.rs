@@ -15,7 +15,7 @@ use num_lib::NumCast;
 use std::fmt::{self, Formatter};
 use std::ops::{Add, Neg, Mul, Sub, Div};
 
-#[derive(Clone, Copy, RustcDecodable, RustcEncodable, Eq, Hash, PartialEq)]
+#[derive(Clone, Copy, RustcDecodable, RustcEncodable, Eq, Hash, PartialEq, Deserialize, Serialize)]
 pub struct Point2D<T> {
     pub x: T,
     pub y: T

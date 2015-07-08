@@ -7,11 +7,14 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#![feature(asm, simd, zero_one, test)]
+#![feature(asm, custom_derive, plugin, simd, zero_one, test)]
+
+#![plugin(serde_macros)]
 
 #[macro_use]
 extern crate log;
 extern crate rustc_serialize;
+extern crate serde;
 
 extern crate rand;
 extern crate test;
