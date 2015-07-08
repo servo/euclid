@@ -17,7 +17,7 @@ use std::cmp::PartialOrd;
 use std::fmt::{self, Formatter};
 use std::ops::{Add, Sub, Mul, Div};
 
-#[derive(Clone, Copy, RustcDecodable, RustcEncodable, PartialEq)]
+#[derive(Clone, Copy, RustcDecodable, RustcEncodable, PartialEq, Deserialize, Serialize)]
 pub struct Rect<T> {
     pub origin: Point2D<T>,
     pub size: Size2D<T>,

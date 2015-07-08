@@ -14,7 +14,7 @@ use num_lib::NumCast;
 use std::fmt::{self, Formatter};
 use std::ops::{Mul, Div};
 
-#[derive(Clone, Copy, RustcDecodable, RustcEncodable, PartialEq)]
+#[derive(Clone, Copy, RustcDecodable, RustcEncodable, PartialEq, Deserialize, Serialize)]
 pub struct Size2D<T> {
     pub width: T,
     pub height: T

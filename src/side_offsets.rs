@@ -15,7 +15,7 @@ use std::ops::Add;
 
 /// A group of side offsets, which correspond to top/left/bottom/right for borders, padding,
 /// and margins in CSS.
-#[derive(Clone, Copy, PartialEq, Debug)]
+#[derive(Clone, Copy, PartialEq, Debug, Deserialize, Serialize)]
 pub struct SideOffsets2D<T> {
     pub top: T,
     pub right: T,
