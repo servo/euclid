@@ -11,6 +11,7 @@
 use num::One;
 
 use num_lib::NumCast;
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::ops::{Add, Mul, Sub, Div};
 use std::marker::PhantomData;
 
@@ -35,6 +36,19 @@ use std::marker::PhantomData;
 /// ```
 #[derive(Copy, RustcDecodable, RustcEncodable, Debug)]
 pub struct ScaleFactor<Src, Dst, T>(pub T, PhantomData<(Src, Dst)>);
+
+impl<Src,Dst,T> Deserialize for ScaleFactor<Src,Dst,T> where T: Deserialize {
+    fn deserialize<D>(deserializer: &mut D) -> Result<ScaleFactor<Src,Dst,T>,D::Error>
+                      where D: Deserializer {
+        Ok(ScaleFactor(try!(Deserialize::deserialize(deserializer)), PhantomData))
+    }
+}
+
+impl<Src,Dst,T> Serialize for ScaleFactor<Src,Dst,T> where T: Serialize {
+    fn serialize<S>(&self, serializer: &mut S) -> Result<(),S::Error> where S: Serializer {
+        self.0.serialize(serializer)
+    }
+}
 
 impl<Src, Dst, T> ScaleFactor<Src, Dst, T> {
     pub fn new(x: T) -> ScaleFactor<Src, Dst, T> {

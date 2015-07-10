@@ -12,6 +12,7 @@ use scale_factor::ScaleFactor;
 use num::Zero;
 
 use num_lib::NumCast;
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::cmp::Ordering;
 use std::ops::{Add, Sub, Mul, Div, Neg};
 use std::marker::PhantomData;
@@ -29,6 +30,19 @@ use std::marker::PhantomData;
 /// another.  See the ScaleFactor docs for an example.
 #[derive(Copy, RustcDecodable, RustcEncodable, Debug)]
 pub struct Length<Unit, T>(pub T, PhantomData<Unit>);
+
+impl<Unit,T> Deserialize for Length<Unit,T> where T: Deserialize {
+    fn deserialize<D>(deserializer: &mut D) -> Result<Length<Unit,T>,D::Error>
+                      where D: Deserializer {
+        Ok(Length(try!(Deserialize::deserialize(deserializer)), PhantomData))
+    }
+}
+
+impl<Unit,T> Serialize for Length<Unit,T> where T: Serialize {
+    fn serialize<S>(&self, serializer: &mut S) -> Result<(),S::Error> where S: Serializer {
+        self.0.serialize(serializer)
+    }
+}
 
 impl<Unit, T> Length<Unit, T> {
     pub fn new(x: T) -> Length<Unit, T> {
