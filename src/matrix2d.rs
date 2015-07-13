@@ -13,7 +13,7 @@ use rect::Rect;
 use size::Size2D;
 use std::ops::{Add, Mul, Sub};
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Deserialize, Serialize)]
 pub struct Matrix2D<T> {
     m11: T, m12: T,
     m21: T, m22: T,
