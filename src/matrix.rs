@@ -99,6 +99,111 @@ impl Matrix4 {
                      m.m41*self.m14 + m.m42*self.m24 + m.m43*self.m34 + m.m44*self.m44)
     }
 
+    pub fn invert(&self) -> Matrix4 {
+        let det = self.determinant();
+
+        if det == 0.0 {
+            return Matrix4::identity();
+        }
+
+        // todo(gw): this could be made faster by special casing
+        // for simpler matrix types.
+        let m = Matrix4::new(
+            self.m23*self.m34*self.m42 - self.m24*self.m33*self.m42 +
+            self.m24*self.m32*self.m43 - self.m22*self.m34*self.m43 -
+            self.m23*self.m32*self.m44 + self.m22*self.m33*self.m44,
+
+            self.m14*self.m33*self.m42 - self.m13*self.m34*self.m42 -
+            self.m14*self.m32*self.m43 + self.m12*self.m34*self.m43 +
+            self.m13*self.m32*self.m44 - self.m12*self.m33*self.m44,
+
+            self.m13*self.m24*self.m42 - self.m14*self.m23*self.m42 +
+            self.m14*self.m22*self.m43 - self.m12*self.m24*self.m43 -
+            self.m13*self.m22*self.m44 + self.m12*self.m23*self.m44,
+
+            self.m14*self.m23*self.m32 - self.m13*self.m24*self.m32 -
+            self.m14*self.m22*self.m33 + self.m12*self.m24*self.m33 +
+            self.m13*self.m22*self.m34 - self.m12*self.m23*self.m34,
+
+            self.m24*self.m33*self.m41 - self.m23*self.m34*self.m41 -
+            self.m24*self.m31*self.m43 + self.m21*self.m34*self.m43 +
+            self.m23*self.m31*self.m44 - self.m21*self.m33*self.m44,
+
+            self.m13*self.m34*self.m41 - self.m14*self.m33*self.m41 +
+            self.m14*self.m31*self.m43 - self.m11*self.m34*self.m43 -
+            self.m13*self.m31*self.m44 + self.m11*self.m33*self.m44,
+
+            self.m14*self.m23*self.m41 - self.m13*self.m24*self.m41 -
+            self.m14*self.m21*self.m43 + self.m11*self.m24*self.m43 +
+            self.m13*self.m21*self.m44 - self.m11*self.m23*self.m44,
+
+            self.m13*self.m24*self.m31 - self.m14*self.m23*self.m31 +
+            self.m14*self.m21*self.m33 - self.m11*self.m24*self.m33 -
+            self.m13*self.m21*self.m34 + self.m11*self.m23*self.m34,
+
+            self.m22*self.m34*self.m41 - self.m24*self.m32*self.m41 +
+            self.m24*self.m31*self.m42 - self.m21*self.m34*self.m42 -
+            self.m22*self.m31*self.m44 + self.m21*self.m32*self.m44,
+
+            self.m14*self.m32*self.m41 - self.m12*self.m34*self.m41 -
+            self.m14*self.m31*self.m42 + self.m11*self.m34*self.m42 +
+            self.m12*self.m31*self.m44 - self.m11*self.m32*self.m44,
+
+            self.m12*self.m24*self.m41 - self.m14*self.m22*self.m41 +
+            self.m14*self.m21*self.m42 - self.m11*self.m24*self.m42 -
+            self.m12*self.m21*self.m44 + self.m11*self.m22*self.m44,
+
+            self.m14*self.m22*self.m31 - self.m12*self.m24*self.m31 -
+            self.m14*self.m21*self.m32 + self.m11*self.m24*self.m32 +
+            self.m12*self.m21*self.m34 - self.m11*self.m22*self.m34,
+
+            self.m23*self.m32*self.m41 - self.m22*self.m33*self.m41 -
+            self.m23*self.m31*self.m42 + self.m21*self.m33*self.m42 +
+            self.m22*self.m31*self.m43 - self.m21*self.m32*self.m43,
+
+            self.m12*self.m33*self.m41 - self.m13*self.m32*self.m41 +
+            self.m13*self.m31*self.m42 - self.m11*self.m33*self.m42 -
+            self.m12*self.m31*self.m43 + self.m11*self.m32*self.m43,
+
+            self.m13*self.m22*self.m41 - self.m12*self.m23*self.m41 -
+            self.m13*self.m21*self.m42 + self.m11*self.m23*self.m42 +
+            self.m12*self.m21*self.m43 - self.m11*self.m22*self.m43,
+
+            self.m12*self.m23*self.m31 - self.m13*self.m22*self.m31 +
+            self.m13*self.m21*self.m32 - self.m11*self.m23*self.m32 -
+            self.m12*self.m21*self.m33 + self.m11*self.m22*self.m33
+        );
+
+        m.mul_s(1.0 / det)
+    }
+
+    pub fn determinant(&self) -> f32 {
+        self.m14 * self.m23 * self.m32 * self.m41 -
+        self.m13 * self.m24 * self.m32 * self.m41 -
+        self.m14 * self.m22 * self.m33 * self.m41 +
+        self.m12 * self.m24 * self.m33 * self.m41 +
+        self.m13 * self.m22 * self.m34 * self.m41 -
+        self.m12 * self.m23 * self.m34 * self.m41 -
+        self.m14 * self.m23 * self.m31 * self.m42 +
+        self.m13 * self.m24 * self.m31 * self.m42 +
+        self.m14 * self.m21 * self.m33 * self.m42 -
+        self.m11 * self.m24 * self.m33 * self.m42 -
+        self.m13 * self.m21 * self.m34 * self.m42 +
+        self.m11 * self.m23 * self.m34 * self.m42 +
+        self.m14 * self.m22 * self.m31 * self.m43 -
+        self.m12 * self.m24 * self.m31 * self.m43 -
+        self.m14 * self.m21 * self.m32 * self.m43 +
+        self.m11 * self.m24 * self.m32 * self.m43 +
+        self.m12 * self.m21 * self.m34 * self.m43 -
+        self.m11 * self.m22 * self.m34 * self.m43 -
+        self.m13 * self.m22 * self.m31 * self.m44 +
+        self.m12 * self.m23 * self.m31 * self.m44 +
+        self.m13 * self.m21 * self.m32 * self.m44 -
+        self.m11 * self.m23 * self.m32 * self.m44 -
+        self.m12 * self.m21 * self.m33 * self.m44 +
+        self.m11 * self.m22 * self.m33 * self.m44
+    }
+
     pub fn mul_s(&self, x: f32) -> Matrix4 {
         Matrix4::new(self.m11 * x, self.m12 * x, self.m13 * x, self.m14 * x,
                      self.m21 * x, self.m22 * x, self.m23 * x, self.m24 * x,
@@ -225,4 +330,46 @@ pub fn test_ortho() {
                                 -1.0, -1.22222222, -0.0, 1.0);
     debug!("result={:?} expected={:?}", result, expected);
     assert!(result.approx_eq(&expected));
+}
+
+#[test]
+pub fn test_invert_simple() {
+    let m1 = Matrix4::identity();
+    let m2 = m1.invert();
+    assert!(m1.approx_eq(&m2));
+}
+
+#[test]
+pub fn test_invert_scale() {
+    let m1 = Matrix4::create_scale(1.5, 0.3, 2.1);
+    let m2 = m1.invert();
+    assert!(m1.mul(&m2).approx_eq(&Matrix4::identity()));
+}
+
+#[test]
+pub fn test_invert_translate() {
+    let m1 = Matrix4::create_translation(-132.0, 0.3, 493.0);
+    let m2 = m1.invert();
+    assert!(m1.mul(&m2).approx_eq(&Matrix4::identity()));
+}
+
+#[test]
+pub fn test_invert_rotate() {
+    let m1 = Matrix4::create_rotation(0.0, 1.0, 0.0, 1.57);
+    let m2 = m1.invert();
+    assert!(m1.mul(&m2).approx_eq(&Matrix4::identity()));
+}
+
+#[test]
+pub fn test_invert_transform_point_2d() {
+    let m1 = Matrix4::create_translation(100.0, 200.0, 0.0);
+    let m2 = m1.invert();
+    assert!(m1.mul(&m2).approx_eq(&Matrix4::identity()));
+
+    let p1 = Point2D::new(1000.0, 2000.0);
+    let p2 = m1.transform_point(&p1);
+    assert!(p2.eq(&Point2D::new(1100.0, 2200.0)));
+
+    let p3 = m2.transform_point(&p2);
+    assert!(p3.eq(&p1));
 }
