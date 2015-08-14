@@ -37,10 +37,8 @@ use std::marker::PhantomData;
 // Uncomment the derive, and remove the macro call, once heapsize gets
 // PhantomData<T> support.
 #[derive(Copy, RustcDecodable, RustcEncodable, Debug)]
-//#[cfg_attr(feature = "heap_size", derive(HeapSizeOf))]
+#[cfg_attr(feature = "heap_size", derive(HeapSizeOf))]
 pub struct ScaleFactor<Src, Dst, T>(pub T, PhantomData<(Src, Dst)>);
-#[cfg(feature = "heap_size")]
-known_heap_size!(0, ScaleFactor<Src, Dst, T>);
 
 
 impl<Src,Dst,T> Deserialize for ScaleFactor<Src,Dst,T> where T: Deserialize {
