@@ -15,6 +15,7 @@ use std::fmt::{self, Formatter};
 use std::ops::{Mul, Div};
 
 #[derive(Clone, Copy, RustcDecodable, RustcEncodable, PartialEq, Deserialize, Serialize)]
+#[cfg_attr(feature = "heap_size", derive(HeapSizeOf))]
 pub struct Size2D<T> {
     pub width: T,
     pub height: T

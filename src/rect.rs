@@ -18,6 +18,7 @@ use std::fmt::{self, Formatter};
 use std::ops::{Add, Sub, Mul, Div};
 
 #[derive(Clone, Copy, RustcDecodable, RustcEncodable, PartialEq, Deserialize, Serialize)]
+#[cfg_attr(feature = "heap_size", derive(HeapSizeOf))]
 pub struct Rect<T> {
     pub origin: Point2D<T>,
     pub size: Size2D<T>,

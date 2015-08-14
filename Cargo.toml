@@ -7,6 +7,9 @@ documentation = "http://doc.servo.org/euclid/"
 repository = "https://github.com/servo/euclid"
 license = "MIT / Apache-2.0"
 
+[features]
+heap_size = [ "heapsize", "heapsize_plugin" ]
+
 [dependencies]
 rustc-serialize = "0.3.2"
 rand = "0.3.7"
@@ -14,3 +17,13 @@ num = "0.1.24"
 log = "0.3.1"
 serde = "*"
 serde_macros = "*"
+
+[dependencies.heapsize]
+#version = "0.1.1"
+path = "../heapsize"
+optional = true
+
+[dependencies.heapsize_plugin]
+version = "0.0.1"
+optional = true
+
