@@ -28,9 +28,13 @@ use std::marker::PhantomData;
 ///
 /// You can multiply a Length by a `scale_factor::ScaleFactor` to convert it from one unit to
 /// another.  See the ScaleFactor docs for an example.
+// Uncomment the derive, and remove the macro call, once heapsize gets
+// PhantomData<T> support.
 #[derive(Copy, RustcDecodable, RustcEncodable, Debug)]
-#[cfg_attr(feature = "heap_size", derive(HeapSizeOf))]
+//#[cfg_attr(feature = "heap_size", derive(HeapSizeOf))]
 pub struct Length<Unit, T>(pub T, PhantomData<Unit>);
+#[cfg(feature = "heap_size")]
+known_heap_size!(0, Length<Unit, T>);
 
 impl<Unit,T> Deserialize for Length<Unit,T> where T: Deserialize {
     fn deserialize<D>(deserializer: &mut D) -> Result<Length<Unit,T>,D::Error>

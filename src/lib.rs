@@ -14,6 +14,7 @@
 #![cfg_attr(feature = "heap_size", plugin(heapsize_plugin))]
 
 #[cfg(feature = "heap_size")]
+#[macro_use]
 extern crate heapsize;
 
 #[macro_use]

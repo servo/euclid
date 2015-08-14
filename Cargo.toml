@@ -19,8 +19,7 @@ serde = "*"
 serde_macros = "*"
 
 [dependencies.heapsize]
-#version = "0.1.1"
-path = "../heapsize"
+version = "0.1.1"
 optional = true
 
 [dependencies.heapsize_plugin]
