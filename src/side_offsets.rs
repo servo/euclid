@@ -76,7 +76,7 @@ impl<T: Zero> SideOffsets2D<T> {
 
 /// A SIMD enabled version of SideOffsets2D specialized for i32.
 #[derive(Clone, Copy, PartialEq)]
-#[simd]
+#[repr(simd)]
 #[cfg_attr(feature = "heap_size", derive(HeapSizeOf))]
 pub struct SideOffsets2DSimdI32 {
     pub top: i32,

@@ -7,7 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#![feature(asm, custom_derive, plugin, simd, zero_one, test)]
+#![feature(asm, custom_derive, plugin, repr_simd, zero_one, test)]
 
 #![plugin(serde_macros)]
 
