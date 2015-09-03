@@ -46,6 +46,21 @@ impl<T> Point2D<T> {
     }
 }
 
+impl<T: Mul<T, Output=T> +
+        Add<T, Output=T> +
+        Sub<T, Output=T> +
+        Copy> Point2D<T> {
+    #[inline]
+    pub fn dot(self, other: Point2D<T>) -> T {
+        self.x * other.x +
+        self.y * other.y
+    }
+
+    #[inline]
+    pub fn cross(self, other: Point2D<T>) -> T {
+        self.x * other.y - self.y * other.x
+    }
+}
 
 impl<T:Clone + Add<T, Output=T>> Add for Point2D<T> {
     type Output = Point2D<T>;
@@ -173,6 +188,27 @@ impl<T> Point3D<T> {
     }
 }
 
+impl<T: Mul<T, Output=T> +
+        Add<T, Output=T> +
+        Sub<T, Output=T> +
+        Copy> Point3D<T> {
+    #[inline]
+    pub fn dot(self, other: Point3D<T>) -> T {
+        self.x * other.x +
+        self.y * other.y +
+        self.z * other.z
+    }
+
+    #[inline]
+    pub fn cross(self, other: Point3D<T>) -> Point3D<T> {
+        Point3D {
+            x: self.y * other.z - self.z * other.y,
+            y: self.z * other.x - self.x * other.z,
+            z: self.x * other.y - self.y * other.x,
+        }
+    }
+}
+
 impl<T:Clone + Add<T, Output=T>> Add for Point3D<T> {
     type Output = Point3D<T>;
     fn add(self, other: Point3D<T>) -> Point3D<T> {
@@ -265,4 +301,36 @@ impl <T:Clone + Neg<Output=T>> Neg for Point4D<T> {
     fn neg(self) -> Point4D<T> {
         Point4D::new(-self.x, -self.y, -self.z, -self.w)
     }
+}
+
+#[test]
+pub fn test_dot_2d() {
+    let p1 = Point2D::new(2.0, 7.0);
+    let p2 = Point2D::new(13.0, 11.0);
+    assert!(p1.dot(p2) == 103.0);
+}
+
+#[test]
+pub fn test_dot_3d() {
+    let p1 = Point3D::new(7.0, 21.0, 32.0);
+    let p2 = Point3D::new(43.0, 5.0, 16.0);
+    assert!(p1.dot(p2) == 918.0);
+}
+
+#[test]
+pub fn test_cross_2d() {
+    let p1 = Point2D::new(4.0, 7.0);
+    let p2 = Point2D::new(13.0, 8.0);
+    let r = p1.cross(p2);
+    assert!(r == -59.0);
+}
+
+#[test]
+pub fn test_cross_3d() {
+    let p1 = Point3D::new(4.0, 7.0, 9.0);
+    let p2 = Point3D::new(13.0, 8.0, 3.0);
+    let p3 = p1.cross(p2);
+    assert!(p3.x == -51.0);
+    assert!(p3.y == 105.0);
+    assert!(p3.z == -59.0);
 }
