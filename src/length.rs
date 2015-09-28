@@ -75,6 +75,15 @@ impl<U, T: Clone + Sub<T, Output=T>> Sub<Length<U, T>> for Length<U, T> {
     }
 }
 
+// length / length
+impl<Src, Dst, T: Clone + Div<T, Output=T>> Div<Length<Src, T>> for Length<Dst, T> {
+    type Output = ScaleFactor<Src, Dst, T>;
+    #[inline]
+    fn div(self, other: Length<Src, T>) -> ScaleFactor<Src, Dst, T> {
+        ScaleFactor::new(self.get() / other.get())
+    }
+}
+
 // length * scaleFactor
 impl<Src, Dst, T: Clone + Mul<T, Output=T>> Mul<ScaleFactor<Src, Dst, T>> for Length<Src, T> {
     type Output = Length<Dst, T>;
@@ -145,9 +154,9 @@ mod tests {
     use super::Length;
     use scale_factor::ScaleFactor;
 
-    #[derive(Debug)]
+    #[derive(Debug, Copy, Clone)]
     enum Inch {}
-    #[derive(Debug)]
+    #[derive(Debug, Copy, Clone)]
     enum Mm {}
 
     #[test]
@@ -175,9 +184,10 @@ mod tests {
         assert!(!(two_feet >  two_feet));
         assert!(!(two_feet <  two_feet));
 
-        let one_foot_in_mm: Length<Mm, f32> = one_foot.clone() * mm_per_inch.clone();
+        let one_foot_in_mm: Length<Mm, f32> = one_foot * mm_per_inch;
 
         assert_eq!(one_foot_in_mm, Length::new(304.8));
+        assert_eq!(one_foot_in_mm / one_foot, mm_per_inch);
 
         let back_to_inches: Length<Inch, f32> = one_foot_in_mm / mm_per_inch;
         assert_eq!(one_foot, back_to_inches);
