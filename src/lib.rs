@@ -8,6 +8,8 @@
 // except according to those terms.
 
 #![feature(asm, custom_derive, plugin, repr_simd, zero_one, test)]
+#![feature(augmented_assignments)]
+#![feature(op_assign_traits)]
 
 #![plugin(serde_macros)]
 
