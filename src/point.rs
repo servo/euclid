@@ -12,6 +12,7 @@ use size::Size2D;
 use num::Zero;
 
 use num_lib::NumCast;
+use num_lib::traits;
 use std::fmt::{self, Formatter};
 use std::ops::{Add, Neg, Mul, Sub, Div};
 
@@ -97,6 +98,16 @@ impl <T:Clone + Neg<Output=T>> Neg for Point2D<T> {
     }
 }
 
+impl<T: traits::Float> Point2D<T> {
+    pub fn min(self, other: Point2D<T>) -> Point2D<T> {
+         Point2D::new(self.x.min(other.x), self.y.min(other.y))
+    }
+
+    pub fn max(self, other: Point2D<T>) -> Point2D<T> {
+        Point2D::new(self.x.max(other.x), self.y.max(other.y))
+    }
+}
+
 impl<Scale: Copy, T0: Mul<Scale, Output=T1>, T1: Clone> Mul<Scale> for Point2D<T0> {
     type Output = Point2D<T1>;
     #[inline]
@@ -117,7 +128,7 @@ impl<Scale: Copy, T0: Div<Scale, Output=T1>, T1: Clone> Div<Scale> for Point2D<T
 
 pub type TypedPoint2D<Unit, T> = Point2D<Length<Unit, T>>;
 
-impl<Unit, T: Clone> Point2D<Length<Unit, T>> {
+impl<Unit, T: Clone> TypedPoint2D<Unit, T> {
     pub fn typed(x: T, y: T) -> TypedPoint2D<Unit, T> {
         Point2D::new(Length::new(x), Length::new(y))
     }
@@ -235,6 +246,18 @@ impl <T:Clone + Neg<Output=T>> Neg for Point3D<T> {
     }
 }
 
+impl<T: traits::Float> Point3D<T> {
+    pub fn min(self, other: Point3D<T>) -> Point3D<T> {
+         Point3D::new(self.x.min(other.x), self.y.min(other.y),
+                      self.z.min(other.z))
+    }
+
+    pub fn max(self, other: Point3D<T>) -> Point3D<T> {
+        Point3D::new(self.x.max(other.x), self.y.max(other.y),
+                     self.z.max(other.z))
+    }
+}
+
 #[derive(Clone, Copy, RustcDecodable, RustcEncodable, Eq, Hash, PartialEq)]
 #[cfg_attr(feature = "heap_size", derive(HeapSizeOf))]
 pub struct Point4D<T> {
@@ -303,34 +326,183 @@ impl <T:Clone + Neg<Output=T>> Neg for Point4D<T> {
     }
 }
 
-#[test]
-pub fn test_dot_2d() {
-    let p1 = Point2D::new(2.0, 7.0);
-    let p2 = Point2D::new(13.0, 11.0);
-    assert!(p1.dot(p2) == 103.0);
+impl<T: traits::Float> Point4D<T> {
+    pub fn min(self, other: Point4D<T>) -> Point4D<T> {
+         Point4D::new(self.x.min(other.x), self.y.min(other.y),
+                      self.z.min(other.z), self.w.min(other.w))
+    }
+
+    pub fn max(self, other: Point4D<T>) -> Point4D<T> {
+        Point4D::new(self.x.max(other.x), self.y.max(other.y),
+                     self.z.max(other.z), self.w.max(other.w))
+    }
 }
 
-#[test]
-pub fn test_dot_3d() {
-    let p1 = Point3D::new(7.0, 21.0, 32.0);
-    let p2 = Point3D::new(43.0, 5.0, 16.0);
-    assert!(p1.dot(p2) == 918.0);
+
+#[cfg(test)]
+mod point2d {
+    use super::Point2D;
+
+    #[test]
+    pub fn test_scalar_mul() {
+        let p1 = Point2D::new(3.0, 5.0);
+
+        let result = p1 * 5.0;
+
+        assert_eq!(result, Point2D::new(15.0, 25.0));
+    }
+
+    #[test]
+    pub fn test_dot() {
+        let p1 = Point2D::new(2.0, 7.0);
+        let p2 = Point2D::new(13.0, 11.0);
+        assert_eq!(p1.dot(p2), 103.0);
+    }
+
+    #[test]
+    pub fn test_cross() {
+        let p1 = Point2D::new(4.0, 7.0);
+        let p2 = Point2D::new(13.0, 8.0);
+        let r = p1.cross(p2);
+        assert_eq!(r, -59.0);
+    }
+
+    #[test]
+    pub fn test_min() {
+        let p1 = Point2D::new(1.0, 3.0);
+        let p2 = Point2D::new(2.0, 2.0);
+
+        let result = p1.min(p2);
+
+        assert_eq!(result, Point2D::new(1.0, 2.0));
+    }
+
+    #[test]
+    pub fn test_max() {
+        let p1 = Point2D::new(1.0, 3.0);
+        let p2 = Point2D::new(2.0, 2.0);
+
+        let result = p1.max(p2);
+
+        assert_eq!(result, Point2D::new(2.0, 3.0));
+    }
 }
 
-#[test]
-pub fn test_cross_2d() {
-    let p1 = Point2D::new(4.0, 7.0);
-    let p2 = Point2D::new(13.0, 8.0);
-    let r = p1.cross(p2);
-    assert!(r == -59.0);
+#[cfg(test)]
+mod typedpoint2d {
+    use super::TypedPoint2D;
+    use scale_factor::ScaleFactor;
+
+    #[derive(Debug, Copy, Clone)]
+    enum Mm {}
+    #[derive(Debug, Copy, Clone)]
+    enum Cm {}
+
+    pub type Point2DMm<T> = TypedPoint2D<Mm, T>;
+    pub type Point2DCm<T> = TypedPoint2D<Cm, T>;
+
+    #[test]
+    pub fn test_add() {
+        let p1 = Point2DMm::typed(1.0, 2.0);
+        let p2 = Point2DMm::typed(3.0, 4.0);
+
+        let result = p1 + p2;
+
+        assert_eq!(result, Point2DMm::typed(4.0, 6.0));
+    }
+
+    #[test]
+    pub fn test_scalar_mul() {
+        let p1 = Point2DMm::typed(1.0, 2.0);
+        let cm_per_mm: ScaleFactor<Mm, Cm, f32> = ScaleFactor::new(0.1);
+
+        let result = p1 * cm_per_mm;
+
+        assert_eq!(result, Point2DCm::typed(0.1, 0.2));
+    }
 }
 
-#[test]
-pub fn test_cross_3d() {
-    let p1 = Point3D::new(4.0, 7.0, 9.0);
-    let p2 = Point3D::new(13.0, 8.0, 3.0);
-    let p3 = p1.cross(p2);
-    assert!(p3.x == -51.0);
-    assert!(p3.y == 105.0);
-    assert!(p3.z == -59.0);
+#[cfg(test)]
+mod point3d {
+    use super::Point3D;
+
+    #[test]
+    pub fn test_dot() {
+        let p1 = Point3D::new(7.0, 21.0, 32.0);
+        let p2 = Point3D::new(43.0, 5.0, 16.0);
+        assert_eq!(p1.dot(p2), 918.0);
+    }
+
+    #[test]
+    pub fn test_cross() {
+        let p1 = Point3D::new(4.0, 7.0, 9.0);
+        let p2 = Point3D::new(13.0, 8.0, 3.0);
+        let p3 = p1.cross(p2);
+        assert_eq!(p3, Point3D::new(-51.0, 105.0, -59.0));
+    }
+
+    #[test]
+    pub fn test_min() {
+        let p1 = Point3D::new(1.0, 3.0, 5.0);
+        let p2 = Point3D::new(2.0, 2.0, -1.0);
+
+        let result = p1.min(p2);
+
+        assert_eq!(result, Point3D::new(1.0, 2.0, -1.0));
+    }
+
+    #[test]
+    pub fn test_max() {
+        let p1 = Point3D::new(1.0, 3.0, 5.0);
+        let p2 = Point3D::new(2.0, 2.0, -1.0);
+
+        let result = p1.max(p2);
+
+        assert_eq!(result, Point3D::new(2.0, 3.0, 5.0));
+    }
+}
+
+#[cfg(test)]
+mod point4d {
+    use super::Point4D;
+
+    #[test]
+    pub fn test_add() {
+        let p1 = Point4D::new(7.0, 21.0, 32.0, 1.0);
+        let p2 = Point4D::new(43.0, 5.0, 16.0, 2.0);
+
+        let result = p1 + p2;
+
+        assert_eq!(result, Point4D::new(50.0, 26.0, 48.0, 3.0));
+    }
+
+    #[test]
+    pub fn test_sub() {
+        let p1 = Point4D::new(7.0, 21.0, 32.0, 1.0);
+        let p2 = Point4D::new(43.0, 5.0, 16.0, 2.0);
+
+        let result = p1 - p2;
+
+        assert_eq!(result, Point4D::new(-36.0, 16.0, 16.0, -1.0));
+    }
+
+    #[test]
+    pub fn test_min() {
+        let p1 = Point4D::new(1.0, 3.0, 5.0, 7.0);
+        let p2 = Point4D::new(2.0, 2.0, -1.0, 10.0);
+
+        let result = p1.min(p2);
+
+        assert_eq!(result, Point4D::new(1.0, 2.0, -1.0, 7.0));
+    }
+
+    #[test]
+    pub fn test_max() {
+        let p1 = Point4D::new(1.0, 3.0, 5.0, 7.0);
+        let p2 = Point4D::new(2.0, 2.0, -1.0, 10.0);
+
+        let result = p1.max(p2);
+
+        assert_eq!(result, Point4D::new(2.0, 3.0, 5.0, 10.0));
+    }
 }
