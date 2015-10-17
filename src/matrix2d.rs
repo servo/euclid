@@ -13,8 +13,8 @@ use rect::Rect;
 use size::Size2D;
 use std::ops::{Add, Mul, Sub};
 
-#[derive(Clone, Copy, Deserialize, Serialize)]
-#[cfg_attr(feature = "heap_size", derive(HeapSizeOf))]
+#[derive(Clone, Copy)]
+#[cfg_attr(feature = "plugins", derive(HeapSizeOf, Deserialize, Serialize))]
 pub struct Matrix2D<T> {
     m11: T, m12: T,
     m21: T, m22: T,

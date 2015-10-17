@@ -11,17 +11,17 @@
 #![feature(augmented_assignments)]
 #![feature(op_assign_traits)]
 
-#![plugin(serde_macros)]
+#![cfg_attr(feature = "plugins", plugin(heapsize_plugin))]
+#![cfg_attr(feature = "plugins", plugin(serde_macros))]
 
-#![cfg_attr(feature = "heap_size", plugin(heapsize_plugin))]
-
-#[cfg(feature = "heap_size")]
+#[cfg(feature = "plugins")]
 #[macro_use]
 extern crate heapsize;
 
 #[macro_use]
 extern crate log;
 extern crate rustc_serialize;
+#[cfg(feature = "plugins")]
 extern crate serde;
 
 extern crate rand;
