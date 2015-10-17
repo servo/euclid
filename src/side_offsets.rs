@@ -15,8 +15,8 @@ use std::ops::Add;
 
 /// A group of side offsets, which correspond to top/left/bottom/right for borders, padding,
 /// and margins in CSS.
-#[derive(Clone, Copy, PartialEq, Debug, Deserialize, Serialize)]
-#[cfg_attr(feature = "heap_size", derive(HeapSizeOf))]
+#[derive(Clone, Copy, PartialEq, Debug)]
+#[cfg_attr(feature = "plugins", derive(HeapSizeOf, Deserialize, Serializef))]
 pub struct SideOffsets2D<T> {
     pub top: T,
     pub right: T,
@@ -77,7 +77,7 @@ impl<T: Zero> SideOffsets2D<T> {
 /// A SIMD enabled version of SideOffsets2D specialized for i32.
 #[derive(Clone, Copy, PartialEq)]
 #[repr(simd)]
-#[cfg_attr(feature = "heap_size", derive(HeapSizeOf))]
+#[cfg_attr(feature = "plugins", derive(HeapSizeOf))]
 pub struct SideOffsets2DSimdI32 {
     pub top: i32,
     pub bottom: i32,

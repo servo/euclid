@@ -15,8 +15,8 @@ use num_lib::NumCast;
 use std::fmt::{self, Formatter};
 use std::ops::{Add, Neg, Mul, Sub, Div};
 
-#[derive(Clone, Copy, RustcDecodable, RustcEncodable, Eq, Hash, PartialEq, Deserialize, Serialize)]
-#[cfg_attr(feature = "heap_size", derive(HeapSizeOf))]
+#[derive(Clone, Copy, RustcDecodable, RustcEncodable, Eq, Hash, PartialEq)]
+#[cfg_attr(feature = "plugins", derive(HeapSizeOf, Deserialize, Serialize))]
 pub struct Point2D<T> {
     pub x: T,
     pub y: T
@@ -155,7 +155,7 @@ impl<Unit, T: NumCast + Clone> Point2D<Length<Unit, T>> {
 }
 
 #[derive(Clone, Copy, RustcDecodable, RustcEncodable, Eq, Hash, PartialEq)]
-#[cfg_attr(feature = "heap_size", derive(HeapSizeOf))]
+#[cfg_attr(feature = "plugins", derive(HeapSizeOf))]
 pub struct Point3D<T> {
     pub x: T,
     pub y: T,
@@ -236,7 +236,7 @@ impl <T:Clone + Neg<Output=T>> Neg for Point3D<T> {
 }
 
 #[derive(Clone, Copy, RustcDecodable, RustcEncodable, Eq, Hash, PartialEq)]
-#[cfg_attr(feature = "heap_size", derive(HeapSizeOf))]
+#[cfg_attr(feature = "plugins", derive(HeapSizeOf))]
 pub struct Point4D<T> {
     pub x: T,
     pub y: T,

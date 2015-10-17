@@ -17,8 +17,8 @@ use std::cmp::PartialOrd;
 use std::fmt::{self, Formatter};
 use std::ops::{Add, Sub, Mul, Div};
 
-#[derive(Clone, Copy, RustcDecodable, RustcEncodable, PartialEq, Deserialize, Serialize)]
-#[cfg_attr(feature = "heap_size", derive(HeapSizeOf))]
+#[derive(Clone, Copy, RustcDecodable, RustcEncodable, PartialEq)]
+#[cfg_attr(feature = "plugins", derive(HeapSizeOf, Deserialize, Serialize))]
 pub struct Rect<T> {
     pub origin: Point2D<T>,
     pub size: Size2D<T>,

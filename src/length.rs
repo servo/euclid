@@ -12,6 +12,7 @@ use scale_factor::ScaleFactor;
 use num::Zero;
 
 use num_lib::NumCast;
+#[cfg(feature = "plugins")]
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::cmp::Ordering;
 use std::ops::{Add, AddAssign, Sub, SubAssign, Mul, Div, Neg};
@@ -31,9 +32,10 @@ use std::marker::PhantomData;
 // Uncomment the derive, and remove the macro call, once heapsize gets
 // PhantomData<T> support.
 #[derive(Copy, RustcDecodable, RustcEncodable, Debug)]
-#[cfg_attr(feature = "heap_size", derive(HeapSizeOf))]
+#[cfg_attr(feature = "plugins", derive(HeapSizeOf))]
 pub struct Length<Unit, T>(pub T, PhantomData<Unit>);
 
+#[cfg(feature = "plugins")]
 impl<Unit,T> Deserialize for Length<Unit,T> where T: Deserialize {
     fn deserialize<D>(deserializer: &mut D) -> Result<Length<Unit,T>,D::Error>
                       where D: Deserializer {
@@ -41,6 +43,7 @@ impl<Unit,T> Deserialize for Length<Unit,T> where T: Deserialize {
     }
 }
 
+#[cfg(feature = "plugins")]
 impl<Unit,T> Serialize for Length<Unit,T> where T: Serialize {
     fn serialize<S>(&self, serializer: &mut S) -> Result<(),S::Error> where S: Serializer {
         self.0.serialize(serializer)
