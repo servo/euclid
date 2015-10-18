@@ -174,7 +174,7 @@ impl<T: PartialEq + Zero> Rect<T> {
     }
 
     pub fn is_empty(&self) -> bool {
-        self.size == Size2D::zero()
+        self.size.width == Zero::zero() || self.size.height == Zero::zero()
     }
 }
 
@@ -393,4 +393,16 @@ fn test_min_max_x_y() {
     assert!(r.min_y() == -5);
     assert!(r.max_x() == 40);
     assert!(r.min_x() == -10);
+}
+
+#[test]
+fn test_is_empty() {
+    assert!(Rect::new(Point2D::new(0u32, 0u32), Size2D::new(0u32, 0u32)).is_empty());
+    assert!(Rect::new(Point2D::new(0u32, 0u32), Size2D::new(10u32, 0u32)).is_empty());
+    assert!(Rect::new(Point2D::new(0u32, 0u32), Size2D::new(0u32, 10u32)).is_empty());
+    assert!(!Rect::new(Point2D::new(0u32, 0u32), Size2D::new(1u32, 1u32)).is_empty());
+    assert!(Rect::new(Point2D::new(10u32, 10u32), Size2D::new(0u32, 0u32)).is_empty());
+    assert!(Rect::new(Point2D::new(10u32, 10u32), Size2D::new(10u32, 0u32)).is_empty());
+    assert!(Rect::new(Point2D::new(10u32, 10u32), Size2D::new(0u32, 10u32)).is_empty());
+    assert!(!Rect::new(Point2D::new(10u32, 10u32), Size2D::new(1u32, 1u32)).is_empty());
 }
