@@ -45,7 +45,7 @@ impl<T: Clone> Rect<T> {
     }
 }
 
-impl<T: Copy + Clone + PartialOrd + Add<T, Output=T> + Sub<T, Output=T> + Zero> Rect<T> {
+impl<T: Copy + Clone + PartialOrd + Add<T, Output=T> + Sub<T, Output=T>> Rect<T> {
     #[inline]
     pub fn intersects(&self, other: &Rect<T>) -> bool {
         self.origin.x < other.origin.x + other.size.width &&
@@ -90,27 +90,6 @@ impl<T: Copy + Clone + PartialOrd + Add<T, Output=T> + Sub<T, Output=T> + Zero> 
     }
 
     #[inline]
-    pub fn union(&self, other: &Rect<T>) -> Rect<T> {
-        if self.size == Zero::zero() {
-            return *other
-        }
-        if other.size == Zero::zero() {
-            return *self
-        }
-
-        let upper_left = Point2D::new(min(self.min_x(), other.min_x()),
-                                      min(self.min_y(), other.min_y()));
-
-        let lower_right = Point2D::new(max(self.max_x(), other.max_x()),
-                                       max(self.max_y(), other.max_y()));
-
-        Rect {
-            origin: upper_left.clone(),
-            size: Size2D::new(lower_right.x - upper_left.x, lower_right.y - upper_left.y)
-        }
-    }
-
-    #[inline]
     pub fn translate(&self, other: &Point2D<T>) -> Rect<T> {
         Rect {
             origin: Point2D::new(self.origin.x + other.x, self.origin.y + other.y),
@@ -151,6 +130,29 @@ impl<T: Copy + Clone + PartialOrd + Add<T, Output=T> + Sub<T, Output=T> + Zero> 
     pub fn translate_by_size(&self, size: &Size2D<T>) -> Rect<T> {
         Rect::new(Point2D::new(self.origin.x + size.width, self.origin.y + size.height),
                   self.size.clone())
+    }
+}
+
+impl<T: Copy + Clone + PartialOrd + Add<T, Output=T> + Sub<T, Output=T> + Zero> Rect<T> {
+    #[inline]
+    pub fn union(&self, other: &Rect<T>) -> Rect<T> {
+        if self.size == Zero::zero() {
+            return *other
+        }
+        if other.size == Zero::zero() {
+            return *self
+        }
+
+        let upper_left = Point2D::new(min(self.min_x(), other.min_x()),
+                                      min(self.min_y(), other.min_y()));
+
+        let lower_right = Point2D::new(max(self.max_x(), other.max_x()),
+                                       max(self.max_y(), other.max_y()));
+
+        Rect {
+            origin: upper_left.clone(),
+            size: Size2D::new(lower_right.x - upper_left.x, lower_right.y - upper_left.y)
+        }
     }
 }
 
