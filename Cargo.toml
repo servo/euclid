@@ -1,6 +1,6 @@
 [package]
 name = "euclid"
-version = "0.3.2"
+version = "0.4.0"
 authors = ["The Servo Project Developers"]
 description = "Geometry primitives"
 documentation = "http://doc.servo.org/euclid/"
@@ -20,7 +20,7 @@ serde = {version = "*", optional = true}
 serde_macros = {version = "*", optional = true}
 
 [dependencies.heapsize]
-version = "0.1.2"
+version = "0.2"
 optional = true
 
 [dependencies.heapsize_plugin]
