@@ -10,7 +10,7 @@
 //! A group of side offsets, which correspond to top/left/bottom/right for borders, padding,
 //! and margins in CSS.
 
-use num::Zero;
+use num_lib::Zero;
 use std::ops::Add;
 
 /// A group of side offsets, which correspond to top/left/bottom/right for borders, padding,

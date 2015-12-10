@@ -7,7 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#![cfg_attr(not(feature="rustc_stable"), feature(asm, custom_derive, plugin, repr_simd, zero_one, test))]
+#![cfg_attr(not(feature="rustc_stable"), feature(asm, custom_derive, plugin, repr_simd, test))]
 #![cfg_attr(not(feature="rustc_stable"), feature(augmented_assignments))]
 #![cfg_attr(not(feature="rustc_stable"), feature(op_assign_traits))]
 
