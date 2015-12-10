@@ -9,8 +9,7 @@
 
 use length::Length;
 use size::Size2D;
-use num::Zero;
-
+use num_lib::Zero;
 use num_lib::NumCast;
 use num_lib::traits;
 use std::fmt::{self, Formatter};

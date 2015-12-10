@@ -8,7 +8,7 @@
 // except according to those terms.
 //! A type-checked scaling factor between units.
 
-use num::One;
+use num_lib::One;
 
 use num_lib::NumCast;
 #[cfg(feature = "plugins")]

@@ -8,11 +8,11 @@
 // except according to those terms.
 
 use length::Length;
-use num::Zero;
+use num_lib::Zero;
 
 use num_lib::NumCast;
 use std::fmt::{self, Formatter};
-use std::ops::{Mul, Div};
+use std::ops::{Add, Mul, Div};
 
 #[derive(Clone, Copy, RustcDecodable, RustcEncodable, PartialEq)]
 #[cfg_attr(feature = "plugins", derive(HeapSizeOf, Deserialize, Serialize))]
@@ -55,11 +55,24 @@ impl<T: Zero> Size2D<T> {
     }
 }
 
-impl<T: Zero> Zero for Size2D<T> {
+impl<T: Zero + Copy> Zero for Size2D<T> {
     fn zero() -> Size2D<T> {
         Size2D {
             width: Zero::zero(),
             height: Zero::zero(),
+        }
+    }
+    fn is_zero(&self) -> bool {
+        self.width.is_zero() && self.height.is_zero()
+    }
+}
+
+impl<T:Add<Output=T> + Copy> Add for Size2D<T> {
+    type Output = Size2D<T>;
+    fn add(self, rhs: Size2D<T>) -> Size2D<T> {
+        Size2D {
+            width: self.width + rhs.width,
+            height: self.width + rhs.width
         }
     }
 }

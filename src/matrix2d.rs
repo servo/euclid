@@ -7,7 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use num::{One, Zero};
+use num_lib::{One, Zero};
 use point::Point2D;
 use rect::Rect;
 use size::Size2D;
