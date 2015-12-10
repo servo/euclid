@@ -9,13 +9,15 @@
 //! A one-dimensional length, tagged with its units.
 
 use scale_factor::ScaleFactor;
-use num::Zero;
+use num_lib::Zero;
 
 use num_lib::NumCast;
 #[cfg(feature = "plugins")]
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::cmp::Ordering;
-use std::ops::{Add, AddAssign, Sub, SubAssign, Mul, Div, Neg};
+use std::ops::{Add, Sub, Mul, Div, Neg};
+#[cfg(not(feature="rustc_stable"))]
+use std::ops::{AddAssign, SubAssign};
 use std::marker::PhantomData;
 
 /// A one-dimensional distance, with value represented by `T` and unit of measurement `Unit`.
@@ -71,6 +73,7 @@ impl<U, T: Clone + Add<T, Output=T>> Add for Length<U, T> {
 }
 
 // length += length
+#[cfg(not(feature="rustc_stable"))]
 impl<U, T: Clone + AddAssign<T>> AddAssign for Length<U, T> {
     fn add_assign(&mut self, other: Length<U, T>) {
         self.0 += other.get();
@@ -86,6 +89,7 @@ impl<U, T: Clone + Sub<T, Output=T>> Sub<Length<U, T>> for Length<U, T> {
 }
 
 // length -= length
+#[cfg(not(feature="rustc_stable"))]
 impl<U, T: Clone + SubAssign<T>> SubAssign for Length<U, T> {
     fn sub_assign(&mut self, other: Length<U, T>) {
         self.0 -= other.get();
@@ -160,9 +164,12 @@ impl<Unit, T: Clone + Ord> Ord for Length<Unit, T> {
     fn cmp(&self, other: &Length<Unit, T>) -> Ordering { self.get().cmp(&other.get()) }
 }
 
-impl<Unit, T: Zero> Zero for Length<Unit, T> {
+impl<Unit, T: Zero + Clone> Zero for Length<Unit, T> {
     fn zero() -> Length<Unit, T> {
         Length::new(Zero::zero())
+    }
+    fn is_zero(&self) -> bool {
+        self.get().is_zero()
     }
 }
 

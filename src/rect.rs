@@ -8,7 +8,7 @@
 // except according to those terms.
 
 use length::Length;
-use num::Zero;
+use num_lib::Zero;
 use point::Point2D;
 use size::Size2D;
 

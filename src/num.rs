@@ -8,22 +8,20 @@
 // except according to those terms.
 //! A one-dimensional length, tagged with its units.
 
-use std::num;
-
+use num_lib;
 
 pub trait Zero {
     fn zero() -> Self;
 }
 
-impl<T: num::Zero> Zero for T {
-    fn zero() -> T { num::Zero::zero() }
+impl<T: num_lib::Zero> Zero for T {
+    fn zero() -> T { num_lib::Zero::zero() }
 }
 
 pub trait One {
     fn one() -> Self;
 }
 
-impl<T: num::One> One for T {
-    fn one() -> T { num::One::one() }
+impl<T: num_lib::One> One for T {
+    fn one() -> T { num_lib::One::one() }
 }
-
