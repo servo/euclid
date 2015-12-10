@@ -43,7 +43,6 @@ pub mod approxeq;
 pub mod length;
 pub mod matrix;
 pub mod matrix2d;
-//pub mod num;
 pub mod point;
 pub mod rect;
 pub mod scale_factor;
