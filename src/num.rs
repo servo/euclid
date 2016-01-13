@@ -8,7 +8,7 @@
 // except according to those terms.
 //! A one-dimensional length, tagged with its units.
 
-use std::num;
+use num_lib as num;
 
 
 pub trait Zero {
