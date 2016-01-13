@@ -24,6 +24,7 @@ extern crate rustc_serialize;
 #[cfg(feature = "plugins")]
 extern crate serde;
 
+#[cfg(test)]
 extern crate rand;
 extern crate test;
 extern crate num as num_lib;
