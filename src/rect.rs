@@ -14,7 +14,7 @@ use size::Size2D;
 
 use num_lib::NumCast;
 use std::cmp::PartialOrd;
-use std::fmt::{self, Formatter};
+use std::fmt;
 use std::ops::{Add, Sub, Mul, Div};
 
 #[derive(Clone, Copy, RustcDecodable, RustcEncodable, PartialEq)]

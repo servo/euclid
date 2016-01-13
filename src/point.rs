@@ -13,7 +13,7 @@ use num::Zero;
 
 use num_lib::NumCast;
 use num_lib::traits;
-use std::fmt::{self, Formatter};
+use std::fmt;
 use std::ops::{Add, Neg, Mul, Sub, Div};
 
 #[derive(Clone, Copy, RustcDecodable, RustcEncodable, Eq, Hash, PartialEq)]
