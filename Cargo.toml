@@ -13,8 +13,7 @@ plugins = ["serde", "serde_macros", "heapsize", "heapsize_plugin"]
 
 [dependencies]
 rustc-serialize = "0.3.2"
-rand = "0.3.7"
-num = "0.1.24"
+num = {version = "0.1.24", default-features = false}
 log = "0.3.1"
 serde = {version = "*", optional = true}
 serde_macros = {version = "*", optional = true}
@@ -27,3 +26,5 @@ optional = true
 version = "0.1.0"
 optional = true
 
+[dev-dependencies]
+rand = "0.3.7"

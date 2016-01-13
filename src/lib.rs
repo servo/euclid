@@ -7,7 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#![feature(asm, custom_derive, plugin, repr_simd, zero_one, test)]
+#![feature(asm, custom_derive, plugin, repr_simd, test)]
 #![feature(augmented_assignments)]
 #![feature(op_assign_traits)]
 
@@ -24,6 +24,7 @@ extern crate rustc_serialize;
 #[cfg(feature = "plugins")]
 extern crate serde;
 
+#[cfg(test)]
 extern crate rand;
 extern crate test;
 extern crate num as num_lib;

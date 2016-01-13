@@ -11,7 +11,7 @@ use length::Length;
 use num::Zero;
 
 use num_lib::NumCast;
-use std::fmt::{self, Formatter};
+use std::fmt;
 use std::ops::{Mul, Div};
 
 #[derive(Clone, Copy, RustcDecodable, RustcEncodable, PartialEq)]
