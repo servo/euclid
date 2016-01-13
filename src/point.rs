@@ -394,9 +394,9 @@ mod typedpoint2d {
     use scale_factor::ScaleFactor;
 
     #[derive(Debug, Copy, Clone)]
-    enum Mm {}
+    pub enum Mm {}
     #[derive(Debug, Copy, Clone)]
-    enum Cm {}
+    pub enum Cm {}
 
     pub type Point2DMm<T> = TypedPoint2D<Mm, T>;
     pub type Point2DCm<T> = TypedPoint2D<Cm, T>;
