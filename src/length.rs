@@ -15,7 +15,9 @@ use num_lib::NumCast;
 #[cfg(feature = "plugins")]
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::cmp::Ordering;
-use std::ops::{Add, AddAssign, Sub, SubAssign, Mul, Div, Neg};
+use std::ops::{Add, Sub, Mul, Div, Neg};
+#[cfg(feature = "unstable")]
+use std::ops::{AddAssign, SubAssign};
 use std::marker::PhantomData;
 
 /// A one-dimensional distance, with value represented by `T` and unit of measurement `Unit`.
@@ -71,6 +73,7 @@ impl<U, T: Clone + Add<T, Output=T>> Add for Length<U, T> {
 }
 
 // length += length
+#[cfg(feature = "unstable")]
 impl<U, T: Clone + AddAssign<T>> AddAssign for Length<U, T> {
     fn add_assign(&mut self, other: Length<U, T>) {
         self.0 += other.get();
@@ -86,6 +89,7 @@ impl<U, T: Clone + Sub<T, Output=T>> Sub<Length<U, T>> for Length<U, T> {
 }
 
 // length -= length
+#[cfg(feature = "unstable")]
 impl<U, T: Clone + SubAssign<T>> SubAssign for Length<U, T> {
     fn sub_assign(&mut self, other: Length<U, T>) {
         self.0 -= other.get();
@@ -223,6 +227,7 @@ mod tests {
         assert_eq!(negative_zero_feet.get(), 0.0);
     }
 
+    #[cfg(feature = "unstable")]
     #[test]
     fn test_addassign() {
         let one_cm: Length<Mm, f32> = Length::new(10.0);
@@ -233,6 +238,7 @@ mod tests {
         assert_eq!(measurement.get(), 15.0);
     }
 
+    #[cfg(feature = "unstable")]
     #[test]
     fn test_subassign() {
         let one_cm: Length<Mm, f32> = Length::new(10.0);

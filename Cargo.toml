@@ -10,6 +10,7 @@ license = "MIT / Apache-2.0"
 [features]
 default = []
 plugins = ["serde", "serde_macros", "heapsize", "heapsize_plugin"]
+unstable = []
 
 [dependencies]
 rustc-serialize = "0.3.2"
