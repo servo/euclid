@@ -7,9 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#![feature(asm, repr_simd, test)]
-#![feature(augmented_assignments)]
-#![feature(op_assign_traits)]
+#![cfg_attr(feature = "unstable", feature(asm, repr_simd, test, augmented_assignments, op_assign_traits))]
 
 #![cfg_attr(feature = "plugins", feature(custom_derive, plugin))]
 #![cfg_attr(feature = "plugins", plugin(heapsize_plugin))]
@@ -27,6 +25,7 @@ extern crate serde;
 
 #[cfg(test)]
 extern crate rand;
+#[cfg(feature = "unstable")]
 extern crate test;
 extern crate num as num_lib;
 
@@ -34,7 +33,9 @@ pub use matrix::Matrix4;
 pub use matrix2d::Matrix2D;
 pub use point::{Point2D, Point3D, Point4D};
 pub use rect::Rect;
+#[cfg(feature = "unstable")]
 pub use side_offsets::SideOffsets2D;
+#[cfg(feature = "unstable")]
 pub use side_offsets::SideOffsets2DSimdI32;
 pub use size::Size2D;
 

@@ -75,6 +75,7 @@ impl<T: Zero> SideOffsets2D<T> {
 }
 
 /// A SIMD enabled version of SideOffsets2D specialized for i32.
+#[cfg(feature = "unstable")]
 #[derive(Clone, Copy, PartialEq)]
 #[repr(simd)]
 #[cfg_attr(feature = "plugins", derive(HeapSizeOf))]
@@ -85,6 +86,7 @@ pub struct SideOffsets2DSimdI32 {
     pub left: i32,
 }
 
+#[cfg(feature = "unstable")]
 impl SideOffsets2DSimdI32 {
     #[inline]
     pub fn new(top: i32, right: i32, bottom: i32, left: i32) -> SideOffsets2DSimdI32 {
@@ -97,6 +99,7 @@ impl SideOffsets2DSimdI32 {
     }
 }
 
+#[cfg(feature = "unstable")]
 impl SideOffsets2DSimdI32 {
     #[inline]
     pub fn new_all_same(all: i32) -> SideOffsets2DSimdI32 {
@@ -104,6 +107,7 @@ impl SideOffsets2DSimdI32 {
     }
 }
 
+#[cfg(feature = "unstable")]
 impl SideOffsets2DSimdI32 {
     #[inline]
     pub fn horizontal(&self) -> i32 {
@@ -124,6 +128,7 @@ impl SideOffsets2DSimdI32 {
     }
 }*/
 
+#[cfg(feature = "unstable")]
 impl SideOffsets2DSimdI32 {
     #[inline]
     pub fn zero() -> SideOffsets2DSimdI32 {
@@ -159,6 +164,7 @@ impl SideOffsets2DSimdI32 {
     }
 }
 
+#[cfg(feature = "unstable")]
 #[cfg(test)]
 mod tests {
     use super::SideOffsets2DSimdI32;
@@ -174,6 +180,7 @@ mod tests {
     }
 }
 
+#[cfg(feature = "unstable")]
 #[cfg(bench)]
 mod bench {
     use test::BenchHarness;
