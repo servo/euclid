@@ -7,10 +7,11 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#![feature(asm, custom_derive, plugin, repr_simd, test)]
+#![feature(asm, repr_simd, test)]
 #![feature(augmented_assignments)]
 #![feature(op_assign_traits)]
 
+#![cfg_attr(feature = "plugins", feature(custom_derive, plugin))]
 #![cfg_attr(feature = "plugins", plugin(heapsize_plugin))]
 #![cfg_attr(feature = "plugins", plugin(serde_macros))]
 
