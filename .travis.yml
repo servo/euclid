@@ -1,6 +1,23 @@
 language: rust
-rust:
-  - nightly
 sudo: false
 notifications:
   webhooks: http://build.servo.org:54856/travis
+
+matrix:
+  include:
+    - rust: stable
+      env: FEATURES=""
+    - rust: beta
+      env: FEATURES=""
+    - rust: nightly
+      env: FEATURES=""
+    - rust: nightly
+      env: FEATURES="unstable"
+    - rust: nightly
+      env: FEATURES="plugins"
+    - rust: nightly
+      env: FEATURES="unstable plugins"
+
+script:
+  - cargo build --verbose --features "$FEATURES"
+  - cargo test --verbose --features "$FEATURES"
