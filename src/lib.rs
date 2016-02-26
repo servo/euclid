@@ -12,6 +12,7 @@
 #![cfg_attr(feature = "plugins", feature(custom_derive, plugin))]
 #![cfg_attr(feature = "plugins", plugin(heapsize_plugin))]
 #![cfg_attr(feature = "plugins", plugin(serde_macros))]
+#![feature(deprecated)]
 
 #[cfg(feature = "plugins")]
 #[macro_use]
@@ -31,6 +32,7 @@ extern crate num as num_lib;
 
 pub use matrix::Matrix4;
 pub use matrix2d::Matrix2D;
+pub use matrix4d::Matrix4D;
 pub use point::{Point2D, Point3D, Point4D};
 pub use rect::Rect;
 #[cfg(feature = "unstable")]
@@ -43,9 +45,11 @@ pub mod approxeq;
 pub mod length;
 pub mod matrix;
 pub mod matrix2d;
+pub mod matrix4d;
 pub mod num;
 pub mod point;
 pub mod rect;
 pub mod scale_factor;
 pub mod side_offsets;
 pub mod size;
+mod trig;
