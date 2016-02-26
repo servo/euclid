@@ -14,7 +14,7 @@ use num_lib::NumCast;
 use std::fmt;
 use std::ops::{Mul, Div};
 
-#[derive(Clone, Copy, RustcDecodable, RustcEncodable, PartialEq)]
+#[derive(Clone, Copy, Eq, RustcDecodable, RustcEncodable, PartialEq)]
 #[cfg_attr(feature = "plugins", derive(HeapSizeOf, Deserialize, Serialize))]
 pub struct Size2D<T> {
     pub width: T,
