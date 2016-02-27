@@ -11,7 +11,7 @@
 use point::{Point2D};
 use matrix4d::Matrix4D;
 
-#[deprecated(note="Use matrix4d::Matrix4D instead")]
+#[cfg_attr(feature = "unstable", deprecated(note = "Use matrix4d::Matrix4D instead"))]
 pub type Matrix4 = Matrix4D<f32>;
 
 #[test]
