@@ -21,6 +21,7 @@ pub struct Matrix4 {
 }
 
 impl Matrix4 {
+    #[inline]
     pub fn new(
             m11: f32, m12: f32, m13: f32, m14: f32,
             m21: f32, m22: f32, m23: f32, m24: f32,
@@ -63,6 +64,7 @@ impl Matrix4 {
                      1.0)
     }
 
+    #[inline]
     pub fn identity() -> Matrix4 {
         Matrix4::new(1.0, 0.0, 0.0, 0.0,
                      0.0, 1.0, 0.0, 0.0,
