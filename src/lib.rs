@@ -32,6 +32,7 @@ extern crate num as num_lib;
 pub use matrix::Matrix4;
 pub use matrix2d::Matrix2D;
 pub use point::{Point2D, Point3D, Point4D};
+pub use ray::Ray3D;
 pub use rect::Rect;
 #[cfg(feature = "unstable")]
 pub use side_offsets::SideOffsets2D;
@@ -45,6 +46,7 @@ pub mod matrix;
 pub mod matrix2d;
 pub mod num;
 pub mod point;
+pub mod ray;
 pub mod rect;
 pub mod scale_factor;
 pub mod side_offsets;
