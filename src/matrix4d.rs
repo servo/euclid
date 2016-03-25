@@ -50,6 +50,17 @@ impl <T:Add<T, Output=T> +
         }
     }
 
+    #[inline]
+    pub fn new_2d(m11: T, m12: T, m21: T, m22: T, m41: T, m42: T) -> Matrix4D<T> {
+        let (_0, _1): (T, T) = (Zero::zero(), One::one());
+        Matrix4D {
+            m11: m11, m12: m12, m13:  _0, m14: _0,
+            m21: m21, m22: m22, m23:  _0, m24: _0,
+            m31:  _0, m32:  _0, m33:  _1, m34: _0,
+            m41: m41, m42: m42, m43:  _0, m44: _1
+       }
+    }
+
     pub fn ortho(left: T, right: T,
                  bottom: T, top: T,
                  near: T, far: T) -> Matrix4D<T> {
@@ -88,6 +99,19 @@ impl <T:Add<T, Output=T> +
                       _0, _0, _1, _0,
                       _0, _0, _0, _1)
     }
+
+
+    // See https://drafts.csswg.org/css-transforms/#2d-matrix
+    #[inline]
+    pub fn is_2d(&self) -> bool {
+        let (_0, _1): (T, T) = (Zero::zero(), One::one());
+        self.m31 == _0 && self.m32 == _0 &&
+        self.m13 == _0 && self.m23 == _0 &&
+        self.m43 == _0 && self.m14 == _0 &&
+        self.m24 == _0 && self.m34 == _0 &&
+        self.m33 == _1 && self.m44 == _1
+    }
+
 
     pub fn approx_eq(&self, other: &Matrix4D<T>) -> bool {
         self.m11.approx_eq(&other.m11) && self.m12.approx_eq(&other.m12) &&
