@@ -28,6 +28,23 @@ pub fn test_ortho() {
 }
 
 #[test]
+pub fn test_is_2d() {
+    assert!(Matrix4::identity().is_2d());
+    assert!(Matrix4::create_rotation(0.0, 0.0, 1.0, 0.7854).is_2d());
+    assert!(!Matrix4::create_rotation(0.0, 1.0, 0.0, 0.7854).is_2d());
+}
+
+#[test]
+pub fn test_new_2d() {
+    let m1 = Matrix4::new_2d(1.0, 2.0, 3.0, 4.0, 5.0, 6.0);
+    let m2 = Matrix4::new(1.0, 2.0, 0.0, 0.0,
+                          3.0, 4.0, 0.0, 0.0,
+                          0.0, 0.0, 1.0, 0.0,
+                          5.0, 6.0, 0.0, 1.0);
+    assert_eq!(m1, m2);
+}
+
+#[test]
 pub fn test_invert_simple() {
     let m1 = Matrix4::identity();
     let m2 = m1.invert();
