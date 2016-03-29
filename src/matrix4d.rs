@@ -372,3 +372,85 @@ impl <T:Add<T, Output=T> +
                       _0, _0, _0, _1)
     }
 }
+
+
+
+#[cfg(test)]
+mod tests {
+    use point::{Point2D};
+    use super::*;
+    
+    type Mf32 = Matrix4D<f32>;
+
+    #[test]
+    pub fn test_ortho() {
+        let (left, right, bottom, top) = (0.0f32, 1.0f32, 0.1f32, 1.0f32);
+        let (near, far) = (-1.0f32, 1.0f32);
+        let result = Mf32::ortho(left, right, bottom, top, near, far);
+        let expected = Mf32::new(2.0,  0.0,         0.0,  0.0,
+                                 0.0,  2.22222222,  0.0,  0.0,
+                                 0.0,  0.0,         -1.0, 0.0,
+                                 -1.0, -1.22222222, -0.0, 1.0);
+        debug!("result={:?} expected={:?}", result, expected);
+        assert!(result.approx_eq(&expected));
+    }
+
+    #[test]
+    pub fn test_is_2d() {
+        assert!(Mf32::identity().is_2d());
+        assert!(Mf32::create_rotation(0.0, 0.0, 1.0, 0.7854).is_2d());
+        assert!(!Mf32::create_rotation(0.0, 1.0, 0.0, 0.7854).is_2d());
+    }
+
+    #[test]
+    pub fn test_new_2d() {
+        let m1 = Mf32::new_2d(1.0, 2.0, 3.0, 4.0, 5.0, 6.0);
+        let m2 = Mf32::new(1.0, 2.0, 0.0, 0.0,
+                           3.0, 4.0, 0.0, 0.0,
+                           0.0, 0.0, 1.0, 0.0,
+                           5.0, 6.0, 0.0, 1.0);
+        assert_eq!(m1, m2);
+    }
+
+    #[test]
+    pub fn test_invert_simple() {
+        let m1 = Mf32::identity();
+        let m2 = m1.invert();
+        assert!(m1.approx_eq(&m2));
+    }
+
+    #[test]
+    pub fn test_invert_scale() {
+        let m1 = Mf32::create_scale(1.5, 0.3, 2.1);
+        let m2 = m1.invert();
+        assert!(m1.mul(&m2).approx_eq(&Mf32::identity()));
+    }
+
+    #[test]
+    pub fn test_invert_translate() {
+        let m1 = Mf32::create_translation(-132.0, 0.3, 493.0);
+        let m2 = m1.invert();
+        assert!(m1.mul(&m2).approx_eq(&Mf32::identity()));
+    }
+
+    #[test]
+    pub fn test_invert_rotate() {
+        let m1 = Mf32::create_rotation(0.0, 1.0, 0.0, 1.57);
+        let m2 = m1.invert();
+        assert!(m1.mul(&m2).approx_eq(&Mf32::identity()));
+    }
+
+    #[test]
+    pub fn test_invert_transform_point_2d() {
+        let m1 = Mf32::create_translation(100.0, 200.0, 0.0);
+        let m2 = m1.invert();
+        assert!(m1.mul(&m2).approx_eq(&Mf32::identity()));
+
+        let p1 = Point2D::new(1000.0, 2000.0);
+        let p2 = m1.transform_point(&p1);
+        assert!(p2.eq(&Point2D::new(1100.0, 2200.0)));
+
+        let p3 = m2.transform_point(&p2);
+        assert!(p3.eq(&p1));
+    }
+}
