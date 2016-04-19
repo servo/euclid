@@ -241,170 +241,179 @@ impl<Unit, T: NumCast + Clone> Rect<Length<Unit, T>> {
     }
 }
 
-#[test]
-fn test_min_max() {
-    assert!(min(0u32, 1u32) == 0u32);
-    assert!(min(-1.0f32, 0.0f32) == -1.0f32);
 
-    assert!(max(0u32, 1u32) == 1u32);
-    assert!(max(-1.0f32, 0.0f32) == 0.0f32);
-}
+#[cfg(test)]
+mod tests {
+    use point::Point2D;
+    use size::Size2D;
+    use super::*;
 
-#[test]
-fn test_translate() {
-    let p = Rect::new(Point2D::new(0u32, 0u32), Size2D::new(50u32, 40u32));
-    let pp = p.translate(&Point2D::new(10,15));
+    #[test]
+    fn test_min_max() {
+        assert!(min(0u32, 1u32) == 0u32);
+        assert!(min(-1.0f32, 0.0f32) == -1.0f32);
 
-    assert!(pp.size.width == 50);
-    assert!(pp.size.height == 40);
-    assert!(pp.origin.x == 10);
-    assert!(pp.origin.y == 15);
+        assert!(max(0u32, 1u32) == 1u32);
+        assert!(max(-1.0f32, 0.0f32) == 0.0f32);
+    }
+
+    #[test]
+    fn test_translate() {
+        let p = Rect::new(Point2D::new(0u32, 0u32), Size2D::new(50u32, 40u32));
+        let pp = p.translate(&Point2D::new(10,15));
+
+        assert!(pp.size.width == 50);
+        assert!(pp.size.height == 40);
+        assert!(pp.origin.x == 10);
+        assert!(pp.origin.y == 15);
 
 
-    let r = Rect::new(Point2D::new(-10, -5), Size2D::new(50, 40));
-    let rr = r.translate(&Point2D::new(0,-10));
+        let r = Rect::new(Point2D::new(-10, -5), Size2D::new(50, 40));
+        let rr = r.translate(&Point2D::new(0,-10));
 
-    assert!(rr.size.width == 50);
-    assert!(rr.size.height == 40);
-    assert!(rr.origin.x == -10);
-    assert!(rr.origin.y == -15);
-}
+        assert!(rr.size.width == 50);
+        assert!(rr.size.height == 40);
+        assert!(rr.origin.x == -10);
+        assert!(rr.origin.y == -15);
+    }
 
-#[test]
-fn test_union() {
-    let p = Rect::new(Point2D::new(0, 0), Size2D::new(50, 40));
-    let q = Rect::new(Point2D::new(20,20), Size2D::new(5, 5));
-    let r = Rect::new(Point2D::new(-15, -30), Size2D::new(200, 15));
-    let s = Rect::new(Point2D::new(20, -15), Size2D::new(250, 200));
+    #[test]
+    fn test_union() {
+        let p = Rect::new(Point2D::new(0, 0), Size2D::new(50, 40));
+        let q = Rect::new(Point2D::new(20,20), Size2D::new(5, 5));
+        let r = Rect::new(Point2D::new(-15, -30), Size2D::new(200, 15));
+        let s = Rect::new(Point2D::new(20, -15), Size2D::new(250, 200));
 
-    let pq = p.union(&q);
-    assert!(pq.origin == Point2D::new(0, 0));
-    assert!(pq.size == Size2D::new(50, 40));
+        let pq = p.union(&q);
+        assert!(pq.origin == Point2D::new(0, 0));
+        assert!(pq.size == Size2D::new(50, 40));
 
-    let pr = p.union(&r);
-    assert!(pr.origin == Point2D::new(-15, -30));
-    assert!(pr.size == Size2D::new(200, 70));
+        let pr = p.union(&r);
+        assert!(pr.origin == Point2D::new(-15, -30));
+        assert!(pr.size == Size2D::new(200, 70));
 
-    let ps = p.union(&s);
-    assert!(ps.origin == Point2D::new(0, -15));
-    assert!(ps.size == Size2D::new(270, 200));
+        let ps = p.union(&s);
+        assert!(ps.origin == Point2D::new(0, -15));
+        assert!(ps.size == Size2D::new(270, 200));
 
-}
+    }
 
-#[test]
-fn test_intersection() {
-    let p = Rect::new(Point2D::new(0, 0), Size2D::new(10, 20));
-    let q = Rect::new(Point2D::new(5, 15), Size2D::new(10, 10));
-    let r = Rect::new(Point2D::new(-5, -5), Size2D::new(8, 8));
+    #[test]
+    fn test_intersection() {
+        let p = Rect::new(Point2D::new(0, 0), Size2D::new(10, 20));
+        let q = Rect::new(Point2D::new(5, 15), Size2D::new(10, 10));
+        let r = Rect::new(Point2D::new(-5, -5), Size2D::new(8, 8));
 
-    let pq = p.intersection(&q);
-    assert!(pq.is_some());
-    let pq = pq.unwrap();
-    assert!(pq.origin == Point2D::new(5, 15));
-    assert!(pq.size == Size2D::new(5, 5));
+        let pq = p.intersection(&q);
+        assert!(pq.is_some());
+        let pq = pq.unwrap();
+        assert!(pq.origin == Point2D::new(5, 15));
+        assert!(pq.size == Size2D::new(5, 5));
 
-    let pr = p.intersection(&r);
-    assert!(pr.is_some());
-    let pr = pr.unwrap();
-    assert!(pr.origin == Point2D::new(0, 0));
-    assert!(pr.size == Size2D::new(3, 3));
+        let pr = p.intersection(&r);
+        assert!(pr.is_some());
+        let pr = pr.unwrap();
+        assert!(pr.origin == Point2D::new(0, 0));
+        assert!(pr.size == Size2D::new(3, 3));
 
-    let qr = q.intersection(&r);
-    assert!(qr.is_none());
-}
+        let qr = q.intersection(&r);
+        assert!(qr.is_none());
+    }
 
-#[test]
-fn test_contains() {
-    let r = Rect::new(Point2D::new(-20, 15), Size2D::new(100, 200));
+    #[test]
+    fn test_contains() {
+        let r = Rect::new(Point2D::new(-20, 15), Size2D::new(100, 200));
 
-    assert!(r.contains(&Point2D::new(0, 50)));
-    assert!(r.contains(&Point2D::new(-10, 200)));
+        assert!(r.contains(&Point2D::new(0, 50)));
+        assert!(r.contains(&Point2D::new(-10, 200)));
 
-    // The `contains` method is inclusive of the top/left edges, but not the
-    // bottom/right edges.
-    assert!(r.contains(&Point2D::new(-20, 15)));
-    assert!(!r.contains(&Point2D::new(80, 15)));
-    assert!(!r.contains(&Point2D::new(80, 215)));
-    assert!(!r.contains(&Point2D::new(-20, 215)));
+        // The `contains` method is inclusive of the top/left edges, but not the
+        // bottom/right edges.
+        assert!(r.contains(&Point2D::new(-20, 15)));
+        assert!(!r.contains(&Point2D::new(80, 15)));
+        assert!(!r.contains(&Point2D::new(80, 215)));
+        assert!(!r.contains(&Point2D::new(-20, 215)));
 
-    // Points beyond the top-left corner.
-    assert!(!r.contains(&Point2D::new(-25, 15)));
-    assert!(!r.contains(&Point2D::new(-15, 10)));
+        // Points beyond the top-left corner.
+        assert!(!r.contains(&Point2D::new(-25, 15)));
+        assert!(!r.contains(&Point2D::new(-15, 10)));
 
-    // Points beyond the top-right corner.
-    assert!(!r.contains(&Point2D::new(85, 20)));
-    assert!(!r.contains(&Point2D::new(75, 10)));
+        // Points beyond the top-right corner.
+        assert!(!r.contains(&Point2D::new(85, 20)));
+        assert!(!r.contains(&Point2D::new(75, 10)));
 
-    // Points beyond the bottom-right corner.
-    assert!(!r.contains(&Point2D::new(85, 210)));
-    assert!(!r.contains(&Point2D::new(75, 220)));
+        // Points beyond the bottom-right corner.
+        assert!(!r.contains(&Point2D::new(85, 210)));
+        assert!(!r.contains(&Point2D::new(75, 220)));
 
-    // Points beyond the bottom-left corner.
-    assert!(!r.contains(&Point2D::new(-25, 210)));
-    assert!(!r.contains(&Point2D::new(-15, 220)));
-}
+        // Points beyond the bottom-left corner.
+        assert!(!r.contains(&Point2D::new(-25, 210)));
+        assert!(!r.contains(&Point2D::new(-15, 220)));
+    }
 
-#[test]
-fn test_scale() {
-    let p = Rect::new(Point2D::new(0u32, 0u32), Size2D::new(50u32, 40u32));
-    let pp = p.scale(10, 15);
+    #[test]
+    fn test_scale() {
+        let p = Rect::new(Point2D::new(0u32, 0u32), Size2D::new(50u32, 40u32));
+        let pp = p.scale(10, 15);
 
-    assert!(pp.size.width == 500);
-    assert!(pp.size.height == 600);
-    assert!(pp.origin.x == 0);
-    assert!(pp.origin.y == 0);
+        assert!(pp.size.width == 500);
+        assert!(pp.size.height == 600);
+        assert!(pp.origin.x == 0);
+        assert!(pp.origin.y == 0);
 
-    let r = Rect::new(Point2D::new(-10, -5), Size2D::new(50, 40));
-    let rr = r.scale(1, 20);
+        let r = Rect::new(Point2D::new(-10, -5), Size2D::new(50, 40));
+        let rr = r.scale(1, 20);
 
-    assert!(rr.size.width == 50);
-    assert!(rr.size.height == 800);
-    assert!(rr.origin.x == -10);
-    assert!(rr.origin.y == -100);
-}
+        assert!(rr.size.width == 50);
+        assert!(rr.size.height == 800);
+        assert!(rr.origin.x == -10);
+        assert!(rr.origin.y == -100);
+    }
 
-#[test]
-fn test_inflate() {
-    let p = Rect::new(Point2D::new(0, 0), Size2D::new(10, 10));
-    let pp = p.inflate(10, 20);
+    #[test]
+    fn test_inflate() {
+        let p = Rect::new(Point2D::new(0, 0), Size2D::new(10, 10));
+        let pp = p.inflate(10, 20);
 
-    assert!(pp.size.width == 30);
-    assert!(pp.size.height == 50);
-    assert!(pp.origin.x == -10);
-    assert!(pp.origin.y == -20);
+        assert!(pp.size.width == 30);
+        assert!(pp.size.height == 50);
+        assert!(pp.origin.x == -10);
+        assert!(pp.origin.y == -20);
 
-    let r = Rect::new(Point2D::new(0, 0), Size2D::new(10, 20));
-    let rr = r.inflate(-2, -5);
+        let r = Rect::new(Point2D::new(0, 0), Size2D::new(10, 20));
+        let rr = r.inflate(-2, -5);
 
-    assert!(rr.size.width == 6);
-    assert!(rr.size.height == 10);
-    assert!(rr.origin.x == 2);
-    assert!(rr.origin.y == 5);
-}
+        assert!(rr.size.width == 6);
+        assert!(rr.size.height == 10);
+        assert!(rr.origin.x == 2);
+        assert!(rr.origin.y == 5);
+    }
 
-#[test]
-fn test_min_max_x_y() {
-    let p = Rect::new(Point2D::new(0u32, 0u32), Size2D::new(50u32, 40u32));
-    assert!(p.max_y() == 40);
-    assert!(p.min_y() == 0);
-    assert!(p.max_x() == 50);
-    assert!(p.min_x() == 0);
+    #[test]
+    fn test_min_max_x_y() {
+        let p = Rect::new(Point2D::new(0u32, 0u32), Size2D::new(50u32, 40u32));
+        assert!(p.max_y() == 40);
+        assert!(p.min_y() == 0);
+        assert!(p.max_x() == 50);
+        assert!(p.min_x() == 0);
 
-    let r = Rect::new(Point2D::new(-10, -5), Size2D::new(50, 40));
-    assert!(r.max_y() == 35);
-    assert!(r.min_y() == -5);
-    assert!(r.max_x() == 40);
-    assert!(r.min_x() == -10);
-}
+        let r = Rect::new(Point2D::new(-10, -5), Size2D::new(50, 40));
+        assert!(r.max_y() == 35);
+        assert!(r.min_y() == -5);
+        assert!(r.max_x() == 40);
+        assert!(r.min_x() == -10);
+    }
 
-#[test]
-fn test_is_empty() {
-    assert!(Rect::new(Point2D::new(0u32, 0u32), Size2D::new(0u32, 0u32)).is_empty());
-    assert!(Rect::new(Point2D::new(0u32, 0u32), Size2D::new(10u32, 0u32)).is_empty());
-    assert!(Rect::new(Point2D::new(0u32, 0u32), Size2D::new(0u32, 10u32)).is_empty());
-    assert!(!Rect::new(Point2D::new(0u32, 0u32), Size2D::new(1u32, 1u32)).is_empty());
-    assert!(Rect::new(Point2D::new(10u32, 10u32), Size2D::new(0u32, 0u32)).is_empty());
-    assert!(Rect::new(Point2D::new(10u32, 10u32), Size2D::new(10u32, 0u32)).is_empty());
-    assert!(Rect::new(Point2D::new(10u32, 10u32), Size2D::new(0u32, 10u32)).is_empty());
-    assert!(!Rect::new(Point2D::new(10u32, 10u32), Size2D::new(1u32, 1u32)).is_empty());
+    #[test]
+    fn test_is_empty() {
+        assert!(Rect::new(Point2D::new(0u32, 0u32), Size2D::new(0u32, 0u32)).is_empty());
+        assert!(Rect::new(Point2D::new(0u32, 0u32), Size2D::new(10u32, 0u32)).is_empty());
+        assert!(Rect::new(Point2D::new(0u32, 0u32), Size2D::new(0u32, 10u32)).is_empty());
+        assert!(!Rect::new(Point2D::new(0u32, 0u32), Size2D::new(1u32, 1u32)).is_empty());
+        assert!(Rect::new(Point2D::new(10u32, 10u32), Size2D::new(0u32, 0u32)).is_empty());
+        assert!(Rect::new(Point2D::new(10u32, 10u32), Size2D::new(10u32, 0u32)).is_empty());
+        assert!(Rect::new(Point2D::new(10u32, 10u32), Size2D::new(0u32, 10u32)).is_empty());
+        assert!(!Rect::new(Point2D::new(10u32, 10u32), Size2D::new(1u32, 1u32)).is_empty());
+    }
+
 }
