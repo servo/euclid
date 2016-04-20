@@ -11,7 +11,7 @@
 use scale_factor::ScaleFactor;
 use num::Zero;
 
-use num_lib::NumCast;
+use num_traits::NumCast;
 #[cfg(feature = "plugins")]
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::cmp::Ordering;
