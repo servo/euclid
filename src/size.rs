@@ -10,7 +10,7 @@
 use length::Length;
 use num::Zero;
 
-use num_lib::NumCast;
+use num_traits::NumCast;
 use std::fmt;
 use std::ops::{Mul, Div};
 

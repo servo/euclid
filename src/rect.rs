@@ -12,7 +12,7 @@ use num::Zero;
 use point::Point2D;
 use size::Size2D;
 
-use num_lib::NumCast;
+use num_traits::NumCast;
 use std::cmp::PartialOrd;
 use std::fmt;
 use std::ops::{Add, Sub, Mul, Div};

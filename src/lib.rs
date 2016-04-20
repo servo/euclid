@@ -28,7 +28,7 @@ extern crate serde;
 extern crate rand;
 #[cfg(feature = "unstable")]
 extern crate test;
-extern crate num as num_lib;
+extern crate num_traits;
 
 pub use matrix::Matrix4;
 pub use matrix2d::Matrix2D;

@@ -11,8 +11,7 @@ use length::Length;
 use size::Size2D;
 use num::Zero;
 
-use num_lib::NumCast;
-use num_lib::traits;
+use num_traits::{Float, NumCast};
 use std::fmt;
 use std::ops::{Add, Neg, Mul, Sub, Div};
 
@@ -98,7 +97,7 @@ impl <T:Clone + Neg<Output=T>> Neg for Point2D<T> {
     }
 }
 
-impl<T: traits::Float> Point2D<T> {
+impl<T: Float> Point2D<T> {
     pub fn min(self, other: Point2D<T>) -> Point2D<T> {
          Point2D::new(self.x.min(other.x), self.y.min(other.y))
     }
@@ -246,7 +245,7 @@ impl <T:Clone + Neg<Output=T>> Neg for Point3D<T> {
     }
 }
 
-impl<T: traits::Float> Point3D<T> {
+impl<T: Float> Point3D<T> {
     pub fn min(self, other: Point3D<T>) -> Point3D<T> {
          Point3D::new(self.x.min(other.x), self.y.min(other.y),
                       self.z.min(other.z))
@@ -326,7 +325,7 @@ impl <T:Clone + Neg<Output=T>> Neg for Point4D<T> {
     }
 }
 
-impl<T: traits::Float> Point4D<T> {
+impl<T: Float> Point4D<T> {
     pub fn min(self, other: Point4D<T>) -> Point4D<T> {
          Point4D::new(self.x.min(other.x), self.y.min(other.y),
                       self.z.min(other.z), self.w.min(other.w))
