@@ -7,8 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#![cfg_attr(feature = "unstable", feature(asm, repr_simd, test, augmented_assignments, op_assign_traits))]
-#![cfg_attr(feature = "unstable", feature(deprecated))]
+#![cfg_attr(feature = "unstable", feature(asm, repr_simd, test))]
 
 #![cfg_attr(feature = "plugins", feature(custom_derive, plugin))]
 #![cfg_attr(feature = "plugins", plugin(heapsize_plugin))]
