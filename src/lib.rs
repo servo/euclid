@@ -9,18 +9,11 @@
 
 #![cfg_attr(feature = "unstable", feature(asm, repr_simd, test))]
 
-#![cfg_attr(feature = "plugins", feature(custom_derive, plugin))]
-#![cfg_attr(feature = "plugins", plugin(heapsize_plugin))]
-#![cfg_attr(feature = "plugins", plugin(serde_macros))]
-
-#[cfg(feature = "plugins")]
-#[macro_use]
 extern crate heapsize;
 
 #[macro_use]
 extern crate log;
 extern crate rustc_serialize;
-#[cfg(feature = "plugins")]
 extern crate serde;
 
 #[cfg(test)]
@@ -42,6 +35,8 @@ pub use size::Size2D;
 
 pub mod approxeq;
 pub mod length;
+#[macro_use]
+mod macros;
 pub mod matrix;
 pub mod matrix2d;
 pub mod matrix4d;

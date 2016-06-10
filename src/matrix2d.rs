@@ -13,12 +13,12 @@ use rect::Rect;
 use size::Size2D;
 use std::ops::{Add, Mul, Sub};
 
-#[derive(Clone, Copy)]
-#[cfg_attr(feature = "plugins", derive(HeapSizeOf, Deserialize, Serialize))]
-pub struct Matrix2D<T> {
-    m11: T, m12: T,
-    m21: T, m22: T,
-    m31: T, m32: T
+define_matrix! {
+    pub struct Matrix2D<T> {
+        pub m11: T, pub m12: T,
+        pub m21: T, pub m22: T,
+        pub m31: T, pub m32: T,
+    }
 }
 
 impl<T:Add<T, Output=T> +

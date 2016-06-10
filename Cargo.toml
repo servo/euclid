@@ -1,6 +1,6 @@
 [package]
 name = "euclid"
-version = "0.6.7"
+version = "0.6.8"
 authors = ["The Servo Project Developers"]
 description = "Geometry primitives"
 documentation = "http://doc.servo.org/euclid/"
@@ -9,23 +9,15 @@ license = "MIT / Apache-2.0"
 
 [features]
 default = []
-plugins = ["serde", "serde_macros", "heapsize", "heapsize_plugin"]
+plugins = []
 unstable = []
 
 [dependencies]
+heapsize = ">=0.2, <0.4"
 rustc-serialize = "0.3.2"
 num-traits = {version = "0.1.32", default-features = false}
 log = "0.3.1"
-serde = {version = ">=0.6, <0.8", optional = true}
-serde_macros = {version = ">=0.6, <0.8", optional = true}
-
-[dependencies.heapsize]
-version = ">=0.2, <0.4"
-optional = true
-
-[dependencies.heapsize_plugin]
-version = "0.1.3"
-optional = true
+serde = ">=0.6, <0.8"
 
 [dev-dependencies]
 rand = "0.3.7"
