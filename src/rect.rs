@@ -12,16 +12,46 @@ use num::Zero;
 use point::Point2D;
 use size::Size2D;
 
+use heapsize::HeapSizeOf;
 use num_traits::NumCast;
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::cmp::PartialOrd;
 use std::fmt;
 use std::ops::{Add, Sub, Mul, Div};
 
 #[derive(Clone, Copy, Eq, RustcDecodable, RustcEncodable, PartialEq)]
-#[cfg_attr(feature = "plugins", derive(HeapSizeOf, Deserialize, Serialize))]
 pub struct Rect<T> {
     pub origin: Point2D<T>,
     pub size: Size2D<T>,
+}
+
+impl<T: HeapSizeOf> HeapSizeOf for Rect<T> {
+    fn heap_size_of_children(&self) -> usize {
+        self.origin.heap_size_of_children() + self.size.heap_size_of_children()
+    }
+}
+
+impl<T: Deserialize> Deserialize for Rect<T> {
+    fn deserialize<D>(deserializer: &mut D) -> Result<Self, D::Error>
+        where D: Deserializer
+    {
+        let origin = try!(Deserialize::deserialize(deserializer));
+        let size = try!(Deserialize::deserialize(deserializer));
+        Ok(Rect {
+            origin: origin,
+            size: size,
+        })
+    }
+}
+
+impl<T: Serialize> Serialize for Rect<T> {
+    fn serialize<S>(&self, serializer: &mut S) -> Result<(), S::Error>
+        where S: Serializer
+    {
+        try!(self.origin.serialize(serializer));
+        try!(self.size.serialize(serializer));
+        Ok(())
+    }
 }
 
 impl<T: fmt::Debug> fmt::Debug for Rect<T> {

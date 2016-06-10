@@ -10,8 +10,8 @@
 
 use num::One;
 
+use heapsize::HeapSizeOf;
 use num_traits::NumCast;
-#[cfg(feature = "plugins")]
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::ops::{Add, Mul, Sub, Div};
 use std::marker::PhantomData;
@@ -38,18 +38,22 @@ use std::marker::PhantomData;
 // Uncomment the derive, and remove the macro call, once heapsize gets
 // PhantomData<T> support.
 #[derive(Copy, RustcDecodable, RustcEncodable, Debug)]
-#[cfg_attr(feature = "plugins", derive(HeapSizeOf))]
 pub struct ScaleFactor<Src, Dst, T>(pub T, PhantomData<(Src, Dst)>);
 
-#[cfg(feature = "plugins")]
-impl<Src,Dst,T> Deserialize for ScaleFactor<Src,Dst,T> where T: Deserialize {
+impl<Src, Dst, T: HeapSizeOf> HeapSizeOf for ScaleFactor<Src, Dst, T> {
+    fn heap_size_of_children(&self) -> usize {
+        self.0.heap_size_of_children()
+    }
+}
+
+impl<Src, Dst, T> Deserialize for ScaleFactor<Src, Dst, T> where T: Deserialize {
     fn deserialize<D>(deserializer: &mut D) -> Result<ScaleFactor<Src,Dst,T>,D::Error>
                       where D: Deserializer {
         Ok(ScaleFactor(try!(Deserialize::deserialize(deserializer)), PhantomData))
     }
 }
-#[cfg(feature = "plugins")]
-impl<Src,Dst,T> Serialize for ScaleFactor<Src,Dst,T> where T: Serialize {
+
+impl<Src, Dst, T> Serialize for ScaleFactor<Src, Dst, T> where T: Serialize {
     fn serialize<S>(&self, serializer: &mut S) -> Result<(),S::Error> where S: Serializer {
         self.0.serialize(serializer)
     }

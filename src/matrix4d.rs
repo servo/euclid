@@ -13,13 +13,14 @@ use point::{Point2D, Point4D};
 use num::{One, Zero};
 use std::ops::{Add, Mul, Sub, Div, Neg};
 
-#[derive(Debug, Copy, Clone, PartialEq)]
-#[cfg_attr(feature = "plugins", derive(HeapSizeOf, Deserialize, Serialize))]
-pub struct Matrix4D<T> {
-    pub m11: T, pub m12: T, pub m13: T, pub m14: T,
-    pub m21: T, pub m22: T, pub m23: T, pub m24: T,
-    pub m31: T, pub m32: T, pub m33: T, pub m34: T,
-    pub m41: T, pub m42: T, pub m43: T, pub m44: T,
+define_matrix! {
+    #[derive(Debug)]
+    pub struct Matrix4D<T> {
+        pub m11: T, pub m12: T, pub m13: T, pub m14: T,
+        pub m21: T, pub m22: T, pub m23: T, pub m24: T,
+        pub m31: T, pub m32: T, pub m33: T, pub m34: T,
+        pub m41: T, pub m42: T, pub m43: T, pub m44: T,
+    }
 }
 
 impl <T:Add<T, Output=T> +
