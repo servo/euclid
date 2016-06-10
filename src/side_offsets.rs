@@ -10,18 +10,20 @@
 //! A group of side offsets, which correspond to top/left/bottom/right for borders, padding,
 //! and margins in CSS.
 
+use heapsize::HeapSizeOf;
 use num::Zero;
 use std::ops::Add;
 
 /// A group of side offsets, which correspond to top/left/bottom/right for borders, padding,
 /// and margins in CSS.
-#[derive(Clone, Copy, Eq, PartialEq, Debug)]
-#[cfg_attr(feature = "plugins", derive(HeapSizeOf, Deserialize, Serialize))]
-pub struct SideOffsets2D<T> {
-    pub top: T,
-    pub right: T,
-    pub bottom: T,
-    pub left: T,
+define_matrix! {
+    #[derive(Debug)]
+    pub struct SideOffsets2D<T> {
+        pub top: T,
+        pub right: T,
+        pub bottom: T,
+        pub left: T,
+    }
 }
 
 impl<T> SideOffsets2D<T> {
@@ -78,12 +80,16 @@ impl<T: Zero> SideOffsets2D<T> {
 #[cfg(feature = "unstable")]
 #[derive(Clone, Copy, PartialEq)]
 #[repr(simd)]
-#[cfg_attr(feature = "plugins", derive(HeapSizeOf))]
 pub struct SideOffsets2DSimdI32 {
     pub top: i32,
     pub bottom: i32,
     pub right: i32,
     pub left: i32,
+}
+
+#[cfg(feature = "unstable")]
+impl Heapsize for SideOffsets2DSimdI32 {
+    fn heap_size_of_children(&self) -> usize { 0 }
 }
 
 #[cfg(feature = "unstable")]
