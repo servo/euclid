@@ -15,11 +15,12 @@ use num_traits::{Float, NumCast};
 use std::fmt;
 use std::ops::{Add, Neg, Mul, Sub, Div};
 
-#[derive(Clone, Copy, RustcDecodable, RustcEncodable, Eq, Hash, PartialEq)]
-#[cfg_attr(feature = "plugins", derive(HeapSizeOf, Deserialize, Serialize))]
-pub struct Point2D<T> {
-    pub x: T,
-    pub y: T
+define_matrix! {
+    #[derive(RustcDecodable, RustcEncodable)]
+    pub struct Point2D<T> {
+        pub x: T,
+        pub y: T,
+    }
 }
 
 impl<T: Zero> Point2D<T> {
@@ -164,12 +165,13 @@ impl<Unit, T: NumCast + Clone> Point2D<Length<Unit, T>> {
     }
 }
 
-#[derive(Clone, Copy, RustcDecodable, RustcEncodable, Eq, Hash, PartialEq)]
-#[cfg_attr(feature = "plugins", derive(HeapSizeOf))]
-pub struct Point3D<T> {
-    pub x: T,
-    pub y: T,
-    pub z: T,
+define_matrix! {
+    #[derive(RustcDecodable, RustcEncodable)]
+    pub struct Point3D<T> {
+        pub x: T,
+        pub y: T,
+        pub z: T,
+    }
 }
 
 impl<T: Zero> Point3D<T> {
@@ -257,13 +259,14 @@ impl<T: Float> Point3D<T> {
     }
 }
 
-#[derive(Clone, Copy, RustcDecodable, RustcEncodable, Eq, Hash, PartialEq)]
-#[cfg_attr(feature = "plugins", derive(HeapSizeOf))]
-pub struct Point4D<T> {
-    pub x: T,
-    pub y: T,
-    pub z: T,
-    pub w: T,
+define_matrix! {
+    #[derive(RustcDecodable, RustcEncodable)]
+    pub struct Point4D<T> {
+        pub x: T,
+        pub y: T,
+        pub z: T,
+        pub w: T,
+    }
 }
 
 impl<T: Zero> Point4D<T> {

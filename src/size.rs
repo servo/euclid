@@ -14,11 +14,12 @@ use num_traits::NumCast;
 use std::fmt;
 use std::ops::{Mul, Div};
 
-#[derive(Clone, Copy, Eq, RustcDecodable, RustcEncodable, PartialEq)]
-#[cfg_attr(feature = "plugins", derive(HeapSizeOf, Deserialize, Serialize))]
-pub struct Size2D<T> {
-    pub width: T,
-    pub height: T
+define_matrix! {
+    #[derive(RustcDecodable, RustcEncodable)]
+    pub struct Size2D<T> {
+        pub width: T,
+        pub height: T,
+    }
 }
 
 impl<T: fmt::Debug> fmt::Debug for Size2D<T> {
