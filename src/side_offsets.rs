@@ -202,13 +202,13 @@ impl SideOffsets2DSimdI32 {
         }
     }
 
-    #[cfg(not(target_arch = "x86_64"))]
+    #[cfg(not(target_feature = "sse4.1"))]
     #[inline]
     pub fn is_zero(&self) -> bool {
         self.top == 0 && self.right == 0 && self.bottom == 0 && self.left == 0
     }
 
-    #[cfg(target_arch = "x86_64")]
+    #[cfg(target_feature = "sse4.1")]
     #[inline]
     pub fn is_zero(&self) -> bool {
         let is_zero: bool;

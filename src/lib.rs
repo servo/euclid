@@ -7,7 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#![cfg_attr(feature = "unstable", feature(asm, repr_simd, test, fn_must_use))]
+#![cfg_attr(feature = "unstable", feature(asm, cfg_target_feature, repr_simd, test, fn_must_use))]
 
 //! A collection of strongly typed math tools for computer graphics with an inclination
 //! towards 2d graphics and layout.
