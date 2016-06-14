@@ -7,7 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#![cfg_attr(feature = "unstable", feature(asm, repr_simd, test))]
+#![cfg_attr(feature = "unstable", feature(asm, cfg_target_feature, repr_simd, test))]
 
 extern crate heapsize;
 
