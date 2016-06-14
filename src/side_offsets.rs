@@ -10,6 +10,7 @@
 //! A group of side offsets, which correspond to top/left/bottom/right for borders, padding,
 //! and margins in CSS.
 
+#[cfg(feature = "unstable")]
 use heapsize::HeapSizeOf;
 use num::Zero;
 use std::ops::Add;

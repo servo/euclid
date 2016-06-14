@@ -7,8 +7,38 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+macro_rules! deserialize {
+    (
+        { $field:ident, $($rest:tt)* }
+        $count:tt
+        { $($acc:tt)* }
+        $name:ident
+        $deserializer:ident
+        $T:ty
+    ) => (
+        deserialize!(
+            { $($rest)* }
+            (1 + $count)
+            { $($acc)* { $field $count } }
+            $name
+            $deserializer
+            $T)
+    );
+    (
+        {}
+        $total:tt
+        { $({ $field:ident $index:expr })+ }
+        $name:ident
+        $deserializer:ident
+        $T:ty
+    ) => ({
+        let values = try!(<[$T; $total]>::deserialize($deserializer));
+        Ok($name { $($field: values[$index].clone(),)+ })
+    })
+}
+
 macro_rules! define_matrix {
-    ($(#[$attr:meta])* pub struct $name:ident <T> { $(pub $field:ident: T,)+ }) => (
+    ($(#[$attr:meta])* pub struct $name:ident<T> { $(pub $field:ident: T,)+ }) => (
         $(#[$attr])*
         #[derive(Clone, Copy, Eq, Hash, PartialEq)]
         pub struct $name<T> {
@@ -21,14 +51,11 @@ macro_rules! define_matrix {
             }
         }
 
-        impl<T: ::serde::Deserialize> ::serde::Deserialize for $name<T> {
+        impl<T: Clone + ::serde::Deserialize> ::serde::Deserialize for $name<T> {
             fn deserialize<D>(deserializer: &mut D) -> Result<Self, D::Error>
                 where D: ::serde::Deserializer
             {
-                $(let $field = try!(T::deserialize(deserializer));)+
-                Ok($name {
-                    $($field: $field,)+
-                })
+                deserialize!({ $($field,)+ } 0 {} $name deserializer T)
             }
         }
 
@@ -36,8 +63,7 @@ macro_rules! define_matrix {
             fn serialize<S>(&self, serializer: &mut S) -> Result<(), S::Error>
                 where S: ::serde::Serializer
             {
-                $(try!(self.$field.serialize(serializer));)+
-                Ok(())
+                [$(&self.$field,)+].serialize(serializer)
             }
         }
     )

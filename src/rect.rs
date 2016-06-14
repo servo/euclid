@@ -31,12 +31,11 @@ impl<T: HeapSizeOf> HeapSizeOf for Rect<T> {
     }
 }
 
-impl<T: Deserialize> Deserialize for Rect<T> {
+impl<T: Clone + Deserialize> Deserialize for Rect<T> {
     fn deserialize<D>(deserializer: &mut D) -> Result<Self, D::Error>
         where D: Deserializer
     {
-        let origin = try!(Deserialize::deserialize(deserializer));
-        let size = try!(Deserialize::deserialize(deserializer));
+        let (origin, size) = try!(Deserialize::deserialize(deserializer));
         Ok(Rect {
             origin: origin,
             size: size,
@@ -48,9 +47,7 @@ impl<T: Serialize> Serialize for Rect<T> {
     fn serialize<S>(&self, serializer: &mut S) -> Result<(), S::Error>
         where S: Serializer
     {
-        try!(self.origin.serialize(serializer));
-        try!(self.size.serialize(serializer));
-        Ok(())
+        (&self.origin, &self.size).serialize(serializer)
     }
 }
 
