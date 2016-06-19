@@ -88,7 +88,7 @@ impl<T: Copy + Clone + PartialOrd + Add<T, Output=T> + Sub<T, Output=T>> Rect<T>
 
     #[inline]
     pub fn min_x(&self) -> T {
-        self.origin.x.clone()
+        self.origin.x
     }
 
     #[inline]
@@ -98,7 +98,7 @@ impl<T: Copy + Clone + PartialOrd + Add<T, Output=T> + Sub<T, Output=T>> Rect<T>
 
     #[inline]
     pub fn min_y(&self) -> T {
-        self.origin.y.clone()
+        self.origin.y
     }
 
     #[inline]
@@ -112,15 +112,15 @@ impl<T: Copy + Clone + PartialOrd + Add<T, Output=T> + Sub<T, Output=T>> Rect<T>
         let lower_right = Point2D::new(min(self.max_x(), other.max_x()),
                                        min(self.max_y(), other.max_y()));
 
-        Some(Rect::new(upper_left.clone(), Size2D::new(lower_right.x - upper_left.x,
-                                                       lower_right.y - upper_left.y)))
+        Some(Rect::new(upper_left, Size2D::new(lower_right.x - upper_left.x,
+                                               lower_right.y - upper_left.y)))
     }
 
     #[inline]
     pub fn translate(&self, other: &Point2D<T>) -> Rect<T> {
         Rect {
             origin: Point2D::new(self.origin.x + other.x, self.origin.y + other.y),
-            size: self.size.clone()
+            size: self.size
         }
     }
 
@@ -140,12 +140,12 @@ impl<T: Copy + Clone + PartialOrd + Add<T, Output=T> + Sub<T, Output=T>> Rect<T>
 
     #[inline]
     pub fn top_right(&self) -> Point2D<T> {
-        Point2D::new(self.max_x(), self.origin.y.clone())
+        Point2D::new(self.max_x(), self.origin.y)
     }
 
     #[inline]
     pub fn bottom_left(&self) -> Point2D<T> {
-        Point2D::new(self.origin.x.clone(), self.max_y())
+        Point2D::new(self.origin.x, self.max_y())
     }
 
     #[inline]
@@ -155,8 +155,7 @@ impl<T: Copy + Clone + PartialOrd + Add<T, Output=T> + Sub<T, Output=T>> Rect<T>
 
     #[inline]
     pub fn translate_by_size(&self, size: &Size2D<T>) -> Rect<T> {
-        Rect::new(Point2D::new(self.origin.x + size.width, self.origin.y + size.height),
-                  self.size.clone())
+        self.translate(&Point2D::new(size.width, size.height))
     }
 }
 
@@ -177,7 +176,7 @@ impl<T: Copy + Clone + PartialOrd + Add<T, Output=T> + Sub<T, Output=T> + Zero> 
                                        max(self.max_y(), other.max_y()));
 
         Rect {
-            origin: upper_left.clone(),
+            origin: upper_left,
             size: Size2D::new(lower_right.x - upper_left.x, lower_right.y - upper_left.y)
         }
     }
@@ -297,6 +296,26 @@ mod tests {
 
         let r = Rect::new(Point2D::new(-10, -5), Size2D::new(50, 40));
         let rr = r.translate(&Point2D::new(0,-10));
+
+        assert!(rr.size.width == 50);
+        assert!(rr.size.height == 40);
+        assert!(rr.origin.x == -10);
+        assert!(rr.origin.y == -15);
+    }
+
+    #[test]
+    fn test_translate_by_size() {
+        let p = Rect::new(Point2D::new(0u32, 0u32), Size2D::new(50u32, 40u32));
+        let pp = p.translate_by_size(&Size2D::new(10,15));
+
+        assert!(pp.size.width == 50);
+        assert!(pp.size.height == 40);
+        assert!(pp.origin.x == 10);
+        assert!(pp.origin.y == 15);
+
+
+        let r = Rect::new(Point2D::new(-10, -5), Size2D::new(50, 40));
+        let rr = r.translate_by_size(&Size2D::new(0,-10));
 
         assert!(rr.size.width == 50);
         assert!(rr.size.height == 40);

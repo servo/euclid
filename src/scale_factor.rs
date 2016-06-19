@@ -21,7 +21,7 @@ use std::marker::PhantomData;
 /// This is effectively a type-safe float, intended to be used in combination with other types like
 /// `length::Length` to enforce conversion between systems of measurement at compile time.
 ///
-/// `Src` and `Dst` represent the units before and after multiplying a value by a ScaleFactor.  They
+/// `Src` and `Dst` represent the units before and after multiplying a value by a `ScaleFactor`. They
 /// may be types without values, such as empty enums.  For example:
 ///
 /// ```rust

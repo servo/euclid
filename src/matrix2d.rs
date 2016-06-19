@@ -48,30 +48,30 @@ impl<T:Add<T, Output=T> +
 
     pub fn translate(&self, x: T, y: T) -> Matrix2D<T> {
          let (_0, _1): (T, T) = (Zero::zero(), One::one());
-         let matrix = Matrix2D::new(_1.clone(), _0.clone(),
-                                    _0.clone(), _1.clone(),
+         let matrix = Matrix2D::new(_1, _0,
+                                    _0, _1,
                                     x, y);
-        return self.mul(&matrix);
+        self.mul(&matrix)
     }
 
     pub fn scale(&self, x: T, y: T) -> Matrix2D<T> {
-        Matrix2D::new(self.m11 * x,     self.m12.clone(),
-                      self.m21.clone(), self.m22 * y,
-                      self.m31.clone(), self.m32.clone())
+        Matrix2D::new(self.m11 * x, self.m12,
+                      self.m21, self.m22 * y,
+                      self.m31, self.m32)
     }
 
     pub fn identity() -> Matrix2D<T> {
-        let (_0, _1): (T, T) = (Zero::zero(), One::one());
-        return Matrix2D::new(_1.clone(), _0.clone(),
-                             _0.clone(), _1.clone(),
-                             _0.clone(), _0.clone());
+        let (_0, _1) = (Zero::zero(), One::one());
+        Matrix2D::new(_1, _0,
+                      _0, _1,
+                      _0, _0)
     }
 
     pub fn to_array(&self) -> [T; 6] {
         [
-            self.m11.clone(), self.m12.clone(),
-            self.m21.clone(), self.m22.clone(),
-            self.m31.clone(), self.m32.clone()
+            self.m11, self.m12,
+            self.m21, self.m22,
+            self.m31, self.m32
         ]
     }
 
@@ -90,23 +90,23 @@ impl<T:Add<T, Output=T> +
         let top_right = self.transform_point(&rect.top_right());
         let bottom_left = self.transform_point(&rect.bottom_left());
         let bottom_right = self.transform_point(&rect.bottom_right());
-        let (mut min_x, mut min_y) = (top_left.x.clone(), top_left.y.clone());
-        let (mut max_x, mut max_y) = (min_x.clone(), min_y.clone());
-        for point in [ top_right, bottom_left, bottom_right ].iter() {
+        let (mut min_x, mut min_y) = (top_left.x, top_left.y);
+        let (mut max_x, mut max_y) = (min_x, min_y);
+        for point in &[top_right, bottom_left, bottom_right] {
             if point.x < min_x {
-                min_x = point.x.clone()
+                min_x = point.x
             }
             if point.x > max_x {
-                max_x = point.x.clone()
+                max_x = point.x
             }
             if point.y < min_y {
-                min_y = point.y.clone()
+                min_y = point.y
             }
             if point.y > max_y {
-                max_y = point.y.clone()
+                max_y = point.y
             }
         }
-        Rect::new(Point2D::new(min_x.clone(), min_y.clone()),
+        Rect::new(Point2D::new(min_x, min_y),
                   Size2D::new(max_x - min_x, max_y - min_y))
     }
 }
