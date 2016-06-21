@@ -27,10 +27,8 @@ pub use matrix2d::Matrix2D;
 pub use matrix4d::Matrix4D;
 pub use point::{Point2D, Point3D, Point4D};
 pub use rect::Rect;
-#[cfg(feature = "unstable")]
 pub use side_offsets::SideOffsets2D;
-#[cfg(feature = "unstable")]
-pub use side_offsets::SideOffsets2DSimdI32;
+#[cfg(feature = "unstable")] pub use side_offsets::SideOffsets2DSimdI32;
 pub use size::Size2D;
 
 pub mod approxeq;
