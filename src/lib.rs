@@ -23,13 +23,17 @@ extern crate test;
 extern crate num_traits;
 
 pub use matrix::Matrix4;
-pub use matrix2d::Matrix2D;
-pub use matrix4d::Matrix4D;
-pub use point::{Point2D, Point3D, Point4D};
-pub use rect::Rect;
-pub use side_offsets::SideOffsets2D;
+pub use matrix2d::{Matrix2D, TypedMatrix2D};
+pub use matrix4d::{Matrix4D, TypedMatrix4D};
+pub use point::{
+    Point2D, TypedPoint2D,
+    Point3D, TypedPoint3D,
+    Point4D, TypedPoint4D,
+};
+pub use rect::{Rect, TypedRect};
+pub use side_offsets::{SideOffsets2D, TypedSideOffsets2D};
 #[cfg(feature = "unstable")] pub use side_offsets::SideOffsets2DSimdI32;
-pub use size::Size2D;
+pub use size::{Size2D, TypedSize2D};
 
 pub mod approxeq;
 pub mod length;
