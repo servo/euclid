@@ -7,15 +7,17 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use length::{Length, UnknownUnit};
+use super::UnknownUnit;
+use length::Length;
 use scale_factor::ScaleFactor;
-use num::Zero;
+use num::*;
 
 use num_traits::NumCast;
 use std::fmt;
 use std::ops::{Mul, Div};
 use std::marker::PhantomData;
 
+/// A 2d size tagged with a unit.
 define_vector! {
     #[derive(RustcDecodable, RustcEncodable)]
     pub struct TypedSize2D<T, U> {
@@ -24,6 +26,9 @@ define_vector! {
     }
 }
 
+/// Default 2d size type with no unit.
+///
+/// Size2D provides the same methods as TypedSize2D.
 pub type Size2D<T> = TypedSize2D<T, UnknownUnit>;
 
 impl<T: Copy, U> Copy for TypedSize2D<T, U> {}
@@ -55,6 +60,7 @@ impl<T: fmt::Display, U> fmt::Display for TypedSize2D<T, U> {
 }
 
 impl<T, U> TypedSize2D<T, U> {
+    /// Constructor taing scalar values.
     pub fn new(width: T, height: T) -> TypedSize2D<T, U> {
         TypedSize2D {
             width: width,
@@ -65,8 +71,36 @@ impl<T, U> TypedSize2D<T, U> {
 }
 
 impl<T: Clone, U> TypedSize2D<T, U> {
+    /// Constructor taing scalar stronlgy typed lengths.
     pub fn from_lengths(width: Length<T, U>, height: Length<T, U>) -> TypedSize2D<T, U> {
         TypedSize2D::new(width.get(), height.get())
+    }
+}
+
+impl<T: Round, U> TypedSize2D<T, U> {
+    /// Rounds each component to the nearest integer value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    pub fn round(&self) -> Self {
+        TypedSize2D::new(self.width.round(), self.height.round())
+    }
+}
+
+impl<T: Ceil, U> TypedSize2D<T, U> {
+    /// Rounds each component to the smallest integer equal or greater than the orginal value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    pub fn ceil(&self) -> Self {
+        TypedSize2D::new(self.height.ceil(), self.width.ceil())
+    }
+}
+
+impl<T: Floor, U> TypedSize2D<T, U> {
+    /// Rounds each component to the biggest integer equal or lower than the orginal value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    pub fn floor(&self) -> Self {
+        TypedSize2D::new(self.width.floor(), self.height.floor())
     }
 }
 
@@ -124,6 +158,21 @@ impl<T: Copy + Div<T, Output=T>, U1, U2> Div<ScaleFactor<T, U1, U2>> for TypedSi
     }
 }
 
+impl<T: Clone, U> TypedSize2D<T, U> {
+    /// Returns self.width as a Length carrying the unit.
+    #[inline]
+    pub fn width_typed(&self) -> Length<T, U> { Length::new(self.width.clone()) }
+
+    /// Returns self.height as a Length carrying the unit.
+    #[inline]
+    pub fn height_typed(&self) -> Length<T, U> { Length::new(self.height.clone()) }
+}
+
+impl<T: Copy, U> TypedSize2D<T, U> {
+    #[inline]
+    pub fn to_array(&self) -> [T; 2] { [self.width, self.height] }
+}
+
 // Convenient aliases for TypedSize2D with typed units
 
 impl<Unit, T: Clone> TypedSize2D<T, Unit> {
@@ -140,6 +189,10 @@ impl<Unit, T: Clone> TypedSize2D<T, Unit> {
 
 impl<Unit, T0: NumCast + Clone> TypedSize2D<T0, Unit> {
     /// Cast from one numeric representation to another, preserving the units.
+    ///
+    /// When casting from floating point to integer coordinates, the decimals are truncated
+    /// as one would expect from a simple cast, but this behavior does not always marke sense
+    /// geometrically. Consider using round(), ceil or floor() before casting.
     pub fn cast<T1: NumCast + Clone>(&self) -> Option<TypedSize2D<T1, Unit>> {
         match (NumCast::from(self.width.clone()), NumCast::from(self.height.clone())) {
             (Some(w), Some(h)) => Some(TypedSize2D::new(w, h)),
@@ -150,11 +203,35 @@ impl<Unit, T0: NumCast + Clone> TypedSize2D<T0, Unit> {
 
 // Convenience functions for common casts
 impl<Unit, T: NumCast + Clone> TypedSize2D<T, Unit> {
+    /// Cast into an f32 size.
     pub fn as_f32(&self) -> TypedSize2D<f32, Unit> {
         self.cast().unwrap()
     }
 
+    /// Cast into an usize size, truncating decimals if any.
+    ///
+    /// When casting from floating point sizes, it is worth considering whether
+    /// to round(), ceil() or floor() before the cast in order to obtain the desired
+    /// conversion behavior.
     pub fn as_uint(&self) -> TypedSize2D<usize, Unit> {
+        self.cast().unwrap()
+    }
+
+    /// Cast into an i32 size, truncating decimals if any.
+    ///
+    /// When casting from floating point sizes, it is worth considering whether
+    /// to round(), ceil() or floor() before the cast in order to obtain the desired
+    /// conversion behavior.
+    pub fn as_i32(&self) -> TypedSize2D<i32, Unit> {
+        self.cast().unwrap()
+    }
+
+    /// Cast into an i64 size, truncating decimals if any.
+    ///
+    /// When casting from floating point sizes, it is worth considering whether
+    /// to round(), ceil() or floor() before the cast in order to obtain the desired
+    /// conversion behavior.
+    pub fn as_i64(&self) -> TypedSize2D<i64, Unit> {
         self.cast().unwrap()
     }
 }

@@ -7,10 +7,11 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use length::{Length, UnknownUnit};
+use super::UnknownUnit;
+use length::Length;
 use scale_factor::ScaleFactor;
 use size::TypedSize2D;
-use num::Zero;
+use num::*;
 
 use num_traits::{Float, NumCast};
 use std::fmt;
@@ -20,6 +21,7 @@ use std::cmp::{PartialEq, Eq};
 use std::hash::{Hash, Hasher};
 
 define_vector! {
+    /// A 2d Point tagged with a unit.
     #[derive(RustcDecodable, RustcEncodable)]
     pub struct TypedPoint2D<T, U> {
         pub x: T,
@@ -27,6 +29,9 @@ define_vector! {
     }
 }
 
+/// Default 2d point type with no unit.
+///
+/// Point2D provides the same methods as TypedPoint2D.
 pub type Point2D<T> = TypedPoint2D<T, UnknownUnit>;
 
 impl<T: Copy, U> Copy for TypedPoint2D<T, U> {}
@@ -53,6 +58,8 @@ impl<T: Hash, U> Hash for TypedPoint2D<T, U> {
 }
 
 impl<T: Zero, U> TypedPoint2D<T, U> {
+    /// Constructor, setting all copmonents to zero.
+    #[inline]
     pub fn zero() -> TypedPoint2D<T, U> {
         TypedPoint2D::new(Zero::zero(), Zero::zero())
     }
@@ -71,29 +78,45 @@ impl<T: fmt::Display, U> fmt::Display for TypedPoint2D<T, U> {
 }
 
 impl<T, U> TypedPoint2D<T, U> {
+    /// Constructor taking scalar values directly.
+    #[inline]
     pub fn new(x: T, y: T) -> TypedPoint2D<T, U> {
         TypedPoint2D { x: x, y: y, _unit: PhantomData }
     }
 }
 
 impl<T: Clone, U> TypedPoint2D<T, U> {
+    /// Constructor taking properly typed Lengths instead of scalar values.
+    #[inline]
     pub fn from_lengths(x: Length<T, U>, y: Length<T, U>) -> TypedPoint2D<T, U> {
         TypedPoint2D::new(x.get(), y.get())
     }
 }
 
 impl<T: Clone, U> TypedPoint2D<T, U> {
+    /// Returns self.x as a Length carrying the unit.
+    #[inline]
     pub fn x_typed(&self) -> Length<T, U> { Length::new(self.x.clone()) }
+
+    /// Returns self.y as a Length carrying the unit.
+    #[inline]
     pub fn y_typed(&self) -> Length<T, U> { Length::new(self.y.clone()) }
+}
+
+impl<T: Copy, U> TypedPoint2D<T, U> {
+    #[inline]
+    pub fn to_array(&self) -> [T; 2] { [self.x, self.y] }
 }
 
 impl<T, U> TypedPoint2D<T, U>
 where T: Copy + Mul<T, Output=T> + Add<T, Output=T> + Sub<T, Output=T> {
+    /// Dot product.
     #[inline]
     pub fn dot(self, other: TypedPoint2D<T, U>) -> T {
         self.x * other.x + self.y * other.y
     }
 
+    /// Returns the norm of the cross product [self.x, self.y, 0] x [other.x, other.y, 0]..
     #[inline]
     pub fn cross(self, other: TypedPoint2D<T, U>) -> T {
         self.x * other.y - self.y * other.x
@@ -191,8 +214,42 @@ impl<T: Clone, U> TypedPoint2D<T, U> {
     }
 }
 
+impl<T: Round, U> TypedPoint2D<T, U> {
+    /// Rounds each component to the nearest integer value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    /// For example { -0.1, -0.8 }.round() == { 0.0, -1.0 }
+    pub fn round(&self) -> Self {
+        TypedPoint2D::new(self.x.round(), self.y.round())
+    }
+}
+
+impl<T: Ceil, U> TypedPoint2D<T, U> {
+    /// Rounds each component to the smallest integer equal or greater than the orginal value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    /// For example { -0.1, -0.8 }.ceil() == { 0.0, 0.0 }.
+    pub fn ceil(&self) -> Self {
+        TypedPoint2D::new(self.x.ceil(), self.y.ceil())
+    }
+}
+
+impl<T: Floor, U> TypedPoint2D<T, U> {
+    /// Rounds each component to the biggest integer equal or lower than the orginal value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    /// For example { -0.1, -0.8 }.floor() == { -1.0, -1.0 }.
+    pub fn floor(&self) -> Self {
+        TypedPoint2D::new(self.x.floor(), self.y.floor())
+    }
+}
+
 impl<T0: NumCast + Clone, U> TypedPoint2D<T0, U> {
     /// Cast from one numeric representation to another, preserving the units.
+    ///
+    /// When casting from floating point to integer coordinates, the decimals are truncated
+    /// as one would expect from a simple cast, but this behavior does not always marke sense
+    /// geometrically. Consider using round(), ceil or floor() before casting.
     pub fn cast<T1: NumCast + Clone>(&self) -> Option<TypedPoint2D<T1, U>> {
         match (NumCast::from(self.x.clone()), NumCast::from(self.y.clone())) {
             (Some(x), Some(y)) => Some(TypedPoint2D::new(x, y)),
@@ -203,16 +260,41 @@ impl<T0: NumCast + Clone, U> TypedPoint2D<T0, U> {
 
 // Convenience functions for common casts
 impl<T: NumCast + Clone, U> TypedPoint2D<T, U> {
+    /// Cast into an f32 vector.
     pub fn as_f32(&self) -> TypedPoint2D<f32, U> {
         self.cast().unwrap()
     }
 
+    /// Cast into an usize vector, truncating decimals if any.
+    ///
+    /// When casting from floating point vectors, it is worth considering whether
+    /// to round(), ceil() or floor() before the cast in order to obtain the desired
+    /// conversion behavior.
     pub fn as_uint(&self) -> TypedPoint2D<usize, U> {
+        self.cast().unwrap()
+    }
+
+    /// Cast into an i32 vector, truncating decimals if any.
+    ///
+    /// When casting from floating point vectors, it is worth considering whether
+    /// to round(), ceil() or floor() before the cast in order to obtain the desired
+    /// conversion behavior.
+    pub fn as_i32(&self) -> TypedPoint2D<i32, U> {
+        self.cast().unwrap()
+    }
+
+    /// Cast into an i64 vector, truncating decimals if any.
+    ///
+    /// When casting from floating point vectors, it is worth considering whether
+    /// to round(), ceil() or floor() before the cast in order to obtain the desired
+    /// conversion behavior.
+    pub fn as_i64(&self) -> TypedPoint2D<i64, U> {
         self.cast().unwrap()
     }
 }
 
 define_vector! {
+    /// A 3d Point tagged with a unit.
     #[derive(RustcDecodable, RustcEncodable)]
     pub struct TypedPoint3D<T, U> {
         pub x: T,
@@ -221,6 +303,9 @@ define_vector! {
     }
 }
 
+/// Default 3d point type with no unit.
+///
+/// Point3D provides the same methods as TypedPoint3D.
 pub type Point3D<T> = TypedPoint3D<T, UnknownUnit>;
 
 impl<T: Hash, U> Hash for TypedPoint3D<T, U> {
@@ -232,6 +317,7 @@ impl<T: Hash, U> Hash for TypedPoint3D<T, U> {
 }
 
 impl<T: Zero, U> TypedPoint3D<T, U> {
+    /// Constructor, setting all copmonents to zero.
     #[inline]
     pub fn zero() -> TypedPoint3D<T, U> {
         TypedPoint3D::new(Zero::zero(), Zero::zero(), Zero::zero())
@@ -267,6 +353,7 @@ impl<T: fmt::Display, U> fmt::Display for TypedPoint3D<T, U> {
 }
 
 impl<T, U> TypedPoint3D<T, U> {
+    /// Constructor taking scalar values directly.
     #[inline]
     pub fn new(x: T, y: T, z: T) -> TypedPoint3D<T, U> {
         TypedPoint3D { x: x, y: y, z: z, _unit: PhantomData }
@@ -274,21 +361,34 @@ impl<T, U> TypedPoint3D<T, U> {
 }
 
 impl<T: Clone, U> TypedPoint3D<T, U> {
+    /// Constructor taking properly typed Lengths instead of scalar values.
+    #[inline]
     pub fn from_lengths(x: Length<T, U>, y: Length<T, U>, z: Length<T, U>) -> TypedPoint3D<T, U> {
         TypedPoint3D::new(x.get(), y.get(), z.get())
     }
 }
 
 impl<T: Clone, U> TypedPoint3D<T, U> {
+    /// Returns self.x as a Length carrying the unit.
     pub fn x_typed(&self) -> Length<T, U> { Length::new(self.x.clone()) }
+
+    /// Returns self.y as a Length carrying the unit.
     pub fn y_typed(&self) -> Length<T, U> { Length::new(self.y.clone()) }
+
+    /// Returns self.z as a Length carrying the unit.
     pub fn z_typed(&self) -> Length<T, U> { Length::new(self.z.clone()) }
+}
+
+impl<T: Copy, U> TypedPoint3D<T, U> {
+    pub fn to_array(&self) -> [T; 3] { [self.x, self.y, self.z] }
 }
 
 impl<T: Mul<T, Output=T> +
         Add<T, Output=T> +
         Sub<T, Output=T> +
         Copy, U> TypedPoint3D<T, U> {
+
+    // Dot product.
     #[inline]
     pub fn dot(self, other: TypedPoint3D<T, U>) -> T {
         self.x * other.x +
@@ -296,6 +396,7 @@ impl<T: Mul<T, Output=T> +
         self.z * other.z
     }
 
+    // Cross product.
     #[inline]
     pub fn cross(self, other: TypedPoint3D<T, U>) -> TypedPoint3D<T, U> {
         TypedPoint3D::new(self.y * other.z - self.z * other.y,
@@ -355,7 +456,86 @@ impl<T: Clone, U> TypedPoint3D<T, U> {
     }
 }
 
+impl<T: Round, U> TypedPoint3D<T, U> {
+    /// Rounds each component to the nearest integer value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    pub fn round(&self) -> Self {
+        TypedPoint3D::new(self.x.round(), self.y.round(), self.z.round())
+    }
+}
+
+impl<T: Ceil, U> TypedPoint3D<T, U> {
+    /// Rounds each component to the smallest integer equal or greater than the orginal value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    pub fn ceil(&self) -> Self {
+        TypedPoint3D::new(self.x.ceil(), self.y.ceil(), self.z.ceil())
+    }
+}
+
+impl<T: Floor, U> TypedPoint3D<T, U> {
+    /// Rounds each component to the biggest integer equal or lower than the orginal value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    pub fn floor(&self) -> Self {
+        TypedPoint3D::new(self.x.floor(), self.y.floor(), self.z.floor())
+    }
+}
+
+impl<T0: NumCast + Clone, U> TypedPoint3D<T0, U> {
+    /// Cast from one numeric representation to another, preserving the units.
+    ///
+    /// When casting from floating point to integer coordinates, the decimals are truncated
+    /// as one would expect from a simple cast, but this behavior does not always marke sense
+    /// geometrically. Consider using round(), ceil or floor() before casting.
+    pub fn cast<T1: NumCast + Clone>(&self) -> Option<TypedPoint3D<T1, U>> {
+        match (NumCast::from(self.x.clone()),
+               NumCast::from(self.y.clone()),
+               NumCast::from(self.z.clone())) {
+            (Some(x), Some(y), Some(z)) => Some(TypedPoint3D::new(x, y, z)),
+            _ => None
+        }
+    }
+}
+
+// Convenience functions for common casts
+impl<T: NumCast + Clone, U> TypedPoint3D<T, U> {
+    /// Cast into an f32 vector.
+    pub fn as_f32(&self) -> TypedPoint3D<f32, U> {
+        self.cast().unwrap()
+    }
+
+    /// Cast into an usize vector, truncating decimals if any.
+    ///
+    /// When casting from floating point vectors, it is worth considering whether
+    /// to round(), ceil() or floor() before the cast in order to obtain the desired
+    /// conversion behavior.
+    pub fn as_uint(&self) -> TypedPoint3D<usize, U> {
+        self.cast().unwrap()
+    }
+
+    /// Cast into an i32 vector, truncating decimals if any.
+    ///
+    /// When casting from floating point vectors, it is worth considering whether
+    /// to round(), ceil() or floor() before the cast in order to obtain the desired
+    /// conversion behavior.
+    pub fn as_i32(&self) -> TypedPoint3D<i32, U> {
+        self.cast().unwrap()
+    }
+
+    /// Cast into an i64 vector, truncating decimals if any.
+    ///
+    /// When casting from floating point vectors, it is worth considering whether
+    /// to round(), ceil() or floor() before the cast in order to obtain the desired
+    /// conversion behavior.
+    pub fn as_i64(&self) -> TypedPoint3D<i64, U> {
+        self.cast().unwrap()
+    }
+}
+
 define_vector! {
+    /// A 4d Point tagged with a unit.
     #[derive(RustcDecodable, RustcEncodable)]
     pub struct TypedPoint4D<T, U> {
         pub x: T,
@@ -365,6 +545,9 @@ define_vector! {
     }
 }
 
+/// Default 4d point with no unit.
+///
+/// Point4D provides the same methods as TypedPoint4D.
 pub type Point4D<T> = TypedPoint4D<T, UnknownUnit>;
 
 impl<T: Copy, U> Copy for TypedPoint4D<T, U> {}
@@ -396,6 +579,7 @@ impl<T: Hash, U> Hash for TypedPoint4D<T, U> {
 }
 
 impl<T: Zero, U> TypedPoint4D<T, U> {
+    /// Constructor, setting all copmonents to zero.
     #[inline]
     pub fn zero() -> TypedPoint4D<T, U> {
         TypedPoint4D::new(Zero::zero(), Zero::zero(), Zero::zero(), Zero::zero())
@@ -415,6 +599,7 @@ impl<T: fmt::Display, U> fmt::Display for TypedPoint4D<T, U> {
 }
 
 impl<T, U> TypedPoint4D<T, U> {
+    /// Constructor taking scalar values directly.
     #[inline]
     pub fn new(x: T, y: T, z: T, w: T) -> TypedPoint4D<T, U> {
         TypedPoint4D { x: x, y: y, z: z, w: w, _unit: PhantomData }
@@ -422,6 +607,8 @@ impl<T, U> TypedPoint4D<T, U> {
 }
 
 impl<T: Clone, U> TypedPoint4D<T, U> {
+    /// Constructor taking properly typed Lengths instead of scalar values.
+    #[inline]
     pub fn from_lengths(x: Length<T, U>,
                         y: Length<T, U>,
                         z: Length<T, U>,
@@ -431,10 +618,35 @@ impl<T: Clone, U> TypedPoint4D<T, U> {
 }
 
 impl<T: Clone, U> TypedPoint4D<T, U> {
+    /// Returns self.x as a Length carrying the unit.
     pub fn x_typed(&self) -> Length<T, U> { Length::new(self.x.clone()) }
+
+    /// Returns self.y as a Length carrying the unit.
     pub fn y_typed(&self) -> Length<T, U> { Length::new(self.y.clone()) }
+
+    /// Returns self.z as a Length carrying the unit.
     pub fn z_typed(&self) -> Length<T, U> { Length::new(self.z.clone()) }
+
+    /// Returns self.w as a Length carrying the unit.
     pub fn w_typed(&self) -> Length<T, U> { Length::new(self.w.clone()) }
+}
+
+impl<T: Copy, U> TypedPoint4D<T, U> {
+    pub fn to_array(&self) -> [T; 4] { [self.x, self.y, self.z, self.w] }
+}
+
+impl<T: Copy + Div<T, Output=T>, U> TypedPoint4D<T, U> {
+    /// Convert into a 2d point.
+    #[inline]
+    pub fn to_2d(self) -> TypedPoint2D<T, U> {
+        TypedPoint2D::new(self.x / self.w, self.y / self.w)
+    }
+
+    /// Convert into a 3d point.
+    #[inline]
+    pub fn to_3d(self) -> TypedPoint3D<T, U> {
+        TypedPoint3D::new(self.x / self.w, self.y / self.w, self.z / self.w)
+    }
 }
 
 impl<T: Clone + Add<T, Output=T>, U> Add for TypedPoint4D<T, U> {
@@ -486,6 +698,69 @@ impl<T: Clone, U> TypedPoint4D<T, U> {
     /// Tag a unitless value with units.
     pub fn from_untyped(p: &Point4D<T>) -> TypedPoint4D<T, U> {
         TypedPoint4D::new(p.x.clone(), p.y.clone(), p.z.clone(), p.w.clone())
+    }
+}
+
+impl<T: Round, U> TypedPoint4D<T, U> {
+    /// Rounds each component to the nearest integer value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    pub fn round(&self) -> Self {
+        TypedPoint4D::new(self.x.round(), self.y.round(), self.z.round(), self.w.round())
+    }
+}
+
+impl<T: Ceil, U> TypedPoint4D<T, U> {
+    /// Rounds each component to the smallest integer equal or greater than the orginal value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    pub fn ceil(&self) -> Self {
+        TypedPoint4D::new(self.x.ceil(), self.y.ceil(), self.z.ceil(), self.w.ceil())
+    }
+}
+
+impl<T: Floor, U> TypedPoint4D<T, U> {
+    /// Rounds each component to the biggest integer equal or lower than the orginal value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    pub fn floor(&self) -> Self {
+        TypedPoint4D::new(self.x.floor(), self.y.floor(), self.z.floor(), self.w.floor())
+    }
+}
+
+impl<T0: NumCast + Clone, U> TypedPoint4D<T0, U> {
+    /// Cast from one numeric representation to another, preserving the units.
+    ///
+    /// When casting from floating point to integer coordinates, the decimals are truncated
+    /// as one would expect from a simple cast, but this behavior does not always marke sense
+    /// geometrically. Consider using round(), ceil or floor() before casting.
+    pub fn cast<T1: NumCast + Clone>(&self) -> Option<TypedPoint4D<T1, U>> {
+        match (NumCast::from(self.x.clone()),
+               NumCast::from(self.y.clone()),
+               NumCast::from(self.z.clone()),
+               NumCast::from(self.w.clone())) {
+            (Some(x), Some(y), Some(z), Some(w)) => Some(TypedPoint4D::new(x, y, z, w)),
+            _ => None
+        }
+    }
+}
+
+// Convenience functions for common casts
+impl<T: NumCast + Clone, U> TypedPoint4D<T, U> {
+    pub fn as_f32(&self) -> TypedPoint4D<f32, U> {
+        self.cast().unwrap()
+    }
+
+    pub fn as_uint(&self) -> TypedPoint4D<usize, U> {
+        self.cast().unwrap()
+    }
+
+    pub fn as_i32(&self) -> TypedPoint4D<i32, U> {
+        self.cast().unwrap()
+    }
+
+    pub fn as_i64(&self) -> TypedPoint4D<i64, U> {
+        self.cast().unwrap()
     }
 }
 

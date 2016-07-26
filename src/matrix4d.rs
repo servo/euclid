@@ -7,11 +7,11 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+use super::UnknownUnit;
 use approxeq::ApproxEq;
 use trig::Trig;
-use point::{TypedPoint2D, TypedPoint4D};
+use point::{TypedPoint2D, TypedPoint3D, TypedPoint4D};
 use matrix2d::TypedMatrix2D;
-use length::UnknownUnit;
 use scale_factor::ScaleFactor;
 use num::{One, Zero};
 use std::ops::{Add, Mul, Sub, Div, Neg};
@@ -19,6 +19,18 @@ use std::marker::PhantomData;
 use std::fmt;
 
 define_matrix! {
+    /// A 4 by 4 matrix stored in row-major order in memory, useful to represent
+    /// 3d transformations.
+    ///
+    /// Matrices can be parametrized over the source and destination units, to describe a
+    /// transformation from a space to another.
+    /// For example, TypedMatrix4D<f32, WordSpace, ScreenSpace>::transform_point4d
+    /// takes a TypedPoint4D<f32, WordSpace> and returns a TypedPoint4D<f32, ScreenSpace>.
+    ///
+    /// Matrices expose a set of convenience methods for pre- and post-transformations.
+    /// A pre-transformation corresponds to adding an operation that is applied before
+    /// the rest of the transformation, while a post-transformation adds an operation
+    /// that is appled after.
     pub struct TypedMatrix4D<T, Src, Dst> {
         pub m11: T, pub m12: T, pub m13: T, pub m14: T,
         pub m21: T, pub m22: T, pub m23: T, pub m24: T,
@@ -27,15 +39,40 @@ define_matrix! {
     }
 }
 
+/// The default 4d matrix type with no units.
 pub type Matrix4D<T> = TypedMatrix4D<T, UnknownUnit, UnknownUnit>;
 
 impl<T, Src, Dst> TypedMatrix4D<T, Src, Dst> {
+    /// Create a matrix specifying its components in row-major order.
+    ///
+    /// For example, the translation terms m41, m42, m43 on the last row with the
+    /// row-major convention) are the 13rd, 14th and 15th parameters.
     #[inline]
-    pub fn new(
+    pub fn row_major(
             m11: T, m12: T, m13: T, m14: T,
             m21: T, m22: T, m23: T, m24: T,
             m31: T, m32: T, m33: T, m34: T,
             m41: T, m42: T, m43: T, m44: T)
+         -> TypedMatrix4D<T, Src, Dst> {
+        TypedMatrix4D {
+            m11: m11, m12: m12, m13: m13, m14: m14,
+            m21: m21, m22: m22, m23: m23, m24: m24,
+            m31: m31, m32: m32, m33: m33, m34: m34,
+            m41: m41, m42: m42, m43: m43, m44: m44,
+            _unit: PhantomData,
+        }
+    }
+
+    /// Create a matrix specifying its components in column-major order.
+    ///
+    /// For example, the translation terms m41, m42, m43 on the last column with the
+    /// column-major convention) are the 4th, 8th and 12nd parameters.
+    #[inline]
+    pub fn column_major(
+            m11: T, m21: T, m31: T, m41: T,
+            m12: T, m22: T, m32: T, m42: T,
+            m13: T, m23: T, m33: T, m43: T,
+            m14: T, m24: T, m34: T, m44: T)
          -> TypedMatrix4D<T, Src, Dst> {
         TypedMatrix4D {
             m11: m11, m12: m12, m13: m13, m14: m14,
@@ -65,10 +102,12 @@ where T: Copy + Clone +
          Trig +
          One + Zero {
 
+    /// Create a 4 by 4 matrix representing a 2d transformation, specifying its components
+    /// in row-major order.
     #[inline]
-    pub fn new_2d(m11: T, m12: T, m21: T, m22: T, m41: T, m42: T) -> TypedMatrix4D<T, Src, Dst> {
+    pub fn row_major_2d(m11: T, m12: T, m21: T, m22: T, m41: T, m42: T) -> TypedMatrix4D<T, Src, Dst> {
         let (_0, _1): (T, T) = (Zero::zero(), One::one());
-        TypedMatrix4D::new(
+        TypedMatrix4D::row_major(
             m11, m12, _0, _0,
             m21, m22, _0, _0,
              _0,  _0, _1, _0,
@@ -76,6 +115,7 @@ where T: Copy + Clone +
        )
     }
 
+    /// Create an orthogonal projection matrix.
     pub fn ortho(left: T, right: T,
                  bottom: T, top: T,
                  near: T, far: T) -> TypedMatrix4D<T, Src, Dst> {
@@ -85,31 +125,18 @@ where T: Copy + Clone +
 
         let (_0, _1): (T, T) = (Zero::zero(), One::one());
         let _2 = _1 + _1;
-        TypedMatrix4D::new(_2 / (right - left),
-                      _0,
-                      _0,
-                      _0,
-
-                      _0,
-                      _2 / (top - bottom),
-                      _0,
-                      _0,
-
-                      _0,
-                      _0,
-                      -_2 / (far - near),
-                      _0,
-
-                       tx,
-                       ty,
-                       tz,
-                      _1)
+        TypedMatrix4D::row_major(
+            _2 / (right - left), _0                 , _0                , _0,
+            _0                 , _2 / (top - bottom), _0                , _0,
+            _0                 , _0                 , -_2 / (far - near), _0,
+            tx                 , ty                 , tz                , _1
+        )
     }
 
     #[inline]
     pub fn identity() -> TypedMatrix4D<T, Src, Dst> {
         let (_0, _1): (T, T) = (Zero::zero(), One::one());
-        TypedMatrix4D::new(
+        TypedMatrix4D::row_major(
             _1, _0, _0, _0,
             _0, _1, _0, _0,
             _0, _0, _1, _0,
@@ -117,8 +144,9 @@ where T: Copy + Clone +
         )
     }
 
-
-    // See https://drafts.csswg.org/css-transforms/#2d-matrix
+    /// Returns true if this matrix can be represented with a TypedMatrix2D.
+    ///
+    /// See https://drafts.csswg.org/css-transforms/#2d-matrix
     #[inline]
     pub fn is_2d(&self) -> bool {
         let (_0, _1): (T, T) = (Zero::zero(), One::one());
@@ -129,8 +157,12 @@ where T: Copy + Clone +
         self.m33 == _1 && self.m44 == _1
     }
 
+    /// Create a 2D matrix picking the relevent terms from this matrix.
+    ///
+    /// This method assumes that self represents a 2d transformation, callers
+    /// should check that self.is_2d() returns true beforehand.
     pub fn to_2d(&self) -> TypedMatrix2D<T, Src, Dst> {
-        TypedMatrix2D::new(
+        TypedMatrix2D::row_major(
             self.m11, self.m12,
             self.m21, self.m22,
             self.m41, self.m42
@@ -148,8 +180,10 @@ where T: Copy + Clone +
         self.m43.approx_eq(&other.m43) && self.m44.approx_eq(&other.m44)
     }
 
-    pub fn to<Destination>(&self) -> TypedMatrix4D<T, Src, Destination> {
-        TypedMatrix4D::new(
+    /// Returns the same matrix with a different destination unit.
+    #[inline]
+    pub fn with_destination<NewDst>(&self) -> TypedMatrix4D<T, Src, NewDst> {
+        TypedMatrix4D::row_major(
             self.m11, self.m12, self.m13, self.m14,
             self.m21, self.m22, self.m23, self.m24,
             self.m31, self.m32, self.m33, self.m34,
@@ -157,37 +191,57 @@ where T: Copy + Clone +
         )
     }
 
-    pub fn mul<NewSrc>(&self, mat: &TypedMatrix4D<T, NewSrc, Src>) -> TypedMatrix4D<T, NewSrc, Dst> {
-        TypedMatrix4D::new(
-            mat.m11*self.m11 + mat.m12*self.m21 + mat.m13*self.m31 + mat.m14*self.m41,
-            mat.m11*self.m12 + mat.m12*self.m22 + mat.m13*self.m32 + mat.m14*self.m42,
-            mat.m11*self.m13 + mat.m12*self.m23 + mat.m13*self.m33 + mat.m14*self.m43,
-            mat.m11*self.m14 + mat.m12*self.m24 + mat.m13*self.m34 + mat.m14*self.m44,
-            mat.m21*self.m11 + mat.m22*self.m21 + mat.m23*self.m31 + mat.m24*self.m41,
-            mat.m21*self.m12 + mat.m22*self.m22 + mat.m23*self.m32 + mat.m24*self.m42,
-            mat.m21*self.m13 + mat.m22*self.m23 + mat.m23*self.m33 + mat.m24*self.m43,
-            mat.m21*self.m14 + mat.m22*self.m24 + mat.m23*self.m34 + mat.m24*self.m44,
-            mat.m31*self.m11 + mat.m32*self.m21 + mat.m33*self.m31 + mat.m34*self.m41,
-            mat.m31*self.m12 + mat.m32*self.m22 + mat.m33*self.m32 + mat.m34*self.m42,
-            mat.m31*self.m13 + mat.m32*self.m23 + mat.m33*self.m33 + mat.m34*self.m43,
-            mat.m31*self.m14 + mat.m32*self.m24 + mat.m33*self.m34 + mat.m34*self.m44,
-            mat.m41*self.m11 + mat.m42*self.m21 + mat.m43*self.m31 + mat.m44*self.m41,
-            mat.m41*self.m12 + mat.m42*self.m22 + mat.m43*self.m32 + mat.m44*self.m42,
-            mat.m41*self.m13 + mat.m42*self.m23 + mat.m43*self.m33 + mat.m44*self.m43,
-            mat.m41*self.m14 + mat.m42*self.m24 + mat.m43*self.m34 + mat.m44*self.m44
+    /// Returns the same matrix with a different source unit.
+    #[inline]
+    pub fn with_source<NewSrc>(&self) -> TypedMatrix4D<T, NewSrc, Dst> {
+        TypedMatrix4D::row_major(
+            self.m11, self.m12, self.m13, self.m14,
+            self.m21, self.m22, self.m23, self.m24,
+            self.m31, self.m32, self.m33, self.m34,
+            self.m41, self.m42, self.m43, self.m44,
         )
     }
 
-    pub fn invert(&self) -> TypedMatrix4D<T, Dst, Src> {
+    /// Returns the multiplication of the two matrices such that mat's transformation
+    /// applies after self's transformation.
+    pub fn post_mul<NewDst>(&self, mat: &TypedMatrix4D<T, Dst, NewDst>) -> TypedMatrix4D<T, Src, NewDst> {
+        TypedMatrix4D::row_major(
+            self.m11 * mat.m11  +  self.m12 * mat.m21  +  self.m13 * mat.m31  +  self.m14 * mat.m41,
+            self.m21 * mat.m11  +  self.m22 * mat.m21  +  self.m23 * mat.m31  +  self.m24 * mat.m41,
+            self.m31 * mat.m11  +  self.m32 * mat.m21  +  self.m33 * mat.m31  +  self.m34 * mat.m41,
+            self.m41 * mat.m11  +  self.m42 * mat.m21  +  self.m43 * mat.m31  +  self.m44 * mat.m41,
+            self.m11 * mat.m12  +  self.m12 * mat.m22  +  self.m13 * mat.m32  +  self.m14 * mat.m42,
+            self.m21 * mat.m12  +  self.m22 * mat.m22  +  self.m23 * mat.m32  +  self.m24 * mat.m42,
+            self.m31 * mat.m12  +  self.m32 * mat.m22  +  self.m33 * mat.m32  +  self.m34 * mat.m42,
+            self.m41 * mat.m12  +  self.m42 * mat.m22  +  self.m43 * mat.m32  +  self.m44 * mat.m42,
+            self.m11 * mat.m13  +  self.m12 * mat.m23  +  self.m13 * mat.m33  +  self.m14 * mat.m43,
+            self.m21 * mat.m13  +  self.m22 * mat.m23  +  self.m23 * mat.m33  +  self.m24 * mat.m43,
+            self.m31 * mat.m13  +  self.m32 * mat.m23  +  self.m33 * mat.m33  +  self.m34 * mat.m43,
+            self.m41 * mat.m13  +  self.m42 * mat.m23  +  self.m43 * mat.m33  +  self.m44 * mat.m43,
+            self.m11 * mat.m14  +  self.m12 * mat.m24  +  self.m13 * mat.m34  +  self.m14 * mat.m44,
+            self.m21 * mat.m14  +  self.m22 * mat.m24  +  self.m23 * mat.m34  +  self.m24 * mat.m44,
+            self.m31 * mat.m14  +  self.m32 * mat.m24  +  self.m33 * mat.m34  +  self.m34 * mat.m44,
+            self.m41 * mat.m14  +  self.m42 * mat.m24  +  self.m43 * mat.m34  +  self.m44 * mat.m44,
+        )
+    }
+
+    /// Returns the multiplication of the two matrices such that mat's transformation
+    /// applies before self's transformation.
+    pub fn pre_mul<NewSrc>(&self, mat: &TypedMatrix4D<T, NewSrc, Src>) -> TypedMatrix4D<T, NewSrc, Dst> {
+        mat.post_mul(self)
+    }
+
+    /// Returns the inverse matrix if possible.
+    pub fn inverse(&self) -> Option<TypedMatrix4D<T, Dst, Src>> {
         let det = self.determinant();
 
         if det == Zero::zero() {
-            return TypedMatrix4D::identity();
+            return None;
         }
 
         // todo(gw): this could be made faster by special casing
         // for simpler matrix types.
-        let m = TypedMatrix4D::new(
+        let m = TypedMatrix4D::row_major(
             self.m23*self.m34*self.m42 - self.m24*self.m33*self.m42 +
             self.m24*self.m32*self.m43 - self.m22*self.m34*self.m43 -
             self.m23*self.m32*self.m44 + self.m22*self.m33*self.m44,
@@ -254,9 +308,10 @@ where T: Copy + Clone +
         );
 
         let _1: T = One::one();
-        m.mul_s(_1 / det)
+        Some(m.mul_s(_1 / det))
     }
 
+    /// Compute the determinant of the matrix.
     pub fn determinant(&self) -> T {
         self.m14 * self.m23 * self.m32 * self.m41 -
         self.m13 * self.m24 * self.m32 * self.m41 -
@@ -284,8 +339,9 @@ where T: Copy + Clone +
         self.m11 * self.m22 * self.m33 * self.m44
     }
 
+    /// Multiplies all of the matrix's component by a scalar and returns the result.
     pub fn mul_s(&self, x: T) -> TypedMatrix4D<T, Src, Dst> {
-        TypedMatrix4D::new(
+        TypedMatrix4D::row_major(
             self.m11 * x, self.m12 * x, self.m13 * x, self.m14 * x,
             self.m21 * x, self.m22 * x, self.m23 * x, self.m24 * x,
             self.m31 * x, self.m32 * x, self.m33 * x, self.m34 * x,
@@ -293,26 +349,30 @@ where T: Copy + Clone +
         )
     }
 
+    /// Convenience function to create a scale matrix from a ScaleFactor.
     pub fn from_scale_factor(scale: ScaleFactor<T, Src, Dst>) -> TypedMatrix4D<T, Src, Dst> {
         TypedMatrix4D::create_scale(scale.get(), scale.get(), scale.get())
     }
 
-    pub fn scale(&self, x: T, y: T, z: T) -> TypedMatrix4D<T, Src, Dst> {
-        TypedMatrix4D::new(
-            self.m11 * x, self.m12,     self.m13,     self.m14,
-            self.m21    , self.m22 * y, self.m23,     self.m24,
-            self.m31    , self.m32,     self.m33 * z, self.m34,
-            self.m41    , self.m42,     self.m43,     self.m44
-        )
-    }
-
-    /// Returns the given point transformed by this matrix.
+    /// Returns the given 2d point transformed by this matrix.
+    ///
+    /// The input point must be use the unit Src, and the returned point has the unit Dst.
     #[inline]
     pub fn transform_point(&self, p: &TypedPoint2D<T, Src>) -> TypedPoint2D<T, Dst> {
-        TypedPoint2D::new(p.x * self.m11 + p.y * self.m21 + self.m41,
-                          p.x * self.m12 + p.y * self.m22 + self.m42)
+        self.transform_point4d(&TypedPoint4D::new(p.x, p.y, Zero::zero(), One::one())).to_2d()
     }
 
+    /// Returns the given 3d point transformed by this matrix.
+    ///
+    /// The input point must be use the unit Src, and the returned point has the unit Dst.
+    #[inline]
+    pub fn transform_point3d(&self, p: &TypedPoint3D<T, Src>) -> TypedPoint3D<T, Dst> {
+        self.transform_point4d(&TypedPoint4D::new(p.x, p.y, p.z, One::one())).to_3d()
+    }
+
+    /// Returns the given 4d point transformed by this matrix.
+    ///
+    /// The input point must be use the unit Src, and the returned point has the unit Dst.
     #[inline]
     pub fn transform_point4d(&self, p: &TypedPoint4D<T, Src>) -> TypedPoint4D<T, Dst> {
         let x = p.x * self.m11 + p.y * self.m21 + p.z * self.m31 + self.m41;
@@ -322,14 +382,10 @@ where T: Copy + Clone +
         TypedPoint4D::new(x, y, z, w)
     }
 
-    pub fn translate(&self, x: T, y: T, z: T) -> TypedMatrix4D<T, Src, Dst> {
-        self.mul(&TypedMatrix4D::create_translation(x, y, z))
-    }
-
     /// Create a 3d translation matrix
     pub fn create_translation(x: T, y: T, z: T) -> TypedMatrix4D<T, Src, Dst> {
         let (_0, _1): (T, T) = (Zero::zero(), One::one());
-        TypedMatrix4D::new(
+        TypedMatrix4D::row_major(
             _1, _0, _0, _0,
             _0, _1, _0, _0,
             _0, _0, _1, _0,
@@ -337,15 +393,40 @@ where T: Copy + Clone +
         )
     }
 
+    /// Returns a matrix with a translation applied before self's transformation.
+    pub fn pre_translated(&self, x: T, y: T, z: T) -> TypedMatrix4D<T, Src, Dst> {
+        self.pre_mul(&TypedMatrix4D::create_translation(x, y, z))
+    }
+
+    /// Returns a matrix with a translation applied after self's transformation.
+    pub fn post_translated(&self, x: T, y: T, z: T) -> TypedMatrix4D<T, Src, Dst> {
+        self.post_mul(&TypedMatrix4D::create_translation(x, y, z))
+    }
+
     /// Create a 3d scale matrix
     pub fn create_scale(x: T, y: T, z: T) -> TypedMatrix4D<T, Src, Dst> {
         let (_0, _1): (T, T) = (Zero::zero(), One::one());
-        TypedMatrix4D::new(
+        TypedMatrix4D::row_major(
              x, _0, _0, _0,
             _0,  y, _0, _0,
             _0, _0,  z, _0,
             _0, _0, _0, _1
         )
+    }
+
+    /// Returns a matrix with a scale applied before self's transformation.
+    pub fn pre_scaled(&self, x: T, y: T, z: T) -> TypedMatrix4D<T, Src, Dst> {
+        TypedMatrix4D::row_major(
+            self.m11 * x, self.m12,     self.m13,     self.m14,
+            self.m21    , self.m22 * y, self.m23,     self.m24,
+            self.m31    , self.m32,     self.m33 * z, self.m34,
+            self.m41    , self.m42,     self.m43,     self.m44
+        )
+    }
+
+    /// Returns a matrix with a scale applied after self's transformation.
+    pub fn post_scaled(&self, x: T, y: T, z: T) -> TypedMatrix4D<T, Src, Dst> {
+        self.post_mul(&TypedMatrix4D::create_scale(x, y, z))
     }
 
     /// Create a 3d rotation matrix from an angle / axis.
@@ -362,7 +443,7 @@ where T: Copy + Clone +
         let sc = half_theta.sin() * half_theta.cos();
         let sq = half_theta.sin() * half_theta.sin();
 
-        TypedMatrix4D::new(
+        TypedMatrix4D::row_major(
             _1 - _2 * (yy + zz) * sq,
             _2 * (x * y * sq - z * sc),
             _2 * (x * z * sq + y * sc),
@@ -385,29 +466,46 @@ where T: Copy + Clone +
         )
     }
 
+    /// Returns a matrix with a rotation applied after self's transformation.
+    pub fn post_rotated(&self, x: T, y: T, z: T, theta: T) -> TypedMatrix4D<T, Src, Dst> {
+        self.post_mul(&TypedMatrix4D::create_rotation(x, y, z, theta))
+    }
+
+    /// Returns a matrix with a rotation applied before self's transformation.
+    pub fn pre_rotated(&self, x: T, y: T, z: T, theta: T) -> TypedMatrix4D<T, Src, Dst> {
+        self.pre_mul(&TypedMatrix4D::create_rotation(x, y, z, theta))
+    }
+
     /// Create a 2d skew matrix.
-    /// https://drafts.csswg.org/css-transforms/#funcdef-skew
+    ///
+    /// See https://drafts.csswg.org/css-transforms/#funcdef-skew
     pub fn create_skew(alpha: T, beta: T) -> TypedMatrix4D<T, Src, Dst> {
         let (_0, _1): (T, T) = (Zero::zero(), One::one());
         let (sx, sy) = (beta.tan(), alpha.tan());
-        TypedMatrix4D::new(_1, sx, _0, _0,
-                      sy, _1, _0, _0,
-                      _0, _0, _1, _0,
-                      _0, _0, _0, _1)
+        TypedMatrix4D::row_major(
+            _1, sx, _0, _0,
+            sy, _1, _0, _0,
+            _0, _0, _1, _0,
+            _0, _0, _0, _1
+        )
     }
 
     /// Create a simple perspective projection matrix
     pub fn create_perspective(d: T) -> TypedMatrix4D<T, Src, Dst> {
         let (_0, _1): (T, T) = (Zero::zero(), One::one());
-        TypedMatrix4D::new(_1, _0, _0, _0,
-                      _0, _1, _0, _0,
-                      _0, _0, _1, -_1 / d,
-                      _0, _0, _0, _1)
+        TypedMatrix4D::row_major(
+            _1, _0, _0, _0,
+            _0, _1, _0, _0,
+            _0, _0, _1, -_1 / d,
+            _0, _0, _0, _1
+        )
     }
 }
 
 impl<T: Copy, Src, Dst> TypedMatrix4D<T, Src, Dst> {
-    pub fn to_array(&self) -> [T; 16] {
+    /// Returns an array containing this matrix's terms in row-major order (the order
+    /// in which the matrix is actually laid out in memory).
+    pub fn to_row_major_array(&self) -> [T; 16] {
         [
             self.m11, self.m12, self.m13, self.m14,
             self.m21, self.m22, self.m23, self.m24,
@@ -415,11 +513,48 @@ impl<T: Copy, Src, Dst> TypedMatrix4D<T, Src, Dst> {
             self.m41, self.m42, self.m43, self.m44
         ]
     }
+
+    /// Returns an array containing this matrix's terms in column-major order.
+    pub fn to_column_major_array(&self) -> [T; 16] {
+        [
+            self.m11, self.m21, self.m31, self.m41,
+            self.m12, self.m22, self.m32, self.m42,
+            self.m13, self.m23, self.m33, self.m43,
+            self.m14, self.m24, self.m34, self.m44
+        ]
+    }
+
+
+    /// Returns an array containing this matrix's 4 rows in (in row-major order)
+    /// as arrays.
+    ///
+    /// This is a convenience method to interface with other libraries like glium.
+    pub fn to_row_major_arrays(&self) -> [[T; 4];4] {
+        [
+            [self.m11, self.m12, self.m13, self.m14],
+            [self.m21, self.m22, self.m23, self.m24],
+            [self.m31, self.m32, self.m33, self.m34],
+            [self.m41, self.m42, self.m43, self.m44]
+        ]
+    }
+
+    /// Returns an array containing this matrix's 4 columns in (in row-major order,
+    /// or 4 rows in column-major order) as arrays.
+    ///
+    /// This is a convenience method to interface with other libraries like glium.
+    pub fn to_column_major_arrays(&self) -> [[T; 4]; 4] {
+        [
+            [self.m11, self.m21, self.m31, self.m41],
+            [self.m12, self.m22, self.m32, self.m42],
+            [self.m13, self.m23, self.m33, self.m43],
+            [self.m14, self.m24, self.m34, self.m44]
+        ]
+    }
 }
 
 impl<T: Copy + fmt::Debug, Src, Dst> fmt::Debug for TypedMatrix4D<T, Src, Dst> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        self.to_array().fmt(f)
+        self.to_row_major_array().fmt(f)
     }
 }
 
@@ -444,10 +579,12 @@ mod tests {
         let (left, right, bottom, top) = (0.0f32, 1.0f32, 0.1f32, 1.0f32);
         let (near, far) = (-1.0f32, 1.0f32);
         let result = Mf32::ortho(left, right, bottom, top, near, far);
-        let expected = Mf32::new(2.0,  0.0,         0.0,  0.0,
-                                 0.0,  2.22222222,  0.0,  0.0,
-                                 0.0,  0.0,         -1.0, 0.0,
-                                 -1.0, -1.22222222, -0.0, 1.0);
+        let expected = Mf32::row_major(
+             2.0,  0.0,         0.0, 0.0,
+             0.0,  2.22222222,  0.0, 0.0,
+             0.0,  0.0,        -1.0, 0.0,
+            -1.0, -1.22222222, -0.0, 1.0
+        );
         debug!("result={:?} expected={:?}", result, expected);
         assert!(result.approx_eq(&expected));
     }
@@ -460,48 +597,50 @@ mod tests {
     }
 
     #[test]
-    pub fn test_new_2d() {
-        let m1 = Mf32::new_2d(1.0, 2.0, 3.0, 4.0, 5.0, 6.0);
-        let m2 = Mf32::new(1.0, 2.0, 0.0, 0.0,
-                           3.0, 4.0, 0.0, 0.0,
-                           0.0, 0.0, 1.0, 0.0,
-                           5.0, 6.0, 0.0, 1.0);
+    pub fn test_row_major_2d() {
+        let m1 = Mf32::row_major_2d(1.0, 2.0, 3.0, 4.0, 5.0, 6.0);
+        let m2 = Mf32::row_major(
+            1.0, 2.0, 0.0, 0.0,
+            3.0, 4.0, 0.0, 0.0,
+            0.0, 0.0, 1.0, 0.0,
+            5.0, 6.0, 0.0, 1.0
+        );
         assert_eq!(m1, m2);
     }
 
     #[test]
-    pub fn test_invert_simple() {
+    pub fn test_inverse_simple() {
         let m1 = Mf32::identity();
-        let m2 = m1.invert();
+        let m2 = m1.inverse().unwrap();
         assert!(m1.approx_eq(&m2));
     }
 
     #[test]
-    pub fn test_invert_scale() {
+    pub fn test_inverse_scale() {
         let m1 = Mf32::create_scale(1.5, 0.3, 2.1);
-        let m2 = m1.invert();
-        assert!(m1.mul(&m2).approx_eq(&Mf32::identity()));
+        let m2 = m1.inverse().unwrap();
+        assert!(m1.pre_mul(&m2).approx_eq(&Mf32::identity()));
     }
 
     #[test]
-    pub fn test_invert_translate() {
+    pub fn test_inverse_translate() {
         let m1 = Mf32::create_translation(-132.0, 0.3, 493.0);
-        let m2 = m1.invert();
-        assert!(m1.mul(&m2).approx_eq(&Mf32::identity()));
+        let m2 = m1.inverse().unwrap();
+        assert!(m1.pre_mul(&m2).approx_eq(&Mf32::identity()));
     }
 
     #[test]
-    pub fn test_invert_rotate() {
+    pub fn test_inverse_rotate() {
         let m1 = Mf32::create_rotation(0.0, 1.0, 0.0, 1.57);
-        let m2 = m1.invert();
-        assert!(m1.mul(&m2).approx_eq(&Mf32::identity()));
+        let m2 = m1.inverse().unwrap();
+        assert!(m1.pre_mul(&m2).approx_eq(&Mf32::identity()));
     }
 
     #[test]
-    pub fn test_invert_transform_point_2d() {
+    pub fn test_inverse_transform_point_2d() {
         let m1 = Mf32::create_translation(100.0, 200.0, 0.0);
-        let m2 = m1.invert();
-        assert!(m1.mul(&m2).approx_eq(&Mf32::identity()));
+        let m2 = m1.inverse().unwrap();
+        assert!(m1.pre_mul(&m2).approx_eq(&Mf32::identity()));
 
         let p1 = Point2D::new(1000.0, 2000.0);
         let p2 = m1.transform_point(&p1);
@@ -509,5 +648,12 @@ mod tests {
 
         let p3 = m2.transform_point(&p2);
         assert!(p3.eq(&p1));
+    }
+
+    #[test]
+    pub fn test_pre_post() {
+        let m1 = Matrix4D::identity().post_scaled(1.0, 2.0, 3.0).post_translated(1.0, 2.0, 3.0);
+        let m2 = Matrix4D::identity().pre_translated(1.0, 2.0, 3.0).pre_scaled(1.0, 2.0, 3.0);
+        assert!(m1.approx_eq(&m2));
     }
 }
