@@ -9,6 +9,49 @@
 
 #![cfg_attr(feature = "unstable", feature(asm, repr_simd, test))]
 
+//! A collection of strongly typed math tools for computer graphics with an inclination
+//! towards 2d graphics and layout.
+//!
+//! All types are generic over the the scalar type of their component (f32, i32, etc.),
+//! and tagged with a generic Unit parameter which is useful to prevent mixing
+//! values from different spaces. For example it should not be legal to translate
+//! a screen-space position by a world-space vector and this can be expressed using
+//! the generic Unit parameter.
+//!
+//! This unit system is not mandatory and all Typed* structures have an alias
+//! with the default unit: UnknownUnit.
+//! for example ```Point2D<T>``` is equivalent to ```TypedPoint2D<T, UnknownUnit>```.
+//! Client code typically creates a set of aliases for each type and doesn't need
+//! to deal with the specifics of typed units further. For example:
+//!
+//! ```rust
+//! use euclid::*;
+//! pub struct ScreenSpace;
+//! pub type ScreenPoint = TypedPoint2D<f32, ScreenSpace>;
+//! pub type ScreenSize = TypedSize2D<f32, ScreenSpace>;
+//! pub struct WorldSpace;
+//! pub type WorldPoint = TypedPoint3D<f32, WorldSpace>;
+//! pub type ProjectionMatrix = TypedMatrix4D<f32, WorldSpace, ScreenSpace>;
+//! // etc...
+//! ```
+//!
+//! Components are accessed in their scalar form by default for convenience, and most
+//! types additionally implement strongly typed accessors which return typed ```Length``` wrappers.
+//! For example:
+//!
+//! ```rust
+//! # use euclid::*;
+//! # pub struct WorldSpace;
+//! # pub type WorldPoint = TypedPoint3D<f32, WorldSpace>;
+//! let p = WorldPoint::new(0.0, 1.0, 1.0);
+//! // p.x is an f32.
+//! println!("p.x = {:?} ", p.x);
+//! // p.x is a Length<f32, WorldSpace>.
+//! println!("p.x_typed() = {:?} ", p.x_typed());
+//! // Length::get returns the scalar value (f32).
+//! assert_eq!(p.x, p.x_typed().get());
+//! ```
+
 extern crate heapsize;
 
 #[macro_use]
@@ -22,7 +65,8 @@ extern crate rand;
 extern crate test;
 extern crate num_traits;
 
-pub use matrix::Matrix4;
+pub use length::Length;
+pub use scale_factor::ScaleFactor;
 pub use matrix2d::{Matrix2D, TypedMatrix2D};
 pub use matrix4d::{Matrix4D, TypedMatrix4D};
 pub use point::{
@@ -39,7 +83,6 @@ pub mod approxeq;
 pub mod length;
 #[macro_use]
 mod macros;
-pub mod matrix;
 pub mod matrix2d;
 pub mod matrix4d;
 pub mod num;
@@ -49,3 +92,7 @@ pub mod scale_factor;
 pub mod side_offsets;
 pub mod size;
 mod trig;
+
+/// The default unit.
+#[derive(RustcDecodable, RustcEncodable)]
+pub struct UnknownUnit;

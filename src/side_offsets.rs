@@ -10,16 +10,17 @@
 //! A group of side offsets, which correspond to top/left/bottom/right for borders, padding,
 //! and margins in CSS.
 
+use super::UnknownUnit;
+use length::Length;
 use num::Zero;
 use std::ops::Add;
 use std::marker::PhantomData;
-use length::{Length, UnknownUnit};
 
 #[cfg(feature = "unstable")]
 use heapsize::HeapSizeOf;
 
 /// A group of side offsets, which correspond to top/left/bottom/right for borders, padding,
-/// and margins in CSS.
+/// and margins in CSS, optionally tagged with a unit.
 define_matrix! {
     #[derive(Debug)]
     pub struct TypedSideOffsets2D<T, U> {
@@ -30,9 +31,11 @@ define_matrix! {
     }
 }
 
+/// The default side offset type with no unit.
 pub type SideOffsets2D<T> = TypedSideOffsets2D<T, UnknownUnit>;
 
 impl<T, U> TypedSideOffsets2D<T, U> {
+    /// Constructor taking a scalar for each side.
     pub fn new(top: T, right: T, bottom: T, left: T) -> TypedSideOffsets2D<T, U> {
         TypedSideOffsets2D {
             top: top,
@@ -45,15 +48,38 @@ impl<T, U> TypedSideOffsets2D<T, U> {
 }
 
 impl<T: Clone, U> TypedSideOffsets2D<T, U> {
-    pub fn get_top(&self) -> Length<T, U> { Length::new(self.top.clone()) }
-    pub fn get_right(&self) -> Length<T, U> { Length::new(self.right.clone()) }
-    pub fn get_bottom(&self) -> Length<T, U> { Length::new(self.bottom.clone()) }
-    pub fn get_left(&self) -> Length<T, U> { Length::new(self.left.clone()) }
+    /// Constructor taking a typed Length for each side.
+    pub fn from_lengths(top: Length<T, U>,
+                        right: Length<T, U>,
+                        bottom: Length<T, U>,
+                        left: Length<T, U>) -> TypedSideOffsets2D<T, U> {
+        TypedSideOffsets2D::new(top.get(), right.get(), bottom.get(), left.get())
+    }
 }
 
 impl<T: Clone, U> TypedSideOffsets2D<T, U> {
+    /// Access self.top as a typed Length instead of a scalar value.
+    pub fn top_typed(&self) -> Length<T, U> { Length::new(self.top.clone()) }
+
+    /// Access self.right as a typed Length instead of a scalar value.
+    pub fn right_typed(&self) -> Length<T, U> { Length::new(self.right.clone()) }
+
+    /// Access self.bottom as a typed Length instead of a scalar value.
+    pub fn bottom_typed(&self) -> Length<T, U> { Length::new(self.bottom.clone()) }
+
+    /// Access self.left as a typed Length instead of a scalar value.
+    pub fn left_typed(&self) -> Length<T, U> { Length::new(self.left.clone()) }
+}
+
+impl<T: Clone, U> TypedSideOffsets2D<T, U> {
+    /// Constructor setting the same value to all sides, taking a scalar value directly.
     pub fn new_all_same(all: T) -> TypedSideOffsets2D<T, U> {
         TypedSideOffsets2D::new(all.clone(), all.clone(), all.clone(), all.clone())
+    }
+
+    /// Constructor setting the same value to all sides, taking a typed Length.
+    pub fn from_length_all_same(all: Length<T, U>) -> TypedSideOffsets2D<T, U> {
+        TypedSideOffsets2D::new_all_same(all.get())
     }
 }
 
@@ -64,6 +90,14 @@ impl<T, U> TypedSideOffsets2D<T, U> where T: Add<T, Output=T> + Copy {
 
     pub fn vertical(&self) -> T {
         self.top + self.bottom
+    }
+
+    pub fn horizontal_typed(&self) -> Length<T, U> {
+        Length::new(self.horizontal())
+    }
+
+    pub fn vertical_typed(&self) -> Length<T, U> {
+        Length::new(self.vertical())
     }
 }
 
@@ -80,6 +114,7 @@ impl<T: Add<T, Output=T>, U> Add for TypedSideOffsets2D<T, U> {
 }
 
 impl<T: Zero, U> TypedSideOffsets2D<T, U> {
+    /// Constructor, setting all sides to zero.
     pub fn zero() -> TypedSideOffsets2D<T, U> {
         TypedSideOffsets2D::new(
             Zero::zero(),
