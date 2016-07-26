@@ -7,9 +7,10 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use length::{Length, UnknownUnit};
+use super::UnknownUnit;
+use length::Length;
 use scale_factor::ScaleFactor;
-use num::Zero;
+use num::*;
 use point::TypedPoint2D;
 use size::TypedSize2D;
 
@@ -20,12 +21,14 @@ use std::cmp::PartialOrd;
 use std::fmt;
 use std::ops::{Add, Sub, Mul, Div};
 
+/// A 2d Rectangle optionally tagged with a unit.
 #[derive(RustcDecodable, RustcEncodable)]
 pub struct TypedRect<T, U = UnknownUnit> {
     pub origin: TypedPoint2D<T, U>,
     pub size: TypedSize2D<T, U>,
 }
 
+/// The default rectangle type with no unit.
 pub type Rect<T> = TypedRect<T, UnknownUnit>;
 
 impl<T: HeapSizeOf, U> HeapSizeOf for TypedRect<T, U> {
@@ -34,7 +37,7 @@ impl<T: HeapSizeOf, U> HeapSizeOf for TypedRect<T, U> {
     }
 }
 
-impl<T: Clone + Deserialize, U> Deserialize for TypedRect<T, U> {
+impl<T: Copy + Deserialize, U> Deserialize for TypedRect<T, U> {
     fn deserialize<D>(deserializer: &mut D) -> Result<Self, D::Error>
         where D: Deserializer
     {
@@ -53,10 +56,8 @@ impl<T: Serialize, U> Serialize for TypedRect<T, U> {
 
 impl<T: Copy, U> Copy for TypedRect<T, U> {}
 
-impl<T: Clone, U> Clone for TypedRect<T, U> {
-    fn clone(&self) -> TypedRect<T, U> {
-        TypedRect::new(self.origin.clone(), self.size.clone())
-    }
+impl<T: Copy, U> Clone for TypedRect<T, U> {
+    fn clone(&self) -> TypedRect<T, U> { *self }
 }
 
 impl<T: PartialEq, U> PartialEq<TypedRect<T, U>> for TypedRect<T, U> {
@@ -80,6 +81,7 @@ impl<T: fmt::Display, U> fmt::Display for TypedRect<T, U> {
 }
 
 impl<T, U> TypedRect<T, U> {
+    /// Constructor.
     pub fn new(origin: TypedPoint2D<T, U>, size: TypedSize2D<T, U>) -> TypedRect<T, U> {
         TypedRect {
             origin: origin,
@@ -89,7 +91,7 @@ impl<T, U> TypedRect<T, U> {
 }
 
 impl<T, U> TypedRect<T, U>
-where T: Copy + Clone + PartialOrd + Add<T, Output=T> + Sub<T, Output=T> {
+where T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output=T> + Sub<T, Output=T> {
     #[inline]
     pub fn intersects(&self, other: &TypedRect<T, U>) -> bool {
         self.origin.x < other.origin.x + other.size.width &&
@@ -153,6 +155,7 @@ where T: Copy + Clone + PartialOrd + Add<T, Output=T> + Sub<T, Output=T> {
                                                             lower_right_y - upper_left.y)))
     }
 
+    /// Translates the rect by a vector.
     #[inline]
     pub fn translate(&self, other: &TypedPoint2D<T, U>) -> TypedRect<T, U> {
         TypedRect::new(
@@ -161,10 +164,23 @@ where T: Copy + Clone + PartialOrd + Add<T, Output=T> + Sub<T, Output=T> {
         )
     }
 
+    /// Returns true if this rectangle contains the point. Points are considered
+    /// in the rectangle if they are on the left or top edge, but outside if they
+    /// are on the right or bottom edge.
     #[inline]
     pub fn contains(&self, other: &TypedPoint2D<T, U>) -> bool {
         self.origin.x <= other.x && other.x < self.origin.x + self.size.width &&
         self.origin.y <= other.y && other.y < self.origin.y + self.size.height
+    }
+
+    /// Returns true if this rectangle contains the interior of rect. Always
+    /// returns true if rect is empty, and always returns false if rect is
+    /// nonempty but this rectangle is empty.
+    #[inline]
+    pub fn contains_rect(&self, rect: &TypedRect<T, U>) -> bool {
+        rect.is_empty() ||
+            (self.min_x() <= rect.min_x() && rect.max_x() <= self.max_x() &&
+             self.min_y() <= rect.min_y() && rect.max_y() <= self.max_y())
     }
 
     #[inline]
@@ -201,7 +217,8 @@ where T: Copy + Clone + PartialOrd + Add<T, Output=T> + Sub<T, Output=T> {
     }
 }
 
-impl<T: Copy + Clone + PartialOrd + Add<T, Output=T> + Sub<T, Output=T> + Zero, U> TypedRect<T, U> {
+impl<T, U> TypedRect<T, U>
+where T: Copy + Clone + PartialOrd + Add<T, Output=T> + Sub<T, Output=T> + Zero {
     #[inline]
     pub fn union(&self, other: &TypedRect<T, U>) -> TypedRect<T, U> {
         if self.size == Zero::zero() {
@@ -235,7 +252,8 @@ impl<T, U> TypedRect<T, U> {
     }
 }
 
-impl<T: PartialEq + Zero, U> TypedRect<T, U> {
+impl<T: Copy + PartialEq + Zero, U> TypedRect<T, U> {
+    /// Constructor, setting all sides to zero.
     pub fn zero() -> TypedRect<T, U> {
         TypedRect::new(
             TypedPoint2D::zero(),
@@ -243,6 +261,7 @@ impl<T: PartialEq + Zero, U> TypedRect<T, U> {
         )
     }
 
+    /// Returns true if the size is zero, regardless of the origin's value.
     pub fn is_empty(&self) -> bool {
         self.size.width == Zero::zero() || self.size.height == Zero::zero()
     }
@@ -289,7 +308,7 @@ impl<T: Copy + Div<T, Output=T>, U1, U2> Div<ScaleFactor<T, U1, U2>> for TypedRe
     }
 }
 
-impl<T: Clone, Unit> TypedRect<T, Unit> {
+impl<T: Copy, Unit> TypedRect<T, Unit> {
     /// Drop the units, preserving only the numeric value.
     pub fn to_untyped(&self) -> Rect<T> {
         TypedRect::new(self.origin.to_untyped(), self.size.to_untyped())
@@ -301,9 +320,13 @@ impl<T: Clone, Unit> TypedRect<T, Unit> {
     }
 }
 
-impl<T0: NumCast + Clone, Unit> TypedRect<T0, Unit> {
+impl<T0: NumCast + Copy, Unit> TypedRect<T0, Unit> {
     /// Cast from one numeric representation to another, preserving the units.
-    pub fn cast<T1: NumCast + Clone>(&self) -> Option<TypedRect<T1, Unit>> {
+    ///
+    /// When casting from floating point to integer coordinates, the decimals are truncated
+    /// as one would expect from a simple cast, but this behavior does not always make sense
+    /// geometrically. Consider using round(), round_in or round_out() before casting.
+    pub fn cast<T1: NumCast + Copy>(&self) -> Option<TypedRect<T1, Unit>> {
         match (self.origin.cast(), self.size.cast()) {
             (Some(origin), Some(size)) => Some(TypedRect::new(origin, size)),
             _ => None
@@ -311,13 +334,70 @@ impl<T0: NumCast + Clone, Unit> TypedRect<T0, Unit> {
     }
 }
 
+impl<T: Floor + Ceil + Round + Add<T, Output=T> + Sub<T, Output=T>, U> TypedRect<T, U> {
+    /// Return a rectangle with edges rounded to integer coordinates, such that
+    /// the returned rectangle has the same set of pixel centers as the original
+    /// one.
+    /// Edges at offset 0.5 round up.
+    /// Suitable for most places where integral device coordinates
+    /// are needed, but note that any translation should be applied first to
+    /// avoid pixel rounding errors.
+    /// Note that this is *not* rounding to nearest integer if the values are negative.
+    /// They are always rounding as floor(n + 0.5).
+    pub fn round(&self) -> Self {
+        let origin = self.origin.round();
+        let size = self.origin.add_size(&self.size).round() - origin;
+        TypedRect::new(origin, TypedSize2D::new(size.x, size.y))
+    }
+
+    /// Return a rectangle with edges rounded to integer coordinates, such that
+    /// the original rectangle contains the resulting rectangle.
+    pub fn round_in(&self) -> Self {
+        let origin = self.origin.ceil();
+        let size = self.origin.add_size(&self.size).floor() - origin;
+        TypedRect::new(origin, TypedSize2D::new(size.x, size.y))
+    }
+
+    /// Return a rectangle with edges rounded to integer coordinates, such that
+    /// the original rectangle is contained in the resulting rectangle.
+    pub fn round_out(&self) -> Self {
+        let origin = self.origin.floor();
+        let size = self.origin.add_size(&self.size).ceil() - origin;
+        TypedRect::new(origin, TypedSize2D::new(size.x, size.y))
+    }
+}
+
 // Convenience functions for common casts
-impl<T: NumCast + Clone, Unit> TypedRect<T, Unit> {
-    pub fn as_f32(&self) -> TypedRect<f32, Unit> {
+impl<T: NumCast + Copy, Unit> TypedRect<T, Unit> {
+    /// Cast into an f32 vector.
+    pub fn to_f32(&self) -> TypedRect<f32, Unit> {
         self.cast().unwrap()
     }
 
-    pub fn as_uint(&self) -> TypedRect<usize, Unit> {
+    /// Cast into an usize vector, truncating decimals if any.
+    ///
+    /// When casting from floating point vectors, it is worth considering whether
+    /// to round(), round_in() or round_out() before the cast in order to obtain the desired
+    /// conversion behavior.
+    pub fn to_uint(&self) -> TypedRect<usize, Unit> {
+        self.cast().unwrap()
+    }
+
+    /// Cast into an i32 vector, truncating decimals if any.
+    ///
+    /// When casting from floating point vectors, it is worth considering whether
+    /// to round(), round_in() or round_out() before the cast in order to obtain the desired
+    /// conversion behavior.
+    pub fn to_i32(&self) -> TypedRect<i32, Unit> {
+        self.cast().unwrap()
+    }
+
+    /// Cast into an i64 vector, truncating decimals if any.
+    ///
+    /// When casting from floating point vectors, it is worth considering whether
+    /// to round(), round_in() or round_out() before the cast in order to obtain the desired
+    /// conversion behavior.
+    pub fn to_i64(&self) -> TypedRect<i64, Unit> {
         self.cast().unwrap()
     }
 }
@@ -450,6 +530,18 @@ mod tests {
         // Points beyond the bottom-left corner.
         assert!(!r.contains(&Point2D::new(-25, 210)));
         assert!(!r.contains(&Point2D::new(-15, 220)));
+
+        let r = Rect::new(Point2D::new(-20.0, 15.0), Size2D::new(100.0, 200.0));
+        assert!(r.contains_rect(&r));
+        assert!(!r.contains_rect(&r.translate(&Point2D::new( 0.1,  0.0))));
+        assert!(!r.contains_rect(&r.translate(&Point2D::new(-0.1,  0.0))));
+        assert!(!r.contains_rect(&r.translate(&Point2D::new( 0.0,  0.1))));
+        assert!(!r.contains_rect(&r.translate(&Point2D::new( 0.0, -0.1))));
+        // Empty rectangles are always considered as contained in other rectangles,
+        // even if their origin is not.
+        let p = Point2D::new(1.0, 1.0);
+        assert!(!r.contains(&p));
+        assert!(r.contains_rect(&Rect::new(p, Size2D::zero())));
     }
 
     #[test]
@@ -517,4 +609,34 @@ mod tests {
         assert!(!Rect::new(Point2D::new(10u32, 10u32), Size2D::new(1u32, 1u32)).is_empty());
     }
 
+    #[test]
+    fn test_round() {
+        let mut x = -2.0;
+        let mut y = -2.0;
+        let mut w = -2.0;
+        let mut h = -2.0;
+        while x < 2.0 {
+            while y < 2.0 {
+                while w < 2.0 {
+                    while h < 2.0 {
+                        let rect = Rect::new(Point2D::new(x, y), Size2D::new(w, h));
+
+                        assert!(rect.contains_rect(&rect.round_in()));
+                        assert!(rect.round_in().inflate(1.0, 1.0).contains_rect(&rect));
+
+                        assert!(rect.round_out().contains_rect(&rect));
+                        assert!(rect.inflate(1.0, 1.0).contains_rect(&rect.round_out()));
+
+                        assert!(rect.inflate(1.0, 1.0).contains_rect(&rect.round()));
+                        assert!(rect.round().inflate(1.0, 1.0).contains_rect(&rect));
+
+                        h += 0.1;
+                    }
+                    w += 0.1;
+                }
+                y += 0.1;
+            }
+            x += 0.1
+        }
+    }
 }
