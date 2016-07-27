@@ -87,10 +87,8 @@ impl<T: Clone, U> TypedPoint2D<T, U> {
     pub fn y_typed(&self) -> Length<T, U> { Length::new(self.y.clone()) }
 }
 
-impl<T: Mul<T, Output=T> +
-        Add<T, Output=T> +
-        Sub<T, Output=T> +
-        Copy, U> TypedPoint2D<T, U> {
+impl<T, U> TypedPoint2D<T, U>
+where T: Copy + Mul<T, Output=T> + Add<T, Output=T> + Sub<T, Output=T> {
     #[inline]
     pub fn dot(self, other: TypedPoint2D<T, U>) -> T {
         self.x * other.x + self.y * other.y
@@ -102,14 +100,14 @@ impl<T: Mul<T, Output=T> +
     }
 }
 
-impl<T:Clone + Add<T, Output=T>, U> Add for TypedPoint2D<T, U> {
+impl<T: Clone + Add<T, Output=T>, U> Add for TypedPoint2D<T, U> {
     type Output = TypedPoint2D<T, U>;
     fn add(self, other: TypedPoint2D<T, U>) -> TypedPoint2D<T, U> {
         TypedPoint2D::new(self.x + other.x, self.y + other.y)
     }
 }
 
-impl<T:Clone + Add<T, Output=T>, U> Add<TypedSize2D<T, U>> for TypedPoint2D<T, U> {
+impl<T: Clone + Add<T, Output=T>, U> Add<TypedSize2D<T, U>> for TypedPoint2D<T, U> {
     type Output = TypedPoint2D<T, U>;
     fn add(self, other: TypedSize2D<T, U>) -> TypedPoint2D<T, U> {
         TypedPoint2D::new(self.x + other.width, self.y + other.height)
@@ -122,14 +120,14 @@ impl<T: Copy + Add<T, Output=T>, U> TypedPoint2D<T, U> {
     }
 }
 
-impl<T:Clone + Sub<T, Output=T>, U> Sub for TypedPoint2D<T, U> {
+impl<T: Clone + Sub<T, Output=T>, U> Sub for TypedPoint2D<T, U> {
     type Output = TypedPoint2D<T, U>;
     fn sub(self, other: TypedPoint2D<T, U>) -> TypedPoint2D<T, U> {
         TypedPoint2D::new(self.x - other.x, self.y - other.y)
     }
 }
 
-impl <T:Clone + Neg<Output=T>, U> Neg for TypedPoint2D<T, U> {
+impl <T: Clone + Neg<Output=T>, U> Neg for TypedPoint2D<T, U> {
     type Output = TypedPoint2D<T, U>;
     #[inline]
     fn neg(self) -> TypedPoint2D<T, U> {
@@ -181,7 +179,7 @@ impl<T: Copy + Div<T, Output=T>, U1, U2> Div<ScaleFactor<T, U1, U2>> for TypedPo
 
 // Convenient aliases for TypedPoint2D with typed units
 
-impl<T:Clone, U> TypedPoint2D<T, U> {
+impl<T: Clone, U> TypedPoint2D<T, U> {
     /// Drop the units, preserving only the numeric value.
     pub fn to_untyped(&self) -> Point2D<T> {
         TypedPoint2D::new(self.x.clone(), self.y.clone())
@@ -306,7 +304,7 @@ impl<T: Mul<T, Output=T> +
     }
 }
 
-impl<T:Clone + Add<T, Output=T>, U> Add for TypedPoint3D<T, U> {
+impl<T: Clone + Add<T, Output=T>, U> Add for TypedPoint3D<T, U> {
     type Output = TypedPoint3D<T, U>;
     fn add(self, other: TypedPoint3D<T, U>) -> TypedPoint3D<T, U> {
         TypedPoint3D::new(self.x + other.x,
@@ -315,7 +313,7 @@ impl<T:Clone + Add<T, Output=T>, U> Add for TypedPoint3D<T, U> {
     }
 }
 
-impl<T:Clone + Sub<T, Output=T>, U> Sub for TypedPoint3D<T, U> {
+impl<T: Clone + Sub<T, Output=T>, U> Sub for TypedPoint3D<T, U> {
     type Output = TypedPoint3D<T, U>;
     fn sub(self, other: TypedPoint3D<T, U>) -> TypedPoint3D<T, U> {
         TypedPoint3D::new(self.x - other.x,
@@ -324,7 +322,7 @@ impl<T:Clone + Sub<T, Output=T>, U> Sub for TypedPoint3D<T, U> {
     }
 }
 
-impl <T:Clone + Neg<Output=T>, U> Neg for TypedPoint3D<T, U> {
+impl <T: Clone + Neg<Output=T>, U> Neg for TypedPoint3D<T, U> {
     type Output = TypedPoint3D<T, U>;
     #[inline]
     fn neg(self) -> TypedPoint3D<T, U> {
@@ -345,7 +343,7 @@ impl<T: Float, U> TypedPoint3D<T, U> {
     }
 }
 
-impl<T:Clone, U> TypedPoint3D<T, U> {
+impl<T: Clone, U> TypedPoint3D<T, U> {
     /// Drop the units, preserving only the numeric value.
     pub fn to_untyped(&self) -> Point3D<T> {
         TypedPoint3D::new(self.x.clone(), self.y.clone(), self.z.clone())
@@ -439,7 +437,7 @@ impl<T: Clone, U> TypedPoint4D<T, U> {
     pub fn w_typed(&self) -> Length<T, U> { Length::new(self.w.clone()) }
 }
 
-impl<T:Clone + Add<T, Output=T>, U> Add for TypedPoint4D<T, U> {
+impl<T: Clone + Add<T, Output=T>, U> Add for TypedPoint4D<T, U> {
     type Output = TypedPoint4D<T, U>;
     fn add(self, other: TypedPoint4D<T, U>) -> TypedPoint4D<T, U> {
         TypedPoint4D::new(self.x + other.x,
@@ -449,7 +447,7 @@ impl<T:Clone + Add<T, Output=T>, U> Add for TypedPoint4D<T, U> {
     }
 }
 
-impl<T:Clone + Sub<T, Output=T>, U> Sub for TypedPoint4D<T, U> {
+impl<T: Clone + Sub<T, Output=T>, U> Sub for TypedPoint4D<T, U> {
     type Output = TypedPoint4D<T, U>;
     fn sub(self, other: TypedPoint4D<T, U>) -> TypedPoint4D<T, U> {
         TypedPoint4D::new(self.x - other.x,
@@ -459,7 +457,7 @@ impl<T:Clone + Sub<T, Output=T>, U> Sub for TypedPoint4D<T, U> {
     }
 }
 
-impl <T:Clone + Neg<Output=T>, U> Neg for TypedPoint4D<T, U> {
+impl <T: Clone + Neg<Output=T>, U> Neg for TypedPoint4D<T, U> {
     type Output = TypedPoint4D<T, U>;
     #[inline]
     fn neg(self) -> TypedPoint4D<T, U> {
@@ -479,7 +477,7 @@ impl<T: Float, U> TypedPoint4D<T, U> {
     }
 }
 
-impl<T:Clone, U> TypedPoint4D<T, U> {
+impl<T: Clone, U> TypedPoint4D<T, U> {
     /// Drop the units, preserving only the numeric value.
     pub fn to_untyped(&self) -> Point4D<T> {
         TypedPoint4D::new(self.x.clone(), self.y.clone(), self.z.clone(), self.w.clone())

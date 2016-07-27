@@ -53,18 +53,17 @@ impl<T: Copy, Src, Dst> Clone for TypedMatrix4D<T, Src, Dst> {
     fn clone(&self) -> Self { *self }
 }
 
-impl <T:Add<T, Output=T> +
-       ApproxEq<T> +
-       Copy +
-       Clone +
-       Div<T, Output=T> +
-       Mul<T, Output=T> +
-       Neg<Output=T> +
-       One +
-       PartialOrd +
-       Sub<T, Output=T> +
-       Trig +
-       Zero, Src, Dst> TypedMatrix4D<T, Src, Dst> {
+impl <T, Src, Dst> TypedMatrix4D<T, Src, Dst>
+where T: Copy + Clone +
+         Add<T, Output=T> +
+         Sub<T, Output=T> +
+         Mul<T, Output=T> +
+         Div<T, Output=T> +
+         Neg<Output=T> +
+         ApproxEq<T> +
+         PartialOrd +
+         Trig +
+         One + Zero {
 
     #[inline]
     pub fn new_2d(m11: T, m12: T, m21: T, m22: T, m41: T, m42: T) -> TypedMatrix4D<T, Src, Dst> {
@@ -418,7 +417,7 @@ impl<T: Copy, Src, Dst> TypedMatrix4D<T, Src, Dst> {
     }
 }
 
-impl<T: Copy+fmt::Debug, Src, Dst> fmt::Debug for TypedMatrix4D<T, Src, Dst> {
+impl<T: Copy + fmt::Debug, Src, Dst> fmt::Debug for TypedMatrix4D<T, Src, Dst> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         self.to_array().fmt(f)
     }
