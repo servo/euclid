@@ -46,14 +46,13 @@ impl<T: Copy, Src, Dst> TypedMatrix2D<T, Src, Dst> {
     }
 }
 
-impl<T:Add<T, Output=T> +
-       Copy +
-       Clone +
-       Mul<T, Output=T> +
-       One +
-       PartialOrd +
-       Sub<T, Output=T> +
-       Zero, Src, Dst> TypedMatrix2D<T, Src, Dst> {
+impl<T, Src, Dst> TypedMatrix2D<T, Src, Dst>
+where T: Copy + Clone +
+         Add<T, Output=T> +
+         Mul<T, Output=T> +
+         Sub<T, Output=T> +
+         PartialOrd +
+         One + Zero  {
 
     pub fn mul<NewSrc>(&self, m: &TypedMatrix2D<T, NewSrc, Src>) -> TypedMatrix2D<T, NewSrc, Dst> {
         TypedMatrix2D::new(
@@ -124,7 +123,7 @@ impl<T:Add<T, Output=T> +
 }
 
 // Convenient aliases for TypedPoint2D with typed units
-impl<T:Copy, Src, Dst> TypedMatrix2D<T, Src, Dst> {
+impl<T: Copy, Src, Dst> TypedMatrix2D<T, Src, Dst> {
     /// Drop the units, preserving only the numeric value.
     pub fn to_untyped(&self) -> Matrix2D<T> {
         Matrix2D::new(
