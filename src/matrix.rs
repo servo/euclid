@@ -7,7 +7,8 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use matrix4d::Matrix4D;
+use matrix4d::TypedMatrix4D;
+use length::UnknownUnit;
 
 #[cfg_attr(feature = "unstable", deprecated(note = "Use matrix4d::Matrix4D instead"))]
-pub type Matrix4 = Matrix4D<f32>;
+pub type Matrix4 = TypedMatrix4D<f32, UnknownUnit, UnknownUnit>;
