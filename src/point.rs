@@ -19,7 +19,7 @@ use std::marker::PhantomData;
 use std::cmp::{PartialEq, Eq};
 use std::hash::{Hash, Hasher};
 
-define_vector! {
+define_matrix! {
     #[derive(RustcDecodable, RustcEncodable)]
     pub struct TypedPoint2D<T, U> {
         pub x: T,
@@ -212,7 +212,7 @@ impl<T: NumCast + Clone, U> TypedPoint2D<T, U> {
     }
 }
 
-define_vector! {
+define_matrix! {
     #[derive(RustcDecodable, RustcEncodable)]
     pub struct TypedPoint3D<T, U> {
         pub x: T,
@@ -355,7 +355,7 @@ impl<T: Clone, U> TypedPoint3D<T, U> {
     }
 }
 
-define_vector! {
+define_matrix! {
     #[derive(RustcDecodable, RustcEncodable)]
     pub struct TypedPoint4D<T, U> {
         pub x: T,

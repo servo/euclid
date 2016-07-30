@@ -20,7 +20,7 @@ use heapsize::HeapSizeOf;
 
 /// A group of side offsets, which correspond to top/left/bottom/right for borders, padding,
 /// and margins in CSS.
-define_vector! {
+define_matrix! {
     #[derive(Debug)]
     pub struct TypedSideOffsets2D<T, U> {
         pub top: T,

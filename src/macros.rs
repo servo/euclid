@@ -38,20 +38,29 @@ macro_rules! deserialize {
 }
 
 macro_rules! define_matrix {
-    ($(#[$attr:meta])* pub struct $name:ident<T, Src, Dst> { $(pub $field:ident: T,)+ }) => (
+    (
+        $(#[$attr:meta])*
+        pub struct $name:ident<T, $($phantom:ident),+> {
+            $(pub $field:ident: T,)+
+        }
+    ) => (
         $(#[$attr])*
-        pub struct $name<T, Src, Dst> {
+        pub struct $name<T, $($phantom),+> {
             $(pub $field: T,)+
-            _unit: PhantomData<(Src, Dst)>
+            _unit: PhantomData<($($phantom),+)>
         }
 
-        impl<T: ::heapsize::HeapSizeOf, Src, Dst> ::heapsize::HeapSizeOf for $name<T, Src, Dst> {
+        impl<T, $($phantom),+> ::heapsize::HeapSizeOf for $name<T, $($phantom),+>
+            where T: ::heapsize::HeapSizeOf
+        {
             fn heap_size_of_children(&self) -> usize {
                 $(self.$field.heap_size_of_children() +)+ 0
             }
         }
 
-        impl<T: Clone + ::serde::Deserialize, Src, Dst> ::serde::Deserialize for $name<T, Src, Dst> {
+        impl<T, $($phantom),+> ::serde::Deserialize for $name<T, $($phantom),+>
+            where T: Clone + ::serde::Deserialize
+        {
             fn deserialize<D>(deserializer: &mut D) -> Result<Self, D::Error>
                 where D: ::serde::Deserializer
             {
@@ -59,39 +68,9 @@ macro_rules! define_matrix {
             }
         }
 
-        impl<T: ::serde::Serialize, Src, Dst> ::serde::Serialize for $name<T, Src, Dst> {
-            fn serialize<S>(&self, serializer: &mut S) -> Result<(), S::Error>
-                where S: ::serde::Serializer
-            {
-                [$(&self.$field,)+].serialize(serializer)
-            }
-        }
-    )
-}
-
-macro_rules! define_vector {
-    ($(#[$attr:meta])* pub struct $name:ident<T, U> { $(pub $field:ident: T,)+ }) => (
-        $(#[$attr])*
-        pub struct $name<T, U> {
-            $(pub $field: T,)+
-            _unit: PhantomData<U>,
-        }
-
-        impl<T: ::heapsize::HeapSizeOf, U> ::heapsize::HeapSizeOf for $name<T, U> {
-            fn heap_size_of_children(&self) -> usize {
-                $(self.$field.heap_size_of_children() +)+ 0
-            }
-        }
-
-        impl<T: Clone + ::serde::Deserialize, U> ::serde::Deserialize for $name<T, U> {
-            fn deserialize<D>(deserializer: &mut D) -> Result<Self, D::Error>
-                where D: ::serde::Deserializer
-            {
-                deserialize!({ $($field,)+ } 0 {} $name deserializer T)
-            }
-        }
-
-        impl<T: ::serde::Serialize, U> ::serde::Serialize for $name<T, U> {
+        impl<T, $($phantom),+> ::serde::Serialize for $name<T, $($phantom),+>
+            where T: ::serde::Serialize
+        {
             fn serialize<S>(&self, serializer: &mut S) -> Result<(), S::Error>
                 where S: ::serde::Serializer
             {
