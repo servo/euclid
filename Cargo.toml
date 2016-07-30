@@ -8,8 +8,6 @@ repository = "https://github.com/servo/euclid"
 license = "MIT / Apache-2.0"
 
 [features]
-default = []
-plugins = []
 unstable = []
 
 [dependencies]

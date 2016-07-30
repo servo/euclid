@@ -13,10 +13,6 @@ matrix:
       env: FEATURES=""
     - rust: nightly
       env: FEATURES="unstable"
-    - rust: nightly
-      env: FEATURES="plugins"
-    - rust: nightly
-      env: FEATURES="unstable plugins"
 
 script:
   - cargo build --verbose --features "$FEATURES"
