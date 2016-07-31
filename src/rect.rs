@@ -37,7 +37,7 @@ impl<T: HeapSizeOf, U> HeapSizeOf for TypedRect<T, U> {
     }
 }
 
-impl<T: Clone + Deserialize, U> Deserialize for TypedRect<T, U> {
+impl<T: Copy + Deserialize, U> Deserialize for TypedRect<T, U> {
     fn deserialize<D>(deserializer: &mut D) -> Result<Self, D::Error>
         where D: Deserializer
     {
@@ -56,10 +56,8 @@ impl<T: Serialize, U> Serialize for TypedRect<T, U> {
 
 impl<T: Copy, U> Copy for TypedRect<T, U> {}
 
-impl<T: Clone, U> Clone for TypedRect<T, U> {
-    fn clone(&self) -> TypedRect<T, U> {
-        TypedRect::new(self.origin.clone(), self.size.clone())
-    }
+impl<T: Copy, U> Clone for TypedRect<T, U> {
+    fn clone(&self) -> TypedRect<T, U> { *self }
 }
 
 impl<T: PartialEq, U> PartialEq<TypedRect<T, U>> for TypedRect<T, U> {
@@ -219,7 +217,8 @@ where T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output=T> + Sub<T
     }
 }
 
-impl<T: Copy + Clone + PartialOrd + Add<T, Output=T> + Sub<T, Output=T> + Zero, U> TypedRect<T, U> {
+impl<T, U> TypedRect<T, U>
+where T: Copy + Clone + PartialOrd + Add<T, Output=T> + Sub<T, Output=T> + Zero {
     #[inline]
     pub fn union(&self, other: &TypedRect<T, U>) -> TypedRect<T, U> {
         if self.size == Zero::zero() {
@@ -253,11 +252,11 @@ impl<T, U> TypedRect<T, U> {
     }
 }
 
-impl<T: PartialEq + Zero, U> TypedRect<T, U> {
+impl<T: Copy + PartialEq + Zero, U> TypedRect<T, U> {
     /// Constructor, setting all sides to zero.
     pub fn zero() -> TypedRect<T, U> {
         TypedRect::new(
-            TypedPoint2D::zero(),
+            TypedPoint2D::origin(),
             TypedSize2D::zero(),
         )
     }
@@ -309,7 +308,7 @@ impl<T: Copy + Div<T, Output=T>, U1, U2> Div<ScaleFactor<T, U1, U2>> for TypedRe
     }
 }
 
-impl<T: Clone, Unit> TypedRect<T, Unit> {
+impl<T: Copy, Unit> TypedRect<T, Unit> {
     /// Drop the units, preserving only the numeric value.
     pub fn to_untyped(&self) -> Rect<T> {
         TypedRect::new(self.origin.to_untyped(), self.size.to_untyped())
@@ -321,13 +320,13 @@ impl<T: Clone, Unit> TypedRect<T, Unit> {
     }
 }
 
-impl<T0: NumCast + Clone, Unit> TypedRect<T0, Unit> {
+impl<T0: NumCast + Copy, Unit> TypedRect<T0, Unit> {
     /// Cast from one numeric representation to another, preserving the units.
     ///
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always marke sense
     /// geometrically. Consider using round(), round_in or round_out() before casting.
-    pub fn cast<T1: NumCast + Clone>(&self) -> Option<TypedRect<T1, Unit>> {
+    pub fn cast<T1: NumCast + Copy>(&self) -> Option<TypedRect<T1, Unit>> {
         match (self.origin.cast(), self.size.cast()) {
             (Some(origin), Some(size)) => Some(TypedRect::new(origin, size)),
             _ => None
@@ -369,9 +368,9 @@ impl<T: Floor + Ceil + Round + Add<T, Output=T> + Sub<T, Output=T>, U> TypedRect
 }
 
 // Convenience functions for common casts
-impl<T: NumCast + Clone, Unit> TypedRect<T, Unit> {
+impl<T: NumCast + Copy, Unit> TypedRect<T, Unit> {
     /// Cast into an f32 vector.
-    pub fn as_f32(&self) -> TypedRect<f32, Unit> {
+    pub fn to_f32(&self) -> TypedRect<f32, Unit> {
         self.cast().unwrap()
     }
 
@@ -380,7 +379,7 @@ impl<T: NumCast + Clone, Unit> TypedRect<T, Unit> {
     /// When casting from floating point vectors, it is worth considering whether
     /// to round(), round_in() or round_out() before the cast in order to obtain the desired
     /// conversion behavior.
-    pub fn as_uint(&self) -> TypedRect<usize, Unit> {
+    pub fn to_uint(&self) -> TypedRect<usize, Unit> {
         self.cast().unwrap()
     }
 
@@ -389,7 +388,7 @@ impl<T: NumCast + Clone, Unit> TypedRect<T, Unit> {
     /// When casting from floating point vectors, it is worth considering whether
     /// to round(), round_in() or round_out() before the cast in order to obtain the desired
     /// conversion behavior.
-    pub fn as_i32(&self) -> TypedRect<i32, Unit> {
+    pub fn to_i32(&self) -> TypedRect<i32, Unit> {
         self.cast().unwrap()
     }
 
@@ -398,7 +397,7 @@ impl<T: NumCast + Clone, Unit> TypedRect<T, Unit> {
     /// When casting from floating point vectors, it is worth considering whether
     /// to round(), round_in() or round_out() before the cast in order to obtain the desired
     /// conversion behavior.
-    pub fn as_i64(&self) -> TypedRect<i64, Unit> {
+    pub fn to_i64(&self) -> TypedRect<i64, Unit> {
         self.cast().unwrap()
     }
 }
