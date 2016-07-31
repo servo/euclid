@@ -66,7 +66,7 @@ extern crate test;
 extern crate num_traits;
 
 pub use length::Length;
-pub mod scale_factor::ScaleFactor;
+pub use scale_factor::ScaleFactor;
 pub use matrix2d::{Matrix2D, TypedMatrix2D};
 pub use matrix4d::{Matrix4D, TypedMatrix4D};
 pub use point::{

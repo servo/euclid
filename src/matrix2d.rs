@@ -39,7 +39,7 @@ define_matrix! {
 /// The default 2d matrix type with no units.
 pub type Matrix2D<T> = TypedMatrix2D<T, UnknownUnit, UnknownUnit>;
 
-impl<T, Src, Dst> TypedMatrix2D<T, Src, Dst> {
+impl<T: Copy, Src, Dst> TypedMatrix2D<T, Src, Dst> {
     /// Create a matrix specifying its components in row-major order.
     pub fn row_major(m11: T, m12: T, m21: T, m22: T, m31: T, m32: T) -> TypedMatrix2D<T, Src, Dst> {
         TypedMatrix2D {
@@ -59,9 +59,7 @@ impl<T, Src, Dst> TypedMatrix2D<T, Src, Dst> {
             _unit: PhantomData,
         }
     }
-}
 
-impl<T: Copy, Src, Dst> TypedMatrix2D<T, Src, Dst> {
     /// Returns an array containing this matrix's terms in row-major order (the order
     /// in which the matrix is actually laid out in memory).
     pub fn to_row_major_array(&self) -> [T; 6] {
@@ -78,6 +76,24 @@ impl<T: Copy, Src, Dst> TypedMatrix2D<T, Src, Dst> {
             self.m11, self.m21, self.m31,
             self.m12, self.m22, self.m32
         ]
+    }
+
+    /// Drop the units, preserving only the numeric value.
+    pub fn to_untyped(&self) -> Matrix2D<T> {
+        Matrix2D::row_major(
+            self.m11, self.m12,
+            self.m21, self.m22,
+            self.m31, self.m32
+        )
+    }
+
+    /// Tag a unitless value with units.
+    pub fn from_untyped(p: &Matrix2D<T>) -> TypedMatrix2D<T, Src, Dst> {
+        TypedMatrix2D::row_major(
+            p.m11, p.m12,
+            p.m21, p.m22,
+            p.m31, p.m32
+        )
     }
 }
 
@@ -247,27 +263,6 @@ impl<T: ApproxEq<T>, Src, Dst> TypedMatrix2D<T, Src, Dst> {
         self.m11.approx_eq(&other.m11) && self.m12.approx_eq(&other.m12) &&
         self.m21.approx_eq(&other.m21) && self.m22.approx_eq(&other.m22) &&
         self.m31.approx_eq(&other.m31) && self.m32.approx_eq(&other.m32)
-    }
-}
-
-// Convenient aliases for TypedPoint2D with typed units
-impl<T: Copy, Src, Dst> TypedMatrix2D<T, Src, Dst> {
-    /// Drop the units, preserving only the numeric value.
-    pub fn to_untyped(&self) -> Matrix2D<T> {
-        Matrix2D::row_major(
-            self.m11, self.m12,
-            self.m21, self.m22,
-            self.m31, self.m32
-        )
-    }
-
-    /// Tag a unitless value with units.
-    pub fn from_untyped(p: &Matrix2D<T>) -> TypedMatrix2D<T, Src, Dst> {
-        TypedMatrix2D::row_major(
-            p.m11, p.m12,
-            p.m21, p.m22,
-            p.m31, p.m32
-        )
     }
 }
 
