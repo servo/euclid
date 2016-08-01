@@ -7,7 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::UnknownUnit;
+use super::{UnknownUnit, Radians};
 use approxeq::ApproxEq;
 use trig::Trig;
 use point::{TypedPoint2D, TypedPoint3D, TypedPoint4D};
@@ -431,7 +431,7 @@ where T: Copy + Clone +
 
     /// Create a 3d rotation matrix from an angle / axis.
     /// The supplied axis must be normalized.
-    pub fn create_rotation(x: T, y: T, z: T, theta: T) -> TypedMatrix4D<T, Src, Dst> {
+    pub fn create_rotation(x: T, y: T, z: T, theta: Radians<T>) -> TypedMatrix4D<T, Src, Dst> {
         let (_0, _1): (T, T) = (Zero::zero(), One::one());
         let _2 = _1 + _1;
 
@@ -439,7 +439,7 @@ where T: Copy + Clone +
         let yy = y * y;
         let zz = z * z;
 
-        let half_theta = theta / _2;
+        let half_theta = theta.get() / _2;
         let sc = half_theta.sin() * half_theta.cos();
         let sq = half_theta.sin() * half_theta.sin();
 
@@ -467,12 +467,12 @@ where T: Copy + Clone +
     }
 
     /// Returns a matrix with a rotation applied after self's transformation.
-    pub fn post_rotated(&self, x: T, y: T, z: T, theta: T) -> TypedMatrix4D<T, Src, Dst> {
+    pub fn post_rotated(&self, x: T, y: T, z: T, theta: Radians<T>) -> TypedMatrix4D<T, Src, Dst> {
         self.post_mul(&TypedMatrix4D::create_rotation(x, y, z, theta))
     }
 
     /// Returns a matrix with a rotation applied before self's transformation.
-    pub fn pre_rotated(&self, x: T, y: T, z: T, theta: T) -> TypedMatrix4D<T, Src, Dst> {
+    pub fn pre_rotated(&self, x: T, y: T, z: T, theta: Radians<T>) -> TypedMatrix4D<T, Src, Dst> {
         self.pre_mul(&TypedMatrix4D::create_rotation(x, y, z, theta))
     }
 
@@ -571,6 +571,7 @@ impl<T: PartialEq, Src, Dst> PartialEq for TypedMatrix4D<T, Src, Dst> {
 mod tests {
     use point::Point2D;
     use super::*;
+    use rad;
 
     type Mf32 = Matrix4D<f32>;
 
@@ -592,8 +593,8 @@ mod tests {
     #[test]
     pub fn test_is_2d() {
         assert!(Mf32::identity().is_2d());
-        assert!(Mf32::create_rotation(0.0, 0.0, 1.0, 0.7854).is_2d());
-        assert!(!Mf32::create_rotation(0.0, 1.0, 0.0, 0.7854).is_2d());
+        assert!(Mf32::create_rotation(0.0, 0.0, 1.0, rad(0.7854)).is_2d());
+        assert!(!Mf32::create_rotation(0.0, 1.0, 0.0, rad(0.7854)).is_2d());
     }
 
     #[test]
@@ -631,7 +632,7 @@ mod tests {
 
     #[test]
     pub fn test_inverse_rotate() {
-        let m1 = Mf32::create_rotation(0.0, 1.0, 0.0, 1.57);
+        let m1 = Mf32::create_rotation(0.0, 1.0, 0.0, rad(1.57));
         let m2 = m1.inverse().unwrap();
         assert!(m1.pre_mul(&m2).approx_eq(&Mf32::identity()));
     }

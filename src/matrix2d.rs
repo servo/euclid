@@ -7,7 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::UnknownUnit;
+use super::{UnknownUnit, Radians};
 use num::{One, Zero};
 use point::TypedPoint2D;
 use rect::TypedRect;
@@ -15,6 +15,7 @@ use size::TypedSize2D;
 use std::ops::{Add, Mul, Div, Sub};
 use std::marker::PhantomData;
 use approxeq::ApproxEq;
+use trig::Trig;
 
 define_matrix! {
     /// A 2d transform stored as a 2 by 3 matrix in row-major order in memory,
@@ -103,6 +104,7 @@ where T: Copy + Clone +
          Mul<T, Output=T> +
          Div<T, Output=T> +
          Sub<T, Output=T> +
+         Trig +
          PartialOrd +
          One + Zero  {
 
@@ -134,6 +136,7 @@ where T: Copy + Clone +
         mat.post_mul(self)
     }
 
+    /// Returns a translation matrix.
     pub fn create_translation(x: T, y: T) -> TypedMatrix2D<T, Src, Dst> {
          let (_0, _1): (T, T) = (Zero::zero(), One::one());
          TypedMatrix2D::row_major(
@@ -153,6 +156,7 @@ where T: Copy + Clone +
         self.pre_mul(&TypedMatrix2D::create_translation(x, y))
     }
 
+    /// Returns a scale matrix.
     pub fn create_scale(x: T, y: T) -> TypedMatrix2D<T, Src, Dst> {
         let _0 = Zero::zero();
         TypedMatrix2D::row_major(
@@ -174,6 +178,28 @@ where T: Copy + Clone +
             self.m21,     self.m22 * y,
             self.m31,     self.m32
         )
+    }
+
+    /// Returns a rotation matrix.
+    pub fn create_rotation(theta: Radians<T>) -> TypedMatrix2D<T, Src, Dst> {
+        let _0 = Zero::zero();
+        let cos = theta.get().cos();
+        let sin = theta.get().sin();
+        TypedMatrix2D::row_major(
+            cos, _0 - sin,
+            sin, cos,
+             _0, _0
+        )
+    }
+
+    /// Applies a rotation after self's transformation and returns the resulting matrix.
+    pub fn post_rotated(&self, theta: Radians<T>) -> TypedMatrix2D<T, Src, Dst> {
+        self.post_mul(&TypedMatrix2D::create_rotation(theta))
+    }
+
+    /// Applies a rotation after self's transformation and returns the resulting matrix.
+    pub fn pre_rotated(&self, theta: Radians<T>) -> TypedMatrix2D<T, Src, Dst> {
+        self.pre_mul(&TypedMatrix2D::create_rotation(theta))
     }
 
     /// Returns the given point transformed by this matrix.
@@ -211,6 +237,7 @@ where T: Copy + Clone +
                        TypedSize2D::new(max_x - min_x, max_y - min_y))
     }
 
+    /// Computes and returns the determinant of this matrix.
     pub fn determinant(&self) -> T {
         self.m11 * self.m22 - self.m12 * self.m21
     }
