@@ -108,9 +108,3 @@ pub type Radians<T> = Length<T, Rad>;
 
 /// A value in Degrees.
 pub type Degrees<T> = Length<T, Deg>;
-
-/// Convenience function to create an angle in radians from a scalar value.
-pub fn rad<T>(v: T) -> Radians<T> { Length::new(v) }
-
-/// Convenience function to create an angle in degrees from a scalar value.
-pub fn deg<T>(v: T) -> Degrees<T> { Length::new(v) }
