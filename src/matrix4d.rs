@@ -570,10 +570,13 @@ impl<T: PartialEq, Src, Dst> PartialEq for TypedMatrix4D<T, Src, Dst> {
 #[cfg(test)]
 mod tests {
     use point::Point2D;
+    use Radians;
     use super::*;
-    use rad;
 
     type Mf32 = Matrix4D<f32>;
+
+    // For convenience.
+    fn rad(v: f32) -> Radians<f32> { Radians::new(v) }
 
     #[test]
     pub fn test_ortho() {
