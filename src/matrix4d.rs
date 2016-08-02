@@ -529,7 +529,7 @@ impl<T: Copy, Src, Dst> TypedMatrix4D<T, Src, Dst> {
     /// as arrays.
     ///
     /// This is a convenience method to interface with other libraries like glium.
-    pub fn to_row_major_arrays(&self) -> [[T; 4];4] {
+    pub fn to_row_arrays(&self) -> [[T; 4];4] {
         [
             [self.m11, self.m12, self.m13, self.m14],
             [self.m21, self.m22, self.m23, self.m24],
@@ -542,7 +542,7 @@ impl<T: Copy, Src, Dst> TypedMatrix4D<T, Src, Dst> {
     /// or 4 rows in column-major order) as arrays.
     ///
     /// This is a convenience method to interface with other libraries like glium.
-    pub fn to_column_major_arrays(&self) -> [[T; 4]; 4] {
+    pub fn to_column_arrays(&self) -> [[T; 4]; 4] {
         [
             [self.m11, self.m21, self.m31, self.m41],
             [self.m12, self.m22, self.m32, self.m42],
