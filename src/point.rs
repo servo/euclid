@@ -244,7 +244,7 @@ impl<T: NumCast + Copy, U> TypedPoint2D<T, U> {
     /// Cast from one numeric representation to another, preserving the units.
     ///
     /// When casting from floating point to integer coordinates, the decimals are truncated
-    /// as one would expect from a simple cast, but this behavior does not always marke sense
+    /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using round(), ceil or floor() before casting.
     pub fn cast<NewT: NumCast + Copy>(&self) -> Option<TypedPoint2D<NewT, U>> {
         match (NumCast::from(self.x), NumCast::from(self.y)) {
@@ -478,7 +478,7 @@ impl<T: NumCast + Copy, U> TypedPoint3D<T, U> {
     /// Cast from one numeric representation to another, preserving the units.
     ///
     /// When casting from floating point to integer coordinates, the decimals are truncated
-    /// as one would expect from a simple cast, but this behavior does not always marke sense
+    /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using round(), ceil or floor() before casting.
     pub fn cast<NewT: NumCast + Copy>(&self) -> Option<TypedPoint3D<NewT, U>> {
         match (NumCast::from(self.x),
@@ -718,7 +718,7 @@ impl<T: NumCast + Copy, U> TypedPoint4D<T, U> {
     /// Cast from one numeric representation to another, preserving the units.
     ///
     /// When casting from floating point to integer coordinates, the decimals are truncated
-    /// as one would expect from a simple cast, but this behavior does not always marke sense
+    /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using round(), ceil or floor() before casting.
     pub fn cast<NewT: NumCast + Copy>(&self) -> Option<TypedPoint4D<NewT, U>> {
         match (NumCast::from(self.x),

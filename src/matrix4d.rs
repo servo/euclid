@@ -524,7 +524,6 @@ impl<T: Copy, Src, Dst> TypedMatrix4D<T, Src, Dst> {
         ]
     }
 
-
     /// Returns an array containing this matrix's 4 rows in (in row-major order)
     /// as arrays.
     ///

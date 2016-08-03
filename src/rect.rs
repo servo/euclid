@@ -324,7 +324,7 @@ impl<T0: NumCast + Copy, Unit> TypedRect<T0, Unit> {
     /// Cast from one numeric representation to another, preserving the units.
     ///
     /// When casting from floating point to integer coordinates, the decimals are truncated
-    /// as one would expect from a simple cast, but this behavior does not always marke sense
+    /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using round(), round_in or round_out() before casting.
     pub fn cast<T1: NumCast + Copy>(&self) -> Option<TypedRect<T1, Unit>> {
         match (self.origin.cast(), self.size.cast()) {

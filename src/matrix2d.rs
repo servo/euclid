@@ -52,7 +52,7 @@ impl<T: Copy, Src, Dst> TypedMatrix2D<T, Src, Dst> {
     }
 
     /// Create a matrix specifying its components in column-major order.
-    pub fn colum_major(m11: T, m21: T, m31: T, m12: T, m22: T, m32: T) -> TypedMatrix2D<T, Src, Dst> {
+    pub fn column_major(m11: T, m21: T, m31: T, m12: T, m22: T, m32: T) -> TypedMatrix2D<T, Src, Dst> {
         TypedMatrix2D {
             m11: m11, m12: m12,
             m21: m21, m22: m22,
