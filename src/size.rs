@@ -16,7 +16,7 @@ use std::fmt;
 use std::ops::{Mul, Div};
 use std::marker::PhantomData;
 
-define_vector! {
+define_matrix! {
     #[derive(RustcDecodable, RustcEncodable)]
     pub struct TypedSize2D<T, U> {
         pub width: T,
