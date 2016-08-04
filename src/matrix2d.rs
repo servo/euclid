@@ -16,6 +16,7 @@ use std::ops::{Add, Mul, Sub};
 use std::marker::PhantomData;
 
 define_matrix! {
+    #[derive(Clone, Copy, Eq, Hash, PartialEq)]
     pub struct TypedMatrix2D<T, Src, Dst> {
         pub m11: T, pub m12: T,
         pub m21: T, pub m22: T,
