@@ -20,7 +20,7 @@ use std::ops::{AddAssign, SubAssign};
 use std::marker::PhantomData;
 use std::fmt;
 
-#[derive(RustcDecodable, RustcEncodable)]
+#[derive(Clone, Copy, RustcDecodable, RustcEncodable)]
 pub struct UnknownUnit;
 
 /// A one-dimensional distance, with value represented by `T` and unit of measurement `Unit`.
@@ -36,7 +36,7 @@ pub struct UnknownUnit;
 /// another. See the `ScaleFactor` docs for an example.
 // Uncomment the derive, and remove the macro call, once heapsize gets
 // PhantomData<T> support.
-#[derive(RustcDecodable, RustcEncodable)]
+#[derive(Clone, Copy, RustcDecodable, RustcEncodable)]
 pub struct Length<T, Unit>(pub T, PhantomData<Unit>);
 
 impl<Unit, T: HeapSizeOf> HeapSizeOf for Length<T, Unit> {
@@ -63,8 +63,6 @@ impl<T, Unit> Length<T, Unit> {
         Length(x, PhantomData)
     }
 }
-
-impl<T: Copy, Unit> Copy for Length<T, Unit> {}
 
 impl<Unit, T: Clone> Length<T, Unit> {
     pub fn get(&self) -> T {
@@ -154,15 +152,6 @@ impl<Unit, T0: NumCast + Clone> Length<T0, Unit> {
     /// Cast from one numeric representation to another, preserving the units.
     pub fn cast<T1: NumCast + Clone>(&self) -> Option<Length<T1, Unit>> {
         NumCast::from(self.get()).map(Length::new)
-    }
-}
-
-// FIXME: Switch to `derive(Clone, PartialEq, PartialOrd, Zero)` after this Rust issue is fixed:
-// https://github.com/mozilla/rust/issues/7671
-
-impl<Unit, T: Clone> Clone for Length<T, Unit> {
-    fn clone(&self) -> Length<T, Unit> {
-        Length::new(self.get())
     }
 }
 
