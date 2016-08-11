@@ -20,7 +20,7 @@ use std::ops::{AddAssign, SubAssign};
 use std::marker::PhantomData;
 use std::fmt;
 
-#[derive(Clone, Copy, RustcDecodable, RustcEncodable)]
+#[derive(Clone, Copy, RustcDecodable, RustcEncodable, PartialEq)]
 pub struct UnknownUnit;
 
 /// A one-dimensional distance, with value represented by `T` and unit of measurement `Unit`.
