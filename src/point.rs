@@ -16,8 +16,6 @@ use num_traits::{Float, NumCast};
 use std::fmt;
 use std::ops::{Add, Neg, Mul, Sub, Div};
 use std::marker::PhantomData;
-use std::cmp::{PartialEq, Eq};
-use std::hash::{Hash, Hasher};
 
 define_matrix! {
     #[derive(RustcDecodable, RustcEncodable)]
@@ -28,29 +26,6 @@ define_matrix! {
 }
 
 pub type Point2D<T> = TypedPoint2D<T, UnknownUnit>;
-
-impl<T: Copy, U> Copy for TypedPoint2D<T, U> {}
-
-impl<T: Clone, U> Clone for TypedPoint2D<T, U> {
-    fn clone(&self) -> TypedPoint2D<T, U> {
-        TypedPoint2D::new(self.x.clone(), self.y.clone())
-    }
-}
-
-impl<T: PartialEq, U> PartialEq<TypedPoint2D<T, U>> for TypedPoint2D<T, U> {
-    fn eq(&self, other: &TypedPoint2D<T, U>) -> bool {
-        self.x.eq(&other.x) && self.y.eq(&other.y)
-    }
-}
-
-impl<T: Eq, U> Eq for TypedPoint2D<T, U> {}
-
-impl<T: Hash, U> Hash for TypedPoint2D<T, U> {
-    fn hash<H: Hasher>(&self, h: &mut H) {
-        self.x.hash(h);
-        self.y.hash(h);
-    }
-}
 
 impl<T: Zero, U> TypedPoint2D<T, U> {
     pub fn zero() -> TypedPoint2D<T, U> {
@@ -223,36 +198,12 @@ define_matrix! {
 
 pub type Point3D<T> = TypedPoint3D<T, UnknownUnit>;
 
-impl<T: Hash, U> Hash for TypedPoint3D<T, U> {
-    fn hash<H: Hasher>(&self, h: &mut H) {
-        self.x.hash(h);
-        self.y.hash(h);
-        self.z.hash(h);
-    }
-}
-
 impl<T: Zero, U> TypedPoint3D<T, U> {
     #[inline]
     pub fn zero() -> TypedPoint3D<T, U> {
         TypedPoint3D::new(Zero::zero(), Zero::zero(), Zero::zero())
     }
 }
-
-impl<T: Copy, U> Copy for TypedPoint3D<T, U> {}
-
-impl<T: Clone, U> Clone for TypedPoint3D<T, U> {
-    fn clone(&self) -> TypedPoint3D<T, U> {
-        TypedPoint3D::new(self.x.clone(), self.y.clone(), self.z.clone())
-    }
-}
-
-impl<T: PartialEq, U> PartialEq<TypedPoint3D<T, U>> for TypedPoint3D<T, U> {
-    fn eq(&self, other: &TypedPoint3D<T, U>) -> bool {
-        self.x.eq(&other.x) && self.y.eq(&other.y) && self.z.eq(&other.z)
-    }
-}
-
-impl<T: Eq, U> Eq for TypedPoint3D<T, U> {}
 
 impl<T: fmt::Debug, U> fmt::Debug for TypedPoint3D<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -366,34 +317,6 @@ define_matrix! {
 }
 
 pub type Point4D<T> = TypedPoint4D<T, UnknownUnit>;
-
-impl<T: Copy, U> Copy for TypedPoint4D<T, U> {}
-
-impl<T: Clone, U> Clone for TypedPoint4D<T, U> {
-    fn clone(&self) -> TypedPoint4D<T, U> {
-        TypedPoint4D::new(self.x.clone(),
-                          self.y.clone(),
-                          self.z.clone(),
-                          self.w.clone())
-    }
-}
-
-impl<T: PartialEq, U> PartialEq<TypedPoint4D<T, U>> for TypedPoint4D<T, U> {
-    fn eq(&self, other: &TypedPoint4D<T, U>) -> bool {
-        self.x.eq(&other.x) && self.y.eq(&other.y) && self.z.eq(&other.z) && self.w.eq(&other.w)
-    }
-}
-
-impl<T: Eq, U> Eq for TypedPoint4D<T, U> {}
-
-impl<T: Hash, U> Hash for TypedPoint4D<T, U> {
-    fn hash<H: Hasher>(&self, h: &mut H) {
-        self.x.hash(h);
-        self.y.hash(h);
-        self.z.hash(h);
-        self.w.hash(h);
-    }
-}
 
 impl<T: Zero, U> TypedPoint4D<T, U> {
     #[inline]
@@ -543,9 +466,7 @@ mod typedpoint2d {
     use super::TypedPoint2D;
     use scale_factor::ScaleFactor;
 
-    #[derive(Debug, Copy, Clone)]
     pub enum Mm {}
-    #[derive(Debug, Copy, Clone)]
     pub enum Cm {}
 
     pub type Point2DMm<T> = TypedPoint2D<T, Mm>;

@@ -13,6 +13,7 @@ use num::One;
 use heapsize::HeapSizeOf;
 use num_traits::NumCast;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use std::fmt;
 use std::ops::{Add, Mul, Sub, Div};
 use std::marker::PhantomData;
 
@@ -35,9 +36,7 @@ use std::marker::PhantomData;
 /// let one_foot: Length<f32, Inch> = Length::new(12.0);
 /// let one_foot_in_mm: Length<f32, Mm> = one_foot * mm_per_inch;
 /// ```
-// Uncomment the derive, and remove the macro call, once heapsize gets
-// PhantomData<T> support.
-#[derive(Copy, RustcDecodable, RustcEncodable, Debug)]
+#[derive(RustcDecodable, RustcEncodable)]
 pub struct ScaleFactor<T, Src, Dst>(pub T, PhantomData<(Src, Dst)>);
 
 impl<T: HeapSizeOf, Src, Dst> HeapSizeOf for ScaleFactor<T, Src, Dst> {
@@ -117,9 +116,9 @@ impl<T: NumCast + Clone, Src, Dst0> ScaleFactor<T, Src, Dst0> {
 // FIXME: Switch to `derive(PartialEq, Clone)` after this Rust issue is fixed:
 // https://github.com/mozilla/rust/issues/7671
 
-impl<T: Clone + PartialEq, Src, Dst> PartialEq for ScaleFactor<T, Src, Dst> {
+impl<T: PartialEq, Src, Dst> PartialEq for ScaleFactor<T, Src, Dst> {
     fn eq(&self, other: &ScaleFactor<T, Src, Dst>) -> bool {
-        self.get().eq(&other.get())
+        self.0 == other.0
     }
 }
 
@@ -129,15 +128,26 @@ impl<T: Clone, Src, Dst> Clone for ScaleFactor<T, Src, Dst> {
     }
 }
 
+impl<T: Copy, Src, Dst> Copy for ScaleFactor<T, Src, Dst> {}
+
+impl<T: fmt::Debug, Src, Dst> fmt::Debug for ScaleFactor<T, Src, Dst> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        self.0.fmt(f)
+    }
+}
+
+impl<T: fmt::Display, Src, Dst> fmt::Display for ScaleFactor<T, Src, Dst> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        self.0.fmt(f)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::ScaleFactor;
 
-    #[derive(Debug)]
     enum Inch {}
-    #[derive(Debug)]
     enum Cm {}
-    #[derive(Debug)]
     enum Mm {}
 
     #[test]

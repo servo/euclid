@@ -47,12 +47,6 @@ impl<T, Src, Dst> TypedMatrix4D<T, Src, Dst> {
     }
 }
 
-impl<T: Copy, Src, Dst> Copy for TypedMatrix4D<T, Src, Dst> {}
-
-impl<T: Copy, Src, Dst> Clone for TypedMatrix4D<T, Src, Dst> {
-    fn clone(&self) -> Self { *self }
-}
-
 impl <T, Src, Dst> TypedMatrix4D<T, Src, Dst>
 where T: Copy + Clone +
          Add<T, Output=T> +
@@ -420,15 +414,6 @@ impl<T: Copy, Src, Dst> TypedMatrix4D<T, Src, Dst> {
 impl<T: Copy + fmt::Debug, Src, Dst> fmt::Debug for TypedMatrix4D<T, Src, Dst> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         self.to_array().fmt(f)
-    }
-}
-
-impl<T: PartialEq, Src, Dst> PartialEq for TypedMatrix4D<T, Src, Dst> {
-    fn eq(&self, other: &Self) -> bool {
-        self.m11 == other.m11 && self.m12 == other.m12 && self.m13 == other.m13 && self.m14 == other.m14 &&
-        self.m21 == other.m21 && self.m22 == other.m22 && self.m23 == other.m23 && self.m24 == other.m24 &&
-        self.m31 == other.m31 && self.m32 == other.m32 && self.m33 == other.m33 && self.m34 == other.m34 &&
-        self.m41 == other.m41 && self.m42 == other.m42 && self.m43 == other.m43 && self.m44 == other.m44
     }
 }
 
