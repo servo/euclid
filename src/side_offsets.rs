@@ -11,6 +11,7 @@
 //! and margins in CSS.
 
 use num::Zero;
+use std::fmt;
 use std::ops::Add;
 use std::marker::PhantomData;
 use length::{Length, UnknownUnit};
@@ -21,12 +22,18 @@ use heapsize::HeapSizeOf;
 /// A group of side offsets, which correspond to top/left/bottom/right for borders, padding,
 /// and margins in CSS.
 define_matrix! {
-    #[derive(Clone, Debug)]
     pub struct TypedSideOffsets2D<T, U> {
         pub top: T,
         pub right: T,
         pub bottom: T,
         pub left: T,
+    }
+}
+
+impl<T: fmt::Debug, U> fmt::Debug for TypedSideOffsets2D<T, U> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "({:?},{:?},{:?},{:?})",
+               self.top, self.right, self.bottom, self.left)
     }
 }
 

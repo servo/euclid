@@ -20,6 +20,17 @@ macro_rules! define_matrix {
             _unit: PhantomData<($($phantom),+)>
         }
 
+        impl<T: Clone, $($phantom),+> Clone for $name<T, $($phantom),+> {
+            fn clone(&self) -> Self {
+                $name {
+                    $($field: self.$field.clone(),)+
+                    _unit: PhantomData,
+                }
+            }
+        }
+
+        impl<T: Copy, $($phantom),+> Copy for $name<T, $($phantom),+> {}
+
         impl<T, $($phantom),+> ::heapsize::HeapSizeOf for $name<T, $($phantom),+>
             where T: ::heapsize::HeapSizeOf
         {
@@ -50,6 +61,25 @@ macro_rules! define_matrix {
                 where S: ::serde::Serializer
             {
                 ($(&self.$field,)+).serialize(serializer)
+            }
+        }
+
+        impl<T, $($phantom),+> ::std::cmp::Eq for $name<T, $($phantom),+>
+            where T: ::std::cmp::Eq {}
+
+        impl<T, $($phantom),+> ::std::cmp::PartialEq for $name<T, $($phantom),+>
+            where T: ::std::cmp::PartialEq
+        {
+            fn eq(&self, other: &Self) -> bool {
+                true $(&& self.$field == other.$field)+
+            }
+        }
+
+        impl<T, $($phantom),+> ::std::hash::Hash for $name<T, $($phantom),+>
+            where T: ::std::hash::Hash
+        {
+            fn hash<H: ::std::hash::Hasher>(&self, h: &mut H) {
+                $(self.$field.hash(h);)+
             }
         }
     )

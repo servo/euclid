@@ -26,22 +26,6 @@ define_matrix! {
 
 pub type Size2D<T> = TypedSize2D<T, UnknownUnit>;
 
-impl<T: Copy, U> Copy for TypedSize2D<T, U> {}
-
-impl<T: Clone, U> Clone for TypedSize2D<T, U> {
-    fn clone(&self) -> TypedSize2D<T, U> {
-        TypedSize2D::new(self.width.clone(), self.height.clone())
-    }
-}
-
-impl<T: PartialEq, U> PartialEq<TypedSize2D<T, U>> for TypedSize2D<T, U> {
-    fn eq(&self, other: &TypedSize2D<T, U>) -> bool {
-        self.width.eq(&other.width) && self.height.eq(&other.height)
-    }
-}
-
-impl<T: Eq, U> Eq for TypedSize2D<T, U> {}
-
 impl<T: fmt::Debug, U> fmt::Debug for TypedSize2D<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{:?}×{:?}", self.width, self.height)

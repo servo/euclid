@@ -36,8 +36,16 @@ pub struct UnknownUnit;
 /// another. See the `ScaleFactor` docs for an example.
 // Uncomment the derive, and remove the macro call, once heapsize gets
 // PhantomData<T> support.
-#[derive(Clone, Copy, RustcDecodable, RustcEncodable)]
+#[derive(RustcDecodable, RustcEncodable)]
 pub struct Length<T, Unit>(pub T, PhantomData<Unit>);
+
+impl<T: Clone, Unit> Clone for Length<T, Unit> {
+    fn clone(&self) -> Self {
+        Length(self.0.clone(), PhantomData)
+    }
+}
+
+impl<T: Copy, Unit> Copy for Length<T, Unit> {}
 
 impl<Unit, T: HeapSizeOf> HeapSizeOf for Length<T, Unit> {
     fn heap_size_of_children(&self) -> usize {
@@ -182,9 +190,7 @@ mod tests {
     use super::Length;
     use scale_factor::ScaleFactor;
 
-    #[derive(Debug, Copy, Clone)]
     enum Inch {}
-    #[derive(Debug, Copy, Clone)]
     enum Mm {}
 
     #[test]
