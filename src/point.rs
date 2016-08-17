@@ -7,6 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+use approxeq::ApproxEq;
 use length::{Length, UnknownUnit};
 use scale_factor::ScaleFactor;
 use size::TypedSize2D;
@@ -411,6 +412,23 @@ impl<T: Clone, U> TypedPoint4D<T, U> {
         TypedPoint4D::new(p.x.clone(), p.y.clone(), p.z.clone(), p.w.clone())
     }
 }
+
+    impl<T: ApproxEq<T>, U> ApproxEq<T> for TypedPoint4D<T, U> {
+        fn approx_epsilon() -> T {
+            T::approx_epsilon()
+        }
+
+        fn approx_eq_eps(&self, other: &Self, approx_epsilon: &T) -> bool {
+            self.x.approx_eq_eps(&other.x, approx_epsilon)
+            && self.y.approx_eq_eps(&other.y, approx_epsilon)
+            && self.z.approx_eq_eps(&other.z, approx_epsilon)
+            && self.w.approx_eq_eps(&other.w, approx_epsilon)
+        }
+
+        fn approx_eq(&self, other: &Self) -> bool {
+            self.approx_eq_eps(&other, &Self::approx_epsilon())
+        }
+    }
 
 #[cfg(test)]
 mod point2d {
