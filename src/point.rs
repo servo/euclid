@@ -8,11 +8,11 @@
 // except according to those terms.
 
 use super::UnknownUnit;
+use approxeq::ApproxEq;
 use length::Length;
 use scale_factor::ScaleFactor;
 use size::TypedSize2D;
 use num::*;
-use approxeq::ApproxEq;
 use num_traits::{Float, NumCast};
 use std::fmt;
 use std::ops::{Add, Neg, Mul, Sub, Div};
@@ -728,6 +728,23 @@ impl<T: NumCast + Copy, U> TypedPoint4D<T, U> {
     /// conversion behavior.
     pub fn to_i64(&self) -> TypedPoint4D<i64, U> {
         self.cast().unwrap()
+    }
+}
+
+impl<T: ApproxEq<T>, U> ApproxEq<T> for TypedPoint4D<T, U> {
+    fn approx_epsilon() -> T {
+        T::approx_epsilon()
+    }
+
+    fn approx_eq_eps(&self, other: &Self, approx_epsilon: &T) -> bool {
+        self.x.approx_eq_eps(&other.x, approx_epsilon)
+        && self.y.approx_eq_eps(&other.y, approx_epsilon)
+        && self.z.approx_eq_eps(&other.z, approx_epsilon)
+        && self.w.approx_eq_eps(&other.w, approx_epsilon)
+    }
+
+    fn approx_eq(&self, other: &Self) -> bool {
+        self.approx_eq_eps(&other, &Self::approx_epsilon())
     }
 }
 
