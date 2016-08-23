@@ -12,7 +12,7 @@ use length::Length;
 use scale_factor::ScaleFactor;
 use size::TypedSize2D;
 use num::*;
-
+use approxeq::ApproxEq;
 use num_traits::{Float, NumCast};
 use std::fmt;
 use std::ops::{Add, Neg, Mul, Sub, Div};
@@ -261,6 +261,23 @@ impl<T: NumCast + Copy, U> TypedPoint2D<T, U> {
     }
 }
 
+impl<T: Copy+ApproxEq<T>, U> ApproxEq<TypedPoint2D<T, U>> for TypedPoint2D<T, U> {
+    #[inline]
+    fn approx_epsilon() -> Self {
+        TypedPoint2D::new(T::approx_epsilon(), T::approx_epsilon())
+    }
+
+    #[inline]
+    fn approx_eq(&self, other: &Self) -> bool {
+        self.x.approx_eq(&other.x) && self.y.approx_eq(&other.y)
+    }
+
+    #[inline]
+    fn approx_eq_eps(&self, other: &Self, eps: &Self) -> bool {
+        self.x.approx_eq_eps(&other.x, &eps.x) && self.y.approx_eq_eps(&other.y, &eps.y)
+    }
+}
+
 define_matrix! {
     /// A 3d Point tagged with a unit.
     #[derive(RustcDecodable, RustcEncodable)]
@@ -472,6 +489,27 @@ impl<T: NumCast + Copy, U> TypedPoint3D<T, U> {
     /// conversion behavior.
     pub fn to_i64(&self) -> TypedPoint3D<i64, U> {
         self.cast().unwrap()
+    }
+}
+
+impl<T: Copy+ApproxEq<T>, U> ApproxEq<TypedPoint3D<T, U>> for TypedPoint3D<T, U> {
+    #[inline]
+    fn approx_epsilon() -> Self {
+        TypedPoint3D::new(T::approx_epsilon(), T::approx_epsilon(), T::approx_epsilon())
+    }
+
+    #[inline]
+    fn approx_eq(&self, other: &Self) -> bool {
+        self.x.approx_eq(&other.x)
+            && self.y.approx_eq(&other.y)
+            && self.z.approx_eq(&other.z)
+    }
+
+    #[inline]
+    fn approx_eq_eps(&self, other: &Self, eps: &Self) -> bool {
+        self.x.approx_eq_eps(&other.x, &eps.x)
+            && self.y.approx_eq_eps(&other.y, &eps.y)
+            && self.z.approx_eq_eps(&other.z, &eps.z)
     }
 }
 

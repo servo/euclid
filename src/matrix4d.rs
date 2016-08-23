@@ -553,14 +553,69 @@ impl<T: Copy + fmt::Debug, Src, Dst> fmt::Debug for TypedMatrix4D<T, Src, Dst> {
 
 #[cfg(test)]
 mod tests {
-    use point::Point2D;
+    use point::{Point2D, Point3D};
+    use matrix2d::Matrix2D;
     use Radians;
     use super::*;
+    use approxeq::ApproxEq;
+
+    use std::f32::consts::FRAC_PI_2;
 
     type Mf32 = Matrix4D<f32>;
 
     // For convenience.
     fn rad(v: f32) -> Radians<f32> { Radians::new(v) }
+
+    #[test]
+    pub fn test_translation() {
+        let t1 = Mf32::create_translation(1.0, 2.0, 3.0);
+        let t2 = Mf32::identity().pre_translated(1.0, 2.0, 3.0);
+        let t3 = Mf32::identity().post_translated(1.0, 2.0, 3.0);
+        assert_eq!(t1, t2);
+        assert_eq!(t1, t3);
+
+        assert_eq!(t1.transform_point3d(&Point3D::new(1.0, 1.0, 1.0)), Point3D::new(2.0, 3.0, 4.0));
+        assert_eq!(t1.transform_point(&Point2D::new(1.0, 1.0)), Point2D::new(2.0, 3.0));
+
+        assert_eq!(t1.post_mul(&t1), Mf32::create_translation(2.0, 4.0, 6.0));
+
+        assert!(!t1.is_2d());
+        assert_eq!(Mf32::create_translation(1.0, 2.0, 3.0).to_2d(), Matrix2D::create_translation(1.0, 2.0));
+    }
+
+    #[test]
+    pub fn test_rotation() {
+        let r1 = Mf32::create_rotation(0.0, 0.0, 1.0, rad(FRAC_PI_2));
+        let r2 = Mf32::identity().pre_rotated(0.0, 0.0, 1.0, rad(FRAC_PI_2));
+        let r3 = Mf32::identity().post_rotated(0.0, 0.0, 1.0, rad(FRAC_PI_2));
+        assert_eq!(r1, r2);
+        assert_eq!(r1, r3);
+
+        assert!(r1.transform_point3d(&Point3D::new(1.0, 2.0, 3.0)).approx_eq(&Point3D::new(2.0, -1.0, 3.0)));
+        assert!(r1.transform_point(&Point2D::new(1.0, 2.0)).approx_eq(&Point2D::new(2.0, -1.0)));
+
+        assert!(r1.post_mul(&r1).approx_eq(&Mf32::create_rotation(0.0, 0.0, 1.0, rad(FRAC_PI_2*2.0))));
+
+        assert!(r1.is_2d());
+        assert!(r1.to_2d().approx_eq(&Matrix2D::create_rotation(rad(FRAC_PI_2))));
+    }
+
+    #[test]
+    pub fn test_scale() {
+        let s1 = Mf32::create_scale(2.0, 3.0, 4.0);
+        let s2 = Mf32::identity().pre_scaled(2.0, 3.0, 4.0);
+        let s3 = Mf32::identity().post_scaled(2.0, 3.0, 4.0);
+        assert_eq!(s1, s2);
+        assert_eq!(s1, s3);
+
+        assert!(s1.transform_point3d(&Point3D::new(2.0, 2.0, 2.0)).approx_eq(&Point3D::new(4.0, 6.0, 8.0)));
+        assert!(s1.transform_point(&Point2D::new(2.0, 2.0)).approx_eq(&Point2D::new(4.0, 6.0)));
+
+        assert_eq!(s1.post_mul(&s1), Mf32::create_scale(4.0, 9.0, 16.0));
+
+        assert!(!s1.is_2d());
+        assert_eq!(Mf32::create_scale(2.0, 3.0, 0.0).to_2d(), Matrix2D::create_scale(2.0, 3.0));
+    }
 
     #[test]
     pub fn test_ortho() {
@@ -594,6 +649,24 @@ mod tests {
             5.0, 6.0, 0.0, 1.0
         );
         assert_eq!(m1, m2);
+    }
+
+    #[test]
+    fn test_column_major() {
+        assert_eq!(
+            Mf32::row_major(
+                1.0,  2.0,  3.0,  4.0,
+                5.0,  6.0,  7.0,  8.0,
+                9.0,  10.0, 11.0, 12.0,
+                13.0, 14.0, 15.0, 16.0,
+            ),
+            Mf32::column_major(
+                1.0,  5.0,  9.0,  13.0,
+                2.0,  6.0,  10.0, 14.0,
+                3.0,  7.0,  11.0, 15.0,
+                4.0,  8.0,  12.0, 16.0,
+            )
+        );
     }
 
     #[test]
@@ -639,9 +712,35 @@ mod tests {
     }
 
     #[test]
+    fn test_inverse_none() {
+        assert!(Mf32::create_scale(2.0, 0.0, 2.0).inverse().is_none());
+        assert!(Mf32::create_scale(2.0, 2.0, 2.0).inverse().is_some());
+    }
+
+    #[test]
     pub fn test_pre_post() {
         let m1 = Matrix4D::identity().post_scaled(1.0, 2.0, 3.0).post_translated(1.0, 2.0, 3.0);
         let m2 = Matrix4D::identity().pre_translated(1.0, 2.0, 3.0).pre_scaled(1.0, 2.0, 3.0);
         assert!(m1.approx_eq(&m2));
+
+        let r = Mf32::create_rotation(0.0, 0.0, 1.0, rad(FRAC_PI_2));
+        let t = Mf32::create_translation(2.0, 3.0, 0.0);
+
+        let a = Point3D::new(1.0, 1.0, 1.0);
+
+        assert!(r.post_mul(&t).transform_point3d(&a).approx_eq(&Point3D::new(3.0, 2.0, 1.0)));
+        assert!(t.post_mul(&r).transform_point3d(&a).approx_eq(&Point3D::new(4.0, -3.0, 1.0)));
+        assert!(t.post_mul(&r).transform_point3d(&a).approx_eq(&r.transform_point3d(&t.transform_point3d(&a))));
+
+        assert!(r.pre_mul(&t).transform_point3d(&a).approx_eq(&Point3D::new(4.0, -3.0, 1.0)));
+        assert!(t.pre_mul(&r).transform_point3d(&a).approx_eq(&Point3D::new(3.0, 2.0, 1.0)));
+        assert!(t.pre_mul(&r).transform_point3d(&a).approx_eq(&t.transform_point3d(&r.transform_point3d(&a))));
+    }
+
+    #[test]
+    fn test_size_of() {
+        use std::mem::size_of;
+        assert_eq!(size_of::<Matrix4D<f32>>(), 16*size_of::<f32>());
+        assert_eq!(size_of::<Matrix4D<f64>>(), 16*size_of::<f64>());
     }
 }
