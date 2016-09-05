@@ -151,8 +151,8 @@ where T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output=T> + Sub<T
         let lower_right_x = min(self.max_x(), other.max_x());
         let lower_right_y = min(self.max_y(), other.max_y());
 
-        Some(TypedRect::new(upper_left.clone(), TypedSize2D::new(lower_right_x - upper_left.x,
-                                                            lower_right_y - upper_left.y)))
+        Some(TypedRect::new(upper_left, TypedSize2D::new(lower_right_x - upper_left.x,
+                                                    lower_right_y - upper_left.y)))
     }
 
     /// Translates the rect by a vector.
@@ -203,7 +203,7 @@ where T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output=T> + Sub<T
 
     #[inline]
     pub fn bottom_left(&self) -> TypedPoint2D<T, U> {
-        TypedPoint2D::new(self.origin.x.clone(), self.max_y())
+        TypedPoint2D::new(self.origin.x, self.max_y())
     }
 
     #[inline]
@@ -222,10 +222,10 @@ where T: Copy + Clone + PartialOrd + Add<T, Output=T> + Sub<T, Output=T> + Zero 
     #[inline]
     pub fn union(&self, other: &TypedRect<T, U>) -> TypedRect<T, U> {
         if self.size == Zero::zero() {
-            return other.clone();
+            return *other;
         }
         if other.size == Zero::zero() {
-            return self.clone();
+            return *self;
         }
 
         let upper_left = TypedPoint2D::new(min(self.min_x(), other.min_x()),
@@ -296,7 +296,7 @@ impl<T: Copy + Mul<T, Output=T>, U1, U2> Mul<ScaleFactor<T, U1, U2>> for TypedRe
     type Output = TypedRect<T, U2>;
     #[inline]
     fn mul(self, scale: ScaleFactor<T, U1, U2>) -> TypedRect<T, U2> {
-        TypedRect::new(self.origin * scale.clone(), self.size * scale.clone())
+        TypedRect::new(self.origin * scale, self.size * scale)
     }
 }
 
@@ -304,7 +304,7 @@ impl<T: Copy + Div<T, Output=T>, U1, U2> Div<ScaleFactor<T, U1, U2>> for TypedRe
     type Output = TypedRect<T, U1>;
     #[inline]
     fn div(self, scale: ScaleFactor<T, U1, U2>) -> TypedRect<T, U1> {
-        TypedRect::new(self.origin / scale.clone(), self.size / scale.clone())
+        TypedRect::new(self.origin / scale, self.size / scale)
     }
 }
 
