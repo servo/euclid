@@ -19,7 +19,7 @@
 //! the generic Unit parameter.
 //!
 //! This unit system is not mandatory and all Typed* structures have an alias
-//! with the default unit: UnknownUnit.
+//! with the default unit: `UnknownUnit`.
 //! for example ```Point2D<T>``` is equivalent to ```TypedPoint2D<T, UnknownUnit>```.
 //! Client code typically creates a set of aliases for each type and doesn't need
 //! to deal with the specifics of typed units further. For example:

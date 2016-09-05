@@ -29,7 +29,7 @@ define_matrix! {
 
 /// Default 2d point type with no unit.
 ///
-/// Point2D provides the same methods as TypedPoint2D.
+/// `Point2D` provides the same methods as `TypedPoint2D`.
 pub type Point2D<T> = TypedPoint2D<T, UnknownUnit>;
 
 impl<T: Copy + Zero, U> TypedPoint2D<T, U> {
@@ -273,7 +273,7 @@ define_matrix! {
 
 /// Default 3d point type with no unit.
 ///
-/// Point3D provides the same methods as TypedPoint3D.
+/// `Point3D` provides the same methods as `TypedPoint3D`.
 pub type Point3D<T> = TypedPoint3D<T, UnknownUnit>;
 
 impl<T: Copy + Zero, U> TypedPoint3D<T, U> {
@@ -488,7 +488,7 @@ define_matrix! {
 
 /// Default 4d point with no unit.
 ///
-/// Point4D provides the same methods as TypedPoint4D.
+/// `Point4D` provides the same methods as `TypedPoint4D`.
 pub type Point4D<T> = TypedPoint4D<T, UnknownUnit>;
 
 impl<T: Copy + Zero, U> TypedPoint4D<T, U> {

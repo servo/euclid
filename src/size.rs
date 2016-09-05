@@ -28,7 +28,7 @@ define_matrix! {
 
 /// Default 2d size type with no unit.
 ///
-/// Size2D provides the same methods as TypedSize2D.
+/// `Size2D` provides the same methods as `TypedSize2D`.
 pub type Size2D<T> = TypedSize2D<T, UnknownUnit>;
 
 impl<T: fmt::Debug, U> fmt::Debug for TypedSize2D<T, U> {
@@ -172,7 +172,7 @@ impl<T: NumCast + Copy, Unit> TypedSize2D<T, Unit> {
     /// as one would expect from a simple cast, but this behavior does not always marke sense
     /// geometrically. Consider using round(), ceil or floor() before casting.
     pub fn cast<NewT: NumCast + Copy>(&self) -> Option<TypedSize2D<NewT, Unit>> {
-        match (NumCast::from(self.width.clone()), NumCast::from(self.height.clone())) {
+        match (NumCast::from(self.width), NumCast::from(self.height)) {
             (Some(w), Some(h)) => Some(TypedSize2D::new(w, h)),
             _ => None
         }
