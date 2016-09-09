@@ -16,6 +16,7 @@ use std::ops::{Add, Mul, Div, Sub};
 use std::marker::PhantomData;
 use approxeq::ApproxEq;
 use trig::Trig;
+use std::fmt;
 
 define_matrix! {
     /// A 2d transform stored as a 2 by 3 matrix in row-major order in memory,
@@ -293,11 +294,76 @@ impl<T: ApproxEq<T>, Src, Dst> TypedMatrix2D<T, Src, Dst> {
     }
 }
 
+impl<T: Copy + fmt::Debug, Src, Dst> fmt::Debug for TypedMatrix2D<T, Src, Dst> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        self.to_row_major_array().fmt(f)
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
+    use approxeq::ApproxEq;
+    use point::Point2D;
+    use Radians;
+
+    use std::f32::consts::FRAC_PI_2;
 
     type Mat = Matrix2D<f32>;
+
+    fn rad(v: f32) -> Radians<f32> { Radians::new(v) }
+
+    #[test]
+    pub fn test_translation() {
+        let t1 = Mat::create_translation(1.0, 2.0);
+        let t2 = Mat::identity().pre_translated(1.0, 2.0);
+        let t3 = Mat::identity().post_translated(1.0, 2.0);
+        assert_eq!(t1, t2);
+        assert_eq!(t1, t3);
+
+        assert_eq!(t1.transform_point(&Point2D::new(1.0, 1.0)), Point2D::new(2.0, 3.0));
+
+        assert_eq!(t1.post_mul(&t1), Mat::create_translation(2.0, 4.0));
+    }
+
+    #[test]
+    pub fn test_rotation() {
+        let r1 = Mat::create_rotation(rad(FRAC_PI_2));
+        let r2 = Mat::identity().pre_rotated(rad(FRAC_PI_2));
+        let r3 = Mat::identity().post_rotated(rad(FRAC_PI_2));
+        assert_eq!(r1, r2);
+        assert_eq!(r1, r3);
+
+        assert!(r1.transform_point(&Point2D::new(1.0, 2.0)).approx_eq(&Point2D::new(2.0, -1.0)));
+
+        assert!(r1.post_mul(&r1).approx_eq(&Mat::create_rotation(rad(FRAC_PI_2*2.0))));
+    }
+
+    #[test]
+    pub fn test_scale() {
+        let s1 = Mat::create_scale(2.0, 3.0);
+        let s2 = Mat::identity().pre_scaled(2.0, 3.0);
+        let s3 = Mat::identity().post_scaled(2.0, 3.0);
+        assert_eq!(s1, s2);
+        assert_eq!(s1, s3);
+
+        assert!(s1.transform_point(&Point2D::new(2.0, 2.0)).approx_eq(&Point2D::new(4.0, 6.0)));
+    }
+
+    #[test]
+    fn test_column_major() {
+        assert_eq!(
+            Mat::row_major(
+                1.0,  2.0,
+                3.0,  4.0,
+                5.0,  6.0
+            ),
+            Mat::column_major(
+                1.0,  3.0,  5.0,
+                2.0,  4.0,  6.0,
+            )
+        );
+    }
 
     #[test]
     pub fn test_inverse_simple() {
@@ -321,9 +387,35 @@ mod test {
     }
 
     #[test]
+    fn test_inverse_none() {
+        assert!(Mat::create_scale(2.0, 0.0).inverse().is_none());
+        assert!(Mat::create_scale(2.0, 2.0).inverse().is_some());
+    }
+
+    #[test]
     pub fn test_pre_post() {
         let m1 = Matrix2D::identity().post_scaled(1.0, 2.0).post_translated(1.0, 2.0);
         let m2 = Matrix2D::identity().pre_translated(1.0, 2.0).pre_scaled(1.0, 2.0);
         assert!(m1.approx_eq(&m2));
+
+        let r = Mat::create_rotation(rad(FRAC_PI_2));
+        let t = Mat::create_translation(2.0, 3.0);
+
+        let a = Point2D::new(1.0, 1.0);
+
+        assert!(r.post_mul(&t).transform_point(&a).approx_eq(&Point2D::new(3.0, 2.0)));
+        assert!(t.post_mul(&r).transform_point(&a).approx_eq(&Point2D::new(4.0, -3.0)));
+        assert!(t.post_mul(&r).transform_point(&a).approx_eq(&r.transform_point(&t.transform_point(&a))));
+
+        assert!(r.pre_mul(&t).transform_point(&a).approx_eq(&Point2D::new(4.0, -3.0)));
+        assert!(t.pre_mul(&r).transform_point(&a).approx_eq(&Point2D::new(3.0, 2.0)));
+        assert!(t.pre_mul(&r).transform_point(&a).approx_eq(&t.transform_point(&r.transform_point(&a))));
+    }
+
+    #[test]
+    fn test_size_of() {
+        use std::mem::size_of;
+        assert_eq!(size_of::<Matrix2D<f32>>(), 6*size_of::<f32>());
+        assert_eq!(size_of::<Matrix2D<f64>>(), 6*size_of::<f64>());
     }
 }
