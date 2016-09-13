@@ -369,10 +369,10 @@ where T: Copy + Clone +
     /// The input point must be use the unit Src, and the returned point has the unit Dst.
     #[inline]
     pub fn transform_point4d(&self, p: &TypedPoint4D<T, Src>) -> TypedPoint4D<T, Dst> {
-        let x = p.x * self.m11 + p.y * self.m21 + p.z * self.m31 + self.m41;
-        let y = p.x * self.m12 + p.y * self.m22 + p.z * self.m32 + self.m42;
-        let z = p.x * self.m13 + p.y * self.m23 + p.z * self.m33 + self.m43;
-        let w = p.x * self.m14 + p.y * self.m24 + p.z * self.m34 + self.m44;
+        let x = p.x * self.m11 + p.y * self.m21 + p.z * self.m31 + p.w * self.m41;
+        let y = p.x * self.m12 + p.y * self.m22 + p.z * self.m32 + p.w * self.m42;
+        let z = p.x * self.m13 + p.y * self.m23 + p.z * self.m33 + p.w * self.m43;
+        let w = p.x * self.m14 + p.y * self.m24 + p.z * self.m34 + p.w * self.m44;
         TypedPoint4D::new(x, y, z, w)
     }
 
@@ -553,11 +553,11 @@ impl<T: Copy + fmt::Debug, Src, Dst> fmt::Debug for TypedMatrix4D<T, Src, Dst> {
 
 #[cfg(test)]
 mod tests {
-    use point::{Point2D, Point3D};
+    use approxeq::ApproxEq;
     use matrix2d::Matrix2D;
+    use point::{Point2D, Point3D, Point4D};
     use Radians;
     use super::*;
-    use approxeq::ApproxEq;
 
     use std::f32::consts::FRAC_PI_2;
 
@@ -742,5 +742,22 @@ mod tests {
         use std::mem::size_of;
         assert_eq!(size_of::<Matrix4D<f32>>(), 16*size_of::<f32>());
         assert_eq!(size_of::<Matrix4D<f64>>(), 16*size_of::<f64>());
+    }
+
+    #[test]
+    pub fn test_transform_associativity() {
+        let m1 = Mf32::row_major(3.0, 2.0, 1.5, 1.0,
+                                 0.0, 4.5, -1.0, -4.0,
+                                 0.0, 3.5, 2.5, 40.0,
+                                 0.0, 3.0, 0.0, 1.0);
+        let m2 = Mf32::row_major(1.0, -1.0, 3.0, 0.0,
+                                 -1.0, 0.5, 0.0, 2.0,
+                                 1.5, -2.0, 6.0, 0.0,
+                                 -2.5, 6.0, 1.0, 1.0);
+
+        let p = Point4D::new(1.0, 3.0, 5.0, 1.0);
+        let p1 = m2.pre_mul(&m1).transform_point4d(&p);
+        let p2 = m2.transform_point4d(&m1.transform_point4d(&p));
+        assert!(p1.approx_eq(&p2));
     }
 }
