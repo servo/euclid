@@ -14,7 +14,7 @@ use num::*;
 
 use num_traits::NumCast;
 use std::fmt;
-use std::ops::{Mul, Div};
+use std::ops::{Add, Div, Mul, Sub};
 use std::marker::PhantomData;
 
 /// A 2d size tagged with a unit.
@@ -85,6 +85,20 @@ impl<T: Floor, U> TypedSize2D<T, U> {
     /// This behavior is preserved for negative values (unlike the basic cast).
     pub fn floor(&self) -> Self {
         TypedSize2D::new(self.width.floor(), self.height.floor())
+    }
+}
+
+impl<T: Copy + Add<T, Output=T>, U> Add for TypedSize2D<T, U> {
+    type Output = TypedSize2D<T, U>;
+    fn add(self, other: TypedSize2D<T, U>) -> TypedSize2D<T, U> {
+        TypedSize2D::new(self.width + other.width, self.height + other.height)
+    }
+}
+
+impl<T: Copy + Sub<T, Output=T>, U> Sub for TypedSize2D<T, U> {
+    type Output = TypedSize2D<T, U>;
+    fn sub(self, other: TypedSize2D<T, U>) -> TypedSize2D<T, U> {
+        TypedSize2D::new(self.width - other.width, self.height - other.height)
     }
 }
 
@@ -210,5 +224,48 @@ impl<T: NumCast + Copy, Unit> TypedSize2D<T, Unit> {
     /// conversion behavior.
     pub fn to_i64(&self) -> TypedSize2D<i64, Unit> {
         self.cast().unwrap()
+    }
+}
+
+#[cfg(test)]
+mod size2d {
+    use super::Size2D;
+
+    #[test]
+    pub fn test_add() {
+        let p1 = Size2D::new(1.0, 2.0);
+        let p2 = Size2D::new(3.0, 4.0);
+        assert_eq!(p1 + p2, Size2D::new(4.0, 6.0));
+
+        let p1 = Size2D::new(1.0, 2.0);
+        let p2 = Size2D::new(0.0, 0.0);
+        assert_eq!(p1 + p2, Size2D::new(1.0, 2.0));
+
+        let p1 = Size2D::new(1.0, 2.0);
+        let p2 = Size2D::new(-3.0, -4.0);
+        assert_eq!(p1 + p2, Size2D::new(-2.0, -2.0));
+
+        let p1 = Size2D::new(0.0, 0.0);
+        let p2 = Size2D::new(0.0, 0.0);
+        assert_eq!(p1 + p2, Size2D::new(0.0, 0.0));
+    }
+
+    #[test]
+    pub fn test_sub() {
+        let p1 = Size2D::new(1.0, 2.0);
+        let p2 = Size2D::new(3.0, 4.0);
+        assert_eq!(p1 - p2, Size2D::new(-2.0, -2.0));
+
+        let p1 = Size2D::new(1.0, 2.0);
+        let p2 = Size2D::new(0.0, 0.0);
+        assert_eq!(p1 - p2, Size2D::new(1.0, 2.0));
+
+        let p1 = Size2D::new(1.0, 2.0);
+        let p2 = Size2D::new(-3.0, -4.0);
+        assert_eq!(p1 - p2, Size2D::new(4.0, 6.0));
+
+        let p1 = Size2D::new(0.0, 0.0);
+        let p2 = Size2D::new(0.0, 0.0);
+        assert_eq!(p1 - p2, Size2D::new(0.0, 0.0));
     }
 }
