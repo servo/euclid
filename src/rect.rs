@@ -215,6 +215,31 @@ where T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output=T> + Sub<T
     pub fn translate_by_size(&self, size: &TypedSize2D<T, U>) -> TypedRect<T, U> {
         self.translate(&TypedPoint2D::new(size.width, size.height))
     }
+
+    /// Returns the smallest rectangle containing the four points.
+    pub fn from_points(points: &[TypedPoint2D<T, U>]) -> Self {
+        if points.len() == 0 {
+            return TypedRect::zero();
+        }
+        let (mut min_x, mut min_y) = (points[0].x, points[0].y);
+        let (mut max_x, mut max_y) = (min_x, min_y);
+        for point in &points[1..] {
+            if point.x < min_x {
+                min_x = point.x
+            }
+            if point.x > max_x {
+                max_x = point.x
+            }
+            if point.y < min_y {
+                min_y = point.y
+            }
+            if point.y > max_y {
+                max_y = point.y
+            }
+        }
+        TypedRect::new(TypedPoint2D::new(min_x, min_y),
+                       TypedSize2D::new(max_x - min_x, max_y - min_y))
+    }
 }
 
 impl<T, U> TypedRect<T, U>
