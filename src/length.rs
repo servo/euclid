@@ -119,7 +119,6 @@ impl<U, T: Clone + SubAssign<T>> SubAssign for Length<T, U> {
 
 // Saturating length + length and length - length.
 impl<U, T: Clone + Saturating> Saturating for Length<T, U> {
-    // type Output = Length<T, U>;
     fn saturating_add(self, other: Length<T, U>) -> Length<T, U> {
         Length::new(self.get().saturating_add(other.get()))
     }
