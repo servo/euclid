@@ -38,6 +38,12 @@ impl<T: Copy + Zero, U> TypedPoint2D<T, U> {
     pub fn zero() -> TypedPoint2D<T, U> {
         TypedPoint2D::new(Zero::zero(), Zero::zero())
     }
+
+    /// Convert into a 3d point.
+    #[inline]
+    pub fn to_3d(&self) -> TypedPoint3D<T, U> {
+        TypedPoint3D::new(self.x, self.y, Zero::zero())
+    }
 }
 
 impl<T: fmt::Debug, U> fmt::Debug for TypedPoint2D<T, U> {
@@ -351,6 +357,12 @@ impl<T: Copy, U> TypedPoint3D<T, U> {
     #[inline]
     pub fn from_untyped(p: &Point3D<T>) -> TypedPoint3D<T, U> {
         TypedPoint3D::new(p.x, p.y, p.z)
+    }
+
+    /// Convert into a 2d point.
+    #[inline]
+    pub fn to_2d(&self) -> TypedPoint2D<T, U> {
+        TypedPoint2D::new(self.x, self.y)
     }
 }
 
