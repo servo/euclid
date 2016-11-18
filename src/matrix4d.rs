@@ -196,6 +196,28 @@ where T: Copy + Clone +
         )
     }
 
+    /// Drop the units, preserving only the numeric value.
+    #[inline]
+    pub fn to_untyped(&self) -> Matrix4D<T> {
+        Matrix4D::row_major(
+            self.m11, self.m12, self.m13, self.m14,
+            self.m21, self.m22, self.m23, self.m24,
+            self.m31, self.m32, self.m33, self.m34,
+            self.m41, self.m42, self.m43, self.m44,
+        )
+    }
+
+    /// Tag a unitless value with units.
+    #[inline]
+    pub fn from_untyped(m: &Matrix4D<T>) -> Self {
+        TypedMatrix4D::row_major(
+            m.m11, m.m12, m.m13, m.m14,
+            m.m21, m.m22, m.m23, m.m24,
+            m.m31, m.m32, m.m33, m.m34,
+            m.m41, m.m42, m.m43, m.m44,
+        )
+    }
+
     /// Returns the multiplication of the two matrices such that mat's transformation
     /// applies after self's transformation.
     pub fn post_mul<NewDst>(&self, mat: &TypedMatrix4D<T, Dst, NewDst>) -> TypedMatrix4D<T, Src, NewDst> {
