@@ -760,6 +760,18 @@ impl<T: ApproxEq<T>, U> ApproxEq<T> for TypedPoint4D<T, U> {
     }
 }
 
+pub fn point2<T: Copy, U>(x: T, y: T) -> TypedPoint2D<T, U> {
+    TypedPoint2D::new(x, y)
+}
+
+pub fn point3<T: Copy, U>(x: T, y: T, z: T) -> TypedPoint3D<T, U> {
+    TypedPoint3D::new(x, y, z)
+}
+
+pub fn point4<T: Copy, U>(x: T, y: T, z: T, w: T) -> TypedPoint4D<T, U> {
+    TypedPoint4D::new(x, y, z, w)
+}
+
 #[cfg(test)]
 mod point2d {
     use super::Point2D;

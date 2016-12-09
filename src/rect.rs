@@ -427,6 +427,10 @@ impl<T: NumCast + Copy, Unit> TypedRect<T, Unit> {
     }
 }
 
+/// Shorthand for TypedRect::new(TypedPoint2D::new(x, y), TypedSize2D::new(w, h)).
+pub fn rect<T: Copy, U>(x: T, y: T, w: T, h: T) -> TypedRect<T, U> {
+    TypedRect::new(TypedPoint2D::new(x, y), TypedSize2D::new(w, h))
+}
 
 #[cfg(test)]
 mod tests {
