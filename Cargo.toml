@@ -19,3 +19,4 @@ serde = "0.8"
 
 [dev-dependencies]
 rand = "0.3.7"
+serde_test = "0.8"
