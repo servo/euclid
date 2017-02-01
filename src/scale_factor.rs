@@ -46,14 +46,14 @@ impl<T: HeapSizeOf, Src, Dst> HeapSizeOf for ScaleFactor<T, Src, Dst> {
 }
 
 impl<T, Src, Dst> Deserialize for ScaleFactor<T, Src, Dst> where T: Deserialize {
-    fn deserialize<D>(deserializer: &mut D) -> Result<ScaleFactor<T, Src, Dst>, D::Error>
+    fn deserialize<D>(deserializer: D) -> Result<ScaleFactor<T, Src, Dst>, D::Error>
                       where D: Deserializer {
         Ok(ScaleFactor(try!(Deserialize::deserialize(deserializer)), PhantomData))
     }
 }
 
 impl<T, Src, Dst> Serialize for ScaleFactor<T, Src, Dst> where T: Serialize {
-    fn serialize<S>(&self, serializer: &mut S) -> Result<(),S::Error> where S: Serializer {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
         self.0.serialize(serializer)
     }
 }
