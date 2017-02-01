@@ -57,7 +57,7 @@
 
 extern crate heapsize;
 
-#[macro_use]
+#[cfg_attr(test, macro_use)]
 extern crate log;
 extern crate rustc_serialize;
 extern crate serde;
