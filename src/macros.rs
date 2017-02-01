@@ -43,7 +43,7 @@ macro_rules! define_matrix {
         impl<T, $($phantom),+> ::serde::Deserialize for $name<T, $($phantom),+>
             where T: ::serde::Deserialize
         {
-            fn deserialize<D>(deserializer: &mut D) -> Result<Self, D::Error>
+            fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
                 where D: ::serde::Deserializer
             {
                 let ($($field,)+) =
@@ -58,7 +58,7 @@ macro_rules! define_matrix {
         impl<T, $($phantom),+> ::serde::Serialize for $name<T, $($phantom),+>
             where T: ::serde::Serialize
         {
-            fn serialize<S>(&self, serializer: &mut S) -> Result<(), S::Error>
+            fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
                 where S: ::serde::Serializer
             {
                 ($(&self.$field,)+).serialize(serializer)
