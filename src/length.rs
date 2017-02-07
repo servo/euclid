@@ -33,6 +33,7 @@ use std::fmt;
 /// another. See the `ScaleFactor` docs for an example.
 // Uncomment the derive, and remove the macro call, once heapsize gets
 // PhantomData<T> support.
+#[repr(C)]
 #[derive(RustcDecodable, RustcEncodable)]
 pub struct Length<T, Unit>(pub T, PhantomData<Unit>);
 
