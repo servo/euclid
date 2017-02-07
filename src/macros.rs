@@ -14,6 +14,7 @@ macro_rules! define_matrix {
             $(pub $field:ident: T,)+
         }
     ) => (
+        #[repr(C)]
         $(#[$attr])*
         pub struct $name<T, $($phantom),+> {
             $(pub $field: T,)+
