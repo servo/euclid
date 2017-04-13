@@ -277,7 +277,7 @@ impl<T, U> TypedRect<T, U> {
     }
 }
 
-impl<T: Copy + PartialEq + Zero, U> TypedRect<T, U> {
+impl<T: Copy + PartialEq + Zero + PartialOrd, U> TypedRect<T, U> {
     /// Constructor, setting all sides to zero.
     pub fn zero() -> TypedRect<T, U> {
         TypedRect::new(
@@ -288,7 +288,7 @@ impl<T: Copy + PartialEq + Zero, U> TypedRect<T, U> {
 
     /// Returns true if the size is zero, regardless of the origin's value.
     pub fn is_empty(&self) -> bool {
-        self.size.width == Zero::zero() || self.size.height == Zero::zero()
+        self.size.width <= Zero::zero() || self.size.height <= Zero::zero()
     }
 }
 
@@ -636,6 +636,8 @@ mod tests {
         assert!(Rect::new(Point2D::new(10u32, 10u32), Size2D::new(10u32, 0u32)).is_empty());
         assert!(Rect::new(Point2D::new(10u32, 10u32), Size2D::new(0u32, 10u32)).is_empty());
         assert!(!Rect::new(Point2D::new(10u32, 10u32), Size2D::new(1u32, 1u32)).is_empty());
+        assert!(Rect::new(Point2D::new(10i32, 10i32), Size2D::new(-10i32, 10i32)).is_empty());
+        assert!(Rect::new(Point2D::new(10i32, 10i32), Size2D::new(10i32, -10i32)).is_empty());
     }
 
     #[test]
