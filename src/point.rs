@@ -110,6 +110,16 @@ where T: Copy + Mul<T, Output=T> + Add<T, Output=T> + Sub<T, Output=T> {
     pub fn cross(self, other: TypedPoint2D<T, U>) -> T {
         self.x * other.y - self.y * other.x
     }
+
+    #[inline]
+    pub fn normalize(self) -> Self where T: Float + ApproxEq<T> {
+        let dot = self.dot(self);
+        if dot.approx_eq(&T::zero()) {
+            self
+        } else {
+            self / dot.sqrt()
+        }
+    }
 }
 
 impl<T: Copy + Add<T, Output=T>, U> Add for TypedPoint2D<T, U> {
@@ -386,6 +396,16 @@ impl<T: Mul<T, Output=T> +
                           self.z * other.x - self.x * other.z,
                           self.x * other.y - self.y * other.x)
     }
+
+    #[inline]
+    pub fn normalize(self) -> Self where T: Float + ApproxEq<T> {
+        let dot = self.dot(self);
+        if dot.approx_eq(&T::zero()) {
+            self
+        } else {
+            self / dot.sqrt()
+        }
+    }
 }
 
 impl<T: Copy + Add<T, Output=T>, U> Add for TypedPoint3D<T, U> {
@@ -411,6 +431,22 @@ impl <T: Copy + Neg<Output=T>, U> Neg for TypedPoint3D<T, U> {
     #[inline]
     fn neg(self) -> TypedPoint3D<T, U> {
         TypedPoint3D::new(-self.x, -self.y, -self.z)
+    }
+}
+
+impl<T: Copy + Mul<T, Output=T>, U> Mul<T> for TypedPoint3D<T, U> {
+    type Output = Self;
+    #[inline]
+    fn mul(self, scale: T) -> Self {
+        Self::new(self.x * scale, self.y * scale, self.z * scale)
+    }
+}
+
+impl<T: Copy + Div<T, Output=T>, U> Div<T> for TypedPoint3D<T, U> {
+    type Output = Self;
+    #[inline]
+    fn div(self, scale: T) -> Self {
+        Self::new(self.x / scale, self.y / scale, self.z / scale)
     }
 }
 
@@ -801,6 +837,16 @@ mod point2d {
     }
 
     #[test]
+    pub fn test_normalize() {
+        let p0: Point2D<f32> = Point2D::zero();
+        let p1: Point2D<f32> = Point2D::new(4.0, 0.0);
+        let p2: Point2D<f32> = Point2D::new(3.0, -4.0);
+        assert_eq!(p0.normalize(), p0);
+        assert_eq!(p1.normalize(), Point2D::new(1.0, 0.0));
+        assert_eq!(p2.normalize(), Point2D::new(0.6, -0.8));
+    }
+
+    #[test]
     pub fn test_min() {
         let p1 = Point2D::new(1.0, 3.0);
         let p2 = Point2D::new(2.0, 2.0);
@@ -870,6 +916,16 @@ mod point3d {
         let p2 = Point3D::new(13.0, 8.0, 3.0);
         let p3 = p1.cross(p2);
         assert_eq!(p3, Point3D::new(-51.0, 105.0, -59.0));
+    }
+
+    #[test]
+    pub fn test_normalize() {
+        let p0: Point3D<f32> = Point3D::zero();
+        let p1: Point3D<f32> = Point3D::new(0.0, -6.0, 0.0);
+        let p2: Point3D<f32> = Point3D::new(1.0, 2.0, -2.0);
+        assert_eq!(p0.normalize(), p0);
+        assert_eq!(p1.normalize(), Point3D::new(0.0, -1.0, 0.0));
+        assert_eq!(p2.normalize(), Point3D::new(1.0/3.0, 2.0/3.0, -2.0/3.0));
     }
 
     #[test]
