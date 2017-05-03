@@ -20,7 +20,6 @@ use std::marker::PhantomData;
 
 define_matrix! {
     /// A 2d Point tagged with a unit.
-    #[derive(RustcDecodable, RustcEncodable)]
     pub struct TypedPoint2D<T, U> {
         pub x: T,
         pub y: T,
@@ -296,7 +295,6 @@ impl<T: Copy+ApproxEq<T>, U> ApproxEq<TypedPoint2D<T, U>> for TypedPoint2D<T, U>
 
 define_matrix! {
     /// A 3d Point tagged with a unit.
-    #[derive(RustcDecodable, RustcEncodable)]
     pub struct TypedPoint3D<T, U> {
         pub x: T,
         pub y: T,
@@ -563,7 +561,6 @@ impl<T: Copy+ApproxEq<T>, U> ApproxEq<TypedPoint3D<T, U>> for TypedPoint3D<T, U>
 
 define_matrix! {
     /// A 4d Point tagged with a unit.
-    #[derive(RustcDecodable, RustcEncodable)]
     pub struct TypedPoint4D<T, U> {
         pub x: T,
         pub y: T,
