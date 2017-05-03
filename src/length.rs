@@ -34,7 +34,6 @@ use std::fmt;
 // Uncomment the derive, and remove the macro call, once heapsize gets
 // PhantomData<T> support.
 #[repr(C)]
-#[derive(RustcDecodable, RustcEncodable)]
 pub struct Length<T, Unit>(pub T, PhantomData<Unit>);
 
 impl<T: Clone, Unit> Clone for Length<T, Unit> {

@@ -19,7 +19,6 @@ use std::marker::PhantomData;
 
 /// A 2d size tagged with a unit.
 define_matrix! {
-    #[derive(RustcDecodable, RustcEncodable)]
     pub struct TypedSize2D<T, U> {
         pub width: T,
         pub height: T,

@@ -22,7 +22,6 @@ use std::fmt;
 use std::ops::{Add, Sub, Mul, Div};
 
 /// A 2d Rectangle optionally tagged with a unit.
-#[derive(RustcDecodable, RustcEncodable)]
 pub struct TypedRect<T, U = UnknownUnit> {
     pub origin: TypedPoint2D<T, U>,
     pub size: TypedSize2D<T, U>,
