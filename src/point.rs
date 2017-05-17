@@ -15,7 +15,7 @@ use size::TypedSize2D;
 use num::*;
 use num_traits::{Float, NumCast};
 use std::fmt;
-use std::ops::{Add, Neg, Mul, Sub, Div};
+use std::ops::{Add, Neg, Mul, Sub, Div, AddAssign};
 use std::marker::PhantomData;
 
 define_matrix! {
@@ -126,6 +126,12 @@ impl<T: Copy + Add<T, Output=T>, U> Add for TypedPoint2D<T, U> {
     type Output = TypedPoint2D<T, U>;
     fn add(self, other: TypedPoint2D<T, U>) -> TypedPoint2D<T, U> {
         TypedPoint2D::new(self.x + other.x, self.y + other.y)
+    }
+}
+
+impl<T: Copy + Add<T, Output=T>, U> AddAssign for TypedPoint2D<T, U> {
+    fn add_assign(&mut self, other: TypedPoint2D<T, U>){
+        *self = *self + other
     }
 }
 
@@ -886,6 +892,14 @@ mod typedpoint2d {
         let result = p1 + p2;
 
         assert_eq!(result, Point2DMm::new(4.0, 6.0));
+    }
+
+    #[test]
+    pub fn test_add_assign() {
+        let mut p1 = Point2DMm::new(1.0, 2.0);
+        p1 += Point2DMm::new(3.0, 4.0);
+
+        assert_eq!(p1, Point2DMm::new(4.0, 6.0));
     }
 
     #[test]
