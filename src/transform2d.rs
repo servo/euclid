@@ -18,32 +18,32 @@ use trig::Trig;
 use std::fmt;
 
 define_matrix! {
-    /// A 2d transform stored as a 2 by 3 matrix in row-major order in memory,
+    /// A 2d transform stored as a 2 by 3 transform in row-major order in memory,
     /// useful to represent 2d transformations.
     ///
     /// Matrices can be parametrized over the source and destination units, to describe a
     /// transformation from a space to another.
-    /// For example, `TypedMatrix2D<f32, WordSpace, ScreenSpace>::transform_point4d`
+    /// For example, `TypedTransform2D<f32, WordSpace, ScreenSpace>::transform_point4d`
     /// takes a `TypedPoint2D<f32, WordSpace>` and returns a `TypedPoint2D<f32, ScreenSpace>`.
     ///
     /// Matrices expose a set of convenience methods for pre- and post-transformations.
     /// A pre-transformation corresponds to adding an operation that is applied before
     /// the rest of the transformation, while a post-transformation adds an operation
     /// that is applied after.
-    pub struct TypedMatrix2D<T, Src, Dst> {
+    pub struct TypedTransform2D<T, Src, Dst> {
         pub m11: T, pub m12: T,
         pub m21: T, pub m22: T,
         pub m31: T, pub m32: T,
     }
 }
 
-/// The default 2d matrix type with no units.
-pub type Matrix2D<T> = TypedMatrix2D<T, UnknownUnit, UnknownUnit>;
+/// The default 2d transform type with no units.
+pub type Transform2D<T> = TypedTransform2D<T, UnknownUnit, UnknownUnit>;
 
-impl<T: Copy, Src, Dst> TypedMatrix2D<T, Src, Dst> {
-    /// Create a matrix specifying its components in row-major order.
-    pub fn row_major(m11: T, m12: T, m21: T, m22: T, m31: T, m32: T) -> TypedMatrix2D<T, Src, Dst> {
-        TypedMatrix2D {
+impl<T: Copy, Src, Dst> TypedTransform2D<T, Src, Dst> {
+    /// Create a transform specifying its components in row-major order.
+    pub fn row_major(m11: T, m12: T, m21: T, m22: T, m31: T, m32: T) -> TypedTransform2D<T, Src, Dst> {
+        TypedTransform2D {
             m11: m11, m12: m12,
             m21: m21, m22: m22,
             m31: m31, m32: m32,
@@ -51,9 +51,9 @@ impl<T: Copy, Src, Dst> TypedMatrix2D<T, Src, Dst> {
         }
     }
 
-    /// Create a matrix specifying its components in column-major order.
-    pub fn column_major(m11: T, m21: T, m31: T, m12: T, m22: T, m32: T) -> TypedMatrix2D<T, Src, Dst> {
-        TypedMatrix2D {
+    /// Create a transform specifying its components in column-major order.
+    pub fn column_major(m11: T, m21: T, m31: T, m12: T, m22: T, m32: T) -> TypedTransform2D<T, Src, Dst> {
+        TypedTransform2D {
             m11: m11, m12: m12,
             m21: m21, m22: m22,
             m31: m31, m32: m32,
@@ -61,8 +61,8 @@ impl<T: Copy, Src, Dst> TypedMatrix2D<T, Src, Dst> {
         }
     }
 
-    /// Returns an array containing this matrix's terms in row-major order (the order
-    /// in which the matrix is actually laid out in memory).
+    /// Returns an array containing this transform's terms in row-major order (the order
+    /// in which the transform is actually laid out in memory).
     pub fn to_row_major_array(&self) -> [T; 6] {
         [
             self.m11, self.m12,
@@ -71,7 +71,7 @@ impl<T: Copy, Src, Dst> TypedMatrix2D<T, Src, Dst> {
         ]
     }
 
-    /// Returns an array containing this matrix's terms in column-major order.
+    /// Returns an array containing this transform's terms in column-major order.
     pub fn to_column_major_array(&self) -> [T; 6] {
         [
             self.m11, self.m21, self.m31,
@@ -80,8 +80,8 @@ impl<T: Copy, Src, Dst> TypedMatrix2D<T, Src, Dst> {
     }
 
     /// Drop the units, preserving only the numeric value.
-    pub fn to_untyped(&self) -> Matrix2D<T> {
-        Matrix2D::row_major(
+    pub fn to_untyped(&self) -> Transform2D<T> {
+        Transform2D::row_major(
             self.m11, self.m12,
             self.m21, self.m22,
             self.m31, self.m32
@@ -89,8 +89,8 @@ impl<T: Copy, Src, Dst> TypedMatrix2D<T, Src, Dst> {
     }
 
     /// Tag a unitless value with units.
-    pub fn from_untyped(p: &Matrix2D<T>) -> TypedMatrix2D<T, Src, Dst> {
-        TypedMatrix2D::row_major(
+    pub fn from_untyped(p: &Transform2D<T>) -> TypedTransform2D<T, Src, Dst> {
+        TypedTransform2D::row_major(
             p.m11, p.m12,
             p.m21, p.m22,
             p.m31, p.m32
@@ -98,13 +98,13 @@ impl<T: Copy, Src, Dst> TypedMatrix2D<T, Src, Dst> {
     }
 }
 
-impl<T, Src, Dst> TypedMatrix2D<T, Src, Dst>
+impl<T, Src, Dst> TypedTransform2D<T, Src, Dst>
 where T: Copy +
          PartialEq +
          One + Zero {
-    pub fn identity() -> TypedMatrix2D<T, Src, Dst> {
+    pub fn identity() -> TypedTransform2D<T, Src, Dst> {
         let (_0, _1) = (Zero::zero(), One::one());
-        TypedMatrix2D::row_major(
+        TypedTransform2D::row_major(
            _1, _0,
            _0, _1,
            _0, _0
@@ -115,11 +115,11 @@ where T: Copy +
     // while most consumers will probably want some sort of approximate
     // equivalence to deal with floating-point errors.
     fn is_identity(&self) -> bool {
-        *self == TypedMatrix2D::identity()
+        *self == TypedTransform2D::identity()
     }
 }
 
-impl<T, Src, Dst> TypedMatrix2D<T, Src, Dst>
+impl<T, Src, Dst> TypedTransform2D<T, Src, Dst>
 where T: Copy + Clone +
          Add<T, Output=T> +
          Mul<T, Output=T> +
@@ -131,8 +131,8 @@ where T: Copy + Clone +
 
     /// Returns the multiplication of the two matrices such that mat's transformation
     /// applies after self's transformation.
-    pub fn post_mul<NewDst>(&self, mat: &TypedMatrix2D<T, Dst, NewDst>) -> TypedMatrix2D<T, Src, NewDst> {
-        TypedMatrix2D::row_major(
+    pub fn post_mul<NewDst>(&self, mat: &TypedTransform2D<T, Dst, NewDst>) -> TypedTransform2D<T, Src, NewDst> {
+        TypedTransform2D::row_major(
             self.m11 * mat.m11 + self.m12 * mat.m21,
             self.m11 * mat.m12 + self.m12 * mat.m22,
             self.m21 * mat.m11 + self.m22 * mat.m21,
@@ -144,77 +144,77 @@ where T: Copy + Clone +
 
     /// Returns the multiplication of the two matrices such that mat's transformation
     /// applies before self's transformation.
-    pub fn pre_mul<NewSrc>(&self, mat: &TypedMatrix2D<T, NewSrc, Src>) -> TypedMatrix2D<T, NewSrc, Dst> {
+    pub fn pre_mul<NewSrc>(&self, mat: &TypedTransform2D<T, NewSrc, Src>) -> TypedTransform2D<T, NewSrc, Dst> {
         mat.post_mul(self)
     }
 
-    /// Returns a translation matrix.
-    pub fn create_translation(x: T, y: T) -> TypedMatrix2D<T, Src, Dst> {
+    /// Returns a translation transform.
+    pub fn create_translation(x: T, y: T) -> TypedTransform2D<T, Src, Dst> {
          let (_0, _1): (T, T) = (Zero::zero(), One::one());
-         TypedMatrix2D::row_major(
+         TypedTransform2D::row_major(
             _1, _0,
             _0, _1,
              x,  y
         )
     }
 
-    /// Applies a translation after self's transformation and returns the resulting matrix.
-    pub fn post_translated(&self, x: T, y: T) -> TypedMatrix2D<T, Src, Dst> {
-        self.post_mul(&TypedMatrix2D::create_translation(x, y))
+    /// Applies a translation after self's transformation and returns the resulting transform.
+    pub fn post_translated(&self, x: T, y: T) -> TypedTransform2D<T, Src, Dst> {
+        self.post_mul(&TypedTransform2D::create_translation(x, y))
     }
 
-    /// Applies a translation before self's transformation and returns the resulting matrix.
-    pub fn pre_translated(&self, x: T, y: T) -> TypedMatrix2D<T, Src, Dst> {
-        self.pre_mul(&TypedMatrix2D::create_translation(x, y))
+    /// Applies a translation before self's transformation and returns the resulting transform.
+    pub fn pre_translated(&self, x: T, y: T) -> TypedTransform2D<T, Src, Dst> {
+        self.pre_mul(&TypedTransform2D::create_translation(x, y))
     }
 
-    /// Returns a scale matrix.
-    pub fn create_scale(x: T, y: T) -> TypedMatrix2D<T, Src, Dst> {
+    /// Returns a scale transform.
+    pub fn create_scale(x: T, y: T) -> TypedTransform2D<T, Src, Dst> {
         let _0 = Zero::zero();
-        TypedMatrix2D::row_major(
+        TypedTransform2D::row_major(
              x, _0,
             _0,  y,
             _0, _0
         )
     }
 
-    /// Applies a scale after self's transformation and returns the resulting matrix.
-    pub fn post_scaled(&self, x: T, y: T) -> TypedMatrix2D<T, Src, Dst> {
-        self.post_mul(&TypedMatrix2D::create_scale(x, y))
+    /// Applies a scale after self's transformation and returns the resulting transform.
+    pub fn post_scaled(&self, x: T, y: T) -> TypedTransform2D<T, Src, Dst> {
+        self.post_mul(&TypedTransform2D::create_scale(x, y))
     }
 
-    /// Applies a scale before self's transformation and returns the resulting matrix.
-    pub fn pre_scaled(&self, x: T, y: T) -> TypedMatrix2D<T, Src, Dst> {
-        TypedMatrix2D::row_major(
+    /// Applies a scale before self's transformation and returns the resulting transform.
+    pub fn pre_scaled(&self, x: T, y: T) -> TypedTransform2D<T, Src, Dst> {
+        TypedTransform2D::row_major(
             self.m11 * x, self.m12,
             self.m21,     self.m22 * y,
             self.m31,     self.m32
         )
     }
 
-    /// Returns a rotation matrix.
-    pub fn create_rotation(theta: Radians<T>) -> TypedMatrix2D<T, Src, Dst> {
+    /// Returns a rotation transform.
+    pub fn create_rotation(theta: Radians<T>) -> TypedTransform2D<T, Src, Dst> {
         let _0 = Zero::zero();
         let cos = theta.get().cos();
         let sin = theta.get().sin();
-        TypedMatrix2D::row_major(
+        TypedTransform2D::row_major(
             cos, _0 - sin,
             sin, cos,
              _0, _0
         )
     }
 
-    /// Applies a rotation after self's transformation and returns the resulting matrix.
-    pub fn post_rotated(&self, theta: Radians<T>) -> TypedMatrix2D<T, Src, Dst> {
-        self.post_mul(&TypedMatrix2D::create_rotation(theta))
+    /// Applies a rotation after self's transformation and returns the resulting transform.
+    pub fn post_rotated(&self, theta: Radians<T>) -> TypedTransform2D<T, Src, Dst> {
+        self.post_mul(&TypedTransform2D::create_rotation(theta))
     }
 
-    /// Applies a rotation after self's transformation and returns the resulting matrix.
-    pub fn pre_rotated(&self, theta: Radians<T>) -> TypedMatrix2D<T, Src, Dst> {
-        self.pre_mul(&TypedMatrix2D::create_rotation(theta))
+    /// Applies a rotation after self's transformation and returns the resulting transform.
+    pub fn pre_rotated(&self, theta: Radians<T>) -> TypedTransform2D<T, Src, Dst> {
+        self.pre_mul(&TypedTransform2D::create_rotation(theta))
     }
 
-    /// Returns the given point transformed by this matrix.
+    /// Returns the given point transformed by this transform.
     #[inline]
     pub fn transform_point(&self, point: &TypedPoint2D<T, Src>) -> TypedPoint2D<T, Dst> {
         TypedPoint2D::new(point.x * self.m11 + point.y * self.m21 + self.m31,
@@ -222,7 +222,7 @@ where T: Copy + Clone +
     }
 
     /// Returns a rectangle that encompasses the result of transforming the given rectangle by this
-    /// matrix.
+    /// transform.
     #[inline]
     pub fn transform_rect(&self, rect: &TypedRect<T, Src>) -> TypedRect<T, Dst> {
         TypedRect::from_points(&[
@@ -233,13 +233,13 @@ where T: Copy + Clone +
         ])
     }
 
-    /// Computes and returns the determinant of this matrix.
+    /// Computes and returns the determinant of this transform.
     pub fn determinant(&self) -> T {
         self.m11 * self.m22 - self.m12 * self.m21
     }
 
-    /// Returns the inverse matrix if possible.
-    pub fn inverse(&self) -> Option<TypedMatrix2D<T, Dst, Src>> {
+    /// Returns the inverse transform if possible.
+    pub fn inverse(&self) -> Option<TypedTransform2D<T, Dst, Src>> {
         let det = self.determinant();
 
         let _0: T = Zero::zero();
@@ -250,7 +250,7 @@ where T: Copy + Clone +
         }
 
         let inv_det = _1 / det;
-        Some(TypedMatrix2D::row_major(
+        Some(TypedTransform2D::row_major(
             inv_det * self.m22,
             inv_det * (_0 - self.m12),
             inv_det * (_0 - self.m21),
@@ -260,20 +260,20 @@ where T: Copy + Clone +
         ))
     }
 
-    /// Returns the same matrix with a different destination unit.
+    /// Returns the same transform with a different destination unit.
     #[inline]
-    pub fn with_destination<NewDst>(&self) -> TypedMatrix2D<T, Src, NewDst> {
-        TypedMatrix2D::row_major(
+    pub fn with_destination<NewDst>(&self) -> TypedTransform2D<T, Src, NewDst> {
+        TypedTransform2D::row_major(
             self.m11, self.m12,
             self.m21, self.m22,
             self.m31, self.m32,
         )
     }
 
-    /// Returns the same matrix with a different source unit.
+    /// Returns the same transform with a different source unit.
     #[inline]
-    pub fn with_source<NewSrc>(&self) -> TypedMatrix2D<T, NewSrc, Dst> {
-        TypedMatrix2D::row_major(
+    pub fn with_source<NewSrc>(&self) -> TypedTransform2D<T, NewSrc, Dst> {
+        TypedTransform2D::row_major(
             self.m11, self.m12,
             self.m21, self.m22,
             self.m31, self.m32,
@@ -281,7 +281,7 @@ where T: Copy + Clone +
     }
 }
 
-impl<T: ApproxEq<T>, Src, Dst> TypedMatrix2D<T, Src, Dst> {
+impl<T: ApproxEq<T>, Src, Dst> TypedTransform2D<T, Src, Dst> {
     pub fn approx_eq(&self, other: &Self) -> bool {
         self.m11.approx_eq(&other.m11) && self.m12.approx_eq(&other.m12) &&
         self.m21.approx_eq(&other.m21) && self.m22.approx_eq(&other.m22) &&
@@ -289,7 +289,7 @@ impl<T: ApproxEq<T>, Src, Dst> TypedMatrix2D<T, Src, Dst> {
     }
 }
 
-impl<T: Copy + fmt::Debug, Src, Dst> fmt::Debug for TypedMatrix2D<T, Src, Dst>
+impl<T: Copy + fmt::Debug, Src, Dst> fmt::Debug for TypedTransform2D<T, Src, Dst>
 where T: Copy + fmt::Debug +
          PartialEq +
          One + Zero {
@@ -311,7 +311,7 @@ mod test {
 
     use std::f32::consts::FRAC_PI_2;
 
-    type Mat = Matrix2D<f32>;
+    type Mat = Transform2D<f32>;
 
     fn rad(v: f32) -> Radians<f32> { Radians::new(v) }
 
@@ -396,8 +396,8 @@ mod test {
 
     #[test]
     pub fn test_pre_post() {
-        let m1 = Matrix2D::identity().post_scaled(1.0, 2.0).post_translated(1.0, 2.0);
-        let m2 = Matrix2D::identity().pre_translated(1.0, 2.0).pre_scaled(1.0, 2.0);
+        let m1 = Transform2D::identity().post_scaled(1.0, 2.0).post_translated(1.0, 2.0);
+        let m2 = Transform2D::identity().pre_translated(1.0, 2.0).pre_scaled(1.0, 2.0);
         assert!(m1.approx_eq(&m2));
 
         let r = Mat::create_rotation(rad(FRAC_PI_2));
@@ -417,13 +417,13 @@ mod test {
     #[test]
     fn test_size_of() {
         use std::mem::size_of;
-        assert_eq!(size_of::<Matrix2D<f32>>(), 6*size_of::<f32>());
-        assert_eq!(size_of::<Matrix2D<f64>>(), 6*size_of::<f64>());
+        assert_eq!(size_of::<Transform2D<f32>>(), 6*size_of::<f32>());
+        assert_eq!(size_of::<Transform2D<f64>>(), 6*size_of::<f64>());
     }
 
     #[test]
     pub fn test_is_identity() {
-        let m1 = Matrix2D::identity();
+        let m1 = Transform2D::identity();
         assert!(m1.is_identity());
         let m2 = m1.post_translated(0.1, 0.0);
         assert!(!m2.is_identity());
