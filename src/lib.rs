@@ -59,7 +59,6 @@ extern crate heapsize;
 
 #[cfg_attr(test, macro_use)]
 extern crate log;
-extern crate rustc_serialize;
 extern crate serde;
 
 #[cfg(test)]
@@ -97,7 +96,7 @@ pub mod size;
 pub mod trig;
 
 /// The default unit.
-#[derive(Clone, Copy, RustcDecodable, RustcEncodable)]
+#[derive(Clone, Copy)]
 pub struct UnknownUnit;
 
 /// Unit for angles in radians.
