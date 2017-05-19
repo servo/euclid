@@ -280,7 +280,7 @@ impl<T: Copy + PartialEq + Zero, U> TypedRect<T, U> {
     /// Constructor, setting all sides to zero.
     pub fn zero() -> TypedRect<T, U> {
         TypedRect::new(
-            TypedPoint2D::zero(),
+            TypedPoint2D::origin(),
             TypedSize2D::zero(),
         )
     }

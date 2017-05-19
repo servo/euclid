@@ -14,8 +14,9 @@ use scale_factor::ScaleFactor;
 use size::TypedSize2D;
 use num::*;
 use num_traits::{Float, NumCast};
+use vector::{TypedVector2D, TypedVector3D, vec2, vec3};
 use std::fmt;
-use std::ops::{Add, Neg, Mul, Sub, Div, AddAssign};
+use std::ops::{Add, Mul, Sub, Div, AddAssign, SubAssign, MulAssign, DivAssign};
 use std::marker::PhantomData;
 
 define_matrix! {
@@ -34,14 +35,19 @@ pub type Point2D<T> = TypedPoint2D<T, UnknownUnit>;
 impl<T: Copy + Zero, U> TypedPoint2D<T, U> {
     /// Constructor, setting all components to zero.
     #[inline]
-    pub fn zero() -> TypedPoint2D<T, U> {
-        TypedPoint2D::new(Zero::zero(), Zero::zero())
+    pub fn origin() -> Self {
+        point2(Zero::zero(), Zero::zero())
+    }
+
+    #[inline]
+    pub fn zero() -> Self {
+        Self::origin()
     }
 
     /// Convert into a 3d point.
     #[inline]
     pub fn to_3d(&self) -> TypedPoint3D<T, U> {
-        TypedPoint3D::new(self.x, self.y, Zero::zero())
+        point3(self.x, self.y, Zero::zero())
     }
 }
 
@@ -60,14 +66,22 @@ impl<T: fmt::Display, U> fmt::Display for TypedPoint2D<T, U> {
 impl<T: Copy, U> TypedPoint2D<T, U> {
     /// Constructor taking scalar values directly.
     #[inline]
-    pub fn new(x: T, y: T) -> TypedPoint2D<T, U> {
+    pub fn new(x: T, y: T) -> Self {
         TypedPoint2D { x: x, y: y, _unit: PhantomData }
     }
 
     /// Constructor taking properly typed Lengths instead of scalar values.
     #[inline]
-    pub fn from_lengths(x: Length<T, U>, y: Length<T, U>) -> TypedPoint2D<T, U> {
-        TypedPoint2D::new(x.0, y.0)
+    pub fn from_lengths(x: Length<T, U>, y: Length<T, U>) -> Self {
+        point2(x.0, y.0)
+    }
+
+    /// Cast this point into a vector.
+    ///
+    /// Equivalent to substracting the origin to this point.
+    #[inline]
+    pub fn to_vector(&self) -> TypedVector2D<T, U> {
+        vec2(self.x, self.y)
     }
 
     /// Returns self.x as a Length carrying the unit.
@@ -81,13 +95,13 @@ impl<T: Copy, U> TypedPoint2D<T, U> {
     /// Drop the units, preserving only the numeric value.
     #[inline]
     pub fn to_untyped(&self) -> Point2D<T> {
-        TypedPoint2D::new(self.x, self.y)
+        point2(self.x, self.y)
     }
 
     /// Tag a unitless value with units.
     #[inline]
-    pub fn from_untyped(p: &Point2D<T>) -> TypedPoint2D<T, U> {
-        TypedPoint2D::new(p.x, p.y)
+    pub fn from_untyped(p: &Point2D<T>) -> Self {
+        point2(p.x, p.y)
     }
 
     #[inline]
@@ -96,95 +110,98 @@ impl<T: Copy, U> TypedPoint2D<T, U> {
     }
 }
 
-impl<T, U> TypedPoint2D<T, U>
-where T: Copy + Mul<T, Output=T> + Add<T, Output=T> + Sub<T, Output=T> {
-    /// Dot product.
+impl<T: Copy + Add<T, Output=T>, U> TypedPoint2D<T, U> {
     #[inline]
-    pub fn dot(self, other: TypedPoint2D<T, U>) -> T {
-        self.x * other.x + self.y * other.y
-    }
-
-    /// Returns the norm of the cross product [self.x, self.y, 0] x [other.x, other.y, 0]..
-    #[inline]
-    pub fn cross(self, other: TypedPoint2D<T, U>) -> T {
-        self.x * other.y - self.y * other.x
-    }
-
-    #[inline]
-    pub fn normalize(self) -> Self where T: Float + ApproxEq<T> {
-        let dot = self.dot(self);
-        if dot.approx_eq(&T::zero()) {
-            self
-        } else {
-            self / dot.sqrt()
-        }
-    }
-}
-
-impl<T: Copy + Add<T, Output=T>, U> Add for TypedPoint2D<T, U> {
-    type Output = TypedPoint2D<T, U>;
-    fn add(self, other: TypedPoint2D<T, U>) -> TypedPoint2D<T, U> {
-        TypedPoint2D::new(self.x + other.x, self.y + other.y)
-    }
-}
-
-impl<T: Copy + Add<T, Output=T>, U> AddAssign for TypedPoint2D<T, U> {
-    fn add_assign(&mut self, other: TypedPoint2D<T, U>){
-        *self = *self + other
+    pub fn add_size(&self, other: &TypedSize2D<T, U>) -> Self {
+        point2(self.x + other.width, self.y + other.height)
     }
 }
 
 impl<T: Copy + Add<T, Output=T>, U> Add<TypedSize2D<T, U>> for TypedPoint2D<T, U> {
     type Output = TypedPoint2D<T, U>;
-    fn add(self, other: TypedSize2D<T, U>) -> TypedPoint2D<T, U> {
-        TypedPoint2D::new(self.x + other.width, self.y + other.height)
+    #[inline]
+    fn add(self, other: TypedSize2D<T, U>) -> Self {
+        point2(self.x + other.width, self.y + other.height)
     }
 }
 
-impl<T: Copy + Add<T, Output=T>, U> TypedPoint2D<T, U> {
-    pub fn add_size(&self, other: &TypedSize2D<T, U>) -> TypedPoint2D<T, U> {
-        TypedPoint2D::new(self.x + other.width, self.y + other.height)
+impl<T: Copy + Add<T, Output=T>, U> AddAssign<TypedVector2D<T, U>> for TypedPoint2D<T, U> {
+    #[inline]
+    fn add_assign(&mut self, other: TypedVector2D<T, U>) {
+        *self = *self + other
+    }
+}
+
+impl<T: Copy + Sub<T, Output=T>, U> SubAssign<TypedVector2D<T, U>> for TypedPoint2D<T, U> {
+    #[inline]
+    fn sub_assign(&mut self, other: TypedVector2D<T, U>) {
+        *self = *self - other
+    }
+}
+
+impl<T: Copy + Add<T, Output=T>, U> Add<TypedVector2D<T, U>> for TypedPoint2D<T, U> {
+    type Output = TypedPoint2D<T, U>;
+    #[inline]
+    fn add(self, other: TypedVector2D<T, U>) -> Self {
+        point2(self.x + other.x, self.y + other.y)
     }
 }
 
 impl<T: Copy + Sub<T, Output=T>, U> Sub for TypedPoint2D<T, U> {
-    type Output = TypedPoint2D<T, U>;
-    fn sub(self, other: TypedPoint2D<T, U>) -> TypedPoint2D<T, U> {
-        TypedPoint2D::new(self.x - other.x, self.y - other.y)
+    type Output = TypedVector2D<T, U>;
+    #[inline]
+    fn sub(self, other: TypedPoint2D<T, U>) -> TypedVector2D<T, U> {
+        vec2(self.x - other.x, self.y - other.y)
     }
 }
 
-impl <T: Copy + Neg<Output=T>, U> Neg for TypedPoint2D<T, U> {
+impl<T: Copy + Sub<T, Output=T>, U> Sub<TypedVector2D<T, U>> for TypedPoint2D<T, U> {
     type Output = TypedPoint2D<T, U>;
     #[inline]
-    fn neg(self) -> TypedPoint2D<T, U> {
-        TypedPoint2D::new(-self.x, -self.y)
+    fn sub(self, other: TypedVector2D<T, U>) -> Self {
+        point2(self.x - other.x, self.y - other.y)
     }
 }
 
 impl<T: Float, U> TypedPoint2D<T, U> {
-    pub fn min(self, other: TypedPoint2D<T, U>) -> TypedPoint2D<T, U> {
-         TypedPoint2D::new(self.x.min(other.x), self.y.min(other.y))
+    #[inline]
+    pub fn min(self, other: TypedPoint2D<T, U>) -> Self {
+         point2(self.x.min(other.x), self.y.min(other.y))
     }
 
-    pub fn max(self, other: TypedPoint2D<T, U>) -> TypedPoint2D<T, U> {
-        TypedPoint2D::new(self.x.max(other.x), self.y.max(other.y))
+    #[inline]
+    pub fn max(self, other: TypedPoint2D<T, U>) -> Self {
+        point2(self.x.max(other.x), self.y.max(other.y))
     }
 }
 
 impl<T: Copy + Mul<T, Output=T>, U> Mul<T> for TypedPoint2D<T, U> {
     type Output = TypedPoint2D<T, U>;
     #[inline]
-    fn mul(self, scale: T) -> TypedPoint2D<T, U> {
-        TypedPoint2D::new(self.x * scale, self.y * scale)
+    fn mul(self, scale: T) -> Self {
+        point2(self.x * scale, self.y * scale)
+    }
+}
+
+impl<T: Copy + Mul<T, Output=T>, U> MulAssign<T> for TypedPoint2D<T, U> {
+    #[inline]
+    fn mul_assign(&mut self, scale: T) {
+        *self = *self * scale
     }
 }
 
 impl<T: Copy + Div<T, Output=T>, U> Div<T> for TypedPoint2D<T, U> {
     type Output = TypedPoint2D<T, U>;
     #[inline]
-    fn div(self, scale: T) -> TypedPoint2D<T, U> {
-        TypedPoint2D::new(self.x / scale, self.y / scale)
+    fn div(self, scale: T) -> Self {
+        point2(self.x / scale, self.y / scale)
+    }
+}
+
+impl<T: Copy + Div<T, Output=T>, U> DivAssign<T> for TypedPoint2D<T, U> {
+    #[inline]
+    fn div_assign(&mut self, scale: T) {
+        *self = *self / scale
     }
 }
 
@@ -192,7 +209,7 @@ impl<T: Copy + Mul<T, Output=T>, U1, U2> Mul<ScaleFactor<T, U1, U2>> for TypedPo
     type Output = TypedPoint2D<T, U2>;
     #[inline]
     fn mul(self, scale: ScaleFactor<T, U1, U2>) -> TypedPoint2D<T, U2> {
-        TypedPoint2D::new(self.x * scale.get(), self.y * scale.get())
+        point2(self.x * scale.get(), self.y * scale.get())
     }
 }
 
@@ -200,7 +217,7 @@ impl<T: Copy + Div<T, Output=T>, U1, U2> Div<ScaleFactor<T, U1, U2>> for TypedPo
     type Output = TypedPoint2D<T, U1>;
     #[inline]
     fn div(self, scale: ScaleFactor<T, U1, U2>) -> TypedPoint2D<T, U1> {
-        TypedPoint2D::new(self.x / scale.get(), self.y / scale.get())
+        point2(self.x / scale.get(), self.y / scale.get())
     }
 }
 
@@ -209,8 +226,9 @@ impl<T: Round, U> TypedPoint2D<T, U> {
     ///
     /// This behavior is preserved for negative values (unlike the basic cast).
     /// For example `{ -0.1, -0.8 }.round() == { 0.0, -1.0 }`.
+    #[inline]
     pub fn round(&self) -> Self {
-        TypedPoint2D::new(self.x.round(), self.y.round())
+        point2(self.x.round(), self.y.round())
     }
 }
 
@@ -219,8 +237,9 @@ impl<T: Ceil, U> TypedPoint2D<T, U> {
     ///
     /// This behavior is preserved for negative values (unlike the basic cast).
     /// For example `{ -0.1, -0.8 }.ceil() == { 0.0, 0.0 }`.
+    #[inline]
     pub fn ceil(&self) -> Self {
-        TypedPoint2D::new(self.x.ceil(), self.y.ceil())
+        point2(self.x.ceil(), self.y.ceil())
     }
 }
 
@@ -229,8 +248,9 @@ impl<T: Floor, U> TypedPoint2D<T, U> {
     ///
     /// This behavior is preserved for negative values (unlike the basic cast).
     /// For example `{ -0.1, -0.8 }.floor() == { -1.0, -1.0 }`.
+    #[inline]
     pub fn floor(&self) -> Self {
-        TypedPoint2D::new(self.x.floor(), self.y.floor())
+        point2(self.x.floor(), self.y.floor())
     }
 }
 
@@ -240,9 +260,10 @@ impl<T: NumCast + Copy, U> TypedPoint2D<T, U> {
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
+    #[inline]
     pub fn cast<NewT: NumCast + Copy>(&self) -> Option<TypedPoint2D<NewT, U>> {
         match (NumCast::from(self.x), NumCast::from(self.y)) {
-            (Some(x), Some(y)) => Some(TypedPoint2D::new(x, y)),
+            (Some(x), Some(y)) => Some(point2(x, y)),
             _ => None
         }
     }
@@ -250,6 +271,7 @@ impl<T: NumCast + Copy, U> TypedPoint2D<T, U> {
     // Convenience functions for common casts
 
     /// Cast into an `f32` point.
+    #[inline]
     pub fn to_f32(&self) -> TypedPoint2D<f32, U> {
         self.cast().unwrap()
     }
@@ -259,6 +281,7 @@ impl<T: NumCast + Copy, U> TypedPoint2D<T, U> {
     /// When casting from floating point points, it is worth considering whether
     /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
     /// the desired conversion behavior.
+    #[inline]
     pub fn to_usize(&self) -> TypedPoint2D<usize, U> {
         self.cast().unwrap()
     }
@@ -268,6 +291,7 @@ impl<T: NumCast + Copy, U> TypedPoint2D<T, U> {
     /// When casting from floating point points, it is worth considering whether
     /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
     /// the desired conversion behavior.
+    #[inline]
     pub fn to_i32(&self) -> TypedPoint2D<i32, U> {
         self.cast().unwrap()
     }
@@ -277,6 +301,7 @@ impl<T: NumCast + Copy, U> TypedPoint2D<T, U> {
     /// When casting from floating point points, it is worth considering whether
     /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
     /// the desired conversion behavior.
+    #[inline]
     pub fn to_i64(&self) -> TypedPoint2D<i64, U> {
         self.cast().unwrap()
     }
@@ -285,7 +310,7 @@ impl<T: NumCast + Copy, U> TypedPoint2D<T, U> {
 impl<T: Copy+ApproxEq<T>, U> ApproxEq<TypedPoint2D<T, U>> for TypedPoint2D<T, U> {
     #[inline]
     fn approx_epsilon() -> Self {
-        TypedPoint2D::new(T::approx_epsilon(), T::approx_epsilon())
+        point2(T::approx_epsilon(), T::approx_epsilon())
     }
 
     #[inline]
@@ -316,8 +341,15 @@ pub type Point3D<T> = TypedPoint3D<T, UnknownUnit>;
 impl<T: Copy + Zero, U> TypedPoint3D<T, U> {
     /// Constructor, setting all copmonents to zero.
     #[inline]
-    pub fn zero() -> TypedPoint3D<T, U> {
-        TypedPoint3D::new(Zero::zero(), Zero::zero(), Zero::zero())
+    pub fn origin() -> Self {
+        point3(Zero::zero(), Zero::zero(), Zero::zero())
+    }
+}
+
+impl<T: Copy + One, U> TypedPoint3D<T, U> {
+    #[inline]
+    pub fn to_array_4d(&self) -> [T; 4] {
+        [self.x, self.y, self.z, One::one()]
     }
 }
 
@@ -336,14 +368,22 @@ impl<T: fmt::Display, U> fmt::Display for TypedPoint3D<T, U> {
 impl<T: Copy, U> TypedPoint3D<T, U> {
     /// Constructor taking scalar values directly.
     #[inline]
-    pub fn new(x: T, y: T, z: T) -> TypedPoint3D<T, U> {
+    pub fn new(x: T, y: T, z: T) -> Self {
         TypedPoint3D { x: x, y: y, z: z, _unit: PhantomData }
     }
 
     /// Constructor taking properly typed Lengths instead of scalar values.
     #[inline]
-    pub fn from_lengths(x: Length<T, U>, y: Length<T, U>, z: Length<T, U>) -> TypedPoint3D<T, U> {
-        TypedPoint3D::new(x.0, y.0, z.0)
+    pub fn from_lengths(x: Length<T, U>, y: Length<T, U>, z: Length<T, U>) -> Self {
+        point3(x.0, y.0, z.0)
+    }
+
+    /// Cast this point into a vector.
+    ///
+    /// Equivalent to substracting the origin to this point.
+    #[inline]
+    pub fn to_vector(&self) -> TypedVector3D<T, U> {
+        TypedVector3D::new(self.x, self.y, self.y)
     }
 
     /// Returns self.x as a Length carrying the unit.
@@ -364,19 +404,19 @@ impl<T: Copy, U> TypedPoint3D<T, U> {
     /// Drop the units, preserving only the numeric value.
     #[inline]
     pub fn to_untyped(&self) -> Point3D<T> {
-        TypedPoint3D::new(self.x, self.y, self.z)
+        point3(self.x, self.y, self.z)
     }
 
     /// Tag a unitless value with units.
     #[inline]
-    pub fn from_untyped(p: &Point3D<T>) -> TypedPoint3D<T, U> {
-        TypedPoint3D::new(p.x, p.y, p.z)
+    pub fn from_untyped(p: &Point3D<T>) -> Self {
+        point3(p.x, p.y, p.z)
     }
 
     /// Convert into a 2d point.
     #[inline]
     pub fn to_2d(&self) -> TypedPoint2D<T, U> {
-        TypedPoint2D::new(self.x, self.y)
+        point2(self.x, self.y)
     }
 }
 
@@ -395,8 +435,8 @@ impl<T: Mul<T, Output=T> +
 
     // Cross product.
     #[inline]
-    pub fn cross(self, other: TypedPoint3D<T, U>) -> TypedPoint3D<T, U> {
-        TypedPoint3D::new(self.y * other.z - self.z * other.y,
+    pub fn cross(self, other: TypedPoint3D<T, U>) -> Self {
+        point3(self.y * other.z - self.z * other.y,
                           self.z * other.x - self.x * other.z,
                           self.x * other.y - self.y * other.x)
     }
@@ -412,29 +452,41 @@ impl<T: Mul<T, Output=T> +
     }
 }
 
-impl<T: Copy + Add<T, Output=T>, U> Add for TypedPoint3D<T, U> {
+impl<T: Copy + Add<T, Output=T>, U> AddAssign<TypedVector3D<T, U>> for TypedPoint3D<T, U> {
+    #[inline]
+    fn add_assign(&mut self, other: TypedVector3D<T, U>) {
+        *self = *self + other
+    }
+}
+
+impl<T: Copy + Sub<T, Output=T>, U> SubAssign<TypedVector3D<T, U>> for TypedPoint3D<T, U> {
+    #[inline]
+    fn sub_assign(&mut self, other: TypedVector3D<T, U>) {
+        *self = *self - other
+    }
+}
+
+impl<T: Copy + Add<T, Output=T>, U> Add<TypedVector3D<T, U>> for TypedPoint3D<T, U> {
     type Output = TypedPoint3D<T, U>;
-    fn add(self, other: TypedPoint3D<T, U>) -> TypedPoint3D<T, U> {
-        TypedPoint3D::new(self.x + other.x,
-                          self.y + other.y,
-                          self.z + other.z)
+    #[inline]
+    fn add(self, other: TypedVector3D<T, U>) -> Self {
+        point3(self.x + other.x, self.y + other.y, self.z + other.z)
     }
 }
 
 impl<T: Copy + Sub<T, Output=T>, U> Sub for TypedPoint3D<T, U> {
-    type Output = TypedPoint3D<T, U>;
-    fn sub(self, other: TypedPoint3D<T, U>) -> TypedPoint3D<T, U> {
-        TypedPoint3D::new(self.x - other.x,
-                          self.y - other.y,
-                          self.z - other.z)
+    type Output = TypedVector3D<T, U>;
+    #[inline]
+    fn sub(self, other: TypedPoint3D<T, U>) -> TypedVector3D<T, U> {
+        vec3(self.x - other.x, self.y - other.y, self.z - other.z)
     }
 }
 
-impl <T: Copy + Neg<Output=T>, U> Neg for TypedPoint3D<T, U> {
+impl<T: Copy + Sub<T, Output=T>, U> Sub<TypedVector3D<T, U>> for TypedPoint3D<T, U> {
     type Output = TypedPoint3D<T, U>;
     #[inline]
-    fn neg(self) -> TypedPoint3D<T, U> {
-        TypedPoint3D::new(-self.x, -self.y, -self.z)
+    fn sub(self, other: TypedVector3D<T, U>) -> Self {
+        point3(self.x - other.x, self.y - other.y, self.z - other.z)
     }
 }
 
@@ -455,15 +507,14 @@ impl<T: Copy + Div<T, Output=T>, U> Div<T> for TypedPoint3D<T, U> {
 }
 
 impl<T: Float, U> TypedPoint3D<T, U> {
-    pub fn min(self, other: TypedPoint3D<T, U>) -> TypedPoint3D<T, U> {
-         TypedPoint3D::new(self.x.min(other.x),
-                           self.y.min(other.y),
-                           self.z.min(other.z))
+    #[inline]
+    pub fn min(self, other: TypedPoint3D<T, U>) -> Self {
+         point3(self.x.min(other.x), self.y.min(other.y), self.z.min(other.z))
     }
 
-    pub fn max(self, other: TypedPoint3D<T, U>) -> TypedPoint3D<T, U> {
-        TypedPoint3D::new(self.x.max(other.x), self.y.max(other.y),
-                     self.z.max(other.z))
+    #[inline]
+    pub fn max(self, other: TypedPoint3D<T, U>) -> Self {
+        point3(self.x.max(other.x), self.y.max(other.y), self.z.max(other.z))
     }
 }
 
@@ -471,8 +522,9 @@ impl<T: Round, U> TypedPoint3D<T, U> {
     /// Rounds each component to the nearest integer value.
     ///
     /// This behavior is preserved for negative values (unlike the basic cast).
+    #[inline]
     pub fn round(&self) -> Self {
-        TypedPoint3D::new(self.x.round(), self.y.round(), self.z.round())
+        point3(self.x.round(), self.y.round(), self.z.round())
     }
 }
 
@@ -480,8 +532,9 @@ impl<T: Ceil, U> TypedPoint3D<T, U> {
     /// Rounds each component to the smallest integer equal or greater than the original value.
     ///
     /// This behavior is preserved for negative values (unlike the basic cast).
+    #[inline]
     pub fn ceil(&self) -> Self {
-        TypedPoint3D::new(self.x.ceil(), self.y.ceil(), self.z.ceil())
+        point3(self.x.ceil(), self.y.ceil(), self.z.ceil())
     }
 }
 
@@ -489,8 +542,9 @@ impl<T: Floor, U> TypedPoint3D<T, U> {
     /// Rounds each component to the biggest integer equal or lower than the original value.
     ///
     /// This behavior is preserved for negative values (unlike the basic cast).
+    #[inline]
     pub fn floor(&self) -> Self {
-        TypedPoint3D::new(self.x.floor(), self.y.floor(), self.z.floor())
+        point3(self.x.floor(), self.y.floor(), self.z.floor())
     }
 }
 
@@ -500,11 +554,12 @@ impl<T: NumCast + Copy, U> TypedPoint3D<T, U> {
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using round(), ceil or floor() before casting.
+    #[inline]
     pub fn cast<NewT: NumCast + Copy>(&self) -> Option<TypedPoint3D<NewT, U>> {
         match (NumCast::from(self.x),
                NumCast::from(self.y),
                NumCast::from(self.z)) {
-            (Some(x), Some(y), Some(z)) => Some(TypedPoint3D::new(x, y, z)),
+            (Some(x), Some(y), Some(z)) => Some(point3(x, y, z)),
             _ => None
         }
     }
@@ -512,6 +567,7 @@ impl<T: NumCast + Copy, U> TypedPoint3D<T, U> {
     // Convenience functions for common casts
 
     /// Cast into an `f32` point.
+    #[inline]
     pub fn to_f32(&self) -> TypedPoint3D<f32, U> {
         self.cast().unwrap()
     }
@@ -521,6 +577,7 @@ impl<T: NumCast + Copy, U> TypedPoint3D<T, U> {
     /// When casting from floating point points, it is worth considering whether
     /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
     /// the desired conversion behavior.
+    #[inline]
     pub fn to_usize(&self) -> TypedPoint3D<usize, U> {
         self.cast().unwrap()
     }
@@ -530,6 +587,7 @@ impl<T: NumCast + Copy, U> TypedPoint3D<T, U> {
     /// When casting from floating point points, it is worth considering whether
     /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
     /// the desired conversion behavior.
+    #[inline]
     pub fn to_i32(&self) -> TypedPoint3D<i32, U> {
         self.cast().unwrap()
     }
@@ -539,6 +597,7 @@ impl<T: NumCast + Copy, U> TypedPoint3D<T, U> {
     /// When casting from floating point points, it is worth considering whether
     /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
     /// the desired conversion behavior.
+    #[inline]
     pub fn to_i64(&self) -> TypedPoint3D<i64, U> {
         self.cast().unwrap()
     }
@@ -547,7 +606,7 @@ impl<T: NumCast + Copy, U> TypedPoint3D<T, U> {
 impl<T: Copy+ApproxEq<T>, U> ApproxEq<TypedPoint3D<T, U>> for TypedPoint3D<T, U> {
     #[inline]
     fn approx_epsilon() -> Self {
-        TypedPoint3D::new(T::approx_epsilon(), T::approx_epsilon(), T::approx_epsilon())
+        point3(T::approx_epsilon(), T::approx_epsilon(), T::approx_epsilon())
     }
 
     #[inline]
@@ -583,7 +642,7 @@ pub type Point4D<T> = TypedPoint4D<T, UnknownUnit>;
 impl<T: Copy + Zero, U> TypedPoint4D<T, U> {
     /// Constructor, setting all copmonents to zero.
     #[inline]
-    pub fn zero() -> TypedPoint4D<T, U> {
+    pub fn origin() -> TypedPoint4D<T, U> {
         TypedPoint4D::new(Zero::zero(), Zero::zero(), Zero::zero(), Zero::zero())
     }
 }
@@ -654,13 +713,13 @@ impl<T: Copy + Div<T, Output=T>, U> TypedPoint4D<T, U> {
     /// Convert into a 2d point.
     #[inline]
     pub fn to_2d(self) -> TypedPoint2D<T, U> {
-        TypedPoint2D::new(self.x / self.w, self.y / self.w)
+        point2(self.x / self.w, self.y / self.w)
     }
 
     /// Convert into a 3d point.
     #[inline]
     pub fn to_3d(self) -> TypedPoint3D<T, U> {
-        TypedPoint3D::new(self.x / self.w, self.y / self.w, self.z / self.w)
+        point3(self.x / self.w, self.y / self.w, self.z / self.w)
     }
 }
 
@@ -825,31 +884,6 @@ mod point2d {
     }
 
     #[test]
-    pub fn test_dot() {
-        let p1: Point2D<f32> = Point2D::new(2.0, 7.0);
-        let p2: Point2D<f32> = Point2D::new(13.0, 11.0);
-        assert_eq!(p1.dot(p2), 103.0);
-    }
-
-    #[test]
-    pub fn test_cross() {
-        let p1: Point2D<f32> = Point2D::new(4.0, 7.0);
-        let p2: Point2D<f32> = Point2D::new(13.0, 8.0);
-        let r = p1.cross(p2);
-        assert_eq!(r, -59.0);
-    }
-
-    #[test]
-    pub fn test_normalize() {
-        let p0: Point2D<f32> = Point2D::zero();
-        let p1: Point2D<f32> = Point2D::new(4.0, 0.0);
-        let p2: Point2D<f32> = Point2D::new(3.0, -4.0);
-        assert_eq!(p0.normalize(), p0);
-        assert_eq!(p1.normalize(), Point2D::new(1.0, 0.0));
-        assert_eq!(p2.normalize(), Point2D::new(0.6, -0.8));
-    }
-
-    #[test]
     pub fn test_min() {
         let p1 = Point2D::new(1.0, 3.0);
         let p2 = Point2D::new(2.0, 2.0);
@@ -874,6 +908,7 @@ mod point2d {
 mod typedpoint2d {
     use super::TypedPoint2D;
     use scale_factor::ScaleFactor;
+    use vector::vec2;
 
     pub enum Mm {}
     pub enum Cm {}
@@ -884,7 +919,7 @@ mod typedpoint2d {
     #[test]
     pub fn test_add() {
         let p1 = Point2DMm::new(1.0, 2.0);
-        let p2 = Point2DMm::new(3.0, 4.0);
+        let p2 = vec2(3.0, 4.0);
 
         let result = p1 + p2;
 
@@ -894,7 +929,7 @@ mod typedpoint2d {
     #[test]
     pub fn test_add_assign() {
         let mut p1 = Point2DMm::new(1.0, 2.0);
-        p1 += Point2DMm::new(3.0, 4.0);
+        p1 += vec2(3.0, 4.0);
 
         assert_eq!(p1, Point2DMm::new(4.0, 6.0));
     }
@@ -913,31 +948,6 @@ mod typedpoint2d {
 #[cfg(test)]
 mod point3d {
     use super::Point3D;
-
-    #[test]
-    pub fn test_dot() {
-        let p1 = Point3D::new(7.0, 21.0, 32.0);
-        let p2 = Point3D::new(43.0, 5.0, 16.0);
-        assert_eq!(p1.dot(p2), 918.0);
-    }
-
-    #[test]
-    pub fn test_cross() {
-        let p1 = Point3D::new(4.0, 7.0, 9.0);
-        let p2 = Point3D::new(13.0, 8.0, 3.0);
-        let p3 = p1.cross(p2);
-        assert_eq!(p3, Point3D::new(-51.0, 105.0, -59.0));
-    }
-
-    #[test]
-    pub fn test_normalize() {
-        let p0: Point3D<f32> = Point3D::zero();
-        let p1: Point3D<f32> = Point3D::new(0.0, -6.0, 0.0);
-        let p2: Point3D<f32> = Point3D::new(1.0, 2.0, -2.0);
-        assert_eq!(p0.normalize(), p0);
-        assert_eq!(p1.normalize(), Point3D::new(0.0, -1.0, 0.0));
-        assert_eq!(p2.normalize(), Point3D::new(1.0/3.0, 2.0/3.0, -2.0/3.0));
-    }
 
     #[test]
     pub fn test_min() {
