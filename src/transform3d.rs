@@ -10,7 +10,8 @@
 use super::{UnknownUnit, Radians};
 use approxeq::ApproxEq;
 use trig::Trig;
-use point::{TypedPoint2D, TypedPoint3D, TypedPoint4D};
+use point::{TypedPoint2D, TypedPoint3D, point2, point3};
+use vector::{TypedVector2D, TypedVector3D, vec2, vec3};
 use rect::TypedRect;
 use transform2d::TypedTransform2D;
 use scale_factor::ScaleFactor;
@@ -24,8 +25,8 @@ define_matrix! {
     ///
     /// Transforms can be parametrized over the source and destination units, to describe a
     /// transformation from a space to another.
-    /// For example, `TypedTransform3D<f32, WordSpace, ScreenSpace>::transform_point4d`
-    /// takes a `TypedPoint4D<f32, WordSpace>` and returns a `TypedPoint4D<f32, ScreenSpace>`.
+    /// For example, `TypedTransform3D<f32, WordSpace, ScreenSpace>::transform_point3d`
+    /// takes a `TypedPoint3D<f32, WordSpace>` and returns a `TypedPoint3D<f32, ScreenSpace>`.
     ///
     /// Transforms expose a set of convenience methods for pre- and post-transformations.
     /// A pre-transformation corresponds to adding an operation that is applied before
@@ -387,8 +388,24 @@ where T: Copy + Clone +
     ///
     /// The input point must be use the unit Src, and the returned point has the unit Dst.
     #[inline]
-    pub fn transform_point(&self, p: &TypedPoint2D<T, Src>) -> TypedPoint2D<T, Dst> {
-        self.transform_point4d(&TypedPoint4D::new(p.x, p.y, Zero::zero(), One::one())).to_2d()
+    pub fn transform_point2d(&self, p: &TypedPoint2D<T, Src>) -> TypedPoint2D<T, Dst> {
+        let x = p.x * self.m11 + p.y * self.m21 + self.m41;
+        let y = p.x * self.m12 + p.y * self.m22 + self.m42;
+
+        let w = p.x * self.m14 + p.y * self.m24 + self.m44;
+
+        point2(x/w, y/w)
+    }
+
+    /// Returns the given 2d vector transformed by this matrix.
+    ///
+    /// The input point must be use the unit Src, and the returned point has the unit Dst.
+    #[inline]
+    pub fn transform_vector2d(&self, v: &TypedVector2D<T, Src>) -> TypedVector2D<T, Dst> {
+        vec2(
+            v.x * self.m11 + v.y * self.m21,
+            v.x * self.m12 + v.y * self.m22,
+        )
     }
 
     /// Returns the given 3d point transformed by this transform.
@@ -396,29 +413,34 @@ where T: Copy + Clone +
     /// The input point must be use the unit Src, and the returned point has the unit Dst.
     #[inline]
     pub fn transform_point3d(&self, p: &TypedPoint3D<T, Src>) -> TypedPoint3D<T, Dst> {
-        self.transform_point4d(&TypedPoint4D::new(p.x, p.y, p.z, One::one())).to_3d()
+        let x = p.x * self.m11 + p.y * self.m21 + p.z * self.m31 + self.m41;
+        let y = p.x * self.m12 + p.y * self.m22 + p.z * self.m32 + self.m42;
+        let z = p.x * self.m13 + p.y * self.m23 + p.z * self.m33 + self.m43;
+        let w = p.x * self.m14 + p.y * self.m24 + p.z * self.m34 + self.m44;
+
+        point3(x/w, y/w, z/w)
     }
 
-    /// Returns the given 4d point transformed by this transform.
+    /// Returns the given 3d vector transformed by this matrix.
     ///
     /// The input point must be use the unit Src, and the returned point has the unit Dst.
     #[inline]
-    pub fn transform_point4d(&self, p: &TypedPoint4D<T, Src>) -> TypedPoint4D<T, Dst> {
-        let x = p.x * self.m11 + p.y * self.m21 + p.z * self.m31 + p.w * self.m41;
-        let y = p.x * self.m12 + p.y * self.m22 + p.z * self.m32 + p.w * self.m42;
-        let z = p.x * self.m13 + p.y * self.m23 + p.z * self.m33 + p.w * self.m43;
-        let w = p.x * self.m14 + p.y * self.m24 + p.z * self.m34 + p.w * self.m44;
-        TypedPoint4D::new(x, y, z, w)
+    pub fn transform_vector3d(&self, v: &TypedVector3D<T, Src>) -> TypedVector3D<T, Dst> {
+        vec3(
+            v.x * self.m11 + v.y * self.m21 + v.z * self.m31,
+            v.x * self.m12 + v.y * self.m22 + v.z * self.m32,
+            v.x * self.m13 + v.y * self.m23 + v.z * self.m33,
+        )
     }
 
     /// Returns a rectangle that encompasses the result of transforming the given rectangle by this
     /// transform.
     pub fn transform_rect(&self, rect: &TypedRect<T, Src>) -> TypedRect<T, Dst> {
         TypedRect::from_points(&[
-            self.transform_point(&rect.origin),
-            self.transform_point(&rect.top_right()),
-            self.transform_point(&rect.bottom_left()),
-            self.transform_point(&rect.bottom_right()),
+            self.transform_point2d(&rect.origin),
+            self.transform_point2d(&rect.top_right()),
+            self.transform_point2d(&rect.bottom_left()),
+            self.transform_point2d(&rect.bottom_right()),
         ])
     }
 
@@ -434,13 +456,13 @@ where T: Copy + Clone +
     }
 
     /// Returns a transform with a translation applied before self's transformation.
-    pub fn pre_translated(&self, x: T, y: T, z: T) -> TypedTransform3D<T, Src, Dst> {
-        self.pre_mul(&TypedTransform3D::create_translation(x, y, z))
+    pub fn pre_translated(&self, v: TypedVector3D<T, Dst>) -> TypedTransform3D<T, Src, Dst> {
+        self.pre_mul(&TypedTransform3D::create_translation(v.x, v.y, v.z))
     }
 
     /// Returns a transform with a translation applied after self's transformation.
-    pub fn post_translated(&self, x: T, y: T, z: T) -> TypedTransform3D<T, Src, Dst> {
-        self.post_mul(&TypedTransform3D::create_translation(x, y, z))
+    pub fn post_translated(&self, v: TypedVector3D<T, Dst>) -> TypedTransform3D<T, Src, Dst> {
+        self.post_mul(&TypedTransform3D::create_translation(v.x, v.y, v.z))
     }
 
     /// Create a 3d scale transform
@@ -608,7 +630,7 @@ where T: Copy + fmt::Debug +
 mod tests {
     use approxeq::ApproxEq;
     use transform2d::Transform2D;
-    use point::{Point2D, Point3D, Point4D};
+    use point::{Point2D, Point3D};
     use Radians;
     use super::*;
 
@@ -622,13 +644,13 @@ mod tests {
     #[test]
     pub fn test_translation() {
         let t1 = Mf32::create_translation(1.0, 2.0, 3.0);
-        let t2 = Mf32::identity().pre_translated(1.0, 2.0, 3.0);
-        let t3 = Mf32::identity().post_translated(1.0, 2.0, 3.0);
+        let t2 = Mf32::identity().pre_translated(vec3(1.0, 2.0, 3.0));
+        let t3 = Mf32::identity().post_translated(vec3(1.0, 2.0, 3.0));
         assert_eq!(t1, t2);
         assert_eq!(t1, t3);
 
         assert_eq!(t1.transform_point3d(&Point3D::new(1.0, 1.0, 1.0)), Point3D::new(2.0, 3.0, 4.0));
-        assert_eq!(t1.transform_point(&Point2D::new(1.0, 1.0)), Point2D::new(2.0, 3.0));
+        assert_eq!(t1.transform_point2d(&Point2D::new(1.0, 1.0)), Point2D::new(2.0, 3.0));
 
         assert_eq!(t1.post_mul(&t1), Mf32::create_translation(2.0, 4.0, 6.0));
 
@@ -645,7 +667,7 @@ mod tests {
         assert_eq!(r1, r3);
 
         assert!(r1.transform_point3d(&Point3D::new(1.0, 2.0, 3.0)).approx_eq(&Point3D::new(2.0, -1.0, 3.0)));
-        assert!(r1.transform_point(&Point2D::new(1.0, 2.0)).approx_eq(&Point2D::new(2.0, -1.0)));
+        assert!(r1.transform_point2d(&Point2D::new(1.0, 2.0)).approx_eq(&Point2D::new(2.0, -1.0)));
 
         assert!(r1.post_mul(&r1).approx_eq(&Mf32::create_rotation(0.0, 0.0, 1.0, rad(FRAC_PI_2*2.0))));
 
@@ -662,7 +684,7 @@ mod tests {
         assert_eq!(s1, s3);
 
         assert!(s1.transform_point3d(&Point3D::new(2.0, 2.0, 2.0)).approx_eq(&Point3D::new(4.0, 6.0, 8.0)));
-        assert!(s1.transform_point(&Point2D::new(2.0, 2.0)).approx_eq(&Point2D::new(4.0, 6.0)));
+        assert!(s1.transform_point2d(&Point2D::new(2.0, 2.0)).approx_eq(&Point2D::new(4.0, 6.0)));
 
         assert_eq!(s1.post_mul(&s1), Mf32::create_scale(4.0, 9.0, 16.0));
 
@@ -757,10 +779,10 @@ mod tests {
         assert!(m1.pre_mul(&m2).approx_eq(&Mf32::identity()));
 
         let p1 = Point2D::new(1000.0, 2000.0);
-        let p2 = m1.transform_point(&p1);
+        let p2 = m1.transform_point2d(&p1);
         assert!(p2.eq(&Point2D::new(1100.0, 2200.0)));
 
-        let p3 = m2.transform_point(&p2);
+        let p3 = m2.transform_point2d(&p2);
         assert!(p3.eq(&p1));
     }
 
@@ -772,8 +794,8 @@ mod tests {
 
     #[test]
     pub fn test_pre_post() {
-        let m1 = Transform3D::identity().post_scaled(1.0, 2.0, 3.0).post_translated(1.0, 2.0, 3.0);
-        let m2 = Transform3D::identity().pre_translated(1.0, 2.0, 3.0).pre_scaled(1.0, 2.0, 3.0);
+        let m1 = Transform3D::identity().post_scaled(1.0, 2.0, 3.0).post_translated(vec3(1.0, 2.0, 3.0));
+        let m2 = Transform3D::identity().pre_translated(vec3(1.0, 2.0, 3.0)).pre_scaled(1.0, 2.0, 3.0);
         assert!(m1.approx_eq(&m2));
 
         let r = Mf32::create_rotation(0.0, 0.0, 1.0, rad(FRAC_PI_2));
@@ -808,9 +830,9 @@ mod tests {
                                  1.5, -2.0, 6.0, 0.0,
                                  -2.5, 6.0, 1.0, 1.0);
 
-        let p = Point4D::new(1.0, 3.0, 5.0, 1.0);
-        let p1 = m2.pre_mul(&m1).transform_point4d(&p);
-        let p2 = m2.transform_point4d(&m1.transform_point4d(&p));
+        let p = Point3D::new(1.0, 3.0, 5.0);
+        let p1 = m2.pre_mul(&m1).transform_point3d(&p);
+        let p2 = m2.transform_point3d(&m1.transform_point3d(&p));
         assert!(p1.approx_eq(&p2));
     }
 
@@ -818,7 +840,22 @@ mod tests {
     pub fn test_is_identity() {
         let m1 = Transform3D::identity();
         assert!(m1.is_identity());
-        let m2 = m1.post_translated(0.1, 0.0, 0.0);
+        let m2 = m1.post_translated(vec3(0.1, 0.0, 0.0));
         assert!(!m2.is_identity());
+    }
+
+    #[test]
+    pub fn test_transform_vector() {
+        // Translation does not apply to vectors.
+        let m = Mf32::create_translation(1.0, 2.0, 3.0);
+        let v1 = vec3(10.0, -10.0, 3.0);
+        assert_eq!(v1, m.transform_vector3d(&v1));
+        // While it does apply to points.
+        assert!(v1.to_point() != m.transform_point3d(&v1.to_point()));
+
+        // same thing with 2d vectors/points
+        let v2 = vec2(10.0, -5.0);
+        assert_eq!(v2, m.transform_vector2d(&v2));
+        assert!(v2.to_point() != m.transform_point2d(&v2.to_point()));
     }
 }

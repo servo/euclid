@@ -10,6 +10,7 @@
 use super::{UnknownUnit, Radians};
 use num::{One, Zero};
 use point::TypedPoint2D;
+use vector::{TypedVector2D, vec2};
 use rect::TypedRect;
 use std::ops::{Add, Mul, Div, Sub};
 use std::marker::PhantomData;
@@ -158,13 +159,13 @@ where T: Copy + Clone +
     }
 
     /// Applies a translation after self's transformation and returns the resulting transform.
-    pub fn post_translated(&self, x: T, y: T) -> TypedTransform2D<T, Src, Dst> {
-        self.post_mul(&TypedTransform2D::create_translation(x, y))
+    pub fn post_translated(&self, v: TypedVector2D<T, Dst>) -> TypedTransform2D<T, Src, Dst> {
+        self.post_mul(&TypedTransform2D::create_translation(v.x, v.y))
     }
 
     /// Applies a translation before self's transformation and returns the resulting transform.
-    pub fn pre_translated(&self, x: T, y: T) -> TypedTransform2D<T, Src, Dst> {
-        self.pre_mul(&TypedTransform2D::create_translation(x, y))
+    pub fn pre_translated(&self, v: TypedVector2D<T, Src>) -> TypedTransform2D<T, Src, Dst> {
+        self.pre_mul(&TypedTransform2D::create_translation(v.x, v.y))
     }
 
     /// Returns a scale transform.
@@ -218,6 +219,13 @@ where T: Copy + Clone +
     pub fn transform_point(&self, point: &TypedPoint2D<T, Src>) -> TypedPoint2D<T, Dst> {
         TypedPoint2D::new(point.x * self.m11 + point.y * self.m21 + self.m31,
                           point.x * self.m12 + point.y * self.m22 + self.m32)
+    }
+
+    /// Returns the given vector transformed by this matrix.
+    #[inline]
+    pub fn transform_vector(&self, vec: &TypedVector2D<T, Src>) -> TypedVector2D<T, Dst> {
+        vec2(vec.x * self.m11 + vec.y * self.m21,
+             vec.x * self.m12 + vec.y * self.m22)
     }
 
     /// Returns a rectangle that encompasses the result of transforming the given rectangle by this
@@ -317,8 +325,8 @@ mod test {
     #[test]
     pub fn test_translation() {
         let t1 = Mat::create_translation(1.0, 2.0);
-        let t2 = Mat::identity().pre_translated(1.0, 2.0);
-        let t3 = Mat::identity().post_translated(1.0, 2.0);
+        let t2 = Mat::identity().pre_translated(vec2(1.0, 2.0));
+        let t3 = Mat::identity().post_translated(vec2(1.0, 2.0));
         assert_eq!(t1, t2);
         assert_eq!(t1, t3);
 
@@ -395,8 +403,8 @@ mod test {
 
     #[test]
     pub fn test_pre_post() {
-        let m1 = Transform2D::identity().post_scaled(1.0, 2.0).post_translated(1.0, 2.0);
-        let m2 = Transform2D::identity().pre_translated(1.0, 2.0).pre_scaled(1.0, 2.0);
+        let m1 = Transform2D::identity().post_scaled(1.0, 2.0).post_translated(vec2(1.0, 2.0));
+        let m2 = Transform2D::identity().pre_translated(vec2(1.0, 2.0)).pre_scaled(1.0, 2.0);
         assert!(m1.approx_eq(&m2));
 
         let r = Mat::create_rotation(rad(FRAC_PI_2));
@@ -424,7 +432,15 @@ mod test {
     pub fn test_is_identity() {
         let m1 = Transform2D::identity();
         assert!(m1.is_identity());
-        let m2 = m1.post_translated(0.1, 0.0);
+        let m2 = m1.post_translated(vec2(0.1, 0.0));
         assert!(!m2.is_identity());
+    }
+
+    #[test]
+    pub fn test_transform_vector() {
+        // Translation does not apply to vectors.
+        let m1 = Mat::create_translation(1.0, 1.0);
+        let v1 = vec2(10.0, -10.0);
+        assert_eq!(v1, m1.transform_vector(&v1));
     }
 }
