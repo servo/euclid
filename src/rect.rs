@@ -12,6 +12,7 @@ use length::Length;
 use scale_factor::ScaleFactor;
 use num::*;
 use point::TypedPoint2D;
+use vector::TypedVector2D;
 use size::TypedSize2D;
 
 use heapsize::HeapSizeOf;
@@ -154,11 +155,11 @@ where T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output=T> + Sub<T
                                                     lower_right_y - upper_left.y)))
     }
 
-    /// Translates the rect by a vector.
+    /// Returns the same rectangle, translated by a vector.
     #[inline]
-    pub fn translate(&self, other: &TypedPoint2D<T, U>) -> TypedRect<T, U> {
+    pub fn translate(&self, by: &TypedVector2D<T, U>) -> TypedRect<T, U> {
         TypedRect::new(
-            TypedPoint2D::new(self.origin.x + other.x, self.origin.y + other.y),
+            TypedPoint2D::new(self.origin.x + by.x, self.origin.y + by.y),
             self.size
         )
     }
@@ -212,7 +213,7 @@ where T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output=T> + Sub<T
 
     #[inline]
     pub fn translate_by_size(&self, size: &TypedSize2D<T, U>) -> TypedRect<T, U> {
-        self.translate(&TypedPoint2D::new(size.width, size.height))
+        self.translate(&size.to_vector())
     }
 
     /// Returns the smallest rectangle containing the four points.
@@ -434,6 +435,7 @@ pub fn rect<T: Copy, U>(x: T, y: T, w: T, h: T) -> TypedRect<T, U> {
 #[cfg(test)]
 mod tests {
     use point::Point2D;
+    use vector::vec2;
     use size::Size2D;
     use super::*;
 
@@ -449,7 +451,7 @@ mod tests {
     #[test]
     fn test_translate() {
         let p = Rect::new(Point2D::new(0u32, 0u32), Size2D::new(50u32, 40u32));
-        let pp = p.translate(&Point2D::new(10,15));
+        let pp = p.translate(&vec2(10,15));
 
         assert!(pp.size.width == 50);
         assert!(pp.size.height == 40);
@@ -458,7 +460,7 @@ mod tests {
 
 
         let r = Rect::new(Point2D::new(-10, -5), Size2D::new(50, 40));
-        let rr = r.translate(&Point2D::new(0,-10));
+        let rr = r.translate(&vec2(0,-10));
 
         assert!(rr.size.width == 50);
         assert!(rr.size.height == 40);
@@ -561,10 +563,10 @@ mod tests {
 
         let r = Rect::new(Point2D::new(-20.0, 15.0), Size2D::new(100.0, 200.0));
         assert!(r.contains_rect(&r));
-        assert!(!r.contains_rect(&r.translate(&Point2D::new( 0.1,  0.0))));
-        assert!(!r.contains_rect(&r.translate(&Point2D::new(-0.1,  0.0))));
-        assert!(!r.contains_rect(&r.translate(&Point2D::new( 0.0,  0.1))));
-        assert!(!r.contains_rect(&r.translate(&Point2D::new( 0.0, -0.1))));
+        assert!(!r.contains_rect(&r.translate(&vec2( 0.1,  0.0))));
+        assert!(!r.contains_rect(&r.translate(&vec2(-0.1,  0.0))));
+        assert!(!r.contains_rect(&r.translate(&vec2( 0.0,  0.1))));
+        assert!(!r.contains_rect(&r.translate(&vec2( 0.0, -0.1))));
         // Empty rectangles are always considered as contained in other rectangles,
         // even if their origin is not.
         let p = Point2D::new(1.0, 1.0);

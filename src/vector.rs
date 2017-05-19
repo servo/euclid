@@ -11,8 +11,8 @@ use super::UnknownUnit;
 use approxeq::ApproxEq;
 use length::Length;
 use point::{TypedPoint2D, TypedPoint3D};
+use size::{TypedSize2D, size2};
 use scale_factor::ScaleFactor;
-use size::TypedSize2D;
 use num::*;
 use num_traits::{Float, NumCast};
 use std::fmt;
@@ -78,6 +78,13 @@ impl<T: Copy, U> TypedVector2D<T, U> {
     pub fn to_point(&self) -> TypedPoint2D<T, U> {
         TypedPoint2D::new(self.x, self.y)
     }
+
+    /// Cast this vector into a size.
+    #[inline]
+    pub fn to_size(&self) -> TypedSize2D<T, U> {
+        size2(self.x, self.y)
+    }
+
 
     /// Returns self.x as a Length carrying the unit.
     #[inline]
