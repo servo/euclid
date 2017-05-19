@@ -69,8 +69,8 @@ extern crate num_traits;
 
 pub use length::Length;
 pub use scale_factor::ScaleFactor;
-pub use matrix2d::{Matrix2D, TypedMatrix2D};
-pub use matrix4d::{Matrix4D, TypedMatrix4D};
+pub use transform2d::{Transform2D, TypedTransform2D};
+pub use transform3d::{Transform3D, TypedTransform3D};
 pub use point::{
     Point2D, TypedPoint2D,
     Point3D, TypedPoint3D,
@@ -85,8 +85,8 @@ pub mod approxeq;
 pub mod length;
 #[macro_use]
 mod macros;
-pub mod matrix2d;
-pub mod matrix4d;
+pub mod transform2d;
+pub mod transform3d;
 pub mod num;
 pub mod point;
 pub mod rect;
@@ -110,3 +110,20 @@ pub type Radians<T> = Length<T, Rad>;
 
 /// A value in Degrees.
 pub type Degrees<T> = Length<T, Deg>;
+
+/// Temporary alias to facilitate the transition to the new naming scheme
+#[deprecated]
+pub type Matrix2D<T> = Transform2D<T>;
+
+/// Temporary alias to facilitate the transition to the new naming scheme
+#[deprecated]
+pub type TypedMatrix2D<T, Src, Dst> = TypedTransform2D<T, Src, Dst>;
+
+/// Temporary alias to facilitate the transition to the new naming scheme
+#[deprecated]
+pub type Matrix4D<T> = Transform3D<T>;
+
+/// Temporary alias to facilitate the transition to the new naming scheme
+#[deprecated]
+pub type TypedMatrix4D<T, Src, Dst> = TypedTransform3D<T, Src, Dst>;
+
