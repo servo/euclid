@@ -50,9 +50,9 @@ impl<Unit, T: HeapSizeOf> HeapSizeOf for Length<T, Unit> {
     }
 }
 
-impl<Unit, T> Deserialize for Length<T, Unit> where T: Deserialize {
+impl<'de, Unit, T> Deserialize<'de> for Length<T, Unit> where T: Deserialize<'de> {
     fn deserialize<D>(deserializer: D) -> Result<Length<T, Unit>,D::Error>
-                      where D: Deserializer {
+                      where D: Deserializer<'de> {
         Ok(Length(try!(Deserialize::deserialize(deserializer)), PhantomData))
     }
 }
