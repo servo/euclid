@@ -156,7 +156,7 @@ impl<T: Copy + Sub<T, Output=T>, U> Sub for TypedPoint2D<T, U> {
 }
 
 impl<T: Copy + Sub<T, Output=T>, U> Sub<TypedVector2D<T, U>> for TypedPoint2D<T, U> {
-    type Output = TypedPoint2D<T, U>;
+    type Output = Self;
     #[inline]
     fn sub(self, other: TypedVector2D<T, U>) -> Self {
         point2(self.x - other.x, self.y - other.y)
@@ -176,7 +176,7 @@ impl<T: Float, U> TypedPoint2D<T, U> {
 }
 
 impl<T: Copy + Mul<T, Output=T>, U> Mul<T> for TypedPoint2D<T, U> {
-    type Output = TypedPoint2D<T, U>;
+    type Output = Self;
     #[inline]
     fn mul(self, scale: T) -> Self {
         point2(self.x * scale, self.y * scale)
@@ -191,7 +191,7 @@ impl<T: Copy + Mul<T, Output=T>, U> MulAssign<T> for TypedPoint2D<T, U> {
 }
 
 impl<T: Copy + Div<T, Output=T>, U> Div<T> for TypedPoint2D<T, U> {
-    type Output = TypedPoint2D<T, U>;
+    type Output = Self;
     #[inline]
     fn div(self, scale: T) -> Self {
         point2(self.x / scale, self.y / scale)
@@ -307,7 +307,7 @@ impl<T: NumCast + Copy, U> TypedPoint2D<T, U> {
     }
 }
 
-impl<T: Copy+ApproxEq<T>, U> ApproxEq<TypedPoint2D<T, U>> for TypedPoint2D<T, U> {
+impl<T: Copy+ApproxEq<T>, U> ApproxEq<Self> for TypedPoint2D<T, U> {
     #[inline]
     fn approx_epsilon() -> Self {
         point2(T::approx_epsilon(), T::approx_epsilon())
@@ -383,7 +383,7 @@ impl<T: Copy, U> TypedPoint3D<T, U> {
     /// Equivalent to substracting the origin to this point.
     #[inline]
     pub fn to_vector(&self) -> TypedVector3D<T, U> {
-        TypedVector3D::new(self.x, self.y, self.y)
+        vec3(self.x, self.y, self.y)
     }
 
     /// Returns self.x as a Length carrying the unit.
@@ -420,38 +420,6 @@ impl<T: Copy, U> TypedPoint3D<T, U> {
     }
 }
 
-impl<T: Mul<T, Output=T> +
-        Add<T, Output=T> +
-        Sub<T, Output=T> +
-        Copy, U> TypedPoint3D<T, U> {
-
-    // Dot product.
-    #[inline]
-    pub fn dot(self, other: TypedPoint3D<T, U>) -> T {
-        self.x * other.x +
-        self.y * other.y +
-        self.z * other.z
-    }
-
-    // Cross product.
-    #[inline]
-    pub fn cross(self, other: TypedPoint3D<T, U>) -> Self {
-        point3(self.y * other.z - self.z * other.y,
-                          self.z * other.x - self.x * other.z,
-                          self.x * other.y - self.y * other.x)
-    }
-
-    #[inline]
-    pub fn normalize(self) -> Self where T: Float + ApproxEq<T> {
-        let dot = self.dot(self);
-        if dot.approx_eq(&T::zero()) {
-            self
-        } else {
-            self / dot.sqrt()
-        }
-    }
-}
-
 impl<T: Copy + Add<T, Output=T>, U> AddAssign<TypedVector3D<T, U>> for TypedPoint3D<T, U> {
     #[inline]
     fn add_assign(&mut self, other: TypedVector3D<T, U>) {
@@ -467,7 +435,7 @@ impl<T: Copy + Sub<T, Output=T>, U> SubAssign<TypedVector3D<T, U>> for TypedPoin
 }
 
 impl<T: Copy + Add<T, Output=T>, U> Add<TypedVector3D<T, U>> for TypedPoint3D<T, U> {
-    type Output = TypedPoint3D<T, U>;
+    type Output = Self;
     #[inline]
     fn add(self, other: TypedVector3D<T, U>) -> Self {
         point3(self.x + other.x, self.y + other.y, self.z + other.z)
@@ -477,13 +445,13 @@ impl<T: Copy + Add<T, Output=T>, U> Add<TypedVector3D<T, U>> for TypedPoint3D<T,
 impl<T: Copy + Sub<T, Output=T>, U> Sub for TypedPoint3D<T, U> {
     type Output = TypedVector3D<T, U>;
     #[inline]
-    fn sub(self, other: TypedPoint3D<T, U>) -> TypedVector3D<T, U> {
+    fn sub(self, other: Self) -> TypedVector3D<T, U> {
         vec3(self.x - other.x, self.y - other.y, self.z - other.z)
     }
 }
 
 impl<T: Copy + Sub<T, Output=T>, U> Sub<TypedVector3D<T, U>> for TypedPoint3D<T, U> {
-    type Output = TypedPoint3D<T, U>;
+    type Output = Self;
     #[inline]
     fn sub(self, other: TypedVector3D<T, U>) -> Self {
         point3(self.x - other.x, self.y - other.y, self.z - other.z)
@@ -494,7 +462,7 @@ impl<T: Copy + Mul<T, Output=T>, U> Mul<T> for TypedPoint3D<T, U> {
     type Output = Self;
     #[inline]
     fn mul(self, scale: T) -> Self {
-        Self::new(self.x * scale, self.y * scale, self.z * scale)
+        point3(self.x * scale, self.y * scale, self.z * scale)
     }
 }
 
@@ -502,18 +470,18 @@ impl<T: Copy + Div<T, Output=T>, U> Div<T> for TypedPoint3D<T, U> {
     type Output = Self;
     #[inline]
     fn div(self, scale: T) -> Self {
-        Self::new(self.x / scale, self.y / scale, self.z / scale)
+        point3(self.x / scale, self.y / scale, self.z / scale)
     }
 }
 
 impl<T: Float, U> TypedPoint3D<T, U> {
     #[inline]
-    pub fn min(self, other: TypedPoint3D<T, U>) -> Self {
+    pub fn min(self, other: Self) -> Self {
          point3(self.x.min(other.x), self.y.min(other.y), self.z.min(other.z))
     }
 
     #[inline]
-    pub fn max(self, other: TypedPoint3D<T, U>) -> Self {
+    pub fn max(self, other: Self) -> Self {
         point3(self.x.max(other.x), self.y.max(other.y), self.z.max(other.z))
     }
 }
@@ -603,7 +571,7 @@ impl<T: NumCast + Copy, U> TypedPoint3D<T, U> {
     }
 }
 
-impl<T: Copy+ApproxEq<T>, U> ApproxEq<TypedPoint3D<T, U>> for TypedPoint3D<T, U> {
+impl<T: Copy+ApproxEq<T>, U> ApproxEq<Self> for TypedPoint3D<T, U> {
     #[inline]
     fn approx_epsilon() -> Self {
         point3(T::approx_epsilon(), T::approx_epsilon(), T::approx_epsilon())
