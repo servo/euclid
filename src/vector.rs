@@ -10,7 +10,7 @@
 use super::UnknownUnit;
 use approxeq::ApproxEq;
 use length::Length;
-use point::{TypedPoint2D, TypedPoint3D};
+use point::{TypedPoint2D, TypedPoint3D, point2, point3};
 use size::{TypedSize2D, size2};
 use scale_factor::ScaleFactor;
 use num::*;
@@ -35,7 +35,7 @@ pub type Vector2D<T> = TypedVector2D<T, UnknownUnit>;
 impl<T: Copy + Zero, U> TypedVector2D<T, U> {
     /// Constructor, setting all components to zero.
     #[inline]
-    pub fn zero() -> TypedVector2D<T, U> {
+    pub fn zero() -> Self {
         TypedVector2D::new(Zero::zero(), Zero::zero())
     }
 
@@ -61,14 +61,14 @@ impl<T: fmt::Display, U> fmt::Display for TypedVector2D<T, U> {
 impl<T: Copy, U> TypedVector2D<T, U> {
     /// Constructor taking scalar values directly.
     #[inline]
-    pub fn new(x: T, y: T) -> TypedVector2D<T, U> {
+    pub fn new(x: T, y: T) -> Self {
         TypedVector2D { x: x, y: y, _unit: PhantomData }
     }
 
     /// Constructor taking properly typed Lengths instead of scalar values.
     #[inline]
-    pub fn from_lengths(x: Length<T, U>, y: Length<T, U>) -> TypedVector2D<T, U> {
-        TypedVector2D::new(x.0, y.0)
+    pub fn from_lengths(x: Length<T, U>, y: Length<T, U>) -> Self {
+        vec2(x.0, y.0)
     }
 
     /// Cast this vector into a point.
@@ -76,7 +76,7 @@ impl<T: Copy, U> TypedVector2D<T, U> {
     /// Equivalent to adding this vector to the origin.
     #[inline]
     pub fn to_point(&self) -> TypedPoint2D<T, U> {
-        TypedPoint2D::new(self.x, self.y)
+        point2(self.x, self.y)
     }
 
     /// Cast this vector into a size.
@@ -97,13 +97,13 @@ impl<T: Copy, U> TypedVector2D<T, U> {
     /// Drop the units, preserving only the numeric value.
     #[inline]
     pub fn to_untyped(&self) -> Vector2D<T> {
-        TypedVector2D::new(self.x, self.y)
+        vec2(self.x, self.y)
     }
 
     /// Tag a unitless value with units.
     #[inline]
-    pub fn from_untyped(p: &Vector2D<T>) -> TypedVector2D<T, U> {
-        TypedVector2D::new(p.x, p.y)
+    pub fn from_untyped(p: &Vector2D<T>) -> Self {
+        vec2(p.x, p.y)
     }
 
     #[inline]
@@ -116,13 +116,13 @@ impl<T, U> TypedVector2D<T, U>
 where T: Copy + Mul<T, Output=T> + Add<T, Output=T> + Sub<T, Output=T> {
     /// Dot product.
     #[inline]
-    pub fn dot(self, other: TypedVector2D<T, U>) -> T {
+    pub fn dot(self, other: Self) -> T {
         self.x * other.x + self.y * other.y
     }
 
     /// Returns the norm of the cross product [self.x, self.y, 0] x [other.x, other.y, 0]..
     #[inline]
-    pub fn cross(self, other: TypedVector2D<T, U>) -> T {
+    pub fn cross(self, other: Self) -> T {
         self.x * other.y - self.y * other.x
     }
 
@@ -148,81 +148,66 @@ where T: Copy + Mul<T, Output=T> + Add<T, Output=T> + Sub<T, Output=T> {
 }
 
 impl<T: Copy + Add<T, Output=T>, U> Add for TypedVector2D<T, U> {
-    type Output = TypedVector2D<T, U>;
-    fn add(self, other: TypedVector2D<T, U>) -> TypedVector2D<T, U> {
+    type Output = Self;
+    fn add(self, other: Self) -> Self {
         TypedVector2D::new(self.x + other.x, self.y + other.y)
     }
 }
 
 impl<T: Copy + Add<T, Output=T>, U> AddAssign for TypedVector2D<T, U> {
     #[inline]
-    fn add_assign(&mut self, other: TypedVector2D<T, U>) {
+    fn add_assign(&mut self, other: Self) {
         *self = *self + other
     }
 }
 
 impl<T: Copy + Sub<T, Output=T>, U> SubAssign<TypedVector2D<T, U>> for TypedVector2D<T, U> {
     #[inline]
-    fn sub_assign(&mut self, other: TypedVector2D<T, U>) {
+    fn sub_assign(&mut self, other: Self) {
         *self = *self - other
     }
 }
 
-impl<T: Copy + Add<T, Output=T>, U> Add<TypedSize2D<T, U>> for TypedVector2D<T, U> {
-    type Output = TypedVector2D<T, U>;
-    #[inline]
-    fn add(self, other: TypedSize2D<T, U>) -> TypedVector2D<T, U> {
-        vec2(self.x + other.width, self.y + other.height)
-    }
-}
-
-impl<T: Copy + Add<T, Output=T>, U> TypedVector2D<T, U> {
-    #[inline]
-    pub fn add_size(&self, other: &TypedSize2D<T, U>) -> TypedVector2D<T, U> {
-        vec2(self.x + other.width, self.y + other.height)
-    }
-}
-
 impl<T: Copy + Sub<T, Output=T>, U> Sub for TypedVector2D<T, U> {
-    type Output = TypedVector2D<T, U>;
+    type Output = Self;
     #[inline]
-    fn sub(self, other: TypedVector2D<T, U>) -> TypedVector2D<T, U> {
+    fn sub(self, other: TypedVector2D<T, U>) -> Self {
         vec2(self.x - other.x, self.y - other.y)
     }
 }
 
 impl <T: Copy + Neg<Output=T>, U> Neg for TypedVector2D<T, U> {
-    type Output = TypedVector2D<T, U>;
+    type Output = Self;
     #[inline]
-    fn neg(self) -> TypedVector2D<T, U> {
+    fn neg(self) -> Self {
         vec2(-self.x, -self.y)
     }
 }
 
 impl<T: Float, U> TypedVector2D<T, U> {
     #[inline]
-    pub fn min(self, other: TypedVector2D<T, U>) -> TypedVector2D<T, U> {
+    pub fn min(self, other: TypedVector2D<T, U>) -> Self {
          vec2(self.x.min(other.x), self.y.min(other.y))
     }
 
     #[inline]
-    pub fn max(self, other: TypedVector2D<T, U>) -> TypedVector2D<T, U> {
+    pub fn max(self, other: TypedVector2D<T, U>) -> Self {
         vec2(self.x.max(other.x), self.y.max(other.y))
     }
 }
 
 impl<T: Copy + Mul<T, Output=T>, U> Mul<T> for TypedVector2D<T, U> {
-    type Output = TypedVector2D<T, U>;
+    type Output = Self;
     #[inline]
-    fn mul(self, scale: T) -> TypedVector2D<T, U> {
+    fn mul(self, scale: T) -> Self {
         vec2(self.x * scale, self.y * scale)
     }
 }
 
 impl<T: Copy + Div<T, Output=T>, U> Div<T> for TypedVector2D<T, U> {
-    type Output = TypedVector2D<T, U>;
+    type Output = Self;
     #[inline]
-    fn div(self, scale: T) -> TypedVector2D<T, U> {
+    fn div(self, scale: T) -> Self {
         vec2(self.x / scale, self.y / scale)
     }
 }
@@ -377,7 +362,7 @@ pub type Vector3D<T> = TypedVector3D<T, UnknownUnit>;
 impl<T: Copy + Zero, U> TypedVector3D<T, U> {
     /// Constructor, setting all copmonents to zero.
     #[inline]
-    pub fn zero() -> TypedVector3D<T, U> {
+    pub fn zero() -> Self {
         vec3(Zero::zero(), Zero::zero(), Zero::zero())
     }
 
@@ -402,7 +387,7 @@ impl<T: fmt::Display, U> fmt::Display for TypedVector3D<T, U> {
 impl<T: Copy, U> TypedVector3D<T, U> {
     /// Constructor taking scalar values directly.
     #[inline]
-    pub fn new(x: T, y: T, z: T) -> TypedVector3D<T, U> {
+    pub fn new(x: T, y: T, z: T) -> Self {
         TypedVector3D { x: x, y: y, z: z, _unit: PhantomData }
     }
 
@@ -417,7 +402,7 @@ impl<T: Copy, U> TypedVector3D<T, U> {
     /// Equivalent to adding this vector to the origin.
     #[inline]
     pub fn to_point(&self) -> TypedPoint3D<T, U> {
-        TypedPoint3D::new(self.x, self.y, self.z)
+        point3(self.x, self.y, self.z)
     }
 
     /// Returns self.x as a Length carrying the unit.
@@ -443,14 +428,14 @@ impl<T: Copy, U> TypedVector3D<T, U> {
 
     /// Tag a unitless value with units.
     #[inline]
-    pub fn from_untyped(p: &Vector3D<T>) -> TypedVector3D<T, U> {
+    pub fn from_untyped(p: &Vector3D<T>) -> Self {
         vec3(p.x, p.y, p.z)
     }
 
     /// Convert into a 2d vector.
     #[inline]
     pub fn to_2d(&self) -> TypedVector2D<T, U> {
-        TypedVector2D::new(self.x, self.y)
+        vec2(self.x, self.y)
     }
 }
 
@@ -461,7 +446,7 @@ impl<T: Mul<T, Output=T> +
 
     // Dot product.
     #[inline]
-    pub fn dot(self, other: TypedVector3D<T, U>) -> T {
+    pub fn dot(self, other: Self) -> T {
         self.x * other.x +
         self.y * other.y +
         self.z * other.z
@@ -469,10 +454,12 @@ impl<T: Mul<T, Output=T> +
 
     // Cross product.
     #[inline]
-    pub fn cross(self, other: TypedVector3D<T, U>) -> TypedVector3D<T, U> {
-        vec3(self.y * other.z - self.z * other.y,
-                          self.z * other.x - self.x * other.z,
-                          self.x * other.y - self.y * other.x)
+    pub fn cross(self, other: TypedVector3D<T, U>) -> Self {
+        vec3(
+            self.y * other.z - self.z * other.y,
+            self.z * other.x - self.x * other.z,
+            self.x * other.y - self.y * other.x
+        )
     }
 
     #[inline]
@@ -499,41 +486,37 @@ impl<T: Mul<T, Output=T> +
 impl<T: Copy + Add<T, Output=T>, U> Add for TypedVector3D<T, U> {
     type Output = TypedVector3D<T, U>;
     #[inline]
-    fn add(self, other: TypedVector3D<T, U>) -> TypedVector3D<T, U> {
-        vec3(self.x + other.x,
-                          self.y + other.y,
-                          self.z + other.z)
+    fn add(self, other: TypedVector3D<T, U>) -> Self {
+        vec3(self.x + other.x, self.y + other.y, self.z + other.z)
     }
 }
 
 impl<T: Copy + Sub<T, Output=T>, U> Sub for TypedVector3D<T, U> {
     type Output = TypedVector3D<T, U>;
     #[inline]
-    fn sub(self, other: TypedVector3D<T, U>) -> TypedVector3D<T, U> {
-        vec3(self.x - other.x,
-                          self.y - other.y,
-                          self.z - other.z)
+    fn sub(self, other: TypedVector3D<T, U>) -> Self {
+        vec3(self.x - other.x, self.y - other.y, self.z - other.z)
     }
 }
 
 impl<T: Copy + Add<T, Output=T>, U> AddAssign for TypedVector3D<T, U> {
     #[inline]
-    fn add_assign(&mut self, other: TypedVector3D<T, U>) {
+    fn add_assign(&mut self, other: Self) {
         *self = *self + other
     }
 }
 
 impl<T: Copy + Sub<T, Output=T>, U> SubAssign<TypedVector3D<T, U>> for TypedVector3D<T, U> {
     #[inline]
-    fn sub_assign(&mut self, other: TypedVector3D<T, U>) {
+    fn sub_assign(&mut self, other: Self) {
         *self = *self - other
     }
 }
 
 impl <T: Copy + Neg<Output=T>, U> Neg for TypedVector3D<T, U> {
-    type Output = TypedVector3D<T, U>;
+    type Output = Self;
     #[inline]
-    fn neg(self) -> TypedVector3D<T, U> {
+    fn neg(self) -> Self {
         vec3(-self.x, -self.y, -self.z)
     }
 }
@@ -571,15 +554,12 @@ impl<T: Copy + Div<T, Output=T>, U> DivAssign<T> for TypedVector3D<T, U> {
 impl<T: Float, U> TypedVector3D<T, U> {
     #[inline]
     pub fn min(self, other: TypedVector3D<T, U>) -> TypedVector3D<T, U> {
-         vec3(self.x.min(other.x),
-                           self.y.min(other.y),
-                           self.z.min(other.z))
+         vec3(self.x.min(other.x), self.y.min(other.y), self.z.min(other.z))
     }
 
     #[inline]
     pub fn max(self, other: TypedVector3D<T, U>) -> TypedVector3D<T, U> {
-        vec3(self.x.max(other.x), self.y.max(other.y),
-                     self.z.max(other.z))
+        vec3(self.x.max(other.x), self.y.max(other.y), self.z.max(other.z))
     }
 }
 
