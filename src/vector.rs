@@ -137,13 +137,13 @@ where T: Copy + Mul<T, Output=T> + Add<T, Output=T> + Sub<T, Output=T> {
     }
 
     #[inline]
-    pub fn square_norm(&self) -> T {
+    pub fn square_length(&self) -> T {
         self.x * self.x + self.y * self.y
     }
 
     #[inline]
-    pub fn norm(&self) -> T where T: Float + ApproxEq<T> {
-        self.square_norm().sqrt()
+    pub fn length(&self) -> T where T: Float + ApproxEq<T> {
+        self.square_length().sqrt()
     }
 }
 
@@ -473,13 +473,13 @@ impl<T: Mul<T, Output=T> +
     }
 
     #[inline]
-    pub fn square_norm(&self) -> T {
+    pub fn square_length(&self) -> T {
         self.x * self.x + self.y * self.y + self.z * self.z
     }
 
     #[inline]
-    pub fn norm(&self) -> T where T: Float + ApproxEq<T> {
-        self.square_norm().sqrt()
+    pub fn length(&self) -> T where T: Float + ApproxEq<T> {
+        self.square_length().sqrt()
     }
 }
 

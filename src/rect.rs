@@ -158,10 +158,7 @@ where T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output=T> + Sub<T
     /// Returns the same rectangle, translated by a vector.
     #[inline]
     pub fn translate(&self, by: &TypedVector2D<T, U>) -> TypedRect<T, U> {
-        TypedRect::new(
-            TypedPoint2D::new(self.origin.x + by.x, self.origin.y + by.y),
-            self.size
-        )
+        Self::new(self.origin + *by, self.size)
     }
 
     /// Returns true if this rectangle contains the point. Points are considered
