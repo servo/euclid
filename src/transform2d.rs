@@ -131,6 +131,7 @@ where T: Copy + Clone +
 
     /// Returns the multiplication of the two matrices such that mat's transformation
     /// applies after self's transformation.
+    #[must_use]
     pub fn post_mul<NewDst>(&self, mat: &TypedTransform2D<T, Dst, NewDst>) -> TypedTransform2D<T, Src, NewDst> {
         TypedTransform2D::row_major(
             self.m11 * mat.m11 + self.m12 * mat.m21,
@@ -144,6 +145,7 @@ where T: Copy + Clone +
 
     /// Returns the multiplication of the two matrices such that mat's transformation
     /// applies before self's transformation.
+    #[must_use]
     pub fn pre_mul<NewSrc>(&self, mat: &TypedTransform2D<T, NewSrc, Src>) -> TypedTransform2D<T, NewSrc, Dst> {
         mat.post_mul(self)
     }
@@ -159,12 +161,14 @@ where T: Copy + Clone +
     }
 
     /// Applies a translation after self's transformation and returns the resulting transform.
-    pub fn post_translated(&self, v: TypedVector2D<T, Dst>) -> TypedTransform2D<T, Src, Dst> {
+    #[must_use]
+    pub fn post_translate(&self, v: TypedVector2D<T, Dst>) -> TypedTransform2D<T, Src, Dst> {
         self.post_mul(&TypedTransform2D::create_translation(v.x, v.y))
     }
 
     /// Applies a translation before self's transformation and returns the resulting transform.
-    pub fn pre_translated(&self, v: TypedVector2D<T, Src>) -> TypedTransform2D<T, Src, Dst> {
+    #[must_use]
+    pub fn pre_translate(&self, v: TypedVector2D<T, Src>) -> TypedTransform2D<T, Src, Dst> {
         self.pre_mul(&TypedTransform2D::create_translation(v.x, v.y))
     }
 
@@ -179,12 +183,12 @@ where T: Copy + Clone +
     }
 
     /// Applies a scale after self's transformation and returns the resulting transform.
-    pub fn post_scaled(&self, x: T, y: T) -> TypedTransform2D<T, Src, Dst> {
+    pub fn post_scale(&self, x: T, y: T) -> TypedTransform2D<T, Src, Dst> {
         self.post_mul(&TypedTransform2D::create_scale(x, y))
     }
 
     /// Applies a scale before self's transformation and returns the resulting transform.
-    pub fn pre_scaled(&self, x: T, y: T) -> TypedTransform2D<T, Src, Dst> {
+    pub fn pre_scale(&self, x: T, y: T) -> TypedTransform2D<T, Src, Dst> {
         TypedTransform2D::row_major(
             self.m11 * x, self.m12,
             self.m21,     self.m22 * y,
@@ -205,17 +209,20 @@ where T: Copy + Clone +
     }
 
     /// Applies a rotation after self's transformation and returns the resulting transform.
-    pub fn post_rotated(&self, theta: Radians<T>) -> TypedTransform2D<T, Src, Dst> {
+    #[must_use]
+    pub fn post_rotate(&self, theta: Radians<T>) -> TypedTransform2D<T, Src, Dst> {
         self.post_mul(&TypedTransform2D::create_rotation(theta))
     }
 
     /// Applies a rotation after self's transformation and returns the resulting transform.
-    pub fn pre_rotated(&self, theta: Radians<T>) -> TypedTransform2D<T, Src, Dst> {
+    #[must_use]
+    pub fn pre_rotate(&self, theta: Radians<T>) -> TypedTransform2D<T, Src, Dst> {
         self.pre_mul(&TypedTransform2D::create_rotation(theta))
     }
 
     /// Returns the given point transformed by this transform.
     #[inline]
+    #[must_use]
     pub fn transform_point(&self, point: &TypedPoint2D<T, Src>) -> TypedPoint2D<T, Dst> {
         TypedPoint2D::new(point.x * self.m11 + point.y * self.m21 + self.m31,
                           point.x * self.m12 + point.y * self.m22 + self.m32)
@@ -223,6 +230,7 @@ where T: Copy + Clone +
 
     /// Returns the given vector transformed by this matrix.
     #[inline]
+    #[must_use]
     pub fn transform_vector(&self, vec: &TypedVector2D<T, Src>) -> TypedVector2D<T, Dst> {
         vec2(vec.x * self.m11 + vec.y * self.m21,
              vec.x * self.m12 + vec.y * self.m22)
@@ -231,6 +239,7 @@ where T: Copy + Clone +
     /// Returns a rectangle that encompasses the result of transforming the given rectangle by this
     /// transform.
     #[inline]
+    #[must_use]
     pub fn transform_rect(&self, rect: &TypedRect<T, Src>) -> TypedRect<T, Dst> {
         TypedRect::from_points(&[
             self.transform_point(&rect.origin),
@@ -246,6 +255,7 @@ where T: Copy + Clone +
     }
 
     /// Returns the inverse transform if possible.
+    #[must_use]
     pub fn inverse(&self) -> Option<TypedTransform2D<T, Dst, Src>> {
         let det = self.determinant();
 
@@ -325,8 +335,8 @@ mod test {
     #[test]
     pub fn test_translation() {
         let t1 = Mat::create_translation(1.0, 2.0);
-        let t2 = Mat::identity().pre_translated(vec2(1.0, 2.0));
-        let t3 = Mat::identity().post_translated(vec2(1.0, 2.0));
+        let t2 = Mat::identity().pre_translate(vec2(1.0, 2.0));
+        let t3 = Mat::identity().post_translate(vec2(1.0, 2.0));
         assert_eq!(t1, t2);
         assert_eq!(t1, t3);
 
@@ -338,8 +348,8 @@ mod test {
     #[test]
     pub fn test_rotation() {
         let r1 = Mat::create_rotation(rad(FRAC_PI_2));
-        let r2 = Mat::identity().pre_rotated(rad(FRAC_PI_2));
-        let r3 = Mat::identity().post_rotated(rad(FRAC_PI_2));
+        let r2 = Mat::identity().pre_rotate(rad(FRAC_PI_2));
+        let r3 = Mat::identity().post_rotate(rad(FRAC_PI_2));
         assert_eq!(r1, r2);
         assert_eq!(r1, r3);
 
@@ -351,8 +361,8 @@ mod test {
     #[test]
     pub fn test_scale() {
         let s1 = Mat::create_scale(2.0, 3.0);
-        let s2 = Mat::identity().pre_scaled(2.0, 3.0);
-        let s3 = Mat::identity().post_scaled(2.0, 3.0);
+        let s2 = Mat::identity().pre_scale(2.0, 3.0);
+        let s3 = Mat::identity().post_scale(2.0, 3.0);
         assert_eq!(s1, s2);
         assert_eq!(s1, s3);
 
@@ -403,8 +413,8 @@ mod test {
 
     #[test]
     pub fn test_pre_post() {
-        let m1 = Transform2D::identity().post_scaled(1.0, 2.0).post_translated(vec2(1.0, 2.0));
-        let m2 = Transform2D::identity().pre_translated(vec2(1.0, 2.0)).pre_scaled(1.0, 2.0);
+        let m1 = Transform2D::identity().post_scale(1.0, 2.0).post_translate(vec2(1.0, 2.0));
+        let m2 = Transform2D::identity().pre_translate(vec2(1.0, 2.0)).pre_scale(1.0, 2.0);
         assert!(m1.approx_eq(&m2));
 
         let r = Mat::create_rotation(rad(FRAC_PI_2));
@@ -432,7 +442,7 @@ mod test {
     pub fn test_is_identity() {
         let m1 = Transform2D::identity();
         assert!(m1.is_identity());
-        let m2 = m1.post_translated(vec2(0.1, 0.0));
+        let m2 = m1.post_translate(vec2(0.1, 0.0));
         assert!(!m2.is_identity());
     }
 
