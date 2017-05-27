@@ -370,6 +370,7 @@ where T: Copy + Clone +
     }
 
     /// Multiplies all of the transform's component by a scalar and returns the result.
+    #[must_use]
     pub fn mul_s(&self, x: T) -> TypedTransform3D<T, Src, Dst> {
         TypedTransform3D::row_major(
             self.m11 * x, self.m12 * x, self.m13 * x, self.m14 * x,
@@ -456,12 +457,14 @@ where T: Copy + Clone +
     }
 
     /// Returns a transform with a translation applied before self's transformation.
-    pub fn pre_translated(&self, v: TypedVector3D<T, Dst>) -> TypedTransform3D<T, Src, Dst> {
+    #[must_use]
+    pub fn pre_translate(&self, v: TypedVector3D<T, Src>) -> TypedTransform3D<T, Src, Dst> {
         self.pre_mul(&TypedTransform3D::create_translation(v.x, v.y, v.z))
     }
 
     /// Returns a transform with a translation applied after self's transformation.
-    pub fn post_translated(&self, v: TypedVector3D<T, Dst>) -> TypedTransform3D<T, Src, Dst> {
+    #[must_use]
+    pub fn post_translate(&self, v: TypedVector3D<T, Dst>) -> TypedTransform3D<T, Src, Dst> {
         self.post_mul(&TypedTransform3D::create_translation(v.x, v.y, v.z))
     }
 
@@ -477,7 +480,8 @@ where T: Copy + Clone +
     }
 
     /// Returns a transform with a scale applied before self's transformation.
-    pub fn pre_scaled(&self, x: T, y: T, z: T) -> TypedTransform3D<T, Src, Dst> {
+    #[must_use]
+    pub fn pre_scale(&self, x: T, y: T, z: T) -> TypedTransform3D<T, Src, Dst> {
         TypedTransform3D::row_major(
             self.m11 * x, self.m12,     self.m13,     self.m14,
             self.m21    , self.m22 * y, self.m23,     self.m24,
@@ -487,7 +491,8 @@ where T: Copy + Clone +
     }
 
     /// Returns a transform with a scale applied after self's transformation.
-    pub fn post_scaled(&self, x: T, y: T, z: T) -> TypedTransform3D<T, Src, Dst> {
+    #[must_use]
+    pub fn post_scale(&self, x: T, y: T, z: T) -> TypedTransform3D<T, Src, Dst> {
         self.post_mul(&TypedTransform3D::create_scale(x, y, z))
     }
 
@@ -529,12 +534,14 @@ where T: Copy + Clone +
     }
 
     /// Returns a transform with a rotation applied after self's transformation.
-    pub fn post_rotated(&self, x: T, y: T, z: T, theta: Radians<T>) -> TypedTransform3D<T, Src, Dst> {
+    #[must_use]
+    pub fn post_rotate(&self, x: T, y: T, z: T, theta: Radians<T>) -> TypedTransform3D<T, Src, Dst> {
         self.post_mul(&TypedTransform3D::create_rotation(x, y, z, theta))
     }
 
     /// Returns a transform with a rotation applied before self's transformation.
-    pub fn pre_rotated(&self, x: T, y: T, z: T, theta: Radians<T>) -> TypedTransform3D<T, Src, Dst> {
+    #[must_use]
+    pub fn pre_rotate(&self, x: T, y: T, z: T, theta: Radians<T>) -> TypedTransform3D<T, Src, Dst> {
         self.pre_mul(&TypedTransform3D::create_rotation(x, y, z, theta))
     }
 
@@ -644,8 +651,8 @@ mod tests {
     #[test]
     pub fn test_translation() {
         let t1 = Mf32::create_translation(1.0, 2.0, 3.0);
-        let t2 = Mf32::identity().pre_translated(vec3(1.0, 2.0, 3.0));
-        let t3 = Mf32::identity().post_translated(vec3(1.0, 2.0, 3.0));
+        let t2 = Mf32::identity().pre_translate(vec3(1.0, 2.0, 3.0));
+        let t3 = Mf32::identity().post_translate(vec3(1.0, 2.0, 3.0));
         assert_eq!(t1, t2);
         assert_eq!(t1, t3);
 
@@ -661,8 +668,8 @@ mod tests {
     #[test]
     pub fn test_rotation() {
         let r1 = Mf32::create_rotation(0.0, 0.0, 1.0, rad(FRAC_PI_2));
-        let r2 = Mf32::identity().pre_rotated(0.0, 0.0, 1.0, rad(FRAC_PI_2));
-        let r3 = Mf32::identity().post_rotated(0.0, 0.0, 1.0, rad(FRAC_PI_2));
+        let r2 = Mf32::identity().pre_rotate(0.0, 0.0, 1.0, rad(FRAC_PI_2));
+        let r3 = Mf32::identity().post_rotate(0.0, 0.0, 1.0, rad(FRAC_PI_2));
         assert_eq!(r1, r2);
         assert_eq!(r1, r3);
 
@@ -678,8 +685,8 @@ mod tests {
     #[test]
     pub fn test_scale() {
         let s1 = Mf32::create_scale(2.0, 3.0, 4.0);
-        let s2 = Mf32::identity().pre_scaled(2.0, 3.0, 4.0);
-        let s3 = Mf32::identity().post_scaled(2.0, 3.0, 4.0);
+        let s2 = Mf32::identity().pre_scale(2.0, 3.0, 4.0);
+        let s3 = Mf32::identity().post_scale(2.0, 3.0, 4.0);
         assert_eq!(s1, s2);
         assert_eq!(s1, s3);
 
@@ -794,8 +801,8 @@ mod tests {
 
     #[test]
     pub fn test_pre_post() {
-        let m1 = Transform3D::identity().post_scaled(1.0, 2.0, 3.0).post_translated(vec3(1.0, 2.0, 3.0));
-        let m2 = Transform3D::identity().pre_translated(vec3(1.0, 2.0, 3.0)).pre_scaled(1.0, 2.0, 3.0);
+        let m1 = Transform3D::identity().post_scale(1.0, 2.0, 3.0).post_translate(vec3(1.0, 2.0, 3.0));
+        let m2 = Transform3D::identity().pre_translate(vec3(1.0, 2.0, 3.0)).pre_scale(1.0, 2.0, 3.0);
         assert!(m1.approx_eq(&m2));
 
         let r = Mf32::create_rotation(0.0, 0.0, 1.0, rad(FRAC_PI_2));
@@ -840,7 +847,7 @@ mod tests {
     pub fn test_is_identity() {
         let m1 = Transform3D::identity();
         assert!(m1.is_identity());
-        let m2 = m1.post_translated(vec3(0.1, 0.0, 0.0));
+        let m2 = m1.post_translate(vec3(0.1, 0.0, 0.0));
         assert!(!m2.is_identity());
     }
 
