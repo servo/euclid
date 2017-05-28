@@ -458,7 +458,7 @@ where T: Copy + Clone +
 
     /// Returns a transform with a translation applied before self's transformation.
     #[must_use]
-    pub fn pre_translate(&self, v: TypedVector3D<T, Dst>) -> TypedTransform3D<T, Src, Dst> {
+    pub fn pre_translate(&self, v: TypedVector3D<T, Src>) -> TypedTransform3D<T, Src, Dst> {
         self.pre_mul(&TypedTransform3D::create_translation(v.x, v.y, v.z))
     }
 
