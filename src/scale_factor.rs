@@ -26,8 +26,8 @@ use std::marker::PhantomData;
 /// may be types without values, such as empty enums.  For example:
 ///
 /// ```rust
-/// use euclid::scale_factor::ScaleFactor;
-/// use euclid::length::Length;
+/// use euclid::ScaleFactor;
+/// use euclid::Length;
 /// enum Mm {};
 /// enum Inch {};
 ///

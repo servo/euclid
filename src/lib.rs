@@ -72,33 +72,33 @@ pub use scale_factor::ScaleFactor;
 pub use transform2d::{Transform2D, TypedTransform2D};
 pub use transform3d::{Transform3D, TypedTransform3D};
 pub use point::{
-    Point2D, TypedPoint2D,
-    Point3D, TypedPoint3D,
+    Point2D, TypedPoint2D, point2,
+    Point3D, TypedPoint3D, point3,
 };
 pub use vector::{
-    Vector2D, TypedVector2D,
-    Vector3D, TypedVector3D,
+    Vector2D, TypedVector2D, vec2,
+    Vector3D, TypedVector3D, vec3,
 };
 
-pub use rect::{Rect, TypedRect};
+pub use rect::{Rect, TypedRect, rect};
 pub use side_offsets::{SideOffsets2D, TypedSideOffsets2D};
 #[cfg(feature = "unstable")] pub use side_offsets::SideOffsets2DSimdI32;
-pub use size::{Size2D, TypedSize2D};
+pub use size::{Size2D, TypedSize2D, size2};
 
 pub mod approxeq;
-pub mod length;
+pub mod num;
+mod length;
 #[macro_use]
 mod macros;
-pub mod transform2d;
-pub mod transform3d;
-pub mod num;
-pub mod point;
-pub mod rect;
-pub mod scale_factor;
-pub mod side_offsets;
-pub mod size;
-pub mod trig;
-pub mod vector;
+mod transform2d;
+mod transform3d;
+mod point;
+mod rect;
+mod scale_factor;
+mod side_offsets;
+mod size;
+mod trig;
+mod vector;
 
 /// The default unit.
 #[derive(Clone, Copy)]
