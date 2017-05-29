@@ -157,6 +157,7 @@ where T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output=T> + Sub<T
 
     /// Returns the same rectangle, translated by a vector.
     #[inline]
+    #[must_use]
     pub fn translate(&self, by: &TypedVector2D<T, U>) -> TypedRect<T, U> {
         Self::new(self.origin + *by, self.size)
     }
@@ -181,6 +182,7 @@ where T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output=T> + Sub<T
     }
 
     #[inline]
+    #[must_use]
     pub fn inflate(&self, width: T, height: T) -> TypedRect<T, U> {
         TypedRect::new(
             TypedPoint2D::new(self.origin.x - width, self.origin.y - height),
@@ -189,6 +191,7 @@ where T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output=T> + Sub<T
     }
 
     #[inline]
+    #[must_use]
     pub fn inflate_typed(&self, width: Length<T, U>, height: Length<T, U>) -> TypedRect<T, U> {
         self.inflate(width.get(), height.get())
     }
@@ -209,6 +212,7 @@ where T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output=T> + Sub<T
     }
 
     #[inline]
+    #[must_use]
     pub fn translate_by_size(&self, size: &TypedSize2D<T, U>) -> TypedRect<T, U> {
         self.translate(&size.to_vector())
     }
@@ -366,6 +370,7 @@ impl<T: Floor + Ceil + Round + Add<T, Output=T> + Sub<T, Output=T>, U> TypedRect
     /// avoid pixel rounding errors.
     /// Note that this is *not* rounding to nearest integer if the values are negative.
     /// They are always rounding as floor(n + 0.5).
+    #[must_use]
     pub fn round(&self) -> Self {
         let origin = self.origin.round();
         let size = self.origin.add_size(&self.size).round() - origin;
@@ -374,6 +379,7 @@ impl<T: Floor + Ceil + Round + Add<T, Output=T> + Sub<T, Output=T>, U> TypedRect
 
     /// Return a rectangle with edges rounded to integer coordinates, such that
     /// the original rectangle contains the resulting rectangle.
+    #[must_use]
     pub fn round_in(&self) -> Self {
         let origin = self.origin.ceil();
         let size = self.origin.add_size(&self.size).floor() - origin;
@@ -382,6 +388,7 @@ impl<T: Floor + Ceil + Round + Add<T, Output=T> + Sub<T, Output=T>, U> TypedRect
 
     /// Return a rectangle with edges rounded to integer coordinates, such that
     /// the original rectangle is contained in the resulting rectangle.
+    #[must_use]
     pub fn round_out(&self) -> Self {
         let origin = self.origin.floor();
         let size = self.origin.add_size(&self.size).ceil() - origin;
