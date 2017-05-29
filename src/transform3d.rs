@@ -633,6 +633,23 @@ where T: Copy + fmt::Debug +
     }
 }
 
+impl<T: Copy, Src, Dst> Into<[T; 16]> for TypedTransform3D<T, Src, Dst> {
+    fn into(self) -> [T; 16] {
+        self.to_row_major_array()
+    }
+}
+
+impl<T: Copy, Src, Dst> From<[T; 16]> for TypedTransform3D<T, Src, Dst> {
+    fn from(array: [T; 16]) -> Self {
+        Self::row_major(
+            array[0],  array[1],  array[2],  array[3],
+            array[4],  array[5],  array[6],  array[7],
+            array[8],  array[9],  array[10], array[11],
+            array[12], array[13], array[14], array[15],
+        )
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use approxeq::ApproxEq;

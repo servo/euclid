@@ -327,6 +327,19 @@ impl<T: Copy+ApproxEq<T>, U> ApproxEq<Self> for TypedPoint2D<T, U> {
     }
 }
 
+impl<T: Copy, U> Into<[T; 2]> for TypedPoint2D<T, U> {
+    fn into(self) -> [T; 2] {
+        self.to_array()
+    }
+}
+
+impl<T: Copy, U> From<[T; 2]> for TypedPoint2D<T, U> {
+    fn from(array: [T; 2]) -> Self {
+        point2(array[0], array[1])
+    }
+}
+
+
 define_matrix! {
     /// A 3d Point tagged with a unit.
     pub struct TypedPoint3D<T, U> {
@@ -595,6 +608,18 @@ impl<T: Copy+ApproxEq<T>, U> ApproxEq<Self> for TypedPoint3D<T, U> {
         self.x.approx_eq_eps(&other.x, &eps.x)
             && self.y.approx_eq_eps(&other.y, &eps.y)
             && self.z.approx_eq_eps(&other.z, &eps.z)
+    }
+}
+
+impl<T: Copy, U> Into<[T; 3]> for TypedPoint3D<T, U> {
+    fn into(self) -> [T; 3] {
+        self.to_array()
+    }
+}
+
+impl<T: Copy, U> From<[T; 3]> for TypedPoint3D<T, U> {
+    fn from(array: [T; 3]) -> Self {
+        point3(array[0], array[1], array[2])
     }
 }
 

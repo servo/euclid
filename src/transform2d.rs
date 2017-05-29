@@ -321,6 +321,22 @@ where T: Copy + fmt::Debug +
     }
 }
 
+impl<T: Copy, Src, Dst> Into<[T; 6]> for TypedTransform2D<T, Src, Dst> {
+    fn into(self) -> [T; 6] {
+        self.to_row_major_array()
+    }
+}
+
+impl<T: Copy, Src, Dst> From<[T; 6]> for TypedTransform2D<T, Src, Dst> {
+    fn from(array: [T; 6]) -> Self {
+        Self::row_major(
+            array[0], array[1],
+            array[2], array[3],
+            array[4], array[5],
+        )
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;

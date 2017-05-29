@@ -348,6 +348,18 @@ impl<T: Copy+ApproxEq<T>, U> ApproxEq<TypedVector2D<T, U>> for TypedVector2D<T, 
     }
 }
 
+impl<T: Copy, U> Into<[T; 2]> for TypedVector2D<T, U> {
+    fn into(self) -> [T; 2] {
+        self.to_array()
+    }
+}
+
+impl<T: Copy, U> From<[T; 2]> for TypedVector2D<T, U> {
+    fn from(array: [T; 2]) -> Self {
+        vec2(array[0], array[1])
+    }
+}
+
 define_matrix! {
     /// A 3d Vector tagged with a unit.
     pub struct TypedVector3D<T, U> {
@@ -674,6 +686,19 @@ impl<T: Copy+ApproxEq<T>, U> ApproxEq<TypedVector3D<T, U>> for TypedVector3D<T, 
             && self.z.approx_eq_eps(&other.z, &eps.z)
     }
 }
+
+impl<T: Copy, U> Into<[T; 3]> for TypedVector3D<T, U> {
+    fn into(self) -> [T; 3] {
+        self.to_array()
+    }
+}
+
+impl<T: Copy, U> From<[T; 3]> for TypedVector3D<T, U> {
+    fn from(array: [T; 3]) -> Self {
+        vec3(array[0], array[1], array[2])
+    }
+}
+
 
 /// Convenience constructor.
 #[inline]
