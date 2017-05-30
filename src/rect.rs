@@ -20,6 +20,7 @@ use num_traits::NumCast;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::cmp::PartialOrd;
 use std::fmt;
+use std::hash::{Hash, Hasher};
 use std::ops::{Add, Sub, Mul, Div};
 
 /// A 2d Rectangle optionally tagged with a unit.
@@ -51,6 +52,14 @@ impl<T: Serialize, U> Serialize for TypedRect<T, U> {
         where S: Serializer
     {
         (&self.origin, &self.size).serialize(serializer)
+    }
+}
+
+impl<T: Hash, U> Hash for TypedRect<T, U>
+{
+    fn hash<H: Hasher>(&self, h: &mut H) {
+        self.origin.hash(h);
+        self.size.hash(h);
     }
 }
 
