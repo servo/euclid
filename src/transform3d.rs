@@ -597,7 +597,7 @@ impl<T: Copy, Src, Dst> TypedTransform3D<T, Src, Dst> {
     /// as arrays.
     ///
     /// This is a convenience method to interface with other libraries like glium.
-    pub fn to_row_arrays(&self) -> [[T; 4];4] {
+    pub fn to_row_arrays(&self) -> [[T; 4]; 4] {
         [
             [self.m11, self.m12, self.m13, self.m14],
             [self.m21, self.m22, self.m23, self.m24],
@@ -617,6 +617,26 @@ impl<T: Copy, Src, Dst> TypedTransform3D<T, Src, Dst> {
             [self.m13, self.m23, self.m33, self.m43],
             [self.m14, self.m24, self.m34, self.m44]
         ]
+    }
+
+    /// Creates a transform from an array of 16 elements in row-major order.
+    pub fn from_array(array: [T; 16]) -> Self {
+        Self::row_major(
+            array[0],  array[1],  array[2],  array[3],
+            array[4],  array[5],  array[6],  array[7],
+            array[8],  array[9],  array[10], array[11],
+            array[12], array[13], array[14], array[15],
+        )
+    }
+
+    /// Creates a transform from 4 rows of 4 elements (row-major order).
+    pub fn from_row_arrays(array: [[T; 4]; 4]) -> Self {
+        Self::row_major(
+            array[0][0], array[0][1], array[0][2], array[0][3],
+            array[1][0], array[1][1], array[1][2], array[1][3],
+            array[2][0], array[2][1], array[2][2], array[2][3],
+            array[3][0], array[3][1], array[3][2], array[3][3],
+        )
     }
 }
 
@@ -639,14 +659,21 @@ impl<T: Copy, Src, Dst> Into<[T; 16]> for TypedTransform3D<T, Src, Dst> {
     }
 }
 
+impl<T: Copy, Src, Dst> Into<[[T; 4]; 4]> for TypedTransform3D<T, Src, Dst> {
+    fn into(self) -> [[T; 4]; 4] {
+        self.to_row_arrays()
+    }
+}
+
 impl<T: Copy, Src, Dst> From<[T; 16]> for TypedTransform3D<T, Src, Dst> {
     fn from(array: [T; 16]) -> Self {
-        Self::row_major(
-            array[0],  array[1],  array[2],  array[3],
-            array[4],  array[5],  array[6],  array[7],
-            array[8],  array[9],  array[10], array[11],
-            array[12], array[13], array[14], array[15],
-        )
+        Self::from_array(array)
+    }
+}
+
+impl<T: Copy, Src, Dst> From<[[T; 4]; 4]> for TypedTransform3D<T, Src, Dst> {
+    fn from(array: [[T; 4]; 4]) -> Self {
+        Self::from_row_arrays(array)
     }
 }
 
