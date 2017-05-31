@@ -79,6 +79,36 @@ impl<T: Copy, Src, Dst> TypedTransform2D<T, Src, Dst> {
         ]
     }
 
+    /// Returns an array containing this transform's 3 rows in (in row-major order)
+    /// as arrays.
+    ///
+    /// This is a convenience method to interface with other libraries like glium.
+    pub fn to_row_arrays(&self) -> [[T; 2]; 3] {
+        [
+            [self.m11, self.m12],
+            [self.m21, self.m22],
+            [self.m31, self.m32],
+        ]
+    }
+
+    /// Creates a transform from an array of 6 elements in row-major order.
+    pub fn from_row_major_array(array: [T; 6]) -> Self {
+        Self::row_major(
+            array[0], array[1],
+            array[2], array[3],
+            array[4], array[5],
+        )
+    }
+
+    /// Creates a transform from 3 rows of 2 elements (row-major order).
+    pub fn from_row_arrays(array: [[T; 2]; 3]) -> Self {
+        Self::row_major(
+            array[0][0], array[0][1],
+            array[1][0], array[1][1],
+            array[2][0], array[2][1],
+        )
+    }
+
     /// Drop the units, preserving only the numeric value.
     pub fn to_untyped(&self) -> Transform2D<T> {
         Transform2D::row_major(
