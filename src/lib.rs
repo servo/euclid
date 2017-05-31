@@ -84,6 +84,7 @@ pub use rect::{Rect, TypedRect, rect};
 pub use side_offsets::{SideOffsets2D, TypedSideOffsets2D};
 #[cfg(feature = "unstable")] pub use side_offsets::SideOffsets2DSimdI32;
 pub use size::{Size2D, TypedSize2D, size2};
+pub use trig::Trig;
 
 pub mod approxeq;
 pub mod num;
