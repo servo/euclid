@@ -147,6 +147,18 @@ where T: Copy + Mul<T, Output=T> + Add<T, Output=T> + Sub<T, Output=T> {
     }
 }
 
+impl<T, U> TypedVector2D<T, U>
+where T: Copy + One + Add<Output=T> + Sub<Output=T> + Mul<Output=T> {
+    /// Linearly interpolate between this vector and another vector.
+    ///
+    /// `t` is expected to be between zero and one.
+    #[inline]
+    pub fn lerp(&self, other: Self, t: T) -> Self {
+        let one_t = T::one() - t;
+        (*self) * one_t + other * t
+    }
+}
+
 impl<T: Copy + Add<T, Output=T>, U> Add for TypedVector2D<T, U> {
     type Output = Self;
     fn add(self, other: Self) -> Self {
@@ -495,6 +507,18 @@ impl<T: Mul<T, Output=T> +
     #[inline]
     pub fn length(&self) -> T where T: Float + ApproxEq<T> {
         self.square_length().sqrt()
+    }
+}
+
+impl<T, U> TypedVector3D<T, U>
+where T: Copy + One + Add<Output=T> + Sub<Output=T> + Mul<Output=T> {
+    /// Linearly interpolate between this vector and another vector.
+    ///
+    /// `t` is expected to be between zero and one.
+    #[inline]
+    pub fn lerp(&self, other: Self, t: T) -> Self {
+        let one_t = T::one() - t;
+        (*self) * one_t + other * t
     }
 }
 

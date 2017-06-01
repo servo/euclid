@@ -310,6 +310,21 @@ impl<T: NumCast + Copy, U> TypedPoint2D<T, U> {
     }
 }
 
+impl<T, U> TypedPoint2D<T, U>
+where T: Copy + One + Add<Output=T> + Sub<Output=T> + Mul<Output=T> {
+    /// Linearly interpolate between this point and another point.
+    ///
+    /// `t` is expected to be between zero and one.
+    #[inline]
+    pub fn lerp(&self, other: Self, t: T) -> Self {
+        let one_t = T::one() - t;
+        point2(
+            one_t * self.x + t * other.x,
+            one_t * self.y + t * other.y,
+        )
+    }
+}
+
 impl<T: Copy+ApproxEq<T>, U> ApproxEq<Self> for TypedPoint2D<T, U> {
     #[inline]
     fn approx_epsilon() -> Self {
@@ -366,6 +381,22 @@ impl<T: Copy + One, U> TypedPoint3D<T, U> {
     #[inline]
     pub fn to_array_4d(&self) -> [T; 4] {
         [self.x, self.y, self.z, One::one()]
+    }
+}
+
+impl<T, U> TypedPoint3D<T, U>
+where T: Copy + One + Add<Output=T> + Sub<Output=T> + Mul<Output=T> {
+    /// Linearly interpolate between this point and another point.
+    ///
+    /// `t` is expected to be between zero and one.
+    #[inline]
+    pub fn lerp(&self, other: Self, t: T) -> Self {
+        let one_t = T::one() - t;
+        point3(
+            one_t * self.x + t * other.x,
+            one_t * self.y + t * other.y,
+            one_t * self.z + t * other.z,
+        )
     }
 }
 
