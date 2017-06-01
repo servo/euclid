@@ -106,6 +106,21 @@ impl<T: Copy + Clone + Mul<T, Output=U>, U> TypedSize2D<T, U> {
     pub fn area(&self) -> U { self.width * self.height }
 }
 
+impl<T, U> TypedSize2D<T, U>
+where T: Copy + One + Add<Output=T> + Sub<Output=T> + Mul<Output=T> {
+    /// Linearly interpolate between this size and another size.
+    ///
+    /// `t` is expected to be between zero and one.
+    #[inline]
+    pub fn lerp(&self, other: Self, t: T) -> Self {
+        let one_t = T::one() - t;
+        size2(
+            one_t * self.width + t * other.width,
+            one_t * self.height + t * other.height,
+        )
+    }
+}
+
 impl<T: Zero, U> TypedSize2D<T, U> {
     pub fn zero() -> TypedSize2D<T, U> {
         TypedSize2D::new(

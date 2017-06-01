@@ -253,6 +253,20 @@ where T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output=T> + Sub<T
 }
 
 impl<T, U> TypedRect<T, U>
+where T: Copy + One + Add<Output=T> + Sub<Output=T> + Mul<Output=T> {
+    /// Linearly interpolate between this rectangle and another rectange.
+    ///
+    /// `t` is expected to be between zero and one.
+    #[inline]
+    pub fn lerp(&self, other: Self, t: T) -> Self {
+        Self::new(
+            self.origin.lerp(other.origin, t),
+            self.size.lerp(other.size, t),
+        )
+    }
+}
+
+impl<T, U> TypedRect<T, U>
 where T: Copy + Clone + PartialOrd + Add<T, Output=T> + Sub<T, Output=T> + Zero {
     #[inline]
     pub fn union(&self, other: &TypedRect<T, U>) -> TypedRect<T, U> {

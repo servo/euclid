@@ -13,6 +13,7 @@ use num::Zero;
 
 use heapsize::HeapSizeOf;
 use num_traits::{NumCast, Saturating};
+use num::One;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::cmp::Ordering;
 use std::ops::{Add, Sub, Mul, Div, Neg};
@@ -190,6 +191,18 @@ impl<Unit, T: Clone + Ord> Ord for Length<T, Unit> {
 impl<Unit, T: Zero> Zero for Length<T, Unit> {
     fn zero() -> Length<T, Unit> {
         Length::new(Zero::zero())
+    }
+}
+
+impl<T, U> Length<T, U>
+where T: Copy + One + Add<Output=T> + Sub<Output=T> + Mul<Output=T> {
+    /// Linearly interpolate between this length and another length.
+    ///
+    /// `t` is expected to be between zero and one.
+    #[inline]
+    pub fn lerp(&self, other: Self, t: T) -> Self {
+        let one_t = T::one() - t;
+        Length::new(one_t * self.get() + t * other.get())
     }
 }
 
