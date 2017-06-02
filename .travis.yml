@@ -7,6 +7,8 @@ matrix:
   include:
     - rust: stable
       env: FEATURES=""
+    - rust: stable
+      env: FEATURES="minted"
     - rust: beta
       env: FEATURES=""
     - rust: nightly
