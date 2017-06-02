@@ -10,12 +10,14 @@ categories = ["science"]
 license = "MIT / Apache-2.0"
 
 [features]
+minted = ["mint"]
 unstable = []
 
 [dependencies]
 heapsize = "0.4"
 num-traits = {version = "0.1.32", default-features = false}
 log = "0.3.1"
+mint = {version = "0.3", optional = true}
 serde = "0.9"
 
 [dev-dependencies]

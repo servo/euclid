@@ -85,3 +85,25 @@ macro_rules! define_matrix {
         }
     )
 }
+
+macro_rules! mint_vec {
+    ($name:ident [ $($field:ident),* ] = $std_name:ident) => {
+        #[cfg(feature = "minted")]
+        impl<T, U> From<mint::$std_name<T>> for $name<T, U> {
+            fn from(v: mint::$std_name<T>) -> Self {
+                $name {
+                    $( $field: v.$field, )*
+                    _unit: PhantomData,
+                }
+            }
+        }
+        #[cfg(feature = "minted")]
+        impl<T, U> Into<mint::$std_name<T>> for $name<T, U> {
+            fn into(self) -> mint::$std_name<T> {
+                mint::$std_name {
+                    $( $field: self.$field, )*
+                }
+            }
+        }
+    }
+}

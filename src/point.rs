@@ -10,6 +10,8 @@
 use super::UnknownUnit;
 use approxeq::ApproxEq;
 use length::Length;
+#[cfg(feature = "minted")]
+use mint;
 use scale_factor::ScaleFactor;
 use size::TypedSize2D;
 use num::*;
@@ -26,6 +28,7 @@ define_matrix! {
         pub y: T,
     }
 }
+mint_vec!(TypedPoint2D[x, y] = Point2);
 
 /// Default 2d point type with no unit.
 ///
@@ -363,6 +366,7 @@ define_matrix! {
         pub z: T,
     }
 }
+mint_vec!(TypedPoint3D[x, y, z] = Point3);
 
 /// Default 3d point type with no unit.
 ///
@@ -662,6 +666,7 @@ pub fn point2<T: Copy, U>(x: T, y: T) -> TypedPoint2D<T, U> {
 pub fn point3<T: Copy, U>(x: T, y: T, z: T) -> TypedPoint3D<T, U> {
     TypedPoint3D::new(x, y, z)
 }
+
 
 #[cfg(test)]
 mod point2d {
