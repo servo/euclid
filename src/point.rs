@@ -10,7 +10,7 @@
 use super::UnknownUnit;
 use approxeq::ApproxEq;
 use length::Length;
-#[cfg(feature = "minted")]
+#[cfg(feature = "mint")]
 use mint;
 use scale_factor::ScaleFactor;
 use size::TypedSize2D;
@@ -671,6 +671,8 @@ pub fn point3<T: Copy, U>(x: T, y: T, z: T) -> TypedPoint3D<T, U> {
 #[cfg(test)]
 mod point2d {
     use super::Point2D;
+    #[cfg(feature = "mint")]
+    use mint;
 
     #[test]
     pub fn test_scalar_mul() {
@@ -699,6 +701,16 @@ mod point2d {
         let result = p1.max(p2);
 
         assert_eq!(result, Point2D::new(2.0, 3.0));
+    }
+
+    #[cfg(feature = "mint")]
+    #[test]
+    pub fn test_mint() {
+        let p1 = Point2D::new(1.0, 3.0);
+        let pm: mint::Point2<_> = p1.into();
+        let p2 = Point2D::from(pm);
+
+        assert_eq!(p1, p2);
     }
 }
 
@@ -759,6 +771,8 @@ mod typedpoint2d {
 #[cfg(test)]
 mod point3d {
     use super::Point3D;
+    #[cfg(feature = "mint")]
+    use mint;
 
     #[test]
     pub fn test_min() {
@@ -791,5 +805,15 @@ mod point3d {
             let p: Point3D<f32> = point3(x, y, z);
             assert_eq!(p.to_vector().to_point(), p);
         }
+    }
+
+    #[cfg(feature = "mint")]
+    #[test]
+    pub fn test_mint() {
+        let p1 = Point3D::new(1.0, 3.0, 5.0);
+        let pm: mint::Point3<_> = p1.into();
+        let p2 = Point3D::from(pm);
+
+        assert_eq!(p1, p2);
     }
 }

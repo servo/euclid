@@ -8,7 +8,7 @@
 // except according to those terms.
 
 use super::{UnknownUnit, Radians};
-#[cfg(feature = "minted")]
+#[cfg(feature = "mint")]
 use mint;
 use num::{One, Zero};
 use point::TypedPoint2D;
@@ -353,7 +353,7 @@ where T: Copy + fmt::Debug +
     }
 }
 
-#[cfg(feature = "minted")]
+#[cfg(feature = "mint")]
 impl<T, Src, Dst> From<mint::RowMatrix2x3<T>> for TypedTransform2D<T, Src, Dst> {
     fn from(m: mint::RowMatrix2x3<T>) -> Self {
         TypedTransform2D {
@@ -364,7 +364,7 @@ impl<T, Src, Dst> From<mint::RowMatrix2x3<T>> for TypedTransform2D<T, Src, Dst> 
         }
     }
 }
-#[cfg(feature = "minted")]
+#[cfg(feature = "mint")]
 impl<T, Src, Dst> Into<mint::RowMatrix2x3<T>> for TypedTransform2D<T, Src, Dst> {
     fn into(self) -> mint::RowMatrix2x3<T> {
         mint::RowMatrix2x3 {
@@ -382,6 +382,8 @@ mod test {
     use approxeq::ApproxEq;
     use point::Point2D;
     use Radians;
+    #[cfg(feature = "mint")]
+    use mint;
 
     use std::f32::consts::FRAC_PI_2;
 
@@ -509,5 +511,15 @@ mod test {
         let m1 = Mat::create_translation(1.0, 1.0);
         let v1 = vec2(10.0, -10.0);
         assert_eq!(v1, m1.transform_vector(&v1));
+    }
+
+    #[cfg(feature = "mint")]
+    #[test]
+    pub fn test_mint() {
+        let m1 = Mat::create_rotation(rad(FRAC_PI_2));
+        let mm: mint::RowMatrix2x3<_> = m1.into();
+        let m2 = Mat::from(mm);
+
+        assert_eq!(m1, m2);
     }
 }

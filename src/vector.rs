@@ -10,7 +10,7 @@
 use super::UnknownUnit;
 use approxeq::ApproxEq;
 use length::Length;
-#[cfg(feature = "minted")]
+#[cfg(feature = "mint")]
 use mint;
 use point::{TypedPoint2D, TypedPoint3D, point2, point3};
 use size::{TypedSize2D, size2};
@@ -743,6 +743,8 @@ pub fn vec3<T: Copy, U>(x: T, y: T, z: T) -> TypedVector3D<T, U> {
 #[cfg(test)]
 mod vector2d {
     use super::{Vector2D, vec2};
+    #[cfg(feature = "mint")]
+    use mint;
     type Vec2 = Vector2D<f32>;
 
     #[test]
@@ -798,6 +800,16 @@ mod vector2d {
 
         assert_eq!(result, vec2(2.0, 3.0));
     }
+
+    #[cfg(feature = "mint")]
+    #[test]
+    pub fn test_mint() {
+        let v1 = Vec2::new(1.0, 3.0);
+        let vm: mint::Vector2<_> = v1.into();
+        let v2 = Vec2::from(vm);
+
+        assert_eq!(v1, v2);
+    }
 }
 
 #[cfg(test)]
@@ -843,6 +855,8 @@ mod typedvector2d {
 #[cfg(test)]
 mod vector3d {
     use super::{Vector3D, vec3};
+    #[cfg(feature = "mint")]
+    use mint;
     type Vec3 = Vector3D<f32>;
 
     #[test]
@@ -888,5 +902,15 @@ mod vector3d {
         let result = p1.max(p2);
 
         assert_eq!(result, vec3(2.0, 3.0, 5.0));
+    }
+
+    #[cfg(feature = "mint")]
+    #[test]
+    pub fn test_mint() {
+        let v1 = Vec3::new(1.0, 3.0, 5.0);
+        let vm: mint::Vector3<_> = v1.into();
+        let v2 = Vec3::from(vm);
+
+        assert_eq!(v1, v2);
     }
 }

@@ -59,7 +59,7 @@ extern crate heapsize;
 
 #[cfg_attr(test, macro_use)]
 extern crate log;
-#[cfg(feature = "minted")]
+#[cfg(feature = "mint")]
 extern crate mint;
 #[cfg(test)]
 extern crate rand;

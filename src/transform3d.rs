@@ -9,7 +9,7 @@
 
 use super::{UnknownUnit, Radians};
 use approxeq::ApproxEq;
-#[cfg(feature = "minted")]
+#[cfg(feature = "mint")]
 use mint;
 use trig::Trig;
 use point::{TypedPoint2D, TypedPoint3D, point2, point3};
@@ -655,7 +655,7 @@ where T: Copy + fmt::Debug +
     }
 }
 
-#[cfg(feature = "minted")]
+#[cfg(feature = "mint")]
 impl<T, Src, Dst> From<mint::RowMatrix4<T>> for TypedTransform3D<T, Src, Dst> {
     fn from(m: mint::RowMatrix4<T>) -> Self {
         TypedTransform3D {
@@ -667,7 +667,7 @@ impl<T, Src, Dst> From<mint::RowMatrix4<T>> for TypedTransform3D<T, Src, Dst> {
         }
     }
 }
-#[cfg(feature = "minted")]
+#[cfg(feature = "mint")]
 impl<T, Src, Dst> Into<mint::RowMatrix4<T>> for TypedTransform3D<T, Src, Dst> {
     fn into(self) -> mint::RowMatrix4<T> {
         mint::RowMatrix4 {
@@ -911,5 +911,15 @@ mod tests {
         let v2 = vec2(10.0, -5.0);
         assert_eq!(v2, m.transform_vector2d(&v2));
         assert!(v2.to_point() != m.transform_point2d(&v2.to_point()));
+    }
+
+    #[cfg(feature = "mint")]
+    #[test]
+    pub fn test_mint() {
+        let m1 = Mf32::create_rotation(0.0, 0.0, 1.0, rad(FRAC_PI_2));
+        let mm: mint::RowMatrix4<_> = m1.into();
+        let m2 = Mf32::from(mm);
+
+        assert_eq!(m1, m2);
     }
 }
