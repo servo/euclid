@@ -92,11 +92,11 @@ impl<T: Copy, U> TypedPoint2D<T, U> {
 
     /// Returns self.x as a Length carrying the unit.
     #[inline]
-    pub fn x_typed(&self) -> Length<T, U> { Length::new(self.x) }
+    pub fn x(&self) -> Length<T, U> { Length::new(self.x) }
 
     /// Returns self.y as a Length carrying the unit.
     #[inline]
-    pub fn y_typed(&self) -> Length<T, U> { Length::new(self.y) }
+    pub fn y(&self) -> Length<T, U> { Length::new(self.y) }
 
     /// Drop the units, preserving only the numeric value.
     #[inline]
@@ -441,15 +441,15 @@ impl<T: Copy, U> TypedPoint3D<T, U> {
 
     /// Returns self.x as a Length carrying the unit.
     #[inline]
-    pub fn x_typed(&self) -> Length<T, U> { Length::new(self.x) }
+    pub fn x(&self) -> Length<T, U> { Length::new(self.x) }
 
     /// Returns self.y as a Length carrying the unit.
     #[inline]
-    pub fn y_typed(&self) -> Length<T, U> { Length::new(self.y) }
+    pub fn y(&self) -> Length<T, U> { Length::new(self.y) }
 
     /// Returns self.z as a Length carrying the unit.
     #[inline]
-    pub fn z_typed(&self) -> Length<T, U> { Length::new(self.z) }
+    pub fn z(&self) -> Length<T, U> { Length::new(self.z) }
 
     #[inline]
     pub fn to_array(&self) -> [T; 3] { [self.x, self.y, self.z] }

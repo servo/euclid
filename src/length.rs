@@ -206,6 +206,12 @@ where T: Copy + One + Add<Output=T> + Sub<Output=T> + Mul<Output=T> {
     }
 }
 
+impl<T, U> From<T> for Length<T, U> {
+    fn from(val: T) -> Self {
+        Length::new(val)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::Length;

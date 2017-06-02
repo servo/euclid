@@ -192,17 +192,13 @@ where T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output=T> + Sub<T
 
     #[inline]
     #[must_use]
-    pub fn inflate(&self, width: T, height: T) -> Self {
+    pub fn inflate<T2: Into<Length<T, U>>>(&self, width: T2, height: T2) -> Self {
+        let w = width.into().get();
+        let h = height.into().get();
         TypedRect::new(
-            TypedPoint2D::new(self.origin.x - width, self.origin.y - height),
-            TypedSize2D::new(self.size.width + width + width, self.size.height + height + height),
+            TypedPoint2D::new(self.origin.x - w, self.origin.y - h),
+            TypedSize2D::new(self.size.width + w + w, self.size.height + h + h),
         )
-    }
-
-    #[inline]
-    #[must_use]
-    pub fn inflate_typed(&self, width: Length<T, U>, height: Length<T, U>) -> Self {
-        self.inflate(width.get(), height.get())
     }
 
     #[inline]
