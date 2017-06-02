@@ -430,7 +430,7 @@ impl<T: Copy, U> TypedPoint3D<T, U> {
     /// Equivalent to substracting the origin to this point.
     #[inline]
     pub fn to_vector(&self) -> TypedVector3D<T, U> {
-        vec3(self.x, self.y, self.y)
+        vec3(self.x, self.y, self.z)
     }
 
     /// Returns self.x as a Length carrying the unit.
@@ -736,6 +736,19 @@ mod typedpoint2d {
 
         assert_eq!(result, Point2DCm::new(0.1, 0.2));
     }
+
+    #[test]
+    pub fn test_conv_vector() {
+        use {Point2D, point2};
+
+        for i in 0..100 {
+            // We don't care about these values as long as they are not the same.
+            let x = i as f32 *0.012345;
+            let y = i as f32 *0.987654;
+            let p: Point2D<f32> = point2(x, y);
+            assert_eq!(p.to_vector().to_point(), p);
+        }
+    }
 }
 
 #[cfg(test)]
@@ -760,5 +773,18 @@ mod point3d {
         let result = p1.max(p2);
 
         assert_eq!(result, Point3D::new(2.0, 3.0, 5.0));
+    }
+
+    #[test]
+    pub fn test_conv_vector() {
+        use point3;
+        for i in 0..100 {
+            // We don't care about these values as long as they are not the same.
+            let x = i as f32 *0.012345;
+            let y = i as f32 *0.987654;
+            let z = x * y;
+            let p: Point3D<f32> = point3(x, y, z);
+            assert_eq!(p.to_vector().to_point(), p);
+        }
     }
 }
