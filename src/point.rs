@@ -430,7 +430,7 @@ impl<T: Copy, U> TypedPoint3D<T, U> {
     /// Equivalent to substracting the origin to this point.
     #[inline]
     pub fn to_vector(&self) -> TypedVector3D<T, U> {
-        vec3(self.x, self.y, self.y)
+        vec3(self.x, self.y, self.z)
     }
 
     /// Returns self.x as a Length carrying the unit.
