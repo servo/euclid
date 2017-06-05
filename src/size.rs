@@ -45,7 +45,7 @@ impl<T: fmt::Display, U> fmt::Display for TypedSize2D<T, U> {
 
 impl<T, U> TypedSize2D<T, U> {
     /// Constructor taking scalar values.
-    pub fn new(width: T, height: T) -> TypedSize2D<T, U> {
+    pub fn new(width: T, height: T) -> Self {
         TypedSize2D {
             width: width,
             height: height,
@@ -56,7 +56,7 @@ impl<T, U> TypedSize2D<T, U> {
 
 impl<T: Clone, U> TypedSize2D<T, U> {
     /// Constructor taking scalar strongly typed lengths.
-    pub fn from_lengths(width: Length<T, U>, height: Length<T, U>) -> TypedSize2D<T, U> {
+    pub fn from_lengths(width: Length<T, U>, height: Length<T, U>) -> Self {
         TypedSize2D::new(width.get(), height.get())
     }
 }
@@ -89,15 +89,15 @@ impl<T: Floor, U> TypedSize2D<T, U> {
 }
 
 impl<T: Copy + Add<T, Output=T>, U> Add for TypedSize2D<T, U> {
-    type Output = TypedSize2D<T, U>;
-    fn add(self, other: TypedSize2D<T, U>) -> TypedSize2D<T, U> {
+    type Output = Self;
+    fn add(self, other: Self) -> Self {
         TypedSize2D::new(self.width + other.width, self.height + other.height)
     }
 }
 
 impl<T: Copy + Sub<T, Output=T>, U> Sub for TypedSize2D<T, U> {
-    type Output = TypedSize2D<T, U>;
-    fn sub(self, other: TypedSize2D<T, U>) -> TypedSize2D<T, U> {
+    type Output = Self;
+    fn sub(self, other: Self) -> Self {
         TypedSize2D::new(self.width - other.width, self.height - other.height)
     }
 }
@@ -122,7 +122,7 @@ where T: Copy + One + Add<Output=T> + Sub<Output=T> + Mul<Output=T> {
 }
 
 impl<T: Zero, U> TypedSize2D<T, U> {
-    pub fn zero() -> TypedSize2D<T, U> {
+    pub fn zero() -> Self {
         TypedSize2D::new(
             Zero::zero(),
             Zero::zero(),
@@ -131,7 +131,7 @@ impl<T: Zero, U> TypedSize2D<T, U> {
 }
 
 impl<T: Zero, U> Zero for TypedSize2D<T, U> {
-    fn zero() -> TypedSize2D<T, U> {
+    fn zero() -> Self {
         TypedSize2D::new(
             Zero::zero(),
             Zero::zero(),
@@ -140,17 +140,17 @@ impl<T: Zero, U> Zero for TypedSize2D<T, U> {
 }
 
 impl<T: Copy + Mul<T, Output=T>, U> Mul<T> for TypedSize2D<T, U> {
-    type Output = TypedSize2D<T, U>;
+    type Output = Self;
     #[inline]
-    fn mul(self, scale: T) -> TypedSize2D<T, U> {
+    fn mul(self, scale: T) -> Self {
         TypedSize2D::new(self.width * scale, self.height * scale)
     }
 }
 
 impl<T: Copy + Div<T, Output=T>, U> Div<T> for TypedSize2D<T, U> {
-    type Output = TypedSize2D<T, U>;
+    type Output = Self;
     #[inline]
-    fn div(self, scale: T) -> TypedSize2D<T, U> {
+    fn div(self, scale: T) -> Self {
         TypedSize2D::new(self.width / scale, self.height / scale)
     }
 }
@@ -192,7 +192,7 @@ impl<T: Copy, U> TypedSize2D<T, U> {
     }
 
     /// Tag a unitless value with units.
-    pub fn from_untyped(p: &Size2D<T>) -> TypedSize2D<T, U> {
+    pub fn from_untyped(p: &Size2D<T>) -> Self {
         TypedSize2D::new(p.width, p.height)
     }
 }

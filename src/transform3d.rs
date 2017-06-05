@@ -54,7 +54,7 @@ impl<T, Src, Dst> TypedTransform3D<T, Src, Dst> {
             m21: T, m22: T, m23: T, m24: T,
             m31: T, m32: T, m33: T, m34: T,
             m41: T, m42: T, m43: T, m44: T)
-         -> TypedTransform3D<T, Src, Dst> {
+         -> Self {
         TypedTransform3D {
             m11: m11, m12: m12, m13: m13, m14: m14,
             m21: m21, m22: m22, m23: m23, m24: m24,
@@ -74,7 +74,7 @@ impl<T, Src, Dst> TypedTransform3D<T, Src, Dst> {
             m12: T, m22: T, m32: T, m42: T,
             m13: T, m23: T, m33: T, m43: T,
             m14: T, m24: T, m34: T, m44: T)
-         -> TypedTransform3D<T, Src, Dst> {
+         -> Self {
         TypedTransform3D {
             m11: m11, m12: m12, m13: m13, m14: m14,
             m21: m21, m22: m22, m23: m23, m24: m24,
@@ -90,7 +90,7 @@ where T: Copy + Clone +
          PartialEq +
          One + Zero {
     #[inline]
-    pub fn identity() -> TypedTransform3D<T, Src, Dst> {
+    pub fn identity() -> Self {
         let (_0, _1): (T, T) = (Zero::zero(), One::one());
         TypedTransform3D::row_major(
             _1, _0, _0, _0,
@@ -124,7 +124,7 @@ where T: Copy + Clone +
     /// Create a 4 by 4 transform representing a 2d transformation, specifying its components
     /// in row-major order.
     #[inline]
-    pub fn row_major_2d(m11: T, m12: T, m21: T, m22: T, m41: T, m42: T) -> TypedTransform3D<T, Src, Dst> {
+    pub fn row_major_2d(m11: T, m12: T, m21: T, m22: T, m41: T, m42: T) -> Self {
         let (_0, _1): (T, T) = (Zero::zero(), One::one());
         TypedTransform3D::row_major(
             m11, m12, _0, _0,
@@ -137,7 +137,7 @@ where T: Copy + Clone +
     /// Create an orthogonal projection transform.
     pub fn ortho(left: T, right: T,
                  bottom: T, top: T,
-                 near: T, far: T) -> TypedTransform3D<T, Src, Dst> {
+                 near: T, far: T) -> Self {
         let tx = -((right + left) / (right - left));
         let ty = -((top + bottom) / (top - bottom));
         let tz = -((far + near) / (far - near));
@@ -177,7 +177,7 @@ where T: Copy + Clone +
         )
     }
 
-    pub fn approx_eq(&self, other: &TypedTransform3D<T, Src, Dst>) -> bool {
+    pub fn approx_eq(&self, other: &Self) -> bool {
         self.m11.approx_eq(&other.m11) && self.m12.approx_eq(&other.m12) &&
         self.m13.approx_eq(&other.m13) && self.m14.approx_eq(&other.m14) &&
         self.m21.approx_eq(&other.m21) && self.m22.approx_eq(&other.m22) &&
@@ -371,7 +371,7 @@ where T: Copy + Clone +
 
     /// Multiplies all of the transform's component by a scalar and returns the result.
     #[must_use]
-    pub fn mul_s(&self, x: T) -> TypedTransform3D<T, Src, Dst> {
+    pub fn mul_s(&self, x: T) -> Self {
         TypedTransform3D::row_major(
             self.m11 * x, self.m12 * x, self.m13 * x, self.m14 * x,
             self.m21 * x, self.m22 * x, self.m23 * x, self.m24 * x,
@@ -381,7 +381,7 @@ where T: Copy + Clone +
     }
 
     /// Convenience function to create a scale transform from a ScaleFactor.
-    pub fn from_scale_factor(scale: ScaleFactor<T, Src, Dst>) -> TypedTransform3D<T, Src, Dst> {
+    pub fn from_scale_factor(scale: ScaleFactor<T, Src, Dst>) -> Self {
         TypedTransform3D::create_scale(scale.get(), scale.get(), scale.get())
     }
 
@@ -446,7 +446,7 @@ where T: Copy + Clone +
     }
 
     /// Create a 3d translation transform
-    pub fn create_translation(x: T, y: T, z: T) -> TypedTransform3D<T, Src, Dst> {
+    pub fn create_translation(x: T, y: T, z: T) -> Self {
         let (_0, _1): (T, T) = (Zero::zero(), One::one());
         TypedTransform3D::row_major(
             _1, _0, _0, _0,
@@ -458,18 +458,18 @@ where T: Copy + Clone +
 
     /// Returns a transform with a translation applied before self's transformation.
     #[must_use]
-    pub fn pre_translate(&self, v: TypedVector3D<T, Src>) -> TypedTransform3D<T, Src, Dst> {
+    pub fn pre_translate(&self, v: TypedVector3D<T, Src>) -> Self {
         self.pre_mul(&TypedTransform3D::create_translation(v.x, v.y, v.z))
     }
 
     /// Returns a transform with a translation applied after self's transformation.
     #[must_use]
-    pub fn post_translate(&self, v: TypedVector3D<T, Dst>) -> TypedTransform3D<T, Src, Dst> {
+    pub fn post_translate(&self, v: TypedVector3D<T, Dst>) -> Self {
         self.post_mul(&TypedTransform3D::create_translation(v.x, v.y, v.z))
     }
 
     /// Create a 3d scale transform
-    pub fn create_scale(x: T, y: T, z: T) -> TypedTransform3D<T, Src, Dst> {
+    pub fn create_scale(x: T, y: T, z: T) -> Self {
         let (_0, _1): (T, T) = (Zero::zero(), One::one());
         TypedTransform3D::row_major(
              x, _0, _0, _0,
@@ -481,7 +481,7 @@ where T: Copy + Clone +
 
     /// Returns a transform with a scale applied before self's transformation.
     #[must_use]
-    pub fn pre_scale(&self, x: T, y: T, z: T) -> TypedTransform3D<T, Src, Dst> {
+    pub fn pre_scale(&self, x: T, y: T, z: T) -> Self {
         TypedTransform3D::row_major(
             self.m11 * x, self.m12,     self.m13,     self.m14,
             self.m21    , self.m22 * y, self.m23,     self.m24,
@@ -492,13 +492,13 @@ where T: Copy + Clone +
 
     /// Returns a transform with a scale applied after self's transformation.
     #[must_use]
-    pub fn post_scale(&self, x: T, y: T, z: T) -> TypedTransform3D<T, Src, Dst> {
+    pub fn post_scale(&self, x: T, y: T, z: T) -> Self {
         self.post_mul(&TypedTransform3D::create_scale(x, y, z))
     }
 
     /// Create a 3d rotation transform from an angle / axis.
     /// The supplied axis must be normalized.
-    pub fn create_rotation(x: T, y: T, z: T, theta: Radians<T>) -> TypedTransform3D<T, Src, Dst> {
+    pub fn create_rotation(x: T, y: T, z: T, theta: Radians<T>) -> Self {
         let (_0, _1): (T, T) = (Zero::zero(), One::one());
         let _2 = _1 + _1;
 
@@ -535,20 +535,20 @@ where T: Copy + Clone +
 
     /// Returns a transform with a rotation applied after self's transformation.
     #[must_use]
-    pub fn post_rotate(&self, x: T, y: T, z: T, theta: Radians<T>) -> TypedTransform3D<T, Src, Dst> {
+    pub fn post_rotate(&self, x: T, y: T, z: T, theta: Radians<T>) -> Self {
         self.post_mul(&TypedTransform3D::create_rotation(x, y, z, theta))
     }
 
     /// Returns a transform with a rotation applied before self's transformation.
     #[must_use]
-    pub fn pre_rotate(&self, x: T, y: T, z: T, theta: Radians<T>) -> TypedTransform3D<T, Src, Dst> {
+    pub fn pre_rotate(&self, x: T, y: T, z: T, theta: Radians<T>) -> Self {
         self.pre_mul(&TypedTransform3D::create_rotation(x, y, z, theta))
     }
 
     /// Create a 2d skew transform.
     ///
     /// See https://drafts.csswg.org/css-transforms/#funcdef-skew
-    pub fn create_skew(alpha: Radians<T>, beta: Radians<T>) -> TypedTransform3D<T, Src, Dst> {
+    pub fn create_skew(alpha: Radians<T>, beta: Radians<T>) -> Self {
         let (_0, _1): (T, T) = (Zero::zero(), One::one());
         let (sx, sy) = (beta.get().tan(), alpha.get().tan());
         TypedTransform3D::row_major(
@@ -560,7 +560,7 @@ where T: Copy + Clone +
     }
 
     /// Create a simple perspective projection transform
-    pub fn create_perspective(d: T) -> TypedTransform3D<T, Src, Dst> {
+    pub fn create_perspective(d: T) -> Self {
         let (_0, _1): (T, T) = (Zero::zero(), One::one());
         TypedTransform3D::row_major(
             _1, _0, _0, _0,

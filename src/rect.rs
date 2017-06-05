@@ -66,11 +66,11 @@ impl<T: Hash, U> Hash for TypedRect<T, U>
 impl<T: Copy, U> Copy for TypedRect<T, U> {}
 
 impl<T: Copy, U> Clone for TypedRect<T, U> {
-    fn clone(&self) -> TypedRect<T, U> { *self }
+    fn clone(&self) -> Self { *self }
 }
 
-impl<T: PartialEq, U> PartialEq<TypedRect<T, U>> for TypedRect<T, U> {
-    fn eq(&self, other: &TypedRect<T, U>) -> bool {
+impl<T: PartialEq, U> PartialEq<Self> for TypedRect<T, U> {
+    fn eq(&self, other: &Self) -> bool {
         self.origin.eq(&other.origin) && self.size.eq(&other.size)
     }
 }
@@ -91,7 +91,7 @@ impl<T: fmt::Display, U> fmt::Display for TypedRect<T, U> {
 
 impl<T, U> TypedRect<T, U> {
     /// Constructor.
-    pub fn new(origin: TypedPoint2D<T, U>, size: TypedSize2D<T, U>) -> TypedRect<T, U> {
+    pub fn new(origin: TypedPoint2D<T, U>, size: TypedSize2D<T, U>) -> Self {
         TypedRect {
             origin: origin,
             size: size,
@@ -102,7 +102,7 @@ impl<T, U> TypedRect<T, U> {
 impl<T, U> TypedRect<T, U>
 where T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output=T> + Sub<T, Output=T> {
     #[inline]
-    pub fn intersects(&self, other: &TypedRect<T, U>) -> bool {
+    pub fn intersects(&self, other: &Self) -> bool {
         self.origin.x < other.origin.x + other.size.width &&
        other.origin.x <  self.origin.x + self.size.width &&
         self.origin.y < other.origin.y + other.size.height &&
@@ -150,7 +150,7 @@ where T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output=T> + Sub<T
     }
 
     #[inline]
-    pub fn intersection(&self, other: &TypedRect<T, U>) -> Option<TypedRect<T, U>> {
+    pub fn intersection(&self, other: &Self) -> Option<Self> {
         if !self.intersects(other) {
             return None;
         }
@@ -167,7 +167,7 @@ where T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output=T> + Sub<T
     /// Returns the same rectangle, translated by a vector.
     #[inline]
     #[must_use]
-    pub fn translate(&self, by: &TypedVector2D<T, U>) -> TypedRect<T, U> {
+    pub fn translate(&self, by: &TypedVector2D<T, U>) -> Self {
         Self::new(self.origin + *by, self.size)
     }
 
@@ -184,7 +184,7 @@ where T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output=T> + Sub<T
     /// returns true if rect is empty, and always returns false if rect is
     /// nonempty but this rectangle is empty.
     #[inline]
-    pub fn contains_rect(&self, rect: &TypedRect<T, U>) -> bool {
+    pub fn contains_rect(&self, rect: &Self) -> bool {
         rect.is_empty() ||
             (self.min_x() <= rect.min_x() && rect.max_x() <= self.max_x() &&
              self.min_y() <= rect.min_y() && rect.max_y() <= self.max_y())
@@ -192,7 +192,7 @@ where T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output=T> + Sub<T
 
     #[inline]
     #[must_use]
-    pub fn inflate(&self, width: T, height: T) -> TypedRect<T, U> {
+    pub fn inflate(&self, width: T, height: T) -> Self {
         TypedRect::new(
             TypedPoint2D::new(self.origin.x - width, self.origin.y - height),
             TypedSize2D::new(self.size.width + width + width, self.size.height + height + height),
@@ -201,7 +201,7 @@ where T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output=T> + Sub<T
 
     #[inline]
     #[must_use]
-    pub fn inflate_typed(&self, width: Length<T, U>, height: Length<T, U>) -> TypedRect<T, U> {
+    pub fn inflate_typed(&self, width: Length<T, U>, height: Length<T, U>) -> Self {
         self.inflate(width.get(), height.get())
     }
 
@@ -222,7 +222,7 @@ where T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output=T> + Sub<T
 
     #[inline]
     #[must_use]
-    pub fn translate_by_size(&self, size: &TypedSize2D<T, U>) -> TypedRect<T, U> {
+    pub fn translate_by_size(&self, size: &TypedSize2D<T, U>) -> Self {
         self.translate(&size.to_vector())
     }
 
@@ -269,7 +269,7 @@ where T: Copy + One + Add<Output=T> + Sub<Output=T> + Mul<Output=T> {
 impl<T, U> TypedRect<T, U>
 where T: Copy + Clone + PartialOrd + Add<T, Output=T> + Sub<T, Output=T> + Zero {
     #[inline]
-    pub fn union(&self, other: &TypedRect<T, U>) -> TypedRect<T, U> {
+    pub fn union(&self, other: &Self) -> Self {
         if self.size == Zero::zero() {
             return *other;
         }
@@ -292,7 +292,7 @@ where T: Copy + Clone + PartialOrd + Add<T, Output=T> + Sub<T, Output=T> + Zero 
 
 impl<T, U> TypedRect<T, U> {
     #[inline]
-    pub fn scale<Scale: Copy>(&self, x: Scale, y: Scale) -> TypedRect<T, U>
+    pub fn scale<Scale: Copy>(&self, x: Scale, y: Scale) -> Self
         where T: Copy + Clone + Mul<Scale, Output=T> {
         TypedRect::new(
             TypedPoint2D::new(self.origin.x * x, self.origin.y * y),
@@ -303,7 +303,7 @@ impl<T, U> TypedRect<T, U> {
 
 impl<T: Copy + PartialEq + Zero, U> TypedRect<T, U> {
     /// Constructor, setting all sides to zero.
-    pub fn zero() -> TypedRect<T, U> {
+    pub fn zero() -> Self {
         TypedRect::new(
             TypedPoint2D::origin(),
             TypedSize2D::zero(),
@@ -326,17 +326,17 @@ pub fn max<T: Clone + PartialOrd>(x: T, y: T) -> T {
 }
 
 impl<T: Copy + Mul<T, Output=T>, U> Mul<T> for TypedRect<T, U> {
-    type Output = TypedRect<T, U>;
+    type Output = Self;
     #[inline]
-    fn mul(self, scale: T) -> TypedRect<T, U> {
+    fn mul(self, scale: T) -> Self {
         TypedRect::new(self.origin * scale, self.size * scale)
     }
 }
 
 impl<T: Copy + Div<T, Output=T>, U> Div<T> for TypedRect<T, U> {
-    type Output = TypedRect<T, U>;
+    type Output = Self;
     #[inline]
-    fn div(self, scale: T) -> TypedRect<T, U> {
+    fn div(self, scale: T) -> Self {
         TypedRect::new(self.origin / scale, self.size / scale)
     }
 }

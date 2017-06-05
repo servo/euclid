@@ -173,7 +173,7 @@ impl<T: Copy + Add<T, Output=T>, U> AddAssign for TypedVector2D<T, U> {
     }
 }
 
-impl<T: Copy + Sub<T, Output=T>, U> SubAssign<TypedVector2D<T, U>> for TypedVector2D<T, U> {
+impl<T: Copy + Sub<T, Output=T>, U> SubAssign<Self> for TypedVector2D<T, U> {
     #[inline]
     fn sub_assign(&mut self, other: Self) {
         *self = *self - other
@@ -183,7 +183,7 @@ impl<T: Copy + Sub<T, Output=T>, U> SubAssign<TypedVector2D<T, U>> for TypedVect
 impl<T: Copy + Sub<T, Output=T>, U> Sub for TypedVector2D<T, U> {
     type Output = Self;
     #[inline]
-    fn sub(self, other: TypedVector2D<T, U>) -> Self {
+    fn sub(self, other: Self) -> Self {
         vec2(self.x - other.x, self.y - other.y)
     }
 }
@@ -198,12 +198,12 @@ impl <T: Copy + Neg<Output=T>, U> Neg for TypedVector2D<T, U> {
 
 impl<T: Float, U> TypedVector2D<T, U> {
     #[inline]
-    pub fn min(self, other: TypedVector2D<T, U>) -> Self {
+    pub fn min(self, other: Self) -> Self {
          vec2(self.x.min(other.x), self.y.min(other.y))
     }
 
     #[inline]
-    pub fn max(self, other: TypedVector2D<T, U>) -> Self {
+    pub fn max(self, other: Self) -> Self {
         vec2(self.x.max(other.x), self.y.max(other.y))
     }
 }
@@ -343,7 +343,7 @@ impl<T: NumCast + Copy, U> TypedVector2D<T, U> {
     }
 }
 
-impl<T: Copy+ApproxEq<T>, U> ApproxEq<TypedVector2D<T, U>> for TypedVector2D<T, U> {
+impl<T: Copy+ApproxEq<T>, U> ApproxEq<Self> for TypedVector2D<T, U> {
     #[inline]
     fn approx_epsilon() -> Self {
         vec2(T::approx_epsilon(), T::approx_epsilon())
@@ -481,7 +481,7 @@ impl<T: Mul<T, Output=T> +
 
     // Cross product.
     #[inline]
-    pub fn cross(self, other: TypedVector3D<T, U>) -> Self {
+    pub fn cross(self, other: Self) -> Self {
         vec3(
             self.y * other.z - self.z * other.y,
             self.z * other.x - self.x * other.z,
@@ -523,17 +523,17 @@ where T: Copy + One + Add<Output=T> + Sub<Output=T> + Mul<Output=T> {
 }
 
 impl<T: Copy + Add<T, Output=T>, U> Add for TypedVector3D<T, U> {
-    type Output = TypedVector3D<T, U>;
+    type Output = Self;
     #[inline]
-    fn add(self, other: TypedVector3D<T, U>) -> Self {
+    fn add(self, other: Self) -> Self {
         vec3(self.x + other.x, self.y + other.y, self.z + other.z)
     }
 }
 
 impl<T: Copy + Sub<T, Output=T>, U> Sub for TypedVector3D<T, U> {
-    type Output = TypedVector3D<T, U>;
+    type Output = Self;
     #[inline]
-    fn sub(self, other: TypedVector3D<T, U>) -> Self {
+    fn sub(self, other: Self) -> Self {
         vec3(self.x - other.x, self.y - other.y, self.z - other.z)
     }
 }
@@ -545,7 +545,7 @@ impl<T: Copy + Add<T, Output=T>, U> AddAssign for TypedVector3D<T, U> {
     }
 }
 
-impl<T: Copy + Sub<T, Output=T>, U> SubAssign<TypedVector3D<T, U>> for TypedVector3D<T, U> {
+impl<T: Copy + Sub<T, Output=T>, U> SubAssign<Self> for TypedVector3D<T, U> {
     #[inline]
     fn sub_assign(&mut self, other: Self) {
         *self = *self - other
@@ -592,12 +592,12 @@ impl<T: Copy + Div<T, Output=T>, U> DivAssign<T> for TypedVector3D<T, U> {
 
 impl<T: Float, U> TypedVector3D<T, U> {
     #[inline]
-    pub fn min(self, other: TypedVector3D<T, U>) -> TypedVector3D<T, U> {
+    pub fn min(self, other: Self) -> Self {
          vec3(self.x.min(other.x), self.y.min(other.y), self.z.min(other.z))
     }
 
     #[inline]
-    pub fn max(self, other: TypedVector3D<T, U>) -> TypedVector3D<T, U> {
+    pub fn max(self, other: Self) -> Self {
         vec3(self.x.max(other.x), self.y.max(other.y), self.z.max(other.z))
     }
 }
@@ -690,7 +690,7 @@ impl<T: NumCast + Copy, U> TypedVector3D<T, U> {
     }
 }
 
-impl<T: Copy+ApproxEq<T>, U> ApproxEq<TypedVector3D<T, U>> for TypedVector3D<T, U> {
+impl<T: Copy+ApproxEq<T>, U> ApproxEq<Self> for TypedVector3D<T, U> {
     #[inline]
     fn approx_epsilon() -> Self {
         vec3(T::approx_epsilon(), T::approx_epsilon(), T::approx_epsilon())

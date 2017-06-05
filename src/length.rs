@@ -52,7 +52,7 @@ impl<Unit, T: HeapSizeOf> HeapSizeOf for Length<T, Unit> {
 }
 
 impl<Unit, T> Deserialize for Length<T, Unit> where T: Deserialize {
-    fn deserialize<D>(deserializer: D) -> Result<Length<T, Unit>,D::Error>
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
                       where D: Deserializer {
         Ok(Length(try!(Deserialize::deserialize(deserializer)), PhantomData))
     }
@@ -65,7 +65,7 @@ impl<T, Unit> Serialize for Length<T, Unit> where T: Serialize {
 }
 
 impl<T, Unit> Length<T, Unit> {
-    pub fn new(x: T) -> Length<T, Unit> {
+    pub fn new(x: T) -> Self {
         Length(x, PhantomData)
     }
 }
@@ -173,11 +173,11 @@ impl<Unit, T0: NumCast + Clone> Length<T0, Unit> {
 }
 
 impl<Unit, T: Clone + PartialEq> PartialEq for Length<T, Unit> {
-    fn eq(&self, other: &Length<T, Unit>) -> bool { self.get().eq(&other.get()) }
+    fn eq(&self, other: &Self) -> bool { self.get().eq(&other.get()) }
 }
 
 impl<Unit, T: Clone + PartialOrd> PartialOrd for Length<T, Unit> {
-    fn partial_cmp(&self, other: &Length<T, Unit>) -> Option<Ordering> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         self.get().partial_cmp(&other.get())
     }
 }
@@ -185,11 +185,11 @@ impl<Unit, T: Clone + PartialOrd> PartialOrd for Length<T, Unit> {
 impl<Unit, T: Clone + Eq> Eq for Length<T, Unit> {}
 
 impl<Unit, T: Clone + Ord> Ord for Length<T, Unit> {
-    fn cmp(&self, other: &Length<T, Unit>) -> Ordering { self.get().cmp(&other.get()) }
+    fn cmp(&self, other: &Self) -> Ordering { self.get().cmp(&other.get()) }
 }
 
 impl<Unit, T: Zero> Zero for Length<T, Unit> {
-    fn zero() -> Length<T, Unit> {
+    fn zero() -> Self {
         Length::new(Zero::zero())
     }
 }
