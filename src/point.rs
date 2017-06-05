@@ -118,7 +118,7 @@ impl<T: Copy + Add<T, Output=T>, U> TypedPoint2D<T, U> {
 }
 
 impl<T: Copy + Add<T, Output=T>, U> Add<TypedSize2D<T, U>> for TypedPoint2D<T, U> {
-    type Output = TypedPoint2D<T, U>;
+    type Output = Self;
     #[inline]
     fn add(self, other: TypedSize2D<T, U>) -> Self {
         point2(self.x + other.width, self.y + other.height)
@@ -140,7 +140,7 @@ impl<T: Copy + Sub<T, Output=T>, U> SubAssign<TypedVector2D<T, U>> for TypedPoin
 }
 
 impl<T: Copy + Add<T, Output=T>, U> Add<TypedVector2D<T, U>> for TypedPoint2D<T, U> {
-    type Output = TypedPoint2D<T, U>;
+    type Output = Self;
     #[inline]
     fn add(self, other: TypedVector2D<T, U>) -> Self {
         point2(self.x + other.x, self.y + other.y)
@@ -150,7 +150,7 @@ impl<T: Copy + Add<T, Output=T>, U> Add<TypedVector2D<T, U>> for TypedPoint2D<T,
 impl<T: Copy + Sub<T, Output=T>, U> Sub for TypedPoint2D<T, U> {
     type Output = TypedVector2D<T, U>;
     #[inline]
-    fn sub(self, other: TypedPoint2D<T, U>) -> TypedVector2D<T, U> {
+    fn sub(self, other: Self) -> TypedVector2D<T, U> {
         vec2(self.x - other.x, self.y - other.y)
     }
 }
@@ -165,12 +165,12 @@ impl<T: Copy + Sub<T, Output=T>, U> Sub<TypedVector2D<T, U>> for TypedPoint2D<T,
 
 impl<T: Float, U> TypedPoint2D<T, U> {
     #[inline]
-    pub fn min(self, other: TypedPoint2D<T, U>) -> Self {
+    pub fn min(self, other: Self) -> Self {
          point2(self.x.min(other.x), self.y.min(other.y))
     }
 
     #[inline]
-    pub fn max(self, other: TypedPoint2D<T, U>) -> Self {
+    pub fn max(self, other: Self) -> Self {
         point2(self.x.max(other.x), self.y.max(other.y))
     }
 }

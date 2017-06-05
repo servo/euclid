@@ -42,7 +42,7 @@ pub type Transform2D<T> = TypedTransform2D<T, UnknownUnit, UnknownUnit>;
 
 impl<T: Copy, Src, Dst> TypedTransform2D<T, Src, Dst> {
     /// Create a transform specifying its matrix elements in row-major order.
-    pub fn row_major(m11: T, m12: T, m21: T, m22: T, m31: T, m32: T) -> TypedTransform2D<T, Src, Dst> {
+    pub fn row_major(m11: T, m12: T, m21: T, m22: T, m31: T, m32: T) -> Self {
         TypedTransform2D {
             m11: m11, m12: m12,
             m21: m21, m22: m22,
@@ -52,7 +52,7 @@ impl<T: Copy, Src, Dst> TypedTransform2D<T, Src, Dst> {
     }
 
     /// Create a transform specifying its matrix elements in column-major order.
-    pub fn column_major(m11: T, m21: T, m31: T, m12: T, m22: T, m32: T) -> TypedTransform2D<T, Src, Dst> {
+    pub fn column_major(m11: T, m21: T, m31: T, m12: T, m22: T, m32: T) -> Self {
         TypedTransform2D {
             m11: m11, m12: m12,
             m21: m21, m22: m22,
@@ -119,7 +119,7 @@ impl<T: Copy, Src, Dst> TypedTransform2D<T, Src, Dst> {
     }
 
     /// Tag a unitless value with units.
-    pub fn from_untyped(p: &Transform2D<T>) -> TypedTransform2D<T, Src, Dst> {
+    pub fn from_untyped(p: &Transform2D<T>) -> Self {
         TypedTransform2D::row_major(
             p.m11, p.m12,
             p.m21, p.m22,
@@ -132,7 +132,7 @@ impl<T, Src, Dst> TypedTransform2D<T, Src, Dst>
 where T: Copy +
          PartialEq +
          One + Zero {
-    pub fn identity() -> TypedTransform2D<T, Src, Dst> {
+    pub fn identity() -> Self {
         let (_0, _1) = (Zero::zero(), One::one());
         TypedTransform2D::row_major(
            _1, _0,
@@ -181,7 +181,7 @@ where T: Copy + Clone +
     }
 
     /// Returns a translation transform.
-    pub fn create_translation(x: T, y: T) -> TypedTransform2D<T, Src, Dst> {
+    pub fn create_translation(x: T, y: T) -> Self {
          let (_0, _1): (T, T) = (Zero::zero(), One::one());
          TypedTransform2D::row_major(
             _1, _0,
@@ -192,18 +192,18 @@ where T: Copy + Clone +
 
     /// Applies a translation after self's transformation and returns the resulting transform.
     #[must_use]
-    pub fn post_translate(&self, v: TypedVector2D<T, Dst>) -> TypedTransform2D<T, Src, Dst> {
+    pub fn post_translate(&self, v: TypedVector2D<T, Dst>) -> Self {
         self.post_mul(&TypedTransform2D::create_translation(v.x, v.y))
     }
 
     /// Applies a translation before self's transformation and returns the resulting transform.
     #[must_use]
-    pub fn pre_translate(&self, v: TypedVector2D<T, Src>) -> TypedTransform2D<T, Src, Dst> {
+    pub fn pre_translate(&self, v: TypedVector2D<T, Src>) -> Self {
         self.pre_mul(&TypedTransform2D::create_translation(v.x, v.y))
     }
 
     /// Returns a scale transform.
-    pub fn create_scale(x: T, y: T) -> TypedTransform2D<T, Src, Dst> {
+    pub fn create_scale(x: T, y: T) -> Self {
         let _0 = Zero::zero();
         TypedTransform2D::row_major(
              x, _0,
@@ -214,13 +214,13 @@ where T: Copy + Clone +
 
     /// Applies a scale after self's transformation and returns the resulting transform.
     #[must_use]
-    pub fn post_scale(&self, x: T, y: T) -> TypedTransform2D<T, Src, Dst> {
+    pub fn post_scale(&self, x: T, y: T) -> Self {
         self.post_mul(&TypedTransform2D::create_scale(x, y))
     }
 
     /// Applies a scale before self's transformation and returns the resulting transform.
     #[must_use]
-    pub fn pre_scale(&self, x: T, y: T) -> TypedTransform2D<T, Src, Dst> {
+    pub fn pre_scale(&self, x: T, y: T) -> Self {
         TypedTransform2D::row_major(
             self.m11 * x, self.m12,
             self.m21,     self.m22 * y,
@@ -229,7 +229,7 @@ where T: Copy + Clone +
     }
 
     /// Returns a rotation transform.
-    pub fn create_rotation(theta: Radians<T>) -> TypedTransform2D<T, Src, Dst> {
+    pub fn create_rotation(theta: Radians<T>) -> Self {
         let _0 = Zero::zero();
         let cos = theta.get().cos();
         let sin = theta.get().sin();
@@ -242,13 +242,13 @@ where T: Copy + Clone +
 
     /// Applies a rotation after self's transformation and returns the resulting transform.
     #[must_use]
-    pub fn post_rotate(&self, theta: Radians<T>) -> TypedTransform2D<T, Src, Dst> {
+    pub fn post_rotate(&self, theta: Radians<T>) -> Self {
         self.post_mul(&TypedTransform2D::create_rotation(theta))
     }
 
     /// Applies a rotation after self's transformation and returns the resulting transform.
     #[must_use]
-    pub fn pre_rotate(&self, theta: Radians<T>) -> TypedTransform2D<T, Src, Dst> {
+    pub fn pre_rotate(&self, theta: Radians<T>) -> Self {
         self.pre_mul(&TypedTransform2D::create_rotation(theta))
     }
 
