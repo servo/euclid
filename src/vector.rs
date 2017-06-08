@@ -71,6 +71,12 @@ impl<T: Copy, U> TypedVector2D<T, U> {
         vec2(x.0, y.0)
     }
 
+    /// Create a 3d vector from this one, using the specified z value.
+    #[inline]
+    pub fn extend(&self, z: T) -> TypedVector3D<T, U> {
+        vec3(self.x, self.y, z)
+    }
+
     /// Cast this vector into a point.
     ///
     /// Equivalent to adding this vector to the origin.
