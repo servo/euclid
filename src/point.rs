@@ -76,6 +76,12 @@ impl<T: Copy, U> TypedPoint2D<T, U> {
         point2(x.0, y.0)
     }
 
+    /// Create a 3d point from this one, using the specified z value.
+    #[inline]
+    pub fn extend(&self, z: T) -> TypedPoint3D<T, U> {
+        point3(self.x, self.y, z)
+    }
+
     /// Cast this point into a vector.
     ///
     /// Equivalent to substracting the origin to this point.
@@ -325,7 +331,7 @@ where T: Copy + One + Add<Output=T> + Sub<Output=T> + Mul<Output=T> {
     }
 }
 
-impl<T: Copy+ApproxEq<T>, U> ApproxEq<Self> for TypedPoint2D<T, U> {
+impl<T: Copy+ApproxEq<T>, U> ApproxEq<TypedPoint2D<T, U>> for TypedPoint2D<T, U> {
     #[inline]
     fn approx_epsilon() -> Self {
         point2(T::approx_epsilon(), T::approx_epsilon())
@@ -621,7 +627,7 @@ impl<T: NumCast + Copy, U> TypedPoint3D<T, U> {
     }
 }
 
-impl<T: Copy+ApproxEq<T>, U> ApproxEq<Self> for TypedPoint3D<T, U> {
+impl<T: Copy+ApproxEq<T>, U> ApproxEq<TypedPoint3D<T, U>> for TypedPoint3D<T, U> {
     #[inline]
     fn approx_epsilon() -> Self {
         point3(T::approx_epsilon(), T::approx_epsilon(), T::approx_epsilon())
