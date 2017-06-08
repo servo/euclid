@@ -69,7 +69,7 @@ impl<T: Copy, U> Clone for TypedRect<T, U> {
     fn clone(&self) -> Self { *self }
 }
 
-impl<T: PartialEq, U> PartialEq<Self> for TypedRect<T, U> {
+impl<T: PartialEq, U> PartialEq<TypedRect<T, U>> for TypedRect<T, U> {
     fn eq(&self, other: &Self) -> bool {
         self.origin.eq(&other.origin) && self.size.eq(&other.size)
     }

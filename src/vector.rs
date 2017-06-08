@@ -179,7 +179,7 @@ impl<T: Copy + Add<T, Output=T>, U> AddAssign for TypedVector2D<T, U> {
     }
 }
 
-impl<T: Copy + Sub<T, Output=T>, U> SubAssign<Self> for TypedVector2D<T, U> {
+impl<T: Copy + Sub<T, Output=T>, U> SubAssign<TypedVector2D<T, U>> for TypedVector2D<T, U> {
     #[inline]
     fn sub_assign(&mut self, other: Self) {
         *self = *self - other
@@ -349,7 +349,7 @@ impl<T: NumCast + Copy, U> TypedVector2D<T, U> {
     }
 }
 
-impl<T: Copy+ApproxEq<T>, U> ApproxEq<Self> for TypedVector2D<T, U> {
+impl<T: Copy+ApproxEq<T>, U> ApproxEq<TypedVector2D<T, U>> for TypedVector2D<T, U> {
     #[inline]
     fn approx_epsilon() -> Self {
         vec2(T::approx_epsilon(), T::approx_epsilon())
@@ -551,7 +551,7 @@ impl<T: Copy + Add<T, Output=T>, U> AddAssign for TypedVector3D<T, U> {
     }
 }
 
-impl<T: Copy + Sub<T, Output=T>, U> SubAssign<Self> for TypedVector3D<T, U> {
+impl<T: Copy + Sub<T, Output=T>, U> SubAssign<TypedVector3D<T, U>> for TypedVector3D<T, U> {
     #[inline]
     fn sub_assign(&mut self, other: Self) {
         *self = *self - other
@@ -696,7 +696,7 @@ impl<T: NumCast + Copy, U> TypedVector3D<T, U> {
     }
 }
 
-impl<T: Copy+ApproxEq<T>, U> ApproxEq<Self> for TypedVector3D<T, U> {
+impl<T: Copy+ApproxEq<T>, U> ApproxEq<TypedVector3D<T, U>> for TypedVector3D<T, U> {
     #[inline]
     fn approx_epsilon() -> Self {
         vec3(T::approx_epsilon(), T::approx_epsilon(), T::approx_epsilon())
