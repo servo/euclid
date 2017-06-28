@@ -79,8 +79,10 @@ pub use vector::{
     Vector2D, TypedVector2D, vec2,
     Vector3D, TypedVector3D, vec3,
 };
-
-pub use rect::{Rect, TypedRect, rect};
+pub use rect::{
+    Rect, TypedRect, rect,
+    Box2D, TypedBox2D, box2,
+};
 pub use side_offsets::{SideOffsets2D, TypedSideOffsets2D};
 #[cfg(feature = "unstable")] pub use side_offsets::SideOffsets2DSimdI32;
 pub use size::{Size2D, TypedSize2D, size2};
@@ -133,3 +135,10 @@ pub type Matrix4D<T> = Transform3D<T>;
 #[deprecated]
 pub type TypedMatrix4D<T, Src, Dst> = TypedTransform3D<T, Src, Dst>;
 
+fn min<T: PartialOrd>(x: T, y: T) -> T {
+    if x <= y { x } else { y }
+}
+
+fn max<T: PartialOrd>(x: T, y: T) -> T {
+    if x >= y { x } else { y }
+}
