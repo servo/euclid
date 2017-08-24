@@ -13,11 +13,12 @@ use length::Length;
 use scale_factor::ScaleFactor;
 use size::TypedSize2D;
 use num::*;
-use num_traits::{Float, NumCast};
+use num_traits::NumCast;
 use vector::{TypedVector2D, TypedVector3D, vec2, vec3};
 use std::fmt;
 use std::ops::{Add, Mul, Sub, Div, AddAssign, SubAssign, MulAssign, DivAssign};
 use std::marker::PhantomData;
+use {min, max};
 
 define_matrix! {
     /// A 2d Point tagged with a unit.
@@ -175,15 +176,15 @@ impl<T: Copy + Sub<T, Output=T>, U> Sub<TypedVector2D<T, U>> for TypedPoint2D<T,
     }
 }
 
-impl<T: Float, U> TypedPoint2D<T, U> {
+impl<T: Copy + PartialOrd, U> TypedPoint2D<T, U> {
     #[inline]
     pub fn min(self, other: Self) -> Self {
-         point2(self.x.min(other.x), self.y.min(other.y))
+         point2(min(self.x, other.x), min(self.y, other.y))
     }
 
     #[inline]
     pub fn max(self, other: Self) -> Self {
-        point2(self.x.max(other.x), self.y.max(other.y))
+        point2(max(self.x, other.x), max(self.y, other.y))
     }
 }
 
@@ -551,15 +552,15 @@ impl<T: Copy + Div<T, Output=T>, U> Div<T> for TypedPoint3D<T, U> {
     }
 }
 
-impl<T: Float, U> TypedPoint3D<T, U> {
+impl<T: Copy + PartialOrd, U> TypedPoint3D<T, U> {
     #[inline]
     pub fn min(self, other: Self) -> Self {
-         point3(self.x.min(other.x), self.y.min(other.y), self.z.min(other.z))
+         point3(min(self.x, other.x), min(self.y, other.y), min(self.z, other.z))
     }
 
     #[inline]
     pub fn max(self, other: Self) -> Self {
-        point3(self.x.max(other.x), self.y.max(other.y), self.z.max(other.z))
+        point3(max(self.x, other.x), max(self.y, other.y), max(self.z, other.z))
     }
 }
 

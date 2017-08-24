@@ -18,6 +18,7 @@ use num_traits::{Float, NumCast};
 use std::fmt;
 use std::ops::{Add, Neg, Mul, Sub, Div, AddAssign, SubAssign, MulAssign, DivAssign};
 use std::marker::PhantomData;
+use {min, max};
 
 define_matrix! {
     /// A 2d Vector tagged with a unit.
@@ -208,15 +209,15 @@ impl <T: Copy + Neg<Output=T>, U> Neg for TypedVector2D<T, U> {
     }
 }
 
-impl<T: Float, U> TypedVector2D<T, U> {
+impl<T: Copy + PartialOrd, U> TypedVector2D<T, U> {
     #[inline]
     pub fn min(self, other: Self) -> Self {
-         vec2(self.x.min(other.x), self.y.min(other.y))
+         vec2(min(self.x, other.x), min(self.y, other.y))
     }
 
     #[inline]
     pub fn max(self, other: Self) -> Self {
-        vec2(self.x.max(other.x), self.y.max(other.y))
+        vec2(max(self.x, other.x), max(self.y, other.y))
     }
 }
 
@@ -620,15 +621,15 @@ impl<T: Copy + Div<T, Output=T>, U> DivAssign<T> for TypedVector3D<T, U> {
     }
 }
 
-impl<T: Float, U> TypedVector3D<T, U> {
+impl<T: Copy + PartialOrd, U> TypedVector3D<T, U> {
     #[inline]
     pub fn min(self, other: Self) -> Self {
-         vec3(self.x.min(other.x), self.y.min(other.y), self.z.min(other.z))
+         vec3(min(self.x, other.x), min(self.y, other.y), min(self.z, other.z))
     }
 
     #[inline]
     pub fn max(self, other: Self) -> Self {
-        vec3(self.x.max(other.x), self.y.max(other.y), self.z.max(other.z))
+        vec3(max(self.x, other.x), max(self.y, other.y), max(self.z, other.z))
     }
 }
 

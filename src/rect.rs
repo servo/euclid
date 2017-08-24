@@ -11,9 +11,9 @@ use super::UnknownUnit;
 use length::Length;
 use scale_factor::ScaleFactor;
 use num::*;
-use point::TypedPoint2D;
+use point::{TypedPoint2D, point2};
 use vector::TypedVector2D;
-use size::TypedSize2D;
+use size::{TypedSize2D, size2};
 
 use heapsize::HeapSizeOf;
 use num_traits::NumCast;
@@ -22,8 +22,9 @@ use std::cmp::PartialOrd;
 use std::fmt;
 use std::hash::{Hash, Hasher};
 use std::ops::{Add, Sub, Mul, Div};
+use {min, max};
 
-/// A 2d Rectangle optionally tagged with a unit.
+/// A 2d Rectangle represented using a point and a size, optionally tagged with a unit.
 #[repr(C)]
 pub struct TypedRect<T, U = UnknownUnit> {
     pub origin: TypedPoint2D<T, U>,
@@ -163,6 +164,11 @@ where T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output=T> + Sub<T
 
         Some(TypedRect::new(upper_left, TypedSize2D::new(lower_right_x - upper_left.x,
                                                     lower_right_y - upper_left.y)))
+    }
+
+    #[inline]
+    pub fn to_box(&self) -> TypedBox2D<T, U> {
+        TypedBox2D::new(self.origin, point2(self.max_x(), self.max_y()))
     }
 
     /// Returns the same rectangle, translated by a vector.
@@ -317,15 +323,6 @@ impl<T: Copy + PartialEq + Zero, U> TypedRect<T, U> {
     }
 }
 
-
-pub fn min<T: Clone + PartialOrd>(x: T, y: T) -> T {
-    if x <= y { x } else { y }
-}
-
-pub fn max<T: Clone + PartialOrd>(x: T, y: T) -> T {
-    if x >= y { x } else { y }
-}
-
 impl<T: Copy + Mul<T, Output=T>, U> Mul<T> for TypedRect<T, U> {
     type Output = Self;
     #[inline]
@@ -455,9 +452,153 @@ impl<T: NumCast + Copy, Unit> TypedRect<T, Unit> {
     }
 }
 
+/// A 2d Rectangle represented using two points, optionally tagged with a unit.
+#[repr(C)]
+pub struct TypedBox2D<T, Unit = UnknownUnit> {
+    pub min: TypedPoint2D<T, Unit>,
+    pub max: TypedPoint2D<T, Unit>,
+}
+
+/// The default box type with no unit.
+pub type Box2D<T> = TypedBox2D<T, UnknownUnit>;
+
+impl<T, U> TypedBox2D<T, U> {
+    pub fn new(min: TypedPoint2D<T, U>, max: TypedPoint2D<T, U>) -> Self {
+        TypedBox2D { min, max }
+    }
+}
+
+impl<T, U> TypedBox2D<T, U>
+where T: Copy + Clone + Zero + One + PartialOrd + PartialEq + Add<Output=T> + Sub<Output=T> + Mul<Output=T> {
+    /// Returns a rectangle if this box is positive.
+    #[inline]
+    pub fn to_rect(&self) -> Option<TypedRect<T, U>> {
+        if self.is_positive() {
+            return None
+        }
+
+        Some(TypedRect { origin: self.min, size: self.size() })
+    }
+
+    #[inline]
+    pub fn size(&self) -> TypedSize2D<T, U> {
+        (self.max - self.min).to_size()
+    }
+
+    /// Returns true if both width and height are superior or equal to zero.
+    #[inline]
+    pub fn is_positive(&self) -> bool {
+        self.max.x >= self.min.x && self.max.y >= self.min.y
+    }
+
+    /// Returns true if either width or height are inferior to zero.
+    #[inline]
+    pub fn is_negative(&self) -> bool {
+        self.max.x < self.min.x || self.max.y < self.min.y
+    }
+
+    /// Returns true if either width or height are inferior or equal to zero.
+    #[inline]
+    pub fn is_empty_or_negative(&self) -> bool {
+       self.max.x <= self.min.x || self.max.y <= self.min.y
+    }
+
+    #[inline]
+    pub fn intersects(&self, other: &Self) -> bool {
+        self.intersection(other).is_positive()
+    }
+
+    #[inline]
+    pub fn intersection(&self, other: &Self) -> Self {
+        TypedBox2D {
+            min: point2(max(self.min.x, other.min.x), max(self.min.y, other.min.y)),
+            max: point2(min(self.max.x, other.max.x), min(self.max.y, other.max.y)),
+        }
+    }
+
+    #[inline]
+    pub fn union(&self, other: &Self) -> Self {
+        if other.is_empty_or_negative() {
+            return *self;
+        }
+
+        if self.is_empty_or_negative() {
+            return *other;
+        }
+
+        TypedBox2D {
+            min: point2(min(self.min.x, other.min.x), min(self.min.y, other.min.y)),
+            max: point2(max(self.max.x, other.max.x), max(self.max.y, other.max.y)),
+        }
+    }
+
+    /// Returns true if this box contains the point. Points are considered
+    /// in the box if they are on the left or top edge, but outside if they
+    /// are on the right or bottom edge.
+    #[inline]
+    pub fn contains(&self, point: &TypedPoint2D<T, U>) -> bool {
+        self.min.x <= point.x && point.x < self.max.x &&
+            self.min.y <= point.y && point.y < self.max.y
+    }
+
+    /// Linearly interpolate between this box and another box.
+    ///
+    /// The box should be positive.
+    /// `t` is expected to be between zero and one.
+    #[inline]
+    pub fn lerp(&self, other: Self, t: T) -> Self {
+        debug_assert!(self.is_positive());
+        debug_assert!(other.is_positive());
+        Self::new(
+            self.min.lerp(other.min, t),
+            self.max.lerp(other.max, t),
+        )
+    }
+
+    /// Return the same box if positive, or an empty box if negative.
+    ///
+    /// This is useful after computing intersections since the latter can produce negative boxes.
+    #[inline]
+    #[must_use]
+    pub fn ensure_positive(&self) -> Self {
+        TypedBox2D { min: self.min, max: self.max.max(self.min) }
+    }
+}
+
+impl<T: Copy, U> Copy for TypedBox2D<T, U> {}
+
+impl<T: Copy, U> Clone for TypedBox2D<T, U> {
+    fn clone(&self) -> Self { *self }
+}
+
+impl<T: PartialEq, U> PartialEq<TypedBox2D<T, U>> for TypedBox2D<T, U> {
+    fn eq(&self, other: &Self) -> bool {
+        self.min.eq(&other.min) && self.max.eq(&other.max)
+    }
+}
+
+impl<T: Eq, U> Eq for TypedBox2D<T, U> {}
+
+impl<T: fmt::Debug, U> fmt::Debug for TypedBox2D<T, U> {
+   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Box2D({:?} to {:?})", self.min, self.max)
+    }
+}
+
+impl<T: fmt::Display, U> fmt::Display for TypedBox2D<T, U> {
+    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        write!(formatter, "Box2D({} to {})", self.min, self.max)
+    }
+}
+
 /// Shorthand for `TypedRect::new(TypedPoint2D::new(x, y), TypedSize2D::new(w, h))`.
 pub fn rect<T: Copy, U>(x: T, y: T, w: T, h: T) -> TypedRect<T, U> {
-    TypedRect::new(TypedPoint2D::new(x, y), TypedSize2D::new(w, h))
+    TypedRect::new(point2(x, y), size2(w, h))
+}
+
+/// Shorthand for `TypedBox2D::new(TypedPoint2D::new(min_x, min_y), TypedBox2D::new(max_x, max_y))`.
+pub fn box2<T: Copy, U>(min_x: T, min_y: T, max_x: T, max_y: T) -> TypedBox2D<T, U> {
+    TypedBox2D::new(point2(min_x, min_y), point2(max_x, max_y))
 }
 
 #[cfg(test)]
@@ -517,7 +658,7 @@ mod tests {
     }
 
     #[test]
-    fn test_union() {
+    fn test_rect_union() {
         let p = Rect::new(Point2D::new(0, 0), Size2D::new(50, 40));
         let q = Rect::new(Point2D::new(20,20), Size2D::new(5, 5));
         let r = Rect::new(Point2D::new(-15, -30), Size2D::new(200, 15));
@@ -538,7 +679,27 @@ mod tests {
     }
 
     #[test]
-    fn test_intersection() {
+    fn test_box_union() {
+        let p = Rect::new(point2(0, 0), size2(50, 40)).to_box();
+        let q = Rect::new(point2(20, 20), size2(5, 5)).to_box();
+        let r = Rect::new(point2(-15, -30), size2(200, 15)).to_box();
+        let s = Rect::new(point2(20, -15), size2(250, 200)).to_box();
+
+        let pq = p.union(&q);
+        assert_eq!(pq.min, point2(0, 0));
+        assert_eq!(pq.size(), size2(50, 40));
+
+        let pr = p.union(&r);
+        assert_eq!(pr.min, point2(-15, -30));
+        assert_eq!(pr.size(), size2(200, 70));
+
+        let ps = p.union(&s);
+        assert_eq!(ps.min, point2(0, -15));
+        assert_eq!(ps.size(), size2(270, 200));
+    }
+
+    #[test]
+    fn test_rect_intersection() {
         let p = Rect::new(Point2D::new(0, 0), Size2D::new(10, 20));
         let q = Rect::new(Point2D::new(5, 15), Size2D::new(10, 10));
         let r = Rect::new(Point2D::new(-5, -5), Size2D::new(8, 8));
@@ -557,6 +718,26 @@ mod tests {
 
         let qr = q.intersection(&r);
         assert!(qr.is_none());
+    }
+
+    #[test]
+    fn test_box_intersection() {
+        let p = Rect::new(point2(0, 0), size2(10, 20)).to_box();
+        let q = Rect::new(point2(5, 15), size2(10, 10)).to_box();
+        let r = Rect::new(point2(-5, -5), size2(8, 8)).to_box();
+
+        let pq = p.intersection(&q);
+        assert!(pq.is_positive());
+        assert_eq!(pq.min, point2(5, 15));
+        assert_eq!(pq.size(), size2(5, 5));
+
+        let pr = p.intersection(&r);
+        assert!(pr.is_positive());
+        assert_eq!(pr.min, point2(0, 0));
+        assert_eq!(pr.size(), size2(3, 3));
+
+        let qr = q.intersection(&r);
+        assert!(qr.is_empty_or_negative());
     }
 
     #[test]
@@ -696,5 +877,15 @@ mod tests {
             }
             x += 0.1
         }
+    }
+
+    #[test]
+    fn test_box_negative() {
+        assert!(Box2D::new(point2(0.0, 0.0), point2(0.0, 0.0)).is_positive());
+        assert!(Box2D::new(point2(0.0, 0.0), point2(0.0, 0.0)).is_empty_or_negative());
+        assert!(Box2D::new(point2(-1.0, -2.0), point2(0.0, 0.0)).is_positive());
+        assert!(Box2D::new(point2(1.0, 2.0), point2(0.0, 1.0)).is_negative());
+        assert!(Box2D::new(point2(1.0, 2.0), point2(0.0, 2.0)).is_negative());
+        assert!(Box2D::new(point2(1.0, 2.0), point2(1.0, 0.0)).is_negative());
     }
 }
