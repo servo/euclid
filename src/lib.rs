@@ -49,10 +49,10 @@
 //! let p = WorldPoint::new(0.0, 1.0, 1.0);
 //! // p.x is an f32.
 //! println!("p.x = {:?} ", p.x);
-//! // p.x is a Length<f32, WorldSpace>.
-//! println!("p.x_typed() = {:?} ", p.x_typed());
+//! // p.x() is a Length<f32, WorldSpace>.
+//! println!("p.x() = {:?} ", p.x());
 //! // Length::get returns the scalar value (f32).
-//! assert_eq!(p.x, p.x_typed().get());
+//! assert_eq!(p.x, p.x().get());
 //! ```
 
 extern crate heapsize;
