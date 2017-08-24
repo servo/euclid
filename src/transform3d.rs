@@ -177,6 +177,17 @@ where T: Copy + Clone +
         )
     }
 
+    /// Checks if we're facing backface
+    pub fn is_backface_visible(&self) -> bool {
+        // inverse().m33 < 0;
+        let det = self.determinant();
+        let m33 = self.m12 * self.m24 * self.m41 - self.m14 * self.m22 * self.m41 +
+                  self.m14 * self.m21 * self.m42 - self.m11 * self.m24 * self.m42 -
+                  self.m12 * self.m21 * self.m44 + self.m11 * self.m22 * self.m44;
+        let _0: T = Zero::zero();
+        (m33 * det) < _0
+    }
+
     pub fn approx_eq(&self, other: &Self) -> bool {
         self.m11.approx_eq(&other.m11) && self.m12.approx_eq(&other.m12) &&
         self.m13.approx_eq(&other.m13) && self.m14.approx_eq(&other.m14) &&
