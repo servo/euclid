@@ -81,6 +81,7 @@ pub use vector::{
 };
 
 pub use rect::{Rect, TypedRect, rect};
+pub use rotation::{TypedRotation2D, Rotation2D, TypedRotation3D, Rotation3D};
 pub use side_offsets::{SideOffsets2D, TypedSideOffsets2D};
 #[cfg(feature = "unstable")] pub use side_offsets::SideOffsets2DSimdI32;
 pub use size::{Size2D, TypedSize2D, size2};
@@ -95,6 +96,7 @@ mod transform2d;
 mod transform3d;
 mod point;
 mod rect;
+mod rotation;
 mod scale_factor;
 mod side_offsets;
 mod size;
