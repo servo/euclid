@@ -382,7 +382,7 @@ where T: Copy + Clone +
     }
 
     /// Multiplies all of the transform's component by a scalar and returns the result.
-    #[must_use]
+    #[cfg_attr(feature = "unstable", must_use)]
     pub fn mul_s(&self, x: T) -> Self {
         TypedTransform3D::row_major(
             self.m11 * x, self.m12 * x, self.m13 * x, self.m14 * x,
@@ -469,13 +469,13 @@ where T: Copy + Clone +
     }
 
     /// Returns a transform with a translation applied before self's transformation.
-    #[must_use]
+    #[cfg_attr(feature = "unstable", must_use)]
     pub fn pre_translate(&self, v: TypedVector3D<T, Src>) -> Self {
         self.pre_mul(&TypedTransform3D::create_translation(v.x, v.y, v.z))
     }
 
     /// Returns a transform with a translation applied after self's transformation.
-    #[must_use]
+    #[cfg_attr(feature = "unstable", must_use)]
     pub fn post_translate(&self, v: TypedVector3D<T, Dst>) -> Self {
         self.post_mul(&TypedTransform3D::create_translation(v.x, v.y, v.z))
     }
@@ -492,7 +492,7 @@ where T: Copy + Clone +
     }
 
     /// Returns a transform with a scale applied before self's transformation.
-    #[must_use]
+    #[cfg_attr(feature = "unstable", must_use)]
     pub fn pre_scale(&self, x: T, y: T, z: T) -> Self {
         TypedTransform3D::row_major(
             self.m11 * x, self.m12,     self.m13,     self.m14,
@@ -503,7 +503,7 @@ where T: Copy + Clone +
     }
 
     /// Returns a transform with a scale applied after self's transformation.
-    #[must_use]
+    #[cfg_attr(feature = "unstable", must_use)]
     pub fn post_scale(&self, x: T, y: T, z: T) -> Self {
         self.post_mul(&TypedTransform3D::create_scale(x, y, z))
     }
@@ -546,13 +546,13 @@ where T: Copy + Clone +
     }
 
     /// Returns a transform with a rotation applied after self's transformation.
-    #[must_use]
+    #[cfg_attr(feature = "unstable", must_use)]
     pub fn post_rotate(&self, x: T, y: T, z: T, theta: Radians<T>) -> Self {
         self.post_mul(&TypedTransform3D::create_rotation(x, y, z, theta))
     }
 
     /// Returns a transform with a rotation applied before self's transformation.
-    #[must_use]
+    #[cfg_attr(feature = "unstable", must_use)]
     pub fn pre_rotate(&self, x: T, y: T, z: T, theta: Radians<T>) -> Self {
         self.pre_mul(&TypedTransform3D::create_rotation(x, y, z, theta))
     }
