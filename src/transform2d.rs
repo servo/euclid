@@ -12,7 +12,8 @@ use num::{One, Zero};
 use point::TypedPoint2D;
 use vector::{TypedVector2D, vec2};
 use rect::TypedRect;
-use std::ops::{Add, Mul, Div, Sub};
+use transform3d::TypedTransform3D;
+use std::ops::{Add, Mul, Div, Sub, Neg};
 use std::marker::PhantomData;
 use approxeq::ApproxEq;
 use trig::Trig;
@@ -327,7 +328,25 @@ where T: Copy + Clone +
             self.m21, self.m22,
             self.m31, self.m32,
         )
+    }   
+}
+
+impl <T, Src, Dst> TypedTransform2D<T, Src, Dst>
+where T: Copy + Clone +
+         Add<T, Output=T> +
+         Sub<T, Output=T> +
+         Mul<T, Output=T> +
+         Div<T, Output=T> +
+         Neg<Output=T> +
+         ApproxEq<T> +
+         PartialOrd +
+         Trig +
+         One + Zero {
+    /// Create a 3D transform from the current transform
+    pub fn to_3d(&self) -> TypedTransform3D<T, Src, Dst> {
+        TypedTransform3D::row_major_2d(self.m11, self.m12, self.m21, self.m22, self.m31, self.m32)
     }
+
 }
 
 impl<T: ApproxEq<T>, Src, Dst> TypedTransform2D<T, Src, Dst> {
