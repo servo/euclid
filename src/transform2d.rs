@@ -17,6 +17,7 @@ use std::marker::PhantomData;
 use approxeq::ApproxEq;
 use trig::Trig;
 use std::fmt;
+use num_traits::NumCast;
 
 define_matrix! {
     /// A 2d transform stored as a 2 by 3 matrix in row-major order in memory.
@@ -125,6 +126,24 @@ impl<T: Copy, Src, Dst> TypedTransform2D<T, Src, Dst> {
             p.m21, p.m22,
             p.m31, p.m32
         )
+    }
+}
+
+impl<T0: NumCast + Copy, Src, Dst> TypedTransform2D<T0, Src, Dst> {
+    /// Cast from one numeric representation to another, preserving the units.
+    pub fn cast<T1: NumCast + Copy>(&self) -> Option<TypedTransform2D<T1, Src, Dst>> {
+        match (NumCast::from(self.m11), NumCast::from(self.m12),
+               NumCast::from(self.m21), NumCast::from(self.m22),
+               NumCast::from(self.m31), NumCast::from(self.m32)) {
+            (Some(m11), Some(m12),
+             Some(m21), Some(m22),
+             Some(m31), Some(m32)) => {
+                Some(TypedTransform2D::row_major(m11, m12,
+                                                 m21, m22,
+                                                 m31, m32))
+            },
+            _ => None
+        }
     }
 }
 
