@@ -1,6 +1,6 @@
 [package]
 name = "euclid"
-version = "0.15.4"
+version = "0.15.5"
 authors = ["The Servo Project Developers"]
 description = "Geometry primitives"
 documentation = "https://docs.rs/euclid/"
