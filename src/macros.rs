@@ -83,5 +83,31 @@ macro_rules! define_matrix {
                 $(self.$field.hash(h);)+
             }
         }
+
+        impl<T, $($phantom),+> ::std::cmp::PartialOrd for $name<T, $($phantom),+>
+            where T: ::std::cmp::PartialOrd
+        {
+            fn partial_cmp(&self, other: &Self) -> Option<::std::cmp::Ordering> {
+                $(match self.$field.partial_cmp(&other.$field) {
+                    Some(::std::cmp::Ordering::Equal) => {}
+                    x => return x
+                };)+
+
+                Some(::std::cmp::Ordering::Equal)
+            }
+        }
+
+        impl<T, $($phantom),+> ::std::cmp::Ord for $name<T, $($phantom),+>
+            where T: ::std::cmp::Ord
+        {
+            fn cmp(&self, other: &Self) -> ::std::cmp::Ordering {
+                $(match self.$field.cmp(&other.$field) {
+                    ::std::cmp::Ordering::Equal => {}
+                    x => return x
+                };)+
+
+                ::std::cmp::Ordering::Equal
+            }
+        }
     )
 }

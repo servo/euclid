@@ -785,6 +785,36 @@ mod typedpoint2d {
         let p: Point2D<i32> = point2(1, 2);
         assert_eq!(p.yx(), point2(2, 1));
     }
+
+    #[test]
+    pub fn test_ord() {
+        let p00: Point2D<i32> = point2(0, 0);
+        let p01: Point2D<i32> = point2(0, 1);
+        let p10: Point2D<i32> = point2(1, 0);
+        let p11: Point2D<i32> = point2(1, 1);
+
+        assert!(!(p11 < p11) && !(p11 > p11));
+        assert!(p00 < p01);
+        assert!(p01 > p00);
+        assert!(p01 < p10);
+        assert!(p01 < p11);
+        assert!(p10 < p11);
+    }
+
+    #[test]
+    pub fn test_partial_ord() {
+        let p00: Point2D<f32> = point2(0.0, 0.0);
+        let p01: Point2D<f32> = point2(0.0, 1.0);
+        let p10: Point2D<f32> = point2(1.0, 0.0);
+        let p11: Point2D<f32> = point2(1.0, 1.0);
+
+        assert!(!(p11 < p11) && !(p11 > p11));
+        assert!(p00 < p01);
+        assert!(p01 > p00);
+        assert!(p01 < p10);
+        assert!(p01 < p11);
+        assert!(p10 < p11);
+    }
 }
 
 #[cfg(test)]
