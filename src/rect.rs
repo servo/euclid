@@ -427,6 +427,11 @@ impl<T: NumCast + Copy, Unit> TypedRect<T, Unit> {
         self.cast().unwrap()
     }
 
+    /// Cast into an `f64` rectangle.
+    pub fn to_f64(&self) -> TypedRect<f64, Unit> {
+        self.cast().unwrap()
+    }
+
     /// Cast into an `usize` rectangle, truncating decimals if any.
     ///
     /// When casting from floating point rectangles, it is worth considering whether

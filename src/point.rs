@@ -291,6 +291,12 @@ impl<T: NumCast + Copy, U> TypedPoint2D<T, U> {
         self.cast().unwrap()
     }
 
+    /// Cast into an `f64` point.
+    #[inline]
+    pub fn to_f64(&self) -> TypedPoint2D<f64, U> {
+        self.cast().unwrap()
+    }
+
     /// Cast into an `usize` point, truncating decimals if any.
     ///
     /// When casting from floating point points, it is worth considering whether
@@ -617,6 +623,12 @@ impl<T: NumCast + Copy, U> TypedPoint3D<T, U> {
     /// Cast into an `f32` point.
     #[inline]
     pub fn to_f32(&self) -> TypedPoint3D<f32, U> {
+        self.cast().unwrap()
+    }
+
+    /// Cast into an `f64` point.
+    #[inline]
+    pub fn to_f64(&self) -> TypedPoint3D<f64, U> {
         self.cast().unwrap()
     }
 
