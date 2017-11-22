@@ -326,6 +326,12 @@ impl<T: NumCast + Copy, U> TypedVector2D<T, U> {
         self.cast().unwrap()
     }
 
+    /// Cast into an `f64` vector.
+    #[inline]
+    pub fn to_f64(&self) -> TypedVector2D<f64, U> {
+        self.cast().unwrap()
+    }
+
     /// Cast into an `usize` vector, truncating decimals if any.
     ///
     /// When casting from floating vector vectors, it is worth considering whether
@@ -697,6 +703,12 @@ impl<T: NumCast + Copy, U> TypedVector3D<T, U> {
     /// Cast into an `f32` vector.
     #[inline]
     pub fn to_f32(&self) -> TypedVector3D<f32, U> {
+        self.cast().unwrap()
+    }
+
+    /// Cast into an `f64` vector.
+    #[inline]
+    pub fn to_f64(&self) -> TypedVector3D<f64, U> {
         self.cast().unwrap()
     }
 

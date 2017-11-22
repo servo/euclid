@@ -217,6 +217,11 @@ impl<T: NumCast + Copy, Unit> TypedSize2D<T, Unit> {
         self.cast().unwrap()
     }
 
+    /// Cast into an `f64` size.
+    pub fn to_f64(&self) -> TypedSize2D<f64, Unit> {
+        self.cast().unwrap()
+    }
+
     /// Cast into an `uint` size, truncating decimals if any.
     ///
     /// When casting from floating point sizes, it is worth considering whether
