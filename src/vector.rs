@@ -13,6 +13,8 @@ use length::Length;
 use point::{TypedPoint2D, TypedPoint3D, point2, point3};
 use size::{TypedSize2D, size2};
 use scale_factor::ScaleFactor;
+use trig::Trig;
+use Radians;
 use num::*;
 use num_traits::{Float, NumCast, Signed};
 use std::fmt;
@@ -123,6 +125,14 @@ impl<T: Copy, U> TypedVector2D<T, U> {
     #[inline]
     pub fn to_array(&self) -> [T; 2] {
         [self.x, self.y]
+    }
+}
+
+impl<T, U> TypedVector2D<T, U>
+where T: Trig + Copy + Sub<T, Output = T> {
+    /// Returns the angle between this vector and the x axis between -PI and PI.
+    pub fn angle(&self) -> Radians<T> {
+        Radians::new(Trig::fast_atan2(self.y, self.x))
     }
 }
 
@@ -840,6 +850,20 @@ mod vector2d {
         let result = p1.max(p2);
 
         assert_eq!(result, vec2(2.0, 3.0));
+    }
+
+    #[test]
+    pub fn test_angle() {
+        use std::f32::consts::FRAC_PI_2;
+        use approxeq::ApproxEq;
+
+        let right: Vec2 = vec2(10.0, 0.0);
+        let down: Vec2 = vec2(0.0, 4.0);
+        let up: Vec2 = vec2(0.0, -1.0);
+
+        assert!(right.angle().get().approx_eq(&0.0));
+        assert!(down.angle().get().approx_eq(&FRAC_PI_2));
+        assert!(up.angle().get().approx_eq(&-FRAC_PI_2));
     }
 }
 
