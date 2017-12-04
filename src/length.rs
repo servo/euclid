@@ -17,7 +17,7 @@ use num::One;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::cmp::Ordering;
 use std::ops::{Add, Sub, Mul, Div, Neg};
-use std::ops::{AddAssign, SubAssign};
+use std::ops::{AddAssign, SubAssign, MulAssign, DivAssign};
 use std::marker::PhantomData;
 use std::fmt;
 
@@ -135,6 +135,40 @@ impl<Src, Dst, T: Clone + Div<T, Output=T>> Div<Length<T, Src>> for Length<T, Ds
     #[inline]
     fn div(self, other: Length<T, Src>) -> ScaleFactor<T, Src, Dst> {
         ScaleFactor::new(self.get() / other.get())
+    }
+}
+
+// length * scalar
+impl<T: Copy + Mul<T, Output=T>, U> Mul<T> for Length<T, U> {
+    type Output = Self;
+    #[inline]
+    fn mul(self, scale: T) -> Self {
+        Length::new(self.get() * scale)
+    }
+}
+
+// length *= scalar
+impl<T: Copy + Mul<T, Output=T>, U> MulAssign<T> for Length<T, U> {
+    #[inline]
+    fn mul_assign(&mut self, scale: T) {
+        *self = *self * scale
+    }
+}
+
+// length / scalar
+impl<T: Copy + Div<T, Output=T>, U> Div<T> for Length<T, U> {
+    type Output = Self;
+    #[inline]
+    fn div(self, scale: T) -> Self {
+        Length::new(self.get() / scale)
+    }
+}
+
+// length /= scalar
+impl<T: Copy + Div<T, Output=T>, U> DivAssign<T> for Length<T, U> {
+    #[inline]
+    fn div_assign(&mut self, scale: T) {
+        *self = *self / scale
     }
 }
 
@@ -383,6 +417,26 @@ mod tests {
     }
 
     #[test]
+    fn test_multiplication_with_scalar() {
+        let length_mm: Length<f32, Mm> = Length::new(10.0);
+
+        let result = length_mm * 2.0;
+
+        let expected: Length<f32, Mm> = Length::new(20.0);
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn test_multiplication_assignment() {
+        let mut length: Length<f32, Mm> = Length::new(10.0);
+
+        length *= 2.0;
+
+        let expected: Length<f32, Mm> = Length::new(20.0);
+        assert_eq!(length, expected);
+    }
+
+    #[test]
     fn test_division_by_scalefactor() {
         let length: Length<f32, Cm> = Length::new(5.0);
         let cm_per_second: ScaleFactor<f32, Second, Cm> = ScaleFactor::new(10.0);
@@ -391,6 +445,26 @@ mod tests {
 
         let expected: Length<f32, Second> = Length::new(0.5);
         assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn test_division_by_scalar() {
+        let length: Length<f32, Cm> = Length::new(5.0);
+
+        let result = length / 2.0;
+
+        let expected: Length<f32, Cm> = Length::new(2.5);
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn test_division_assignment() {
+        let mut length: Length<f32, Mm> = Length::new(10.0);
+
+        length /= 2.0;
+
+        let expected: Length<f32, Mm> = Length::new(5.0);
+        assert_eq!(length, expected);
     }
 
     #[test]
