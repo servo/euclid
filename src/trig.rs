@@ -14,6 +14,8 @@ pub trait Trig {
     fn cos(self) -> Self;
     fn tan(self) -> Self;
     fn fast_atan2(y: Self, x: Self) -> Self;
+    fn degrees_to_radians(deg: Self) -> Self;
+    fn radians_to_degrees(rad: Self) -> Self;
 }
 
 macro_rules! trig {
@@ -49,6 +51,16 @@ macro_rules! trig {
                 }
 
                 result
+            }
+
+            #[inline]
+            fn degrees_to_radians(deg: Self) -> Self {
+                deg.to_radians()
+            }
+
+            #[inline]
+            fn radians_to_degrees(rad: Self) -> Self {
+                rad.to_degrees()
             }
         }
     )

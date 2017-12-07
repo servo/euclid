@@ -7,7 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::{UnknownUnit, Radians};
+use super::{UnknownUnit, Angle};
 use approxeq::ApproxEq;
 use trig::Trig;
 use point::{TypedPoint2D, TypedPoint3D, point2, point3};
@@ -511,7 +511,7 @@ where T: Copy + Clone +
 
     /// Create a 3d rotation transform from an angle / axis.
     /// The supplied axis must be normalized.
-    pub fn create_rotation(x: T, y: T, z: T, theta: Radians<T>) -> Self {
+    pub fn create_rotation(x: T, y: T, z: T, theta: Angle<T>) -> Self {
         let (_0, _1): (T, T) = (Zero::zero(), One::one());
         let _2 = _1 + _1;
 
@@ -548,20 +548,20 @@ where T: Copy + Clone +
 
     /// Returns a transform with a rotation applied after self's transformation.
     #[cfg_attr(feature = "unstable", must_use)]
-    pub fn post_rotate(&self, x: T, y: T, z: T, theta: Radians<T>) -> Self {
+    pub fn post_rotate(&self, x: T, y: T, z: T, theta: Angle<T>) -> Self {
         self.post_mul(&TypedTransform3D::create_rotation(x, y, z, theta))
     }
 
     /// Returns a transform with a rotation applied before self's transformation.
     #[cfg_attr(feature = "unstable", must_use)]
-    pub fn pre_rotate(&self, x: T, y: T, z: T, theta: Radians<T>) -> Self {
+    pub fn pre_rotate(&self, x: T, y: T, z: T, theta: Angle<T>) -> Self {
         self.pre_mul(&TypedTransform3D::create_rotation(x, y, z, theta))
     }
 
     /// Create a 2d skew transform.
     ///
     /// See https://drafts.csswg.org/css-transforms/#funcdef-skew
-    pub fn create_skew(alpha: Radians<T>, beta: Radians<T>) -> Self {
+    pub fn create_skew(alpha: Angle<T>, beta: Angle<T>) -> Self {
         let (_0, _1): (T, T) = (Zero::zero(), One::one());
         let (sx, sy) = (beta.get().tan(), alpha.get().tan());
         TypedTransform3D::row_major(
@@ -696,7 +696,7 @@ mod tests {
     use approxeq::ApproxEq;
     use transform2d::Transform2D;
     use point::{Point2D, Point3D};
-    use Radians;
+    use Angle;
     use super::*;
 
     use std::f32::consts::{FRAC_PI_2, PI};
@@ -704,7 +704,7 @@ mod tests {
     type Mf32 = Transform3D<f32>;
 
     // For convenience.
-    fn rad(v: f32) -> Radians<f32> { Radians::new(v) }
+    fn rad(v: f32) -> Angle<f32> { Angle::radians(v) }
 
     #[test]
     pub fn test_translation() {

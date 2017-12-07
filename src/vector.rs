@@ -14,7 +14,7 @@ use point::{TypedPoint2D, TypedPoint3D, point2, point3};
 use size::{TypedSize2D, size2};
 use scale::TypedScale;
 use trig::Trig;
-use Radians;
+use Angle;
 use num::*;
 use num_traits::{Float, NumCast, Signed};
 use std::fmt;
@@ -131,8 +131,8 @@ impl<T: Copy, U> TypedVector2D<T, U> {
 impl<T, U> TypedVector2D<T, U>
 where T: Trig + Copy + Sub<T, Output = T> {
     /// Returns the angle between this vector and the x axis between -PI and PI.
-    pub fn angle_from_x_axis(&self) -> Radians<T> {
-        Radians::new(Trig::fast_atan2(self.y, self.x))
+    pub fn angle_from_x_axis(&self) -> Angle<T> {
+        Angle::radians(Trig::fast_atan2(self.y, self.x))
     }
 }
 
