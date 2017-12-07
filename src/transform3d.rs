@@ -14,7 +14,7 @@ use point::{TypedPoint2D, TypedPoint3D, point2, point3};
 use vector::{TypedVector2D, TypedVector3D, vec2, vec3};
 use rect::TypedRect;
 use transform2d::TypedTransform2D;
-use scale_factor::ScaleFactor;
+use scale::TypedScale;
 use num::{One, Zero};
 use std::ops::{Add, Mul, Sub, Div, Neg};
 use std::marker::PhantomData;
@@ -393,8 +393,8 @@ where T: Copy + Clone +
         )
     }
 
-    /// Convenience function to create a scale transform from a ScaleFactor.
-    pub fn from_scale_factor(scale: ScaleFactor<T, Src, Dst>) -> Self {
+    /// Convenience function to create a scale transform from a TypedScale.
+    pub fn from_scale(scale: TypedScale<T, Src, Dst>) -> Self {
         TypedTransform3D::create_scale(scale.get(), scale.get(), scale.get())
     }
 

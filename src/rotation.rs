@@ -16,7 +16,6 @@ use trig::Trig;
 use {TypedPoint2D, TypedPoint3D, TypedVector2D, TypedVector3D, Vector3D, point2, point3, vec3};
 use {TypedTransform3D, TypedTransform2D, UnknownUnit, Radians};
 
-
 define_matrix! {
     /// A transform that can represent rotations in 2d, represented as an angle in radians.
     pub struct TypedRotation2D<T, Src, Dst> {

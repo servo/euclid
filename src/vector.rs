@@ -12,7 +12,7 @@ use approxeq::ApproxEq;
 use length::Length;
 use point::{TypedPoint2D, TypedPoint3D, point2, point3};
 use size::{TypedSize2D, size2};
-use scale_factor::ScaleFactor;
+use scale::TypedScale;
 use trig::Trig;
 use Radians;
 use num::*;
@@ -262,18 +262,18 @@ impl<T: Copy + Div<T, Output=T>, U> DivAssign<T> for TypedVector2D<T, U> {
     }
 }
 
-impl<T: Copy + Mul<T, Output=T>, U1, U2> Mul<ScaleFactor<T, U1, U2>> for TypedVector2D<T, U1> {
+impl<T: Copy + Mul<T, Output=T>, U1, U2> Mul<TypedScale<T, U1, U2>> for TypedVector2D<T, U1> {
     type Output = TypedVector2D<T, U2>;
     #[inline]
-    fn mul(self, scale: ScaleFactor<T, U1, U2>) -> TypedVector2D<T, U2> {
+    fn mul(self, scale: TypedScale<T, U1, U2>) -> TypedVector2D<T, U2> {
         vec2(self.x * scale.get(), self.y * scale.get())
     }
 }
 
-impl<T: Copy + Div<T, Output=T>, U1, U2> Div<ScaleFactor<T, U1, U2>> for TypedVector2D<T, U2> {
+impl<T: Copy + Div<T, Output=T>, U1, U2> Div<TypedScale<T, U1, U2>> for TypedVector2D<T, U2> {
     type Output = TypedVector2D<T, U1>;
     #[inline]
-    fn div(self, scale: ScaleFactor<T, U1, U2>) -> TypedVector2D<T, U1> {
+    fn div(self, scale: TypedScale<T, U1, U2>) -> TypedVector2D<T, U1> {
         vec2(self.x / scale.get(), self.y / scale.get())
     }
 }
@@ -882,7 +882,7 @@ mod vector2d {
 #[cfg(test)]
 mod typedvector2d {
     use super::{TypedVector2D, Vector2D, vec2};
-    use scale_factor::ScaleFactor;
+    use scale::TypedScale;
 
     pub enum Mm {}
     pub enum Cm {}
@@ -911,7 +911,7 @@ mod typedvector2d {
     #[test]
     pub fn test_scalar_mul() {
         let p1 = Vector2DMm::new(1.0, 2.0);
-        let cm_per_mm: ScaleFactor<f32, Mm, Cm> = ScaleFactor::new(0.1);
+        let cm_per_mm: TypedScale<f32, Mm, Cm> = TypedScale::new(0.1);
 
         let result: Vector2DCm<f32> = p1 * cm_per_mm;
 
