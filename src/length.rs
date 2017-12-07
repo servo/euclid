@@ -8,7 +8,7 @@
 // except according to those terms.
 //! A one-dimensional length, tagged with its units.
 
-use scale_factor::ScaleFactor;
+use scale::TypedScale;
 use num::Zero;
 
 use heapsize::HeapSizeOf;
@@ -30,8 +30,8 @@ use std::fmt;
 /// expression that requires a different unit.  It may be a type without values, such as an empty
 /// enum.
 ///
-/// You can multiply a `Length` by a `scale_factor::ScaleFactor` to convert it from one unit to
-/// another. See the `ScaleFactor` docs for an example.
+/// You can multiply a `Length` by a `scale::TypedScale` to convert it from one unit to
+/// another. See the `TypedScale` docs for an example.
 // Uncomment the derive, and remove the macro call, once heapsize gets
 // PhantomData<T> support.
 #[repr(C)]
@@ -131,10 +131,10 @@ impl<U, T: Clone + Saturating> Saturating for Length<T, U> {
 
 // length / length
 impl<Src, Dst, T: Clone + Div<T, Output=T>> Div<Length<T, Src>> for Length<T, Dst> {
-    type Output = ScaleFactor<T, Src, Dst>;
+    type Output = TypedScale<T, Src, Dst>;
     #[inline]
-    fn div(self, other: Length<T, Src>) -> ScaleFactor<T, Src, Dst> {
-        ScaleFactor::new(self.get() / other.get())
+    fn div(self, other: Length<T, Src>) -> TypedScale<T, Src, Dst> {
+        TypedScale::new(self.get() / other.get())
     }
 }
 
@@ -173,19 +173,19 @@ impl<T: Copy + Div<T, Output=T>, U> DivAssign<T> for Length<T, U> {
 }
 
 // length * scaleFactor
-impl<Src, Dst, T: Clone + Mul<T, Output=T>> Mul<ScaleFactor<T, Src, Dst>> for Length<T, Src> {
+impl<Src, Dst, T: Clone + Mul<T, Output=T>> Mul<TypedScale<T, Src, Dst>> for Length<T, Src> {
     type Output = Length<T, Dst>;
     #[inline]
-    fn mul(self, scale: ScaleFactor<T, Src, Dst>) -> Length<T, Dst> {
+    fn mul(self, scale: TypedScale<T, Src, Dst>) -> Length<T, Dst> {
         Length::new(self.get() * scale.get())
     }
 }
 
 // length / scaleFactor
-impl<Src, Dst, T: Clone + Div<T, Output=T>> Div<ScaleFactor<T, Src, Dst>> for Length<T, Dst> {
+impl<Src, Dst, T: Clone + Div<T, Output=T>> Div<TypedScale<T, Src, Dst>> for Length<T, Dst> {
     type Output = Length<T, Src>;
     #[inline]
-    fn div(self, scale: ScaleFactor<T, Src, Dst>) -> Length<T, Src> {
+    fn div(self, scale: TypedScale<T, Src, Dst>) -> Length<T, Src> {
         Length::new(self.get() / scale.get())
     }
 }
@@ -247,7 +247,7 @@ mod tests {
 
     use heapsize::HeapSizeOf;
     use num_traits::Saturating;
-    use scale_factor::ScaleFactor;
+    use scale::TypedScale;
     use std::f32::INFINITY;
 
     extern crate serde_test;
@@ -394,21 +394,21 @@ mod tests {
 
     #[test]
     fn test_division_by_length() {
-        // Division results in a ScaleFactor from denominator units
+        // Division results in a TypedScale from denominator units
         // to numerator units.
         let length: Length<f32, Cm> = Length::new(5.0);
         let duration: Length<f32, Second> = Length::new(10.0);
 
         let result = length / duration;
 
-        let expected: ScaleFactor<f32, Second, Cm> = ScaleFactor::new(0.5);
+        let expected: TypedScale<f32, Second, Cm> = TypedScale::new(0.5);
         assert_eq!(result, expected);
     }
 
     #[test]
     fn test_multiplication() {
         let length_mm: Length<f32, Mm> = Length::new(10.0);
-        let cm_per_mm: ScaleFactor<f32, Mm, Cm> = ScaleFactor::new(0.1);
+        let cm_per_mm: TypedScale<f32, Mm, Cm> = TypedScale::new(0.1);
 
         let result = length_mm * cm_per_mm;
 
@@ -439,7 +439,7 @@ mod tests {
     #[test]
     fn test_division_by_scalefactor() {
         let length: Length<f32, Cm> = Length::new(5.0);
-        let cm_per_second: ScaleFactor<f32, Second, Cm> = ScaleFactor::new(10.0);
+        let cm_per_second: TypedScale<f32, Second, Cm> = TypedScale::new(10.0);
 
         let result = length / cm_per_second;
 
@@ -529,7 +529,7 @@ mod tests {
 
         let result = length / length_zero;
 
-        let expected: ScaleFactor<f32, Cm, Cm> = ScaleFactor::new(INFINITY);
+        let expected: TypedScale<f32, Cm, Cm> = TypedScale::new(INFINITY);
         assert_eq!(result, expected);
     }
 }

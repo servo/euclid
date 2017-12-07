@@ -68,7 +68,7 @@ extern crate test;
 extern crate num_traits;
 
 pub use length::Length;
-pub use scale_factor::ScaleFactor;
+pub use scale::TypedScale;
 pub use transform2d::{Transform2D, TypedTransform2D};
 pub use transform3d::{Transform3D, TypedTransform3D};
 pub use point::{
@@ -97,7 +97,7 @@ mod transform3d;
 mod point;
 mod rect;
 mod rotation;
-mod scale_factor;
+mod scale;
 mod side_offsets;
 mod size;
 mod trig;
@@ -134,3 +134,7 @@ pub type Matrix4D<T> = Transform3D<T>;
 /// Temporary alias to facilitate the transition to the new naming scheme
 #[deprecated]
 pub type TypedMatrix4D<T, Src, Dst> = TypedTransform3D<T, Src, Dst>;
+
+/// Temporary alias to facilitate the transition to the new naming scheme
+#[deprecated]
+pub type ScaleFactor<T, Src, Dst> = TypedScale<T, Src, Dst>;
