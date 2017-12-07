@@ -81,7 +81,7 @@ pub use vector::{
 };
 
 pub use rect::{Rect, TypedRect, rect};
-pub use rotation::{TypedRotation2D, Rotation2D, TypedRotation3D, Rotation3D};
+pub use rotation::{TypedRotation2D, Rotation2D, TypedRotation3D, Rotation3D, Angle};
 pub use side_offsets::{SideOffsets2D, TypedSideOffsets2D};
 #[cfg(feature = "unstable")] pub use side_offsets::SideOffsets2DSimdI32;
 pub use size::{Size2D, TypedSize2D, size2};
@@ -107,18 +107,6 @@ mod vector;
 #[derive(Clone, Copy)]
 pub struct UnknownUnit;
 
-/// Unit for angles in radians.
-pub struct Rad;
-
-/// Unit for angles in degrees.
-pub struct Deg;
-
-/// A value in radians.
-pub type Radians<T> = Length<T, Rad>;
-
-/// A value in Degrees.
-pub type Degrees<T> = Length<T, Deg>;
-
 /// Temporary alias to facilitate the transition to the new naming scheme
 #[deprecated]
 pub type Matrix2D<T> = Transform2D<T>;
@@ -138,3 +126,7 @@ pub type TypedMatrix4D<T, Src, Dst> = TypedTransform3D<T, Src, Dst>;
 /// Temporary alias to facilitate the transition to the new naming scheme
 #[deprecated]
 pub type ScaleFactor<T, Src, Dst> = TypedScale<T, Src, Dst>;
+
+/// Temporary alias to facilitate the transition to the new naming scheme
+#[deprecated]
+pub use Angle as Radians;
