@@ -15,7 +15,6 @@ use point::TypedPoint2D;
 use vector::TypedVector2D;
 use size::TypedSize2D;
 
-use heapsize::HeapSizeOf;
 use num_traits::NumCast;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::cmp::PartialOrd;
@@ -32,12 +31,6 @@ pub struct TypedRect<T, U = UnknownUnit> {
 
 /// The default rectangle type with no unit.
 pub type Rect<T> = TypedRect<T, UnknownUnit>;
-
-impl<T: HeapSizeOf, U> HeapSizeOf for TypedRect<T, U> {
-    fn heap_size_of_children(&self) -> usize {
-        self.origin.heap_size_of_children() + self.size.heap_size_of_children()
-    }
-}
 
 impl<'de, T: Copy + Deserialize<'de>, U> Deserialize<'de> for TypedRect<T, U> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>

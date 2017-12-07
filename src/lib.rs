@@ -55,8 +55,6 @@
 //! assert_eq!(p.x, p.x_typed().get());
 //! ```
 
-extern crate heapsize;
-
 #[cfg_attr(test, macro_use)]
 extern crate log;
 extern crate serde;
