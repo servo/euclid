@@ -10,7 +10,6 @@
 
 use num::One;
 
-use heapsize::HeapSizeOf;
 use num_traits::NumCast;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::fmt;
@@ -39,12 +38,6 @@ use {TypedRect, TypedSize2D, TypedPoint2D, TypedVector2D};
 /// ```
 #[repr(C)]
 pub struct TypedScale<T, Src, Dst>(pub T, PhantomData<(Src, Dst)>);
-
-impl<T: HeapSizeOf, Src, Dst> HeapSizeOf for TypedScale<T, Src, Dst> {
-    fn heap_size_of_children(&self) -> usize {
-        self.0.heap_size_of_children()
-    }
-}
 
 impl<'de, T, Src, Dst> Deserialize<'de> for TypedScale<T, Src, Dst> where T: Deserialize<'de> {
     fn deserialize<D>(deserializer: D) -> Result<TypedScale<T, Src, Dst>, D::Error>

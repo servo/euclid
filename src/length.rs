@@ -11,7 +11,6 @@
 use scale::TypedScale;
 use num::Zero;
 
-use heapsize::HeapSizeOf;
 use num_traits::{NumCast, Saturating};
 use num::One;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
@@ -32,8 +31,6 @@ use std::fmt;
 ///
 /// You can multiply a `Length` by a `scale::TypedScale` to convert it from one unit to
 /// another. See the `TypedScale` docs for an example.
-// Uncomment the derive, and remove the macro call, once heapsize gets
-// PhantomData<T> support.
 #[repr(C)]
 pub struct Length<T, Unit>(pub T, PhantomData<Unit>);
 
@@ -44,12 +41,6 @@ impl<T: Clone, Unit> Clone for Length<T, Unit> {
 }
 
 impl<T: Copy, Unit> Copy for Length<T, Unit> {}
-
-impl<Unit, T: HeapSizeOf> HeapSizeOf for Length<T, Unit> {
-    fn heap_size_of_children(&self) -> usize {
-        self.0.heap_size_of_children()
-    }
-}
 
 impl<'de, Unit, T> Deserialize<'de> for Length<T, Unit> where T: Deserialize<'de> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
@@ -245,7 +236,6 @@ mod tests {
     use super::Length;
     use num::Zero;
 
-    use heapsize::HeapSizeOf;
     use num_traits::Saturating;
     use scale::TypedScale;
     use std::f32::INFINITY;
@@ -270,26 +260,6 @@ mod tests {
 
         assert_eq!(one_foot.get(), 12.0);
         assert_eq!(variable_length.get(), 24.0);
-    }
-
-    #[test]
-    fn test_heapsizeof_builtins() {
-        // Heap size of built-ins is zero by default.
-        let one_foot: Length<f32, Inch> = Length::new(12.0);
-
-        let heap_size_length_f32 = one_foot.heap_size_of_children();
-
-        assert_eq!(heap_size_length_f32, 0);
-    }
-
-    #[test]
-    fn test_heapsizeof_length_vector() {
-        // Heap size of any Length is just the heap size of the length value.
-        for n in 0..5 {
-            let length: Length<Vec<f32>, Inch> = Length::new(Vec::with_capacity(n));
-
-            assert_eq!(length.heap_size_of_children(), length.0.heap_size_of_children());
-        }
     }
 
     #[test]
