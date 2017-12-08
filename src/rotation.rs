@@ -110,6 +110,13 @@ impl<T: Clone + MulAssign<T>> MulAssign<T> for Angle<T> {
     }
 }
 
+impl<T: Neg<Output=T>> Neg for Angle<T> {
+    type Output = Self;
+    fn neg(self) -> Self {
+        Angle::radians(-self.radians)
+    }
+}
+
 
 define_matrix! {
     /// A transform that can represent rotations in 2d, represented as an angle in radians.
