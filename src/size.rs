@@ -121,6 +121,13 @@ where T: Copy + One + Add<Output=T> + Sub<Output=T> + Mul<Output=T> {
     }
 }
 
+impl<T: Zero + PartialOrd, U> TypedSize2D<T, U> {
+    pub fn is_empty_or_negative(&self) -> bool {
+        let zero = T::zero();
+        self.width <= zero || self.height <= zero
+    }
+}
+
 impl<T: Zero, U> TypedSize2D<T, U> {
     pub fn zero() -> Self {
         TypedSize2D::new(
