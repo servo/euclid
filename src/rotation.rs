@@ -74,6 +74,14 @@ where T: Rem<Output=T>
 }
 
 impl<T> Angle<T>
+where T: Float {
+    /// Returns (sin(self), cos(self)).
+    pub fn sin_cos(self) -> (T, T) {
+        self.radians.sin_cos()
+    }
+}
+
+impl<T> Angle<T>
 where T: Zero {
     pub fn zero() -> Self { Angle::radians(T::zero()) }
 }
@@ -355,7 +363,7 @@ where T: Copy + Clone +
     pub fn around_axis(axis: TypedVector3D<T, Src>, angle: Angle<T>) -> Self {
         let axis = axis.normalize();
         let two = T::one() + T::one();
-        let (sin, cos) = Float::sin_cos(angle.radians / two);
+        let (sin, cos) = Angle::sin_cos(angle / two);
         Self::quaternion(axis.x * sin, axis.y * sin, axis.z * sin, cos)
     }
 
@@ -363,7 +371,7 @@ where T: Copy + Clone +
     pub fn around_x(angle: Angle<T>) -> Self {
         let zero = Zero::zero();
         let two = T::one() + T::one();
-        let (sin, cos) = Float::sin_cos(angle.radians / two);
+        let (sin, cos) = Angle::sin_cos(angle / two);
         Self::quaternion(sin, zero, zero, cos)
     }
 
@@ -371,7 +379,7 @@ where T: Copy + Clone +
     pub fn around_y(angle: Angle<T>) -> Self {
         let zero = Zero::zero();
         let two = T::one() + T::one();
-        let (sin, cos) = Float::sin_cos(angle.radians / two);
+        let (sin, cos) = Angle::sin_cos(angle / two);
         Self::quaternion(zero, sin, zero, cos)
     }
 
@@ -379,7 +387,7 @@ where T: Copy + Clone +
     pub fn around_z(angle: Angle<T>) -> Self {
         let zero = Zero::zero();
         let two = T::one() + T::one();
-        let (sin, cos) = Float::sin_cos(angle.radians / two);
+        let (sin, cos) = Angle::sin_cos(angle / two);
         Self::quaternion(zero, zero, sin, cos)
     }
 
