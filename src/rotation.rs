@@ -8,9 +8,9 @@
 // except according to those terms.
 
 use approxeq::ApproxEq;
-use num_traits::{Float, One, Zero};
+use num_traits::{Float, One, Zero, FloatConst};
 use std::fmt;
-use std::ops::{Add, Neg, Mul, Sub, Div, AddAssign, SubAssign, MulAssign, DivAssign};
+use std::ops::{Add, Neg, Mul, Sub, Div, AddAssign, SubAssign, MulAssign, DivAssign, Rem};
 use std::marker::PhantomData;
 use trig::Trig;
 use {TypedPoint2D, TypedPoint3D, TypedVector2D, TypedVector3D, Vector3D, point2, point3, vec3};
@@ -46,6 +46,57 @@ impl<T> Angle<T>
     pub fn to_degrees(self) -> T {
         T::radians_to_degrees(self.radians)
     }
+}
+
+impl<T> Angle<T>
+where T: Rem<Output=T>
+    + Sub<Output=T>
+    + Add<Output=T>
+    + Zero
+    + FloatConst
+    + PartialOrd
+    + Copy
+{
+    /// Returns this angle in the [0..2*PI[ range.
+    pub fn positive(&self) -> Self {
+        let two_pi = T::PI() + T::PI();
+        let mut a = self.radians % two_pi;
+        if a < T::zero() {
+            a = a + two_pi;
+        }
+        Angle::radians(a)
+    }
+
+    /// Returns this angle in the ]-PI..PI] range.
+    pub fn signed(&self) -> Self {
+        Angle::pi() - (Angle::pi() - *self).positive()
+    }
+}
+
+impl<T> Angle<T>
+where T: Float {
+    /// Returns (sin(self), cos(self)).
+    pub fn sin_cos(self) -> (T, T) {
+        self.radians.sin_cos()
+    }
+}
+
+impl<T> Angle<T>
+where T: Zero {
+    pub fn zero() -> Self { Angle::radians(T::zero()) }
+}
+
+impl<T> Angle<T>
+where T: FloatConst + Add<Output=T> {
+    pub fn pi() -> Self { Angle::radians(T::PI()) }
+
+    pub fn two_pi() -> Self { Angle::radians(T::PI() + T::PI()) }
+
+    pub fn frac_pi_2() -> Self { Angle::radians(T::FRAC_PI_2()) }
+
+    pub fn frac_pi_3() -> Self { Angle::radians(T::FRAC_PI_3()) }
+
+    pub fn frac_pi_4() -> Self { Angle::radians(T::FRAC_PI_4()) }
 }
 
 impl<T: Clone + Add<T, Output=T>> Add for Angle<T> {
@@ -312,7 +363,7 @@ where T: Copy + Clone +
     pub fn around_axis(axis: TypedVector3D<T, Src>, angle: Angle<T>) -> Self {
         let axis = axis.normalize();
         let two = T::one() + T::one();
-        let (sin, cos) = Float::sin_cos(angle.radians / two);
+        let (sin, cos) = Angle::sin_cos(angle / two);
         Self::quaternion(axis.x * sin, axis.y * sin, axis.z * sin, cos)
     }
 
@@ -320,7 +371,7 @@ where T: Copy + Clone +
     pub fn around_x(angle: Angle<T>) -> Self {
         let zero = Zero::zero();
         let two = T::one() + T::one();
-        let (sin, cos) = Float::sin_cos(angle.radians / two);
+        let (sin, cos) = Angle::sin_cos(angle / two);
         Self::quaternion(sin, zero, zero, cos)
     }
 
@@ -328,7 +379,7 @@ where T: Copy + Clone +
     pub fn around_y(angle: Angle<T>) -> Self {
         let zero = Zero::zero();
         let two = T::one() + T::one();
-        let (sin, cos) = Float::sin_cos(angle.radians / two);
+        let (sin, cos) = Angle::sin_cos(angle / two);
         Self::quaternion(zero, sin, zero, cos)
     }
 
@@ -336,7 +387,7 @@ where T: Copy + Clone +
     pub fn around_z(angle: Angle<T>) -> Self {
         let zero = Zero::zero();
         let two = T::one() + T::one();
-        let (sin, cos) = Float::sin_cos(angle.radians / two);
+        let (sin, cos) = Angle::sin_cos(angle / two);
         Self::quaternion(zero, zero, sin, cos)
     }
 
@@ -795,3 +846,24 @@ fn from_euler() {
     assert!(ypr_pe.approx_eq(&ypr_pq));
 }
 
+#[test]
+fn wrap_angles() {
+    use std::f32::consts::{FRAC_PI_2, PI};
+    assert!(Angle::radians(0.0).positive().radians.approx_eq(&0.0));
+    assert!(Angle::radians(FRAC_PI_2).positive().radians.approx_eq(&FRAC_PI_2));
+    assert!(Angle::radians(-FRAC_PI_2).positive().radians.approx_eq(&(3.0*FRAC_PI_2)));
+    assert!(Angle::radians(3.0 * FRAC_PI_2).positive().radians.approx_eq(&(3.0 * FRAC_PI_2)));
+    assert!(Angle::radians(5.0 * FRAC_PI_2).positive().radians.approx_eq(&FRAC_PI_2));
+    assert!(Angle::radians(2.0*PI).positive().radians.approx_eq(&0.0));
+    assert!(Angle::radians(-2.0*PI).positive().radians.approx_eq(&0.0));
+    assert!(Angle::radians(PI).positive().radians.approx_eq(&PI));
+    assert!(Angle::radians(-PI).positive().radians.approx_eq(&PI));
+
+    assert!(Angle::radians(FRAC_PI_2).signed().radians.approx_eq(&FRAC_PI_2));
+    assert!(Angle::radians(3.0 * FRAC_PI_2).signed().radians.approx_eq(&-FRAC_PI_2));
+    assert!(Angle::radians(5.0 * FRAC_PI_2).signed().radians.approx_eq(&FRAC_PI_2));
+    assert!(Angle::radians(2.0*PI).signed().radians.approx_eq(&0.0));
+    assert!(Angle::radians(-2.0*PI).signed().radians.approx_eq(&0.0));
+    assert!(Angle::radians(-PI).signed().radians.approx_eq(&PI));
+    assert!(Angle::radians(PI).signed().radians.approx_eq(&PI));
+}
