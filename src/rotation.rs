@@ -391,13 +391,13 @@ where T: Copy + Clone +
         Self::quaternion(zero, zero, sin, cos)
     }
 
-    /// Creates a rotation from euler angles.
+    /// Creates a rotation from Euler angles.
     ///
     /// The rotations are applied in roll then pitch then yaw order.
     ///
-    ///  - Roll (also calld bank) is a rotation around the x axis.
-    ///  - Pitch (also calld bearing) is a rotation around the y axis.
-    ///  - Yaw (also calld heading) is a rotation around the z axis.
+    ///  - Roll (also called bank) is a rotation around the x axis.
+    ///  - Pitch (also called bearing) is a rotation around the y axis.
+    ///  - Yaw (also called heading) is a rotation around the z axis.
     pub fn euler(roll: Angle<T>, pitch: Angle<T>, yaw: Angle<T>) -> Self {
         let half = T::one() / (T::one() + T::one());
 
@@ -715,7 +715,7 @@ fn pre_post() {
     let p = point3(1.0, 2.0, 3.0);
 
     // Check that the order of transformations is correct (corresponds to what
-    // we do in Transfor3D).
+    // we do in Transform3D).
     let p1 = r1.post_rotate(&r2).post_rotate(&r3).rotate_point3d(&p);
     let p2 = t1.post_mul(&t2).post_mul(&t3).transform_point3d(&p);
 
@@ -796,7 +796,7 @@ fn around_axis() {
     assert!(r1.rotate_point3d(&point3(1.0, 2.0, 0.0)).approx_eq(&point3(2.0, 1.0, 0.0)));
     assert!(r2.rotate_point3d(&point3(1.0, 0.0, 0.0)).approx_eq(&point3(0.5, 0.5, -0.5.sqrt())));
 
-    // A more arbitray test (made up with numpy):
+    // A more arbitrary test (made up with numpy):
     let r3 = Rotation3D::around_axis(vec3(0.5, 1.0, 2.0), Angle::radians(2.291288));
     assert!(r3.rotate_point3d(&point3(1.0, 0.0, 0.0)).approx_eq(&point3(-0.58071821,  0.81401868, -0.01182979)));
 }
@@ -808,7 +808,7 @@ fn from_euler() {
     // First test simple separate yaw pitch and roll rotations, because it is easy to come
     // up with the corresponding quaternion.
     // Since several quaternions can represent the same transformation we compare the result
-    // of transforming a point rather than the values of each qauetrnions.
+    // of transforming a point rather than the values of each quaternions.
     let p = point3(1.0, 2.0, 3.0);
 
     let angle = Angle::radians(FRAC_PI_2);
@@ -836,7 +836,7 @@ fn from_euler() {
     assert!(pitch_pe.approx_eq(&pitch_pq));
     assert!(yaw_pe.approx_eq(&yaw_pq));
 
-    // Now check that the yaw pitch and roll transformations when compined are applied in
+    // Now check that the yaw pitch and roll transformations when combined are applied in
     // the proper order: roll -> pitch -> yaw.
     let ypr_e = Rotation3D::euler(angle, angle, angle);
     let ypr_q = roll_rq.post_rotate(&pitch_rq).post_rotate(&yaw_rq);

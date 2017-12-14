@@ -424,7 +424,7 @@ define_matrix! {
 pub type Vector3D<T> = TypedVector3D<T, UnknownUnit>;
 
 impl<T: Copy + Zero, U> TypedVector3D<T, U> {
-    /// Constructor, setting all copmonents to zero.
+    /// Constructor, setting all components to zero.
     #[inline]
     pub fn zero() -> Self {
         vec3(Zero::zero(), Zero::zero(), Zero::zero())
@@ -697,7 +697,7 @@ impl<T: NumCast + Copy, U> TypedVector3D<T, U> {
     ///
     /// When casting from floating vector to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
-    /// geometrically. Consider using round(), ceil or floor() before casting.
+    /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
     #[inline]
     pub fn cast<NewT: NumCast + Copy>(&self) -> Option<TypedVector3D<NewT, U>> {
         match (NumCast::from(self.x),

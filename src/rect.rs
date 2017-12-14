@@ -248,7 +248,7 @@ where T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output=T> + Sub<T
 
 impl<T, U> TypedRect<T, U>
 where T: Copy + One + Add<Output=T> + Sub<Output=T> + Mul<Output=T> {
-    /// Linearly interpolate between this rectangle and another rectange.
+    /// Linearly interpolate between this rectangle and another rectangle.
     ///
     /// `t` is expected to be between zero and one.
     #[inline]

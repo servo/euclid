@@ -26,8 +26,8 @@ define_matrix! {
     ///
     /// Transforms can be parametrized over the source and destination units, to describe a
     /// transformation from a space to another.
-    /// For example, `TypedTransform3D<f32, WordSpace, ScreenSpace>::transform_point3d`
-    /// takes a `TypedPoint3D<f32, WordSpace>` and returns a `TypedPoint3D<f32, ScreenSpace>`.
+    /// For example, `TypedTransform3D<f32, WorldSpace, ScreenSpace>::transform_point3d`
+    /// takes a `TypedPoint3D<f32, WorldSpace>` and returns a `TypedPoint3D<f32, ScreenSpace>`.
     ///
     /// Transforms expose a set of convenience methods for pre- and post-transformations.
     /// A pre-transformation corresponds to adding an operation that is applied before
@@ -166,7 +166,7 @@ where T: Copy + Clone +
         self.m33 == _1 && self.m44 == _1
     }
 
-    /// Create a 2D transform picking the relevent terms from this transform.
+    /// Create a 2D transform picking the relevant terms from this transform.
     ///
     /// This method assumes that self represents a 2d transformation, callers
     /// should check that self.is_2d() returns true beforehand.
