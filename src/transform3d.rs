@@ -155,7 +155,7 @@ where T: Copy + Clone +
 
     /// Returns true if this transform can be represented with a TypedTransform2D.
     ///
-    /// See https://drafts.csswg.org/css-transforms/#2d-transform
+    /// See <https://drafts.csswg.org/css-transforms/#2d-transform>
     #[inline]
     pub fn is_2d(&self) -> bool {
         let (_0, _1): (T, T) = (Zero::zero(), One::one());
@@ -560,7 +560,7 @@ where T: Copy + Clone +
 
     /// Create a 2d skew transform.
     ///
-    /// See https://drafts.csswg.org/css-transforms/#funcdef-skew
+    /// See <https://drafts.csswg.org/css-transforms/#funcdef-skew>
     pub fn create_skew(alpha: Angle<T>, beta: Angle<T>) -> Self {
         let (_0, _1): (T, T) = (Zero::zero(), One::one());
         let (sx, sy) = (beta.get().tan(), alpha.get().tan());
