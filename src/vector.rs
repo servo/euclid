@@ -424,7 +424,7 @@ define_matrix! {
 pub type Vector3D<T> = TypedVector3D<T, UnknownUnit>;
 
 impl<T: Copy + Zero, U> TypedVector3D<T, U> {
-    /// Constructor, setting all copmonents to zero.
+    /// Constructor, setting all components to zero.
     #[inline]
     pub fn zero() -> Self {
         vec3(Zero::zero(), Zero::zero(), Zero::zero())

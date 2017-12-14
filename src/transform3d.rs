@@ -166,7 +166,7 @@ where T: Copy + Clone +
         self.m33 == _1 && self.m44 == _1
     }
 
-    /// Create a 2D transform picking the relevent terms from this transform.
+    /// Create a 2D transform picking the relevant terms from this transform.
     ///
     /// This method assumes that self represents a 2d transformation, callers
     /// should check that self.is_2d() returns true beforehand.
