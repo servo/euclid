@@ -28,7 +28,7 @@ macro_rules! trig {
             #[inline]
             fn tan(self) -> $ty { self.tan() }
 
-            /// A slightly faster approximation of atan2.
+            /// A slightly faster approximation of `atan2`.
             ///
             /// Note that it does not deal with the case where both x and y are 0.
             #[inline]

@@ -697,7 +697,7 @@ impl<T: NumCast + Copy, U> TypedVector3D<T, U> {
     ///
     /// When casting from floating vector to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
-    /// geometrically. Consider using round(), ceil or floor() before casting.
+    /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
     #[inline]
     pub fn cast<NewT: NumCast + Copy>(&self) -> Option<TypedVector3D<NewT, U>> {
         match (NumCast::from(self.x),

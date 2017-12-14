@@ -607,7 +607,7 @@ impl<T: NumCast + Copy, U> TypedPoint3D<T, U> {
     ///
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
-    /// geometrically. Consider using round(), ceil or floor() before casting.
+    /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
     #[inline]
     pub fn cast<NewT: NumCast + Copy>(&self) -> Option<TypedPoint3D<NewT, U>> {
         match (NumCast::from(self.x),
