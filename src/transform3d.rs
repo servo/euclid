@@ -26,8 +26,8 @@ define_matrix! {
     ///
     /// Transforms can be parametrized over the source and destination units, to describe a
     /// transformation from a space to another.
-    /// For example, `TypedTransform3D<f32, WordSpace, ScreenSpace>::transform_point3d`
-    /// takes a `TypedPoint3D<f32, WordSpace>` and returns a `TypedPoint3D<f32, ScreenSpace>`.
+    /// For example, `TypedTransform3D<f32, WorldSpace, ScreenSpace>::transform_point3d`
+    /// takes a `TypedPoint3D<f32, WorldSpace>` and returns a `TypedPoint3D<f32, ScreenSpace>`.
     ///
     /// Transforms expose a set of convenience methods for pre- and post-transformations.
     /// A pre-transformation corresponds to adding an operation that is applied before
