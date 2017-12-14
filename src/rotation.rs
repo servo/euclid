@@ -487,7 +487,7 @@ where T: Copy + Clone +
     #[inline]
     pub fn lerp(&self, other: &Self, t: T) -> Self {
         let one_t = T::one() - t;
-        return self.mul(one_t).add(other.mul(t)).normalize();
+        self.mul(one_t).add(other.mul(t)).normalize()
     }
 
     /// Returns the given 3d point transformed by this rotation.

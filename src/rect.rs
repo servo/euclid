@@ -222,7 +222,7 @@ where T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output=T> + Sub<T
 
     /// Returns the smallest rectangle containing the four points.
     pub fn from_points(points: &[TypedPoint2D<T, U>]) -> Self {
-        if points.len() == 0 {
+        if points.is_empty() {
             return TypedRect::zero();
         }
         let (mut min_x, mut min_y) = (points[0].x, points[0].y);
