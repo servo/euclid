@@ -7,6 +7,24 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+macro_rules! expand_partial_cmp {
+($self:ident, $other:ident) => {
+    Some(::std::cmp::Ordering::Equal)
+};
+($self:ident, $other:ident, $f: ident) => {
+    $self.$f.partial_cmp(&$other.$f)
+};
+($self:ident, $other:ident, $f: ident, $($fx:tt),*) => {{
+    let ca = $self.$f.partial_cmp(&$other.$f);
+    let cr = expand_partial_cmp!($self, $other, $($fx),*);
+    match (ca, cr) {
+        (Some(::std::cmp::Ordering::Equal), other) => other,
+        (Some(o), _) => Some(o),
+        (None, _) => None,
+    }
+}};
+}
+
 macro_rules! define_matrix {
     (
         $(#[$attr:meta])*
@@ -65,6 +83,14 @@ macro_rules! define_matrix {
         {
             fn eq(&self, other: &Self) -> bool {
                 true $(&& self.$field == other.$field)+
+            }
+        }
+
+        impl<T, $($phantom),+> ::std::cmp::PartialOrd for $name<T, $($phantom),+>
+            where T: ::std::cmp::PartialOrd
+        {
+            fn partial_cmp(&self, other: &Self) -> Option<::std::cmp::Ordering> {
+                expand_partial_cmp!(self, other, $($field),+)
             }
         }
 
