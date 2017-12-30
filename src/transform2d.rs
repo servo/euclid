@@ -357,7 +357,6 @@ where T: Copy + Clone +
          Mul<T, Output=T> +
          Div<T, Output=T> +
          Neg<Output=T> +
-         ApproxEq<T> +
          PartialOrd +
          Trig +
          One + Zero {

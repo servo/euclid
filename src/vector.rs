@@ -166,7 +166,7 @@ where T: Copy + Mul<T, Output=T> + Add<T, Output=T> + Sub<T, Output=T> {
     }
 
     #[inline]
-    pub fn length(&self) -> T where T: Float + ApproxEq<T> {
+    pub fn length(&self) -> T where T: Float {
         self.square_length().sqrt()
     }
 }

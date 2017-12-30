@@ -283,26 +283,6 @@ mod tests {
     }
 
     #[test]
-    fn test_fmt_debug() {
-        // Debug and display format the value only.
-        let one_cm: Length<f32, Mm> = Length::new(10.0);
-
-        let result = format!("{:?}", one_cm);
-
-        assert_eq!(result, "10");
-    }
-
-    #[test]
-    fn test_fmt_display() {
-        // Debug and display format the value only.
-        let one_cm: Length<f32, Mm> = Length::new(10.0);
-
-        let result = format!("{}", one_cm);
-
-        assert_eq!(result, "10");
-    }
-
-    #[test]
     fn test_add() {
         let length1: Length<u8, Mm> = Length::new(250);
         let length2: Length<u8, Mm> = Length::new(5);

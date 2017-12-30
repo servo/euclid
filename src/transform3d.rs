@@ -117,7 +117,6 @@ where T: Copy + Clone +
          Mul<T, Output=T> +
          Div<T, Output=T> +
          Neg<Output=T> +
-         ApproxEq<T> +
          PartialOrd +
          Trig +
          One + Zero {
@@ -190,7 +189,8 @@ where T: Copy + Clone +
         (m33 * det) < _0
     }
 
-    pub fn approx_eq(&self, other: &Self) -> bool {
+    pub fn approx_eq(&self, other: &Self) -> bool
+    where T : ApproxEq<T> {
         self.m11.approx_eq(&other.m11) && self.m12.approx_eq(&other.m12) &&
         self.m13.approx_eq(&other.m13) && self.m14.approx_eq(&other.m14) &&
         self.m21.approx_eq(&other.m21) && self.m22.approx_eq(&other.m22) &&
