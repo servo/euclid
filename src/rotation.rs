@@ -330,16 +330,7 @@ impl<T, Src, Dst> TypedRotation3D<T, Src, Dst> where T: Copy {
 }
 
 impl<T, Src, Dst> TypedRotation3D<T, Src, Dst>
-where T: Copy + Clone +
-         Add<T, Output=T> +
-         Sub<T, Output=T> +
-         Mul<T, Output=T> +
-         Div<T, Output=T> +
-         Neg<Output=T> +
-         ApproxEq<T> +
-         PartialOrd +
-         Float +
-         One + Zero
+where T: Float + ApproxEq<T>
 {
     /// Creates the identity rotation.
     #[inline]
