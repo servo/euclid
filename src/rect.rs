@@ -229,16 +229,23 @@ where T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output=T> + Sub<T
     /// semantic on these edges. This means that the right-most and bottom-most
     /// points provided to `from_points` will count as not contained by the rect.
     /// This behavior may change in the future.
-    pub fn from_points(points: &[TypedPoint2D<T, U>]) -> Self {
-        // TODO: it would be less confusing if we inflated the size by the smallest
-        // possible value for the given scalar type to avoid the confusion described
-        // above.
-        if points.is_empty() {
+    pub fn from_points<'a, I>(points: I) -> Self
+    where
+        U: 'a,
+        T: 'a,
+        I: IntoIterator<Item=&'a TypedPoint2D<T, U>>
+    {
+        let mut points = points.into_iter();
+
+        let first = if let Some(first) = points.next() {
+            first
+        } else {
             return TypedRect::zero();
-        }
-        let (mut min_x, mut min_y) = (points[0].x, points[0].y);
+        };
+
+        let (mut min_x, mut min_y) = (first.x, first.y);
         let (mut max_x, mut max_y) = (min_x, min_y);
-        for point in &points[1..] {
+        for point in points{
             if point.x < min_x {
                 min_x = point.x
             }
