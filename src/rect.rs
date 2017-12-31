@@ -222,7 +222,11 @@ where T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output=T> + Sub<T
 
     /// Returns the smallest rectangle containing all the points
     pub fn from_points<'a, I>(points: I) -> Self
-    where U: 'a, T: 'a, I: IntoIterator<Item=&'a TypedPoint2D<T, U>> {
+    where
+        U: 'a,
+        T: 'a,
+        I: IntoIterator<Item=&'a TypedPoint2D<T, U>>
+    {
         let mut points = points.into_iter();
 
         let first = if let Some(first) = points.next() {
