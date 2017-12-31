@@ -220,14 +220,20 @@ where T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output=T> + Sub<T
         self.translate(&size.to_vector())
     }
 
-    /// Returns the smallest rectangle containing the four points.
-    pub fn from_points(points: &[TypedPoint2D<T, U>]) -> Self {
-        if points.is_empty() {
+    /// Returns the smallest rectangle containing all the points
+    pub fn from_points<'a, I>(points: I) -> Self
+    where U: 'a, T: 'a, I: IntoIterator<Item=&'a TypedPoint2D<T, U>> {
+        let mut points = points.into_iter();
+
+        let first = if let Some(first) = points.next() {
+            first
+        } else {
             return TypedRect::zero();
-        }
-        let (mut min_x, mut min_y) = (points[0].x, points[0].y);
+        };
+
+        let (mut min_x, mut min_y) = (first.x, first.y);
         let (mut max_x, mut max_y) = (min_x, min_y);
-        for point in &points[1..] {
+        for point in points{
             if point.x < min_x {
                 min_x = point.x
             }
