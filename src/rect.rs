@@ -220,8 +220,19 @@ where T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output=T> + Sub<T
         self.translate(&size.to_vector())
     }
 
-    /// Returns the smallest rectangle containing the four points.
+    /// Returns the smallest rectangle defined by the top/bottom/left/right-most
+    /// points provided as parameter.
+    ///
+    /// Note: This function has a behavior that can be surprising because
+    /// the right-most and bottom-most points are exactly on the edge
+    /// of the rectangle while the `contains` function is has exclusive
+    /// semantic on these edges. This means that the right-most and bottom-most
+    /// points provided to `from_points` will count as not contained by the rect.
+    /// This behavior may change in the future.
     pub fn from_points(points: &[TypedPoint2D<T, U>]) -> Self {
+        // TODO: it would be less confusing if we inflated the size by the smallest
+        // possible value for the given scalar type to avoid the confusion described
+        // above.
         if points.is_empty() {
             return TypedRect::zero();
         }
