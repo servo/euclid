@@ -220,7 +220,15 @@ where T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output=T> + Sub<T
         self.translate(&size.to_vector())
     }
 
-    /// Returns the smallest rectangle containing all the points
+    /// Returns the smallest rectangle defined by the top/bottom/left/right-most
+    /// points provided as parameter.
+    ///
+    /// Note: This function has a behavior that can be surprising because
+    /// the right-most and bottom-most points are exactly on the edge
+    /// of the rectangle while the `contains` function is has exclusive
+    /// semantic on these edges. This means that the right-most and bottom-most
+    /// points provided to `from_points` will count as not contained by the rect.
+    /// This behavior may change in the future.
     pub fn from_points<'a, I>(points: I) -> Self
     where
         U: 'a,
@@ -237,7 +245,7 @@ where T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output=T> + Sub<T
 
         let (mut min_x, mut min_y) = (first.x, first.y);
         let (mut max_x, mut max_y) = (min_x, min_y);
-        for point in points{
+        for point in points {
             if point.x < min_x {
                 min_x = point.x
             }
