@@ -829,7 +829,7 @@ mod vector2d {
         let p0: Vec2 = Vec2::zero();
         let p1: Vec2 = vec2(4.0, 0.0);
         let p2: Vec2 = vec2(3.0, -4.0);
-        assert_eq!(p0.normalize(), p0);
+        assert!(p0.normalize().x.is_nan() && p0.normalize().y.is_nan());
         assert_eq!(p1.normalize(), vec2(1.0, 0.0));
         assert_eq!(p2.normalize(), vec2(0.6, -0.8));
     }
@@ -940,7 +940,7 @@ mod vector3d {
         let p0: Vec3 = Vec3::zero();
         let p1: Vec3 = vec3(0.0, -6.0, 0.0);
         let p2: Vec3 = vec3(1.0, 2.0, -2.0);
-        assert_eq!(p0.normalize(), p0);
+        assert!(p0.normalize().x.is_nan() && p0.normalize().y.is_nan() && p0.normalize().z.is_nan());
         assert_eq!(p1.normalize(), vec3(0.0, -1.0, 0.0));
         assert_eq!(p2.normalize(), vec3(1.0/3.0, 2.0/3.0, -2.0/3.0));
     }
