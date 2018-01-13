@@ -152,12 +152,7 @@ where T: Copy + Mul<T, Output=T> + Add<T, Output=T> + Sub<T, Output=T> {
 
     #[inline]
     pub fn normalize(self) -> Self where T: Float + ApproxEq<T> {
-        let dot = self.dot(self);
-        if dot.approx_eq(&T::zero()) {
-            self
-        } else {
-            self / dot.sqrt()
-        }
+        self / self.length()
     }
 
     #[inline]
@@ -548,12 +543,7 @@ impl<T: Mul<T, Output=T> +
 
     #[inline]
     pub fn normalize(self) -> Self where T: Float + ApproxEq<T> {
-        let dot = self.dot(self);
-        if dot.approx_eq(&T::zero()) {
-            self
-        } else {
-            self / dot.sqrt()
-        }
+        self / self.length()
     }
 
     #[inline]
