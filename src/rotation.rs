@@ -216,7 +216,6 @@ where T: Copy + Clone +
          Mul<T, Output=T> +
          Div<T, Output=T> +
          Neg<Output=T> +
-         ApproxEq<T> +
          PartialOrd +
          Float +
          One + Zero
@@ -330,7 +329,8 @@ impl<T, Src, Dst> TypedRotation3D<T, Src, Dst> where T: Copy {
 }
 
 impl<T, Src, Dst> TypedRotation3D<T, Src, Dst>
-where T: Float + ApproxEq<T>
+where
+    T: Float,
 {
     /// Creates the identity rotation.
     #[inline]
@@ -428,7 +428,10 @@ where T: Float + ApproxEq<T>
     }
 
     #[inline]
-    pub fn is_normalized(&self) -> bool {
+    pub fn is_normalized(&self) -> bool
+    where
+        T: ApproxEq<T>,
+    {
         // TODO: we might need to relax the threshold here, because of floating point imprecision.
         self.square_norm().approx_eq(&T::one())
     }
@@ -436,7 +439,10 @@ where T: Float + ApproxEq<T>
     /// Spherical linear interpolation between this rotation and another rotation.
     ///
     /// `t` is expected to be between zero and one.
-    pub fn slerp(&self, other: &Self, t: T) -> Self {
+    pub fn slerp(&self, other: &Self, t: T) -> Self
+    where
+        T: ApproxEq<T>,
+    {
         debug_assert!(self.is_normalized());
         debug_assert!(other.is_normalized());
 
@@ -484,7 +490,10 @@ where T: Float + ApproxEq<T>
     /// Returns the given 3d point transformed by this rotation.
     ///
     /// The input point must be use the unit Src, and the returned point has the unit Dst.
-    pub fn rotate_point3d(&self, point: &TypedPoint3D<T, Src>) -> TypedPoint3D<T, Dst> {
+    pub fn rotate_point3d(&self, point: &TypedPoint3D<T, Src>) -> TypedPoint3D<T, Dst>
+    where
+        T: ApproxEq<T>,
+    {
         debug_assert!(self.is_normalized());
 
         let two = T::one() + T::one();
@@ -501,7 +510,10 @@ where T: Float + ApproxEq<T>
     ///
     /// The input point must be use the unit Src, and the returned point has the unit Dst.
     #[inline]
-    pub fn rotate_point2d(&self, point: &TypedPoint2D<T, Src>) -> TypedPoint2D<T, Dst> {
+    pub fn rotate_point2d(&self, point: &TypedPoint2D<T, Src>) -> TypedPoint2D<T, Dst>
+    where
+        T: ApproxEq<T>,
+    {
         self.rotate_point3d(&point.to_3d()).xy()
     }
 
@@ -509,7 +521,10 @@ where T: Float + ApproxEq<T>
     ///
     /// The input vector must be use the unit Src, and the returned point has the unit Dst.
     #[inline]
-    pub fn rotate_vector3d(&self, vector: &TypedVector3D<T, Src>) -> TypedVector3D<T, Dst> {
+    pub fn rotate_vector3d(&self, vector: &TypedVector3D<T, Src>) -> TypedVector3D<T, Dst>
+    where
+        T: ApproxEq<T>,
+    {
         self.rotate_point3d(&vector.to_point()).to_vector()
     }
 
@@ -517,13 +532,19 @@ where T: Float + ApproxEq<T>
     ///
     /// The input vector must be use the unit Src, and the returned point has the unit Dst.
     #[inline]
-    pub fn rotate_vector2d(&self, vector: &TypedVector2D<T, Src>) -> TypedVector2D<T, Dst> {
+    pub fn rotate_vector2d(&self, vector: &TypedVector2D<T, Src>) -> TypedVector2D<T, Dst>
+    where
+        T: ApproxEq<T>,
+    {
         self.rotate_vector3d(&vector.to_3d()).xy()
     }
 
     /// Returns the matrix representation of this rotation.
     #[inline]
-    pub fn to_transform(&self) -> TypedTransform3D<T, Src, Dst> {
+    pub fn to_transform(&self) -> TypedTransform3D<T, Src, Dst>
+    where
+        T: ApproxEq<T>,
+    {
         debug_assert!(self.is_normalized());
 
         let i2 = self.i + self.i;
@@ -563,7 +584,10 @@ where T: Float + ApproxEq<T>
     }
 
     /// Returns a rotation representing the other rotation followed by this rotation.
-    pub fn pre_rotate<NewSrc>(&self, other: &TypedRotation3D<T, NewSrc, Src>) -> TypedRotation3D<T, NewSrc, Dst> {
+    pub fn pre_rotate<NewSrc>(&self, other: &TypedRotation3D<T, NewSrc, Src>) -> TypedRotation3D<T, NewSrc, Dst>
+    where
+        T: ApproxEq<T>,
+    {
         debug_assert!(self.is_normalized());
         TypedRotation3D::quaternion(
             self.i * other.r + self.r * other.i + self.j * other.k - self.k * other.j,
@@ -575,7 +599,10 @@ where T: Float + ApproxEq<T>
 
     /// Returns a rotation representing this rotation followed by the other rotation.
     #[inline]
-    pub fn post_rotate<NewDst>(&self, other: &TypedRotation3D<T, Dst, NewDst>) -> TypedRotation3D<T, Src, NewDst> {
+    pub fn post_rotate<NewDst>(&self, other: &TypedRotation3D<T, Dst, NewDst>) -> TypedRotation3D<T, Src, NewDst>
+    where
+        T: ApproxEq<T>,
+    {
         other.pre_rotate(self)
     }
 
