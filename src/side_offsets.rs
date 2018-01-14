@@ -30,8 +30,11 @@ define_matrix! {
 
 impl<T: fmt::Debug, U> fmt::Debug for TypedSideOffsets2D<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "({:?},{:?},{:?},{:?})",
-               self.top, self.right, self.bottom, self.left)
+        write!(
+            f,
+            "({:?},{:?},{:?},{:?})",
+            self.top, self.right, self.bottom, self.left
+        )
     }
 }
 
@@ -51,24 +54,34 @@ impl<T: Copy, U> TypedSideOffsets2D<T, U> {
     }
 
     /// Constructor taking a typed Length for each side.
-    pub fn from_lengths(top: Length<T, U>,
-                        right: Length<T, U>,
-                        bottom: Length<T, U>,
-                        left: Length<T, U>) -> Self {
+    pub fn from_lengths(
+        top: Length<T, U>,
+        right: Length<T, U>,
+        bottom: Length<T, U>,
+        left: Length<T, U>,
+    ) -> Self {
         TypedSideOffsets2D::new(top.0, right.0, bottom.0, left.0)
     }
 
     /// Access self.top as a typed Length instead of a scalar value.
-    pub fn top_typed(&self) -> Length<T, U> { Length::new(self.top) }
+    pub fn top_typed(&self) -> Length<T, U> {
+        Length::new(self.top)
+    }
 
     /// Access self.right as a typed Length instead of a scalar value.
-    pub fn right_typed(&self) -> Length<T, U> { Length::new(self.right) }
+    pub fn right_typed(&self) -> Length<T, U> {
+        Length::new(self.right)
+    }
 
     /// Access self.bottom as a typed Length instead of a scalar value.
-    pub fn bottom_typed(&self) -> Length<T, U> { Length::new(self.bottom) }
+    pub fn bottom_typed(&self) -> Length<T, U> {
+        Length::new(self.bottom)
+    }
 
     /// Access self.left as a typed Length instead of a scalar value.
-    pub fn left_typed(&self) -> Length<T, U> { Length::new(self.left) }
+    pub fn left_typed(&self) -> Length<T, U> {
+        Length::new(self.left)
+    }
 
     /// Constructor setting the same value to all sides, taking a scalar value directly.
     pub fn new_all_same(all: T) -> Self {
@@ -81,7 +94,10 @@ impl<T: Copy, U> TypedSideOffsets2D<T, U> {
     }
 }
 
-impl<T, U> TypedSideOffsets2D<T, U> where T: Add<T, Output=T> + Copy {
+impl<T, U> TypedSideOffsets2D<T, U>
+where
+    T: Add<T, Output = T> + Copy,
+{
     pub fn horizontal(&self) -> T {
         self.left + self.right
     }
@@ -99,7 +115,10 @@ impl<T, U> TypedSideOffsets2D<T, U> where T: Add<T, Output=T> + Copy {
     }
 }
 
-impl<T, U> Add for TypedSideOffsets2D<T, U> where T : Copy + Add<T, Output=T> {
+impl<T, U> Add for TypedSideOffsets2D<T, U>
+where
+    T: Copy + Add<T, Output = T>,
+{
     type Output = Self;
     fn add(self, other: Self) -> Self {
         TypedSideOffsets2D::new(
@@ -114,12 +133,7 @@ impl<T, U> Add for TypedSideOffsets2D<T, U> where T : Copy + Add<T, Output=T> {
 impl<T: Copy + Zero, U> TypedSideOffsets2D<T, U> {
     /// Constructor, setting all sides to zero.
     pub fn zero() -> Self {
-        TypedSideOffsets2D::new(
-            Zero::zero(),
-            Zero::zero(),
-            Zero::zero(),
-            Zero::zero(),
-        )
+        TypedSideOffsets2D::new(Zero::zero(), Zero::zero(), Zero::zero(), Zero::zero())
     }
 }
 
@@ -233,7 +247,7 @@ mod tests {
 mod bench {
     use test::BenchHarness;
     use std::num::Zero;
-    use rand::{XorShiftRng, Rng};
+    use rand::{Rng, XorShiftRng};
     use super::SideOffsets2DSimdI32;
 
     #[cfg(target_arch = "x86")]
@@ -264,7 +278,12 @@ mod bench {
             }
         }
         let mut rng = XorShiftRng::new().unwrap();
-        bh.iter(|| add(&rng.gen::<SideOffsets2DSimdI32>(), &rng.gen::<SideOffsets2DSimdI32>()))
+        bh.iter(|| {
+            add(
+                &rng.gen::<SideOffsets2DSimdI32>(),
+                &rng.gen::<SideOffsets2DSimdI32>(),
+            )
+        })
     }
 
     #[bench]
