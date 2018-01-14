@@ -13,6 +13,7 @@ use scale::TypedScale;
 use num::*;
 use point::TypedPoint2D;
 use vector::TypedVector2D;
+use side_offsets::TypedSideOffsets2D;
 use size::TypedSize2D;
 
 use num_traits::NumCast;
@@ -218,6 +219,42 @@ where T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output=T> + Sub<T
     #[cfg_attr(feature = "unstable", must_use)]
     pub fn translate_by_size(&self, size: &TypedSize2D<T, U>) -> Self {
         self.translate(&size.to_vector())
+    }
+
+    /// Calculate the size and position of an inner rectangle.
+    ///
+    /// Subtracts the side offsets from all sides. The horizontal and vertical
+    /// offsets must not be larger than the original side length.
+    pub fn inner_rect(&self, offsets: TypedSideOffsets2D<T, U>) -> Self {
+        let rect = TypedRect::new(
+            TypedPoint2D::new(
+                self.origin.x + offsets.left,
+                self.origin.y + offsets.top
+            ),
+            TypedSize2D::new(
+                self.size.width - offsets.horizontal(),
+                self.size.height - offsets.vertical()
+            )
+        );
+        assert!(rect.size.width >= Zero::zero());
+        assert!(rect.size.height >= Zero::zero());
+        rect
+    }
+
+    /// Calculate the size and position of an outer rectangle.
+    ///
+    /// Add the offsets to all sides. The expanded rectangle is returned.
+    pub fn outer_rect(&self, offsets: TypedSideOffsets2D<T, U>) -> Self {
+        TypedRect::new(
+            TypedPoint2D::new(
+                self.origin.x - offsets.left,
+                self.origin.y - offsets.top
+            ),
+            TypedSize2D::new(
+                self.size.width + offsets.horizontal(),
+                self.size.height + offsets.vertical()
+            )
+        )
     }
 
     /// Returns the smallest rectangle defined by the top/bottom/left/right-most
@@ -481,6 +518,7 @@ pub fn rect<T: Copy, U>(x: T, y: T, w: T, h: T) -> TypedRect<T, U> {
 mod tests {
     use point::Point2D;
     use vector::vec2;
+    use side_offsets::SideOffsets2D;
     use size::Size2D;
     use super::*;
 
@@ -655,6 +693,18 @@ mod tests {
         assert!(rr.size.height == 10);
         assert!(rr.origin.x == 2);
         assert!(rr.origin.y == 5);
+    }
+
+    #[test]
+    fn test_inner_outer_rect() {
+        let inner_rect: Rect<i32> = Rect::new(Point2D::new(20, 40), Size2D::new(80, 100));
+        let offsets = SideOffsets2D::new(20, 10, 10, 10);
+        let outer_rect = inner_rect.outer_rect(offsets);
+        assert_eq!(outer_rect.origin.x, 10);
+        assert_eq!(outer_rect.origin.y, 20);
+        assert_eq!(outer_rect.size.width, 100);
+        assert_eq!(outer_rect.size.height, 130);
+        assert_eq!(outer_rect.inner_rect(offsets), inner_rect);
     }
 
     #[test]
