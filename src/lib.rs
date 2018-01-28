@@ -55,6 +55,7 @@
 //! assert_eq!(p.x, p.x_typed().get());
 //! ```
 
+#[cfg(feature = "serde")]
 #[macro_use]
 extern crate serde;
 

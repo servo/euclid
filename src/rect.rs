@@ -17,6 +17,7 @@ use side_offsets::TypedSideOffsets2D;
 use size::TypedSize2D;
 
 use num_traits::NumCast;
+#[cfg(feature = "serde")]
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::cmp::PartialOrd;
 use std::fmt;
@@ -33,6 +34,7 @@ pub struct TypedRect<T, U = UnknownUnit> {
 /// The default rectangle type with no unit.
 pub type Rect<T> = TypedRect<T, UnknownUnit>;
 
+#[cfg(feature = "serde")]
 impl<'de, T: Copy + Deserialize<'de>, U> Deserialize<'de> for TypedRect<T, U> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -43,6 +45,7 @@ impl<'de, T: Copy + Deserialize<'de>, U> Deserialize<'de> for TypedRect<T, U> {
     }
 }
 
+#[cfg(feature = "serde")]
 impl<T: Serialize, U> Serialize for TypedRect<T, U> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where

@@ -11,6 +11,7 @@
 use num::One;
 
 use num_traits::NumCast;
+#[cfg(feature = "serde")]
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::fmt;
 use std::ops::{Add, Div, Mul, Neg, Sub};
@@ -39,6 +40,7 @@ use {TypedPoint2D, TypedRect, TypedSize2D, TypedVector2D};
 #[repr(C)]
 pub struct TypedScale<T, Src, Dst>(pub T, PhantomData<(Src, Dst)>);
 
+#[cfg(feature = "serde")]
 impl<'de, T, Src, Dst> Deserialize<'de> for TypedScale<T, Src, Dst>
 where
     T: Deserialize<'de>,
@@ -54,6 +56,7 @@ where
     }
 }
 
+#[cfg(feature = "serde")]
 impl<T, Src, Dst> Serialize for TypedScale<T, Src, Dst>
 where
     T: Serialize,
