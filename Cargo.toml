@@ -1,6 +1,6 @@
 [package]
 name = "euclid"
-version = "0.16.3"
+version = "0.16.4"
 authors = ["The Servo Project Developers"]
 description = "Geometry primitives"
 documentation = "https://docs.rs/euclid/"
@@ -14,8 +14,7 @@ unstable = []
 
 [dependencies]
 num-traits = {version = "0.1.32", default-features = false}
-log = "0.3.1"
-serde = "1.0"
+serde = { version = "1.0", features = ["serde_derive"] }
 
 [dev-dependencies]
 rand = "0.3.7"
