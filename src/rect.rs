@@ -18,7 +18,7 @@ use size::TypedSize2D;
 
 use num_traits::NumCast;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use std::cmp::PartialOrd;
+use std::cmp::{Ord, PartialOrd, Ordering};
 use std::fmt;
 use std::hash::{Hash, Hasher};
 use std::ops::{Add, Div, Mul, Sub};
@@ -74,6 +74,18 @@ impl<T: PartialEq, U> PartialEq<TypedRect<T, U>> for TypedRect<T, U> {
 }
 
 impl<T: Eq, U> Eq for TypedRect<T, U> {}
+
+impl<T: PartialOrd, U> PartialOrd for TypedRect<T, U> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        (&self.origin, &self.size).partial_cmp(&(&other.origin, &other.size))
+    }
+}
+
+impl<T: Ord, U> Ord for TypedRect<T, U> {
+    fn cmp(&self, other: &Self) -> Ordering {
+        (&self.origin, &self.size).cmp(&(&other.origin, &other.size))
+    }
+}
 
 impl<T: fmt::Debug, U> fmt::Debug for TypedRect<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -788,5 +800,19 @@ mod tests {
             }
             x += 0.1
         }
+    }
+
+    #[test]
+    fn test_ord() {
+        let r1: Rect<i32> = rect(1, 2, 3, 4);
+        let r2: Rect<i32> = rect(2, 3, 1, 1);
+        let r3: Rect<i32> = rect(1, 2, 3, 1);
+        let r4: Rect<i32> = rect(1, 2, 3, 5);
+
+        assert!(!(r1 > r1) && !(r1 < r1));
+        assert!(r1 < r2);
+        assert!(r2 > r1);
+        assert!(r3 < r1);
+        assert!(r4 > r1);
     }
 }
