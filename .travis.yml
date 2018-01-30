@@ -4,7 +4,7 @@ notifications:
   webhooks: http://build.servo.org:54856/travis
 
 rust:
-  - 1.21.0
+  - 1.23.0
   - stable
   - beta
   - nightly
