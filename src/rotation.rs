@@ -17,7 +17,8 @@ use {TypedPoint2D, TypedPoint3D, TypedVector2D, TypedVector3D, Vector3D, point2,
 use {TypedTransform2D, TypedTransform3D, UnknownUnit};
 
 /// An angle in radians
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Hash, Serialize, Deserialize)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Hash)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Angle<T> {
     pub radians: T,
 }

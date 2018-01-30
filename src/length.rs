@@ -13,6 +13,7 @@ use num::Zero;
 
 use num_traits::{NumCast, Saturating};
 use num::One;
+#[cfg(feature = "serde")]
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::cmp::Ordering;
 use std::ops::{Add, Div, Mul, Neg, Sub};
@@ -42,6 +43,7 @@ impl<T: Clone, Unit> Clone for Length<T, Unit> {
 
 impl<T: Copy, Unit> Copy for Length<T, Unit> {}
 
+#[cfg(feature = "serde")]
 impl<'de, Unit, T> Deserialize<'de> for Length<T, Unit>
 where
     T: Deserialize<'de>,
@@ -57,6 +59,7 @@ where
     }
 }
 
+#[cfg(feature = "serde")]
 impl<T, Unit> Serialize for Length<T, Unit>
 where
     T: Serialize,
@@ -260,14 +263,26 @@ mod tests {
     use scale::TypedScale;
     use std::f32::INFINITY;
 
-    extern crate serde_test;
-    use self::serde_test::Token;
-    use self::serde_test::assert_tokens;
-
     enum Inch {}
     enum Mm {}
     enum Cm {}
     enum Second {}
+
+    #[cfg(feature = "serde")]
+    mod serde {
+        use super::*;
+
+        extern crate serde_test;
+        use self::serde_test::Token;
+        use self::serde_test::assert_tokens;
+
+        #[test]
+        fn test_length_serde() {
+            let one_cm: Length<f32, Mm> = Length::new(10.0);
+
+            assert_tokens(&one_cm, &[Token::F32(10.0)]);
+        }
+    }
 
     #[test]
     fn test_clone() {
@@ -280,13 +295,6 @@ mod tests {
 
         assert_eq!(one_foot.get(), 12.0);
         assert_eq!(variable_length.get(), 24.0);
-    }
-
-    #[test]
-    fn test_length_serde() {
-        let one_cm: Length<f32, Mm> = Length::new(10.0);
-
-        assert_tokens(&one_cm, &[Token::F32(10.0)]);
     }
 
     #[test]
