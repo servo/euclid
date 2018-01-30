@@ -7,7 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#![cfg_attr(feature = "unstable", feature(asm, cfg_target_feature, repr_simd, test, fn_must_use))]
+#![cfg_attr(feature = "unstable", feature(cfg_target_feature, test, fn_must_use))]
 
 //! A collection of strongly typed math tools for computer graphics with an inclination
 //! towards 2d graphics and layout.
@@ -74,8 +74,6 @@ pub use vector::{TypedVector2D, TypedVector3D, Vector2D, Vector3D, vec2, vec3};
 pub use rect::{rect, Rect, TypedRect};
 pub use rotation::{Angle, Rotation2D, Rotation3D, TypedRotation2D, TypedRotation3D};
 pub use side_offsets::{SideOffsets2D, TypedSideOffsets2D};
-#[cfg(feature = "unstable")]
-pub use side_offsets::SideOffsets2DSimdI32;
 pub use size::{Size2D, TypedSize2D, size2};
 pub use trig::Trig;
 
