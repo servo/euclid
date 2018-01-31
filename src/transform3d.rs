@@ -15,7 +15,7 @@ use vector::{TypedVector2D, TypedVector3D, vec2, vec3};
 use rect::TypedRect;
 use transform2d::TypedTransform2D;
 use scale::TypedScale;
-use num::{One, Zero};
+use num::{One, Zero, ValueOrScale};
 use std::ops::{Add, Mul, Sub, Div, Neg};
 use std::marker::PhantomData;
 use std::fmt;
@@ -482,8 +482,12 @@ where T: Copy + Clone +
     }
 
     /// Create a 3d scale transform
-    pub fn create_scale(x: T, y: T, z: T) -> Self {
-        let (_0, _1): (T, T) = (Zero::zero(), One::one());
+    pub fn create_scale<N>(x: N, y: N, z: N) -> Self
+    where N: ValueOrScale<T, Src, Dst> {
+        let (_0, _1) = (T::zero(), T::one());
+        let x = x.value();
+        let y = y.value();
+        let z = z.value();
         TypedTransform3D::row_major(
              x, _0, _0, _0,
             _0,  y, _0, _0,

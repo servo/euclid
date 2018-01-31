@@ -12,7 +12,7 @@
 
 use super::UnknownUnit;
 use length::Length;
-use num::Zero;
+use num::{Zero, ValueOrLength};
 use std::fmt;
 use std::ops::Add;
 use std::marker::PhantomData;
@@ -41,28 +41,22 @@ impl<T: fmt::Debug, U> fmt::Debug for TypedSideOffsets2D<T, U> {
 /// The default side offset type with no unit.
 pub type SideOffsets2D<T> = TypedSideOffsets2D<T, UnknownUnit>;
 
-impl<T: Copy, U> TypedSideOffsets2D<T, U> {
-    /// Constructor taking a scalar for each side.
-    pub fn new(top: T, right: T, bottom: T, left: T) -> Self {
+
+impl<T, U> TypedSideOffsets2D<T, U> {
+    /// Constructor taking a scalar or a `Length` for each side.
+    pub fn new<N>(top: N, right: N, bottom: N, left: N) -> Self
+    where N: ValueOrLength<T, U> {
         TypedSideOffsets2D {
-            top: top,
-            right: right,
-            bottom: bottom,
-            left: left,
+            top: top.value(),
+            right: right.value(),
+            bottom: bottom.value(),
+            left: left.value(),
             _unit: PhantomData,
         }
     }
+}
 
-    /// Constructor taking a typed Length for each side.
-    pub fn from_lengths(
-        top: Length<T, U>,
-        right: Length<T, U>,
-        bottom: Length<T, U>,
-        left: Length<T, U>,
-    ) -> Self {
-        TypedSideOffsets2D::new(top.0, right.0, bottom.0, left.0)
-    }
-
+impl<T: Copy, U> TypedSideOffsets2D<T, U> {
     /// Access self.top as a typed Length instead of a scalar value.
     pub fn get_top(&self) -> Length<T, U> {
         Length::new(self.top)
@@ -84,13 +78,10 @@ impl<T: Copy, U> TypedSideOffsets2D<T, U> {
     }
 
     /// Constructor setting the same value to all sides, taking a scalar value directly.
-    pub fn new_all_same(all: T) -> Self {
-        TypedSideOffsets2D::new(all, all, all, all)
-    }
-
-    /// Constructor setting the same value to all sides, taking a typed Length.
-    pub fn from_length_all_same(all: Length<T, U>) -> Self {
-        TypedSideOffsets2D::new_all_same(all.0)
+    pub fn new_all_same<N>(all: N) -> Self
+    where N: ValueOrLength<T, U> {
+        let v = all.value();
+        TypedSideOffsets2D::new(v, v, v, v)
     }
 }
 
@@ -133,6 +124,6 @@ where
 impl<T: Copy + Zero, U> TypedSideOffsets2D<T, U> {
     /// Constructor, setting all sides to zero.
     pub fn zero() -> Self {
-        TypedSideOffsets2D::new(Zero::zero(), Zero::zero(), Zero::zero(), Zero::zero())
+        TypedSideOffsets2D::new(T::zero(), T::zero(), T::zero(), T::zero())
     }
 }

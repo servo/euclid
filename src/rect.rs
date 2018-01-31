@@ -199,20 +199,17 @@ where
 
     #[inline]
     #[cfg_attr(feature = "unstable", must_use)]
-    pub fn inflate(&self, width: T, height: T) -> Self {
+    pub fn inflate<N>(&self, width: N, height: N) -> Self
+    where N: ValueOrLength<T, U> {
+        let w = width.value();
+        let h = height.value();
         TypedRect::new(
-            TypedPoint2D::new(self.origin.x - width, self.origin.y - height),
+            TypedPoint2D::new(self.origin.x - w, self.origin.y - h),
             TypedSize2D::new(
-                self.size.width + width + width,
-                self.size.height + height + height,
+                self.size.width + w + w,
+                self.size.height + h + h,
             ),
         )
-    }
-
-    #[inline]
-    #[cfg_attr(feature = "unstable", must_use)]
-    pub fn inflate_typed(&self, width: Length<T, U>, height: Length<T, U>) -> Self {
-        self.inflate(width.get(), height.get())
     }
 
     #[inline]

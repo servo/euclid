@@ -8,7 +8,7 @@
 // except according to those terms.
 
 use super::{UnknownUnit, Angle};
-use num::{One, Zero};
+use num::{One, Zero, ValueOrScale};
 use point::TypedPoint2D;
 use vector::{TypedVector2D, vec2};
 use rect::TypedRect;
@@ -223,11 +223,12 @@ where T: Copy + Clone +
     }
 
     /// Returns a scale transform.
-    pub fn create_scale(x: T, y: T) -> Self {
+    pub fn create_scale<N>(x: N, y: N) -> Self
+    where N: ValueOrScale<T, Src, Dst> {
         let _0 = Zero::zero();
         TypedTransform2D::row_major(
-             x, _0,
-            _0,  y,
+             x.value(), _0,
+            _0,  y.value(),
             _0, _0
         )
     }
