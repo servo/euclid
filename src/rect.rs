@@ -133,22 +133,22 @@ where
     }
 
     #[inline]
-    pub fn max_x_typed(&self) -> Length<T, U> {
+    pub fn get_max_x(&self) -> Length<T, U> {
         Length::new(self.max_x())
     }
 
     #[inline]
-    pub fn min_x_typed(&self) -> Length<T, U> {
+    pub fn get_min_x(&self) -> Length<T, U> {
         Length::new(self.min_x())
     }
 
     #[inline]
-    pub fn max_y_typed(&self) -> Length<T, U> {
+    pub fn get_max_y(&self) -> Length<T, U> {
         Length::new(self.max_y())
     }
 
     #[inline]
-    pub fn min_y_typed(&self) -> Length<T, U> {
+    pub fn get_min_y(&self) -> Length<T, U> {
         Length::new(self.min_y())
     }
 

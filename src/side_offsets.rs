@@ -64,22 +64,22 @@ impl<T: Copy, U> TypedSideOffsets2D<T, U> {
     }
 
     /// Access self.top as a typed Length instead of a scalar value.
-    pub fn top_typed(&self) -> Length<T, U> {
+    pub fn get_top(&self) -> Length<T, U> {
         Length::new(self.top)
     }
 
     /// Access self.right as a typed Length instead of a scalar value.
-    pub fn right_typed(&self) -> Length<T, U> {
+    pub fn get_right(&self) -> Length<T, U> {
         Length::new(self.right)
     }
 
     /// Access self.bottom as a typed Length instead of a scalar value.
-    pub fn bottom_typed(&self) -> Length<T, U> {
+    pub fn get_bottom(&self) -> Length<T, U> {
         Length::new(self.bottom)
     }
 
     /// Access self.left as a typed Length instead of a scalar value.
-    pub fn left_typed(&self) -> Length<T, U> {
+    pub fn get_left(&self) -> Length<T, U> {
         Length::new(self.left)
     }
 
@@ -106,11 +106,11 @@ where
         self.top + self.bottom
     }
 
-    pub fn horizontal_typed(&self) -> Length<T, U> {
+    pub fn get_horizontal(&self) -> Length<T, U> {
         Length::new(self.horizontal())
     }
 
-    pub fn vertical_typed(&self) -> Length<T, U> {
+    pub fn get_vertical(&self) -> Length<T, U> {
         Length::new(self.vertical())
     }
 }

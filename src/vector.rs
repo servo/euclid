@@ -107,13 +107,13 @@ impl<T: Copy, U> TypedVector2D<T, U> {
 
     /// Returns self.x as a Length carrying the unit.
     #[inline]
-    pub fn x_typed(&self) -> Length<T, U> {
+    pub fn get_x(&self) -> Length<T, U> {
         Length::new(self.x)
     }
 
     /// Returns self.y as a Length carrying the unit.
     #[inline]
-    pub fn y_typed(&self) -> Length<T, U> {
+    pub fn get_y(&self) -> Length<T, U> {
         Length::new(self.y)
     }
 
@@ -180,6 +180,14 @@ where
         T: Float,
     {
         self.square_length().sqrt()
+    }
+
+    #[inline]
+    pub fn get_length(&self) -> Length<T, U>
+    where
+        T: Float,
+    {
+        Length::new(self.length())
     }
 }
 
@@ -512,19 +520,19 @@ impl<T: Copy, U> TypedVector3D<T, U> {
 
     /// Returns self.x as a Length carrying the unit.
     #[inline]
-    pub fn x_typed(&self) -> Length<T, U> {
+    pub fn get_x(&self) -> Length<T, U> {
         Length::new(self.x)
     }
 
     /// Returns self.y as a Length carrying the unit.
     #[inline]
-    pub fn y_typed(&self) -> Length<T, U> {
+    pub fn get_y(&self) -> Length<T, U> {
         Length::new(self.y)
     }
 
     /// Returns self.z as a Length carrying the unit.
     #[inline]
-    pub fn z_typed(&self) -> Length<T, U> {
+    pub fn get_z(&self) -> Length<T, U> {
         Length::new(self.z)
     }
 
@@ -589,6 +597,14 @@ impl<T: Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T> + Copy, U>
         T: Float,
     {
         self.square_length().sqrt()
+    }
+
+    #[inline]
+    pub fn get_length(&self) -> Length<T, U>
+    where
+        T: Float,
+    {
+        Length::new(self.length())
     }
 }
 

@@ -179,13 +179,13 @@ impl<T: Copy + Div<T, Output = T>, U1, U2> Div<TypedScale<T, U1, U2>> for TypedS
 impl<T: Copy, U> TypedSize2D<T, U> {
     /// Returns self.width as a Length carrying the unit.
     #[inline]
-    pub fn width_typed(&self) -> Length<T, U> {
+    pub fn get_width(&self) -> Length<T, U> {
         Length::new(self.width)
     }
 
     /// Returns self.height as a Length carrying the unit.
     #[inline]
-    pub fn height_typed(&self) -> Length<T, U> {
+    pub fn get_height(&self) -> Length<T, U> {
         Length::new(self.height)
     }
 
