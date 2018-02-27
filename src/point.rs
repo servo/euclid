@@ -315,6 +315,16 @@ impl<T: NumCast + Copy, U> TypedPoint2D<T, U> {
         self.cast().unwrap()
     }
 
+    /// Cast into an `u32` point, truncating decimals if any.
+    ///
+    /// When casting from floating point points, it is worth considering whether
+    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
+    /// the desired conversion behavior.
+    #[inline]
+    pub fn to_u32(&self) -> TypedPoint2D<u32, U> {
+        self.cast().unwrap()
+    }
+
     /// Cast into an i32 point, truncating decimals if any.
     ///
     /// When casting from floating point points, it is worth considering whether
@@ -670,6 +680,16 @@ impl<T: NumCast + Copy, U> TypedPoint3D<T, U> {
     /// the desired conversion behavior.
     #[inline]
     pub fn to_usize(&self) -> TypedPoint3D<usize, U> {
+        self.cast().unwrap()
+    }
+
+    /// Cast into an `u32` point, truncating decimals if any.
+    ///
+    /// When casting from floating point points, it is worth considering whether
+    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
+    /// the desired conversion behavior.
+    #[inline]
+    pub fn to_u32(&self) -> TypedPoint3D<u32, U> {
         self.cast().unwrap()
     }
 
