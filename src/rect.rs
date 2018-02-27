@@ -133,22 +133,22 @@ where
     }
 
     #[inline]
-    pub fn max_x_typed(&self) -> Length<T, U> {
+    pub fn get_max_x(&self) -> Length<T, U> {
         Length::new(self.max_x())
     }
 
     #[inline]
-    pub fn min_x_typed(&self) -> Length<T, U> {
+    pub fn get_min_x(&self) -> Length<T, U> {
         Length::new(self.min_x())
     }
 
     #[inline]
-    pub fn max_y_typed(&self) -> Length<T, U> {
+    pub fn get_max_y(&self) -> Length<T, U> {
         Length::new(self.max_y())
     }
 
     #[inline]
-    pub fn min_y_typed(&self) -> Length<T, U> {
+    pub fn get_min_y(&self) -> Length<T, U> {
         Length::new(self.min_y())
     }
 
@@ -199,20 +199,17 @@ where
 
     #[inline]
     #[cfg_attr(feature = "unstable", must_use)]
-    pub fn inflate(&self, width: T, height: T) -> Self {
+    pub fn inflate<N>(&self, width: N, height: N) -> Self
+    where N: ValueOrLength<T, U> {
+        let w = width.value();
+        let h = height.value();
         TypedRect::new(
-            TypedPoint2D::new(self.origin.x - width, self.origin.y - height),
+            TypedPoint2D::new(self.origin.x - w, self.origin.y - h),
             TypedSize2D::new(
-                self.size.width + width + width,
-                self.size.height + height + height,
+                self.size.width + w + w,
+                self.size.height + h + h,
             ),
         )
-    }
-
-    #[inline]
-    #[cfg_attr(feature = "unstable", must_use)]
-    pub fn inflate_typed(&self, width: Length<T, U>, height: Length<T, U>) -> Self {
-        self.inflate(width.get(), height.get())
     }
 
     #[inline]

@@ -10,6 +10,46 @@
 
 use num_traits;
 
+/// A trait for parameters that can be either a `Length<T, U>` or the raw
+/// scalar value `T`.
+///
+/// This makes it possible to write methods that accept both, for example `TypedVector2D::new`
+/// works with both strongly typed length arguments and direct scalar values:
+///
+/// ```
+/// use euclid::{Length, TypedVector2D};
+/// struct WorldSpace;
+/// struct ScreenSpace;
+/// type WorldVec2 = TypedVector2D<f32, WorldSpace>;
+/// type WorldLength = Length<f32, WorldSpace>;
+/// type ScreenLength = Length<f32, ScreenSpace>;
+/// // Convenient synatx:
+/// let v1 = WorldVec2::new(1.0, 2.0);
+/// // Statically checked synatx:
+/// let v2 = WorldVec2::new(WorldLength::new(1.0), WorldLength::new(2.0));
+/// // This would give a compile time error because units do not match:
+/// // let not_good = WorldVec2::new(ScreenLength:new(1.0), ScreenLength::new(2.0));
+/// ```
+pub trait ValueOrLength<T, U> {
+    fn value(self) -> T;
+}
+
+impl<T, U> ValueOrLength<T, U> for T {
+    #[inline]
+    fn value(self) -> T { self }
+}
+
+
+pub trait ValueOrScale<T, Src, Dst> {
+    fn value(self) -> T;
+}
+
+impl<T, Src, Dst> ValueOrScale<T, Src, Dst> for T {
+    #[inline]
+    fn value(self) -> T { self }
+}
+
+
 pub trait Zero {
     fn zero() -> Self;
 }

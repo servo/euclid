@@ -32,11 +32,24 @@ define_matrix! {
 /// `Point2D` provides the same methods as `TypedPoint2D`.
 pub type Point2D<T> = TypedPoint2D<T, UnknownUnit>;
 
+impl<T, U> TypedPoint2D<T, U> {
+    /// Constructor taking scalar values or `Length`.
+    #[inline]
+    pub fn new<N>(x: N, y: N) -> Self
+    where N: ValueOrLength<T, U> {
+        TypedPoint2D {
+            x: x.value(),
+            y: y.value(),
+            _unit: PhantomData,
+        }
+    }
+}
+
 impl<T: Copy + Zero, U> TypedPoint2D<T, U> {
     /// Constructor, setting all components to zero.
     #[inline]
     pub fn origin() -> Self {
-        point2(Zero::zero(), Zero::zero())
+        point2(T::zero(), T::zero())
     }
 
     #[inline]
@@ -64,26 +77,11 @@ impl<T: fmt::Display, U> fmt::Display for TypedPoint2D<T, U> {
 }
 
 impl<T: Copy, U> TypedPoint2D<T, U> {
-    /// Constructor taking scalar values directly.
-    #[inline]
-    pub fn new(x: T, y: T) -> Self {
-        TypedPoint2D {
-            x: x,
-            y: y,
-            _unit: PhantomData,
-        }
-    }
-
-    /// Constructor taking properly typed Lengths instead of scalar values.
-    #[inline]
-    pub fn from_lengths(x: Length<T, U>, y: Length<T, U>) -> Self {
-        point2(x.0, y.0)
-    }
-
     /// Create a 3d point from this one, using the specified z value.
     #[inline]
-    pub fn extend(&self, z: T) -> TypedPoint3D<T, U> {
-        point3(self.x, self.y, z)
+    pub fn extend<N>(&self, z: N) -> TypedPoint3D<T, U>
+    where N: ValueOrLength<T, U> {
+        point3(self.x, self.y, z.value())
     }
 
     /// Cast this point into a vector.
@@ -102,13 +100,13 @@ impl<T: Copy, U> TypedPoint2D<T, U> {
 
     /// Returns self.x as a Length carrying the unit.
     #[inline]
-    pub fn x_typed(&self) -> Length<T, U> {
+    pub fn get_x(&self) -> Length<T, U> {
         Length::new(self.x)
     }
 
     /// Returns self.y as a Length carrying the unit.
     #[inline]
-    pub fn y_typed(&self) -> Length<T, U> {
+    pub fn get_y(&self) -> Length<T, U> {
         Length::new(self.y)
     }
 
@@ -285,7 +283,7 @@ impl<T: NumCast + Copy, U> TypedPoint2D<T, U> {
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
     #[inline]
     pub fn cast<NewT: NumCast + Copy>(&self) -> Option<TypedPoint2D<NewT, U>> {
-        match (NumCast::from(self.x), NumCast::from(self.y)) {
+        match (NewT::from(self.x), NewT::from(self.y)) {
             (Some(x), Some(y)) => Some(point2(x, y)),
             _ => None,
         }
@@ -407,7 +405,7 @@ impl<T: Copy + Zero, U> TypedPoint3D<T, U> {
     /// Constructor, setting all copmonents to zero.
     #[inline]
     pub fn origin() -> Self {
-        point3(Zero::zero(), Zero::zero(), Zero::zero())
+        point3(T::zero(), T::zero(), T::zero())
     }
 }
 
@@ -448,24 +446,20 @@ impl<T: fmt::Display, U> fmt::Display for TypedPoint3D<T, U> {
     }
 }
 
-impl<T: Copy, U> TypedPoint3D<T, U> {
-    /// Constructor taking scalar values directly.
+impl<T, U> TypedPoint3D<T, U> {
+    /// Constructor taking scalar values or `Length`.
     #[inline]
-    pub fn new(x: T, y: T, z: T) -> Self {
+    pub fn new<N: ValueOrLength<T, U>>(x: N, y: N, z: N) -> Self {
         TypedPoint3D {
-            x: x,
-            y: y,
-            z: z,
+            x: x.value(),
+            y: y.value(),
+            z: z.value(),
             _unit: PhantomData,
         }
     }
+}
 
-    /// Constructor taking properly typed Lengths instead of scalar values.
-    #[inline]
-    pub fn from_lengths(x: Length<T, U>, y: Length<T, U>, z: Length<T, U>) -> Self {
-        point3(x.0, y.0, z.0)
-    }
-
+impl<T: Copy, U> TypedPoint3D<T, U> {
     /// Cast this point into a vector.
     ///
     /// Equivalent to substracting the origin to this point.
@@ -494,19 +488,19 @@ impl<T: Copy, U> TypedPoint3D<T, U> {
 
     /// Returns self.x as a Length carrying the unit.
     #[inline]
-    pub fn x_typed(&self) -> Length<T, U> {
+    pub fn get_x(&self) -> Length<T, U> {
         Length::new(self.x)
     }
 
     /// Returns self.y as a Length carrying the unit.
     #[inline]
-    pub fn y_typed(&self) -> Length<T, U> {
+    pub fn get_y(&self) -> Length<T, U> {
         Length::new(self.y)
     }
 
     /// Returns self.z as a Length carrying the unit.
     #[inline]
-    pub fn z_typed(&self) -> Length<T, U> {
+    pub fn get_z(&self) -> Length<T, U> {
         Length::new(self.z)
     }
 
@@ -650,9 +644,9 @@ impl<T: NumCast + Copy, U> TypedPoint3D<T, U> {
     #[inline]
     pub fn cast<NewT: NumCast + Copy>(&self) -> Option<TypedPoint3D<NewT, U>> {
         match (
-            NumCast::from(self.x),
-            NumCast::from(self.y),
-            NumCast::from(self.z),
+            NewT::from(self.x),
+            NewT::from(self.y),
+            NewT::from(self.z),
         ) {
             (Some(x), Some(y), Some(z)) => Some(point3(x, y, z)),
             _ => None,
@@ -748,11 +742,11 @@ impl<T: Copy, U> From<[T; 3]> for TypedPoint3D<T, U> {
     }
 }
 
-pub fn point2<T: Copy, U>(x: T, y: T) -> TypedPoint2D<T, U> {
+pub fn point2<T, U>(x: T, y: T) -> TypedPoint2D<T, U> {
     TypedPoint2D::new(x, y)
 }
 
-pub fn point3<T: Copy, U>(x: T, y: T, z: T) -> TypedPoint3D<T, U> {
+pub fn point3<T, U>(x: T, y: T, z: T) -> TypedPoint3D<T, U> {
     TypedPoint3D::new(x, y, z)
 }
 

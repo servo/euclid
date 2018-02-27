@@ -8,8 +8,7 @@
 // except according to those terms.
 //! A type-checked scaling factor between units.
 
-use num::One;
-
+use num::{One, ValueOrScale};
 use num_traits::NumCast;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
@@ -39,6 +38,11 @@ use {TypedPoint2D, TypedRect, TypedSize2D, TypedVector2D};
 /// ```
 #[repr(C)]
 pub struct TypedScale<T, Src, Dst>(pub T, PhantomData<(Src, Dst)>);
+
+impl<T, Src, Dst> ValueOrScale<T, Src, Dst> for TypedScale<T, Src, Dst> {
+    #[inline]
+    fn value(self) -> T { self.0 }
+}
 
 #[cfg(feature = "serde")]
 impl<'de, T, Src, Dst> Deserialize<'de> for TypedScale<T, Src, Dst>

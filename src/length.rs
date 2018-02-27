@@ -12,7 +12,7 @@ use scale::TypedScale;
 use num::Zero;
 
 use num_traits::{NumCast, Saturating};
-use num::One;
+use num::{One, ValueOrLength};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::cmp::Ordering;
@@ -252,6 +252,11 @@ where
         let one_t = T::one() - t;
         Length::new(one_t * self.get() + t * other.get())
     }
+}
+
+impl<T, U> ValueOrLength<T, U> for Length<T, U> {
+    #[inline]
+    fn value(self) -> T { self.0 }
 }
 
 #[cfg(test)]

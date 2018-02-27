@@ -38,7 +38,7 @@ impl<T: Copy + Zero, U> TypedVector2D<T, U> {
     /// Constructor, setting all components to zero.
     #[inline]
     pub fn zero() -> Self {
-        TypedVector2D::new(Zero::zero(), Zero::zero())
+        TypedVector2D::new(T::zero(), T::zero())
     }
 
     /// Convert into a 3d vector.
@@ -61,28 +61,24 @@ impl<T: fmt::Display, U> fmt::Display for TypedVector2D<T, U> {
 }
 
 impl<T, U> TypedVector2D<T, U> {
-    /// Constructor taking scalar values directly.
+    /// Constructor taking scalar values or `Length`.
     #[inline]
-    pub fn new(x: T, y: T) -> Self {
+    pub fn new<N>(x: N, y: N) -> Self
+    where N: ValueOrLength<T, U> {
         TypedVector2D {
-            x: x,
-            y: y,
+            x: x.value(),
+            y: y.value(),
             _unit: PhantomData,
         }
     }
 }
 
 impl<T: Copy, U> TypedVector2D<T, U> {
-    /// Constructor taking properly typed Lengths instead of scalar values.
-    #[inline]
-    pub fn from_lengths(x: Length<T, U>, y: Length<T, U>) -> Self {
-        vec2(x.0, y.0)
-    }
-
     /// Create a 3d vector from this one, using the specified z value.
     #[inline]
-    pub fn extend(&self, z: T) -> TypedVector3D<T, U> {
-        vec3(self.x, self.y, z)
+    pub fn extend<N>(&self, z: N) -> TypedVector3D<T, U>
+    where N: ValueOrLength<T, U> {
+        vec3(self.x, self.y, z.value())
     }
 
     /// Cast this vector into a point.
@@ -107,13 +103,13 @@ impl<T: Copy, U> TypedVector2D<T, U> {
 
     /// Returns self.x as a Length carrying the unit.
     #[inline]
-    pub fn x_typed(&self) -> Length<T, U> {
+    pub fn get_x(&self) -> Length<T, U> {
         Length::new(self.x)
     }
 
     /// Returns self.y as a Length carrying the unit.
     #[inline]
-    pub fn y_typed(&self) -> Length<T, U> {
+    pub fn get_y(&self) -> Length<T, U> {
         Length::new(self.y)
     }
 
@@ -180,6 +176,14 @@ where
         T: Float,
     {
         self.square_length().sqrt()
+    }
+
+    #[inline]
+    pub fn get_length(&self) -> Length<T, U>
+    where
+        T: Float,
+    {
+        Length::new(self.length())
     }
 }
 
@@ -336,7 +340,7 @@ impl<T: NumCast + Copy, U> TypedVector2D<T, U> {
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
     #[inline]
     pub fn cast<NewT: NumCast + Copy>(&self) -> Option<TypedVector2D<NewT, U>> {
-        match (NumCast::from(self.x), NumCast::from(self.y)) {
+        match (NewT::from(self.x), NewT::from(self.y)) {
             (Some(x), Some(y)) => Some(TypedVector2D::new(x, y)),
             _ => None,
         }
@@ -475,25 +479,20 @@ impl<T: fmt::Display, U> fmt::Display for TypedVector3D<T, U> {
 }
 
 impl<T, U> TypedVector3D<T, U> {
-    /// Constructor taking scalar values directly.
+    /// Constructor taking scalar values or `Length`.
     #[inline]
-    pub fn new(x: T, y: T, z: T) -> Self {
+    pub fn new<N>(x: N, y: N, z: N) -> Self
+    where N: ValueOrLength<T, U> {
         TypedVector3D {
-            x: x,
-            y: y,
-            z: z,
+            x: x.value(),
+            y: y.value(),
+            z: z.value(),
             _unit: PhantomData,
         }
     }
 }
 
 impl<T: Copy, U> TypedVector3D<T, U> {
-    /// Constructor taking properly typed Lengths instead of scalar values.
-    #[inline]
-    pub fn from_lengths(x: Length<T, U>, y: Length<T, U>, z: Length<T, U>) -> TypedVector3D<T, U> {
-        vec3(x.0, y.0, z.0)
-    }
-
     /// Cast this vector into a point.
     ///
     /// Equivalent to adding this vector to the origin.
@@ -522,19 +521,19 @@ impl<T: Copy, U> TypedVector3D<T, U> {
 
     /// Returns self.x as a Length carrying the unit.
     #[inline]
-    pub fn x_typed(&self) -> Length<T, U> {
+    pub fn get_x(&self) -> Length<T, U> {
         Length::new(self.x)
     }
 
     /// Returns self.y as a Length carrying the unit.
     #[inline]
-    pub fn y_typed(&self) -> Length<T, U> {
+    pub fn get_y(&self) -> Length<T, U> {
         Length::new(self.y)
     }
 
     /// Returns self.z as a Length carrying the unit.
     #[inline]
-    pub fn z_typed(&self) -> Length<T, U> {
+    pub fn get_z(&self) -> Length<T, U> {
         Length::new(self.z)
     }
 
@@ -599,6 +598,14 @@ impl<T: Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T> + Copy, U>
         T: Float,
     {
         self.square_length().sqrt()
+    }
+
+    #[inline]
+    pub fn get_length(&self) -> Length<T, U>
+    where
+        T: Float,
+    {
+        Length::new(self.length())
     }
 }
 

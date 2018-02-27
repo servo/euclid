@@ -45,19 +45,13 @@ impl<T: fmt::Display, U> fmt::Display for TypedSize2D<T, U> {
 
 impl<T, U> TypedSize2D<T, U> {
     /// Constructor taking scalar values.
-    pub fn new(width: T, height: T) -> Self {
+    pub fn new<N>(width: N, height: N) -> Self
+    where N: ValueOrLength<T, U> {
         TypedSize2D {
-            width: width,
-            height: height,
+            width: width.value(),
+            height: height.value(),
             _unit: PhantomData,
         }
-    }
-}
-
-impl<T: Clone, U> TypedSize2D<T, U> {
-    /// Constructor taking scalar strongly typed lengths.
-    pub fn from_lengths(width: Length<T, U>, height: Length<T, U>) -> Self {
-        TypedSize2D::new(width.get(), height.get())
     }
 }
 
@@ -134,13 +128,13 @@ impl<T: Zero + PartialOrd, U> TypedSize2D<T, U> {
 
 impl<T: Zero, U> TypedSize2D<T, U> {
     pub fn zero() -> Self {
-        TypedSize2D::new(Zero::zero(), Zero::zero())
+        TypedSize2D::new(T::zero(), T::zero())
     }
 }
 
 impl<T: Zero, U> Zero for TypedSize2D<T, U> {
     fn zero() -> Self {
-        TypedSize2D::new(Zero::zero(), Zero::zero())
+        TypedSize2D::new(T::zero(), T::zero())
     }
 }
 
@@ -179,13 +173,13 @@ impl<T: Copy + Div<T, Output = T>, U1, U2> Div<TypedScale<T, U1, U2>> for TypedS
 impl<T: Copy, U> TypedSize2D<T, U> {
     /// Returns self.width as a Length carrying the unit.
     #[inline]
-    pub fn width_typed(&self) -> Length<T, U> {
+    pub fn get_width(&self) -> Length<T, U> {
         Length::new(self.width)
     }
 
     /// Returns self.height as a Length carrying the unit.
     #[inline]
-    pub fn height_typed(&self) -> Length<T, U> {
+    pub fn get_height(&self) -> Length<T, U> {
         Length::new(self.height)
     }
 
@@ -217,7 +211,7 @@ impl<T: NumCast + Copy, Unit> TypedSize2D<T, Unit> {
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
     pub fn cast<NewT: NumCast + Copy>(&self) -> Option<TypedSize2D<NewT, Unit>> {
-        match (NumCast::from(self.width), NumCast::from(self.height)) {
+        match (NewT::from(self.width), NewT::from(self.height)) {
             (Some(w), Some(h)) => Some(TypedSize2D::new(w, h)),
             _ => None,
         }

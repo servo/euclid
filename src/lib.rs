@@ -50,9 +50,9 @@
 //! // p.x is an f32.
 //! println!("p.x = {:?} ", p.x);
 //! // p.x is a Length<f32, WorldSpace>.
-//! println!("p.x_typed() = {:?} ", p.x_typed());
+//! println!("p.get_x() = {:?} ", p.get_x());
 //! // Length::get returns the scalar value (f32).
-//! assert_eq!(p.x, p.x_typed().get());
+//! assert_eq!(p.x, p.get_x().get());
 //! ```
 
 #[cfg(feature = "serde")]
