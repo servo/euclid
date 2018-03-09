@@ -63,7 +63,7 @@ impl<T: fmt::Display, U> fmt::Display for TypedPoint2D<T, U> {
     }
 }
 
-impl<T: Copy, U> TypedPoint2D<T, U> {
+impl<T, U> TypedPoint2D<T, U> {
     /// Constructor taking scalar values directly.
     #[inline]
     pub fn new(x: T, y: T) -> Self {
@@ -73,7 +73,9 @@ impl<T: Copy, U> TypedPoint2D<T, U> {
             _unit: PhantomData,
         }
     }
+}
 
+impl<T: Copy, U> TypedPoint2D<T, U> {
     /// Constructor taking properly typed Lengths instead of scalar values.
     #[inline]
     pub fn from_lengths(x: Length<T, U>, y: Length<T, U>) -> Self {
