@@ -853,35 +853,6 @@ where
     }
 }
 
-define_matrix! {
-    /// Homogeneous vector in 3D space.
-    pub struct HomogeneousVector<T, U> {
-        pub x: T,
-        pub y: T,
-        pub z: T,
-        pub w: T,
-    }
-}
-
-impl<T: Copy + Div<T, Output=T>, U> HomogeneousVector<T, U> {
-    /// Constructor taking scalar values directly.
-    #[inline]
-    pub fn new(x: T, y: T, z: T, w: T) -> Self {
-        HomogeneousVector { x, y, z, w, _unit: PhantomData }
-    }
-
-    /// Convert into cartesian 2D point.
-    pub fn to_point2d(&self) -> TypedPoint2D<T, U> {
-        TypedPoint2D::new(self.x / self.w, self.y / self.w)
-    }
-
-    /// Convert into cartesian 3D point.
-    pub fn to_point3d(&self) -> TypedPoint3D<T, U> {
-        TypedPoint3D::new(self.x / self.w, self.y / self.w, self.z / self.w)
-    }
-}
-
-
 /// Convenience constructor.
 #[inline]
 pub fn vec2<T, U>(x: T, y: T) -> TypedVector2D<T, U> {
