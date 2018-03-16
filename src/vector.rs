@@ -123,7 +123,7 @@ impl<T: Copy, U> TypedVector2D<T, U> {
         vec2(self.x, self.y)
     }
 
-    /// Tag a unitless value with units.
+    /// Tag a unit-less value with units.
     #[inline]
     pub fn from_untyped(p: &Vector2D<T>) -> Self {
         vec2(p.x, p.y)

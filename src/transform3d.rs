@@ -9,8 +9,9 @@
 
 use super::{UnknownUnit, Angle};
 use approxeq::ApproxEq;
+use homogen::HomogeneousVector;
 use trig::Trig;
-use point::{TypedPoint2D, TypedPoint3D, point2, point3};
+use point::{TypedPoint2D, TypedPoint3D};
 use vector::{TypedVector2D, TypedVector3D, vec2, vec3};
 use rect::TypedRect;
 use transform2d::TypedTransform2D;
@@ -398,17 +399,26 @@ where T: Copy + Clone +
         TypedTransform3D::create_scale(scale.get(), scale.get(), scale.get())
     }
 
+    /// Returns the homogeneous vector corresponding to the transformed 2d point.
+    ///
+    /// The input point must be use the unit Src, and the returned point has the unit Dst.
+    #[inline]
+    pub fn transform_point2d_homogeneous(
+        &self, p: &TypedPoint2D<T, Src>
+    ) -> HomogeneousVector<T, Dst> {
+        let x = p.x * self.m11 + p.y * self.m21 + self.m41;
+        let y = p.x * self.m12 + p.y * self.m22 + self.m42;
+        let w = p.x * self.m14 + p.y * self.m24 + self.m44;
+
+        HomogeneousVector::new(x, y, Zero::zero(), w)
+    }
+
     /// Returns the given 2d point transformed by this transform.
     ///
     /// The input point must be use the unit Src, and the returned point has the unit Dst.
     #[inline]
     pub fn transform_point2d(&self, p: &TypedPoint2D<T, Src>) -> TypedPoint2D<T, Dst> {
-        let x = p.x * self.m11 + p.y * self.m21 + self.m41;
-        let y = p.x * self.m12 + p.y * self.m22 + self.m42;
-
-        let w = p.x * self.m14 + p.y * self.m24 + self.m44;
-
-        point2(x/w, y/w)
+        self.transform_point2d_homogeneous(p).to_point2d()
     }
 
     /// Returns the given 2d vector transformed by this matrix.
@@ -422,17 +432,27 @@ where T: Copy + Clone +
         )
     }
 
-    /// Returns the given 3d point transformed by this transform.
+    /// Returns the homogeneous vector corresponding to the transformed 3d point.
     ///
     /// The input point must be use the unit Src, and the returned point has the unit Dst.
     #[inline]
-    pub fn transform_point3d(&self, p: &TypedPoint3D<T, Src>) -> TypedPoint3D<T, Dst> {
+    pub fn transform_point3d_homogeneous(
+        &self, p: &TypedPoint3D<T, Src>
+    ) -> HomogeneousVector<T, Dst> {
         let x = p.x * self.m11 + p.y * self.m21 + p.z * self.m31 + self.m41;
         let y = p.x * self.m12 + p.y * self.m22 + p.z * self.m32 + self.m42;
         let z = p.x * self.m13 + p.y * self.m23 + p.z * self.m33 + self.m43;
         let w = p.x * self.m14 + p.y * self.m24 + p.z * self.m34 + self.m44;
 
-        point3(x/w, y/w, z/w)
+        HomogeneousVector::new(x, y, z, w)
+    }
+
+    /// Returns the given 3d point transformed by this transform.
+    ///
+    /// The input point must be use the unit Src, and the returned point has the unit Dst.
+    #[inline]
+    pub fn transform_point3d(&self, p: &TypedPoint3D<T, Src>) -> TypedPoint3D<T, Dst> {
+        self.transform_point3d_homogeneous(p).to_point3d()
     }
 
     /// Returns the given 3d vector transformed by this matrix.
