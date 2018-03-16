@@ -68,7 +68,7 @@ pub use scale::TypedScale;
 pub use transform2d::{Transform2D, TypedTransform2D};
 pub use transform3d::{Transform3D, TypedTransform3D};
 pub use point::{Point2D, Point3D, TypedPoint2D, TypedPoint3D, point2, point3};
-pub use vector::{TypedVector2D, TypedVector3D, Vector2D, Vector3D, vec2, vec3};
+pub use vector::{HomogeneousVector, TypedVector2D, TypedVector3D, Vector2D, Vector3D, vec2, vec3};
 
 pub use rect::{rect, Rect, TypedRect};
 pub use rotation::{Angle, Rotation2D, Rotation3D, TypedRotation2D, TypedRotation3D};
@@ -119,3 +119,4 @@ pub type ScaleFactor<T, Src, Dst> = TypedScale<T, Src, Dst>;
 /// Temporary alias to facilitate the transition to the new naming scheme
 #[deprecated]
 pub use Angle as Radians;
+

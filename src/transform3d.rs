@@ -11,7 +11,7 @@ use super::{UnknownUnit, Angle};
 use approxeq::ApproxEq;
 use trig::Trig;
 use point::{TypedPoint2D, TypedPoint3D, point2, point3};
-use vector::{TypedVector2D, TypedVector3D, vec2, vec3};
+use vector::{HomogeneousVector, TypedVector2D, TypedVector3D, vec2, vec3};
 use rect::TypedRect;
 use transform2d::TypedTransform2D;
 use scale::TypedScale;
@@ -405,10 +405,23 @@ where T: Copy + Clone +
     pub fn transform_point2d(&self, p: &TypedPoint2D<T, Src>) -> TypedPoint2D<T, Dst> {
         let x = p.x * self.m11 + p.y * self.m21 + self.m41;
         let y = p.x * self.m12 + p.y * self.m22 + self.m42;
-
         let w = p.x * self.m14 + p.y * self.m24 + self.m44;
 
         point2(x/w, y/w)
+    }
+
+    /// Returns the homogeneous vector corresponding to the transformed 2d point.
+    ///
+    /// The input point must be use the unit Src, and the returned point has the unit Dst.
+    #[inline]
+    pub fn transform_point2d_homogeneous(
+        &self, p: &TypedPoint2D<T, Src>
+    ) -> HomogeneousVector<T, Dst> {
+        let x = p.x * self.m11 + p.y * self.m21 + self.m41;
+        let y = p.x * self.m12 + p.y * self.m22 + self.m42;
+        let w = p.x * self.m14 + p.y * self.m24 + self.m44;
+
+        HomogeneousVector::new(x, y, Zero::zero(), w)
     }
 
     /// Returns the given 2d vector transformed by this matrix.
@@ -433,6 +446,21 @@ where T: Copy + Clone +
         let w = p.x * self.m14 + p.y * self.m24 + p.z * self.m34 + self.m44;
 
         point3(x/w, y/w, z/w)
+    }
+
+    /// Returns the homogeneous vector corresponding to the transformed 3d point.
+    ///
+    /// The input point must be use the unit Src, and the returned point has the unit Dst.
+    #[inline]
+    pub fn transform_point3d_homogeneous(
+        &self, p: &TypedPoint3D<T, Src>
+    ) -> HomogeneousVector<T, Dst> {
+        let x = p.x * self.m11 + p.y * self.m21 + p.z * self.m31 + self.m41;
+        let y = p.x * self.m12 + p.y * self.m22 + p.z * self.m32 + self.m42;
+        let z = p.x * self.m13 + p.y * self.m23 + p.z * self.m33 + self.m43;
+        let w = p.x * self.m14 + p.y * self.m24 + p.z * self.m34 + self.m44;
+
+        HomogeneousVector::new(x, y, z, w)
     }
 
     /// Returns the given 3d vector transformed by this matrix.
