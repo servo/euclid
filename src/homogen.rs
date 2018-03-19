@@ -12,6 +12,7 @@ use vector::{TypedVector2D, TypedVector3D};
 
 use num::{One, Zero};
 
+use std::fmt;
 use std::marker::PhantomData;
 use std::ops::Div;
 
@@ -79,6 +80,18 @@ impl<T: One, U> From<TypedPoint3D<T, U>> for HomogeneousVector<T, U> {
     #[inline]
     fn from(p: TypedPoint3D<T, U>) -> Self {
         HomogeneousVector::new(p.x, p.y, p.z, T::one())
+    }
+}
+
+impl<T: fmt::Debug, U> fmt::Debug for HomogeneousVector<T, U> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "({:?},{:?},{:?},{:?})", self.x, self.y, self.z, self.w)
+    }
+}
+
+impl<T: fmt::Display, U> fmt::Display for HomogeneousVector<T, U> {
+    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        write!(formatter, "({},{},{},{})", self.x, self.y, self.z, self.w)
     }
 }
 
