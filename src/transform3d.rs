@@ -408,9 +408,10 @@ where T: Copy + Clone +
     ) -> HomogeneousVector<T, Dst> {
         let x = p.x * self.m11 + p.y * self.m21 + self.m41;
         let y = p.x * self.m12 + p.y * self.m22 + self.m42;
+        let z = p.x * self.m13 + p.y * self.m23 + self.m43;
         let w = p.x * self.m14 + p.y * self.m24 + self.m44;
 
-        HomogeneousVector::new(x, y, Zero::zero(), w)
+        HomogeneousVector::new(x, y, z, w)
     }
 
     /// Returns the given 2d point transformed by this transform.
@@ -418,7 +419,14 @@ where T: Copy + Clone +
     /// The input point must be use the unit Src, and the returned point has the unit Dst.
     #[inline]
     pub fn transform_point2d(&self, p: &TypedPoint2D<T, Src>) -> TypedPoint2D<T, Dst> {
-        self.transform_point2d_homogeneous(p).to_point2d()
+        //Note: could use `transform_point2d_homogeneous()` but it would waste the calculus of `z`
+
+        let x = p.x * self.m11 + p.y * self.m21 + self.m41;
+        let y = p.x * self.m12 + p.y * self.m22 + self.m42;
+        let w = p.x * self.m14 + p.y * self.m24 + self.m44;
+
+
+        TypedPoint2D::new(x / w, y / w)
     }
 
     /// Returns the given 2d vector transformed by this matrix.
@@ -715,7 +723,7 @@ where T: Copy + fmt::Debug +
 mod tests {
     use approxeq::ApproxEq;
     use transform2d::Transform2D;
-    use point::{Point2D, Point3D};
+    use point::{point2, point3};
     use Angle;
     use super::*;
 
@@ -734,8 +742,8 @@ mod tests {
         assert_eq!(t1, t2);
         assert_eq!(t1, t3);
 
-        assert_eq!(t1.transform_point3d(&Point3D::new(1.0, 1.0, 1.0)), Point3D::new(2.0, 3.0, 4.0));
-        assert_eq!(t1.transform_point2d(&Point2D::new(1.0, 1.0)), Point2D::new(2.0, 3.0));
+        assert_eq!(t1.transform_point3d(&point3(1.0, 1.0, 1.0)), point3(2.0, 3.0, 4.0));
+        assert_eq!(t1.transform_point2d(&point2(1.0, 1.0)), point2(2.0, 3.0));
 
         assert_eq!(t1.post_mul(&t1), Mf32::create_translation(2.0, 4.0, 6.0));
 
@@ -751,8 +759,8 @@ mod tests {
         assert_eq!(r1, r2);
         assert_eq!(r1, r3);
 
-        assert!(r1.transform_point3d(&Point3D::new(1.0, 2.0, 3.0)).approx_eq(&Point3D::new(2.0, -1.0, 3.0)));
-        assert!(r1.transform_point2d(&Point2D::new(1.0, 2.0)).approx_eq(&Point2D::new(2.0, -1.0)));
+        assert!(r1.transform_point3d(&point3(1.0, 2.0, 3.0)).approx_eq(&point3(2.0, -1.0, 3.0)));
+        assert!(r1.transform_point2d(&point2(1.0, 2.0)).approx_eq(&point2(2.0, -1.0)));
 
         assert!(r1.post_mul(&r1).approx_eq(&Mf32::create_rotation(0.0, 0.0, 1.0, rad(FRAC_PI_2*2.0))));
 
@@ -768,8 +776,8 @@ mod tests {
         assert_eq!(s1, s2);
         assert_eq!(s1, s3);
 
-        assert!(s1.transform_point3d(&Point3D::new(2.0, 2.0, 2.0)).approx_eq(&Point3D::new(4.0, 6.0, 8.0)));
-        assert!(s1.transform_point2d(&Point2D::new(2.0, 2.0)).approx_eq(&Point2D::new(4.0, 6.0)));
+        assert!(s1.transform_point3d(&point3(2.0, 2.0, 2.0)).approx_eq(&point3(4.0, 6.0, 8.0)));
+        assert!(s1.transform_point2d(&point2(2.0, 2.0)).approx_eq(&point2(4.0, 6.0)));
 
         assert_eq!(s1.post_mul(&s1), Mf32::create_scale(4.0, 9.0, 16.0));
 
@@ -862,9 +870,9 @@ mod tests {
         let m2 = m1.inverse().unwrap();
         assert!(m1.pre_mul(&m2).approx_eq(&Mf32::identity()));
 
-        let p1 = Point2D::new(1000.0, 2000.0);
+        let p1 = point2(1000.0, 2000.0);
         let p2 = m1.transform_point2d(&p1);
-        assert!(p2.eq(&Point2D::new(1100.0, 2200.0)));
+        assert!(p2.eq(&point2(1100.0, 2200.0)));
 
         let p3 = m2.transform_point2d(&p2);
         assert!(p3.eq(&p1));
@@ -885,14 +893,14 @@ mod tests {
         let r = Mf32::create_rotation(0.0, 0.0, 1.0, rad(FRAC_PI_2));
         let t = Mf32::create_translation(2.0, 3.0, 0.0);
 
-        let a = Point3D::new(1.0, 1.0, 1.0);
+        let a = point3(1.0, 1.0, 1.0);
 
-        assert!(r.post_mul(&t).transform_point3d(&a).approx_eq(&Point3D::new(3.0, 2.0, 1.0)));
-        assert!(t.post_mul(&r).transform_point3d(&a).approx_eq(&Point3D::new(4.0, -3.0, 1.0)));
+        assert!(r.post_mul(&t).transform_point3d(&a).approx_eq(&point3(3.0, 2.0, 1.0)));
+        assert!(t.post_mul(&r).transform_point3d(&a).approx_eq(&point3(4.0, -3.0, 1.0)));
         assert!(t.post_mul(&r).transform_point3d(&a).approx_eq(&r.transform_point3d(&t.transform_point3d(&a))));
 
-        assert!(r.pre_mul(&t).transform_point3d(&a).approx_eq(&Point3D::new(4.0, -3.0, 1.0)));
-        assert!(t.pre_mul(&r).transform_point3d(&a).approx_eq(&Point3D::new(3.0, 2.0, 1.0)));
+        assert!(r.pre_mul(&t).transform_point3d(&a).approx_eq(&point3(4.0, -3.0, 1.0)));
+        assert!(t.pre_mul(&r).transform_point3d(&a).approx_eq(&point3(3.0, 2.0, 1.0)));
         assert!(t.pre_mul(&r).transform_point3d(&a).approx_eq(&t.transform_point3d(&r.transform_point3d(&a))));
     }
 
@@ -914,7 +922,7 @@ mod tests {
                                  1.5, -2.0, 6.0, 0.0,
                                  -2.5, 6.0, 1.0, 1.0);
 
-        let p = Point3D::new(1.0, 3.0, 5.0);
+        let p = point3(1.0, 3.0, 5.0);
         let p1 = m2.pre_mul(&m1).transform_point3d(&p);
         let p2 = m2.transform_point3d(&m1.transform_point3d(&p));
         assert!(p1.approx_eq(&p2));
@@ -960,5 +968,23 @@ mod tests {
         // backface is not visible for non-inverseable matrix
         let r1 = Mf32::create_scale(2.0, 0.0, 2.0);
         assert!(!r1.is_backface_visible());
+    }
+
+    #[test]
+    pub fn test_homogeneous() {
+        let m = Mf32::row_major(
+            1.0, 2.0, 0.5, 5.0,
+            3.0, 4.0, 0.25, 6.0,
+            0.5, -1.0, 1.0, -1.0,
+            -1.0, 1.0, -1.0, 2.0,
+        );
+        assert_eq!(
+            m.transform_point2d_homogeneous(&point2(1.0, 2.0)),
+            HomogeneousVector::new(6.0, 11.0, 0.0, 19.0),
+        );
+        assert_eq!(
+            m.transform_point3d_homogeneous(&point3(1.0, 2.0, 4.0)),
+            HomogeneousVector::new(8.0, 7.0, 4.0, 15.0),
+        );
     }
 }
