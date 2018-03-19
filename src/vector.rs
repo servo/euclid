@@ -279,7 +279,7 @@ impl<T: Copy + Div<T, Output = T>, U> DivAssign<T> for TypedVector2D<T, U> {
 impl<T: Copy + Mul<T, Output = T>, U1, U2> Mul<TypedScale<T, U1, U2>> for TypedVector2D<T, U1> {
     type Output = TypedVector2D<T, U2>;
     #[inline]
-    fn mul(self, scale: TypedScale<T, U1, U2>) -> TypedVector2D<T, U2> {
+    fn mul(self, scale: TypedScale<T, U1, U2>) -> Self::Output {
         vec2(self.x * scale.get(), self.y * scale.get())
     }
 }
@@ -287,7 +287,7 @@ impl<T: Copy + Mul<T, Output = T>, U1, U2> Mul<TypedScale<T, U1, U2>> for TypedV
 impl<T: Copy + Div<T, Output = T>, U1, U2> Div<TypedScale<T, U1, U2>> for TypedVector2D<T, U2> {
     type Output = TypedVector2D<T, U1>;
     #[inline]
-    fn div(self, scale: TypedScale<T, U1, U2>) -> TypedVector2D<T, U1> {
+    fn div(self, scale: TypedScale<T, U1, U2>) -> Self::Output {
         vec2(self.x / scale.get(), self.y / scale.get())
     }
 }
@@ -704,6 +704,22 @@ impl<T: Float, U> TypedVector3D<T, U> {
     }
 }
 
+impl<T: Copy + Mul<T, Output = T>, U1, U2> Mul<TypedScale<T, U1, U2>> for TypedVector3D<T, U1> {
+    type Output = TypedVector3D<T, U2>;
+    #[inline]
+    fn mul(self, scale: TypedScale<T, U1, U2>) -> Self::Output {
+        vec3(self.x * scale.get(), self.y * scale.get(), self.z * scale.get())
+    }
+}
+
+impl<T: Copy + Div<T, Output = T>, U1, U2> Div<TypedScale<T, U1, U2>> for TypedVector3D<T, U2> {
+    type Output = TypedVector3D<T, U1>;
+    #[inline]
+    fn div(self, scale: TypedScale<T, U1, U2>) -> Self::Output {
+        vec3(self.x / scale.get(), self.y / scale.get(), self.z / scale.get())
+    }
+}
+
 impl<T: Round, U> TypedVector3D<T, U> {
     /// Rounds each component to the nearest integer value.
     ///
@@ -971,7 +987,7 @@ mod typedvector2d {
     #[test]
     pub fn test_scalar_mul() {
         let p1 = Vector2DMm::new(1.0, 2.0);
-        let cm_per_mm: TypedScale<f32, Mm, Cm> = TypedScale::new(0.1);
+        let cm_per_mm = TypedScale::<f32, Mm, Cm>::new(0.1);
 
         let result: Vector2DCm<f32> = p1 * cm_per_mm;
 
@@ -987,7 +1003,9 @@ mod typedvector2d {
 
 #[cfg(test)]
 mod vector3d {
-    use super::{Vector3D, vec2, vec3};
+    use super::{TypedVector3D, Vector3D, vec2, vec3};
+    use scale::TypedScale;
+
     type Vec3 = Vector3D<f32>;
 
     #[test]
@@ -1035,6 +1053,19 @@ mod vector3d {
         let result = p1.max(p2);
 
         assert_eq!(result, vec3(2.0, 3.0, 5.0));
+    }
+
+    #[test]
+    pub fn test_scalar_mul() {
+        enum Mm {}
+        enum Cm {}
+
+        let p1 = TypedVector3D::<f32, Mm>::new(1.0, 2.0, 3.0);
+        let cm_per_mm = TypedScale::<f32, Mm, Cm>::new(0.1);
+
+        let result: TypedVector3D<f32, Cm> = p1 * cm_per_mm;
+
+        assert_eq!(result, vec3(0.1, 0.2, 0.3));
     }
 
     #[test]
