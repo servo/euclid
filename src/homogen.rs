@@ -38,7 +38,7 @@ impl<T, U> HomogeneousVector<T, U> {
 
 
 impl<T: Copy + Div<T, Output=T>, U> HomogeneousVector<T, U> {
-    /// Convert into cartesian 2D point.
+    /// Convert into Cartesian 2D point.
     ///
     /// Note: possible division by zero.
     #[inline]
@@ -46,7 +46,7 @@ impl<T: Copy + Div<T, Output=T>, U> HomogeneousVector<T, U> {
         TypedPoint2D::new(self.x / self.w, self.y / self.w)
     }
 
-    /// Convert into cartesian 3D point.
+    /// Convert into Cartesian 3D point.
     ///
     /// Note: possible division by zero.
     #[inline]

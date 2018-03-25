@@ -42,7 +42,7 @@ define_matrix! {
     }
 }
 
-/// The default 4d transform type with no units.
+/// The default 3d transform type with no units.
 pub type Transform3D<T> = TypedTransform3D<T, UnknownUnit, UnknownUnit>;
 
 impl<T, Src, Dst> TypedTransform3D<T, Src, Dst> {
@@ -153,7 +153,7 @@ where T: Copy + Clone +
         )
     }
 
-    /// Returns true if this transform can be represented with a TypedTransform2D.
+    /// Returns true if this transform can be represented with a `TypedTransform2D`.
     ///
     /// See <https://drafts.csswg.org/css-transforms/#2d-transform>
     #[inline]
@@ -394,7 +394,7 @@ where T: Copy + Clone +
         )
     }
 
-    /// Convenience function to create a scale transform from a TypedScale.
+    /// Convenience function to create a scale transform from a `TypedScale`.
     pub fn from_scale(scale: TypedScale<T, Src, Dst>) -> Self {
         TypedTransform3D::create_scale(scale.get(), scale.get(), scale.get())
     }
