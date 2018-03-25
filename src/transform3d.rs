@@ -42,7 +42,7 @@ define_matrix! {
     }
 }
 
-/// The default 4d transform type with no units.
+/// The default 3d transform type with no units.
 pub type Transform3D<T> = TypedTransform3D<T, UnknownUnit, UnknownUnit>;
 
 impl<T, Src, Dst> TypedTransform3D<T, Src, Dst> {
