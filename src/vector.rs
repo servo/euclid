@@ -869,6 +869,241 @@ where
     }
 }
 
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+pub struct BoolVector2D {
+    pub x: bool,
+    pub y: bool,
+}
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+pub struct BoolVector3D {
+    pub x: bool,
+    pub y: bool,
+    pub z: bool,
+}
+
+impl BoolVector2D {
+    #[inline]
+    pub fn all(&self) -> bool {
+        self.x && self.y
+    }
+
+    #[inline]
+    pub fn any(&self) -> bool {
+        self.x || self.y
+    }
+
+    #[inline]
+    pub fn none(&self) -> bool {
+        !self.any()
+    }
+
+    #[inline]
+    pub fn and(&self, other: Self) -> Self {
+        BoolVector2D {
+            x: self.x && other.x,
+            y: self.y && other.y,
+        }
+    }
+
+    #[inline]
+    pub fn or(&self, other: Self) -> Self {
+        BoolVector2D {
+            x: self.x || other.x,
+            y: self.y || other.y,
+        }
+    }
+
+    #[inline]
+    pub fn not(&self) -> Self {
+        BoolVector2D {
+            x: !self.x,
+            y: !self.y,
+        }
+    }
+
+    #[inline]
+    pub fn select_point<T: Copy, U>(&self, a: &TypedPoint2D<T, U>, b: &TypedPoint2D<T, U>) -> TypedPoint2D<T, U> {
+        point2(
+            if self.x { a.x } else { b.x },
+            if self.y { a.y } else { b.y },
+        )
+    }
+
+    #[inline]
+    pub fn select_vector<T: Copy, U>(&self, a: &TypedVector2D<T, U>, b: &TypedVector2D<T, U>) -> TypedVector2D<T, U> {
+        vec2(
+            if self.x { a.x } else { b.x },
+            if self.y { a.y } else { b.y },
+        )
+    }
+
+    #[inline]
+    pub fn select_size<T: Copy, U>(&self, a: &TypedSize2D<T, U>, b: &TypedSize2D<T, U>) -> TypedSize2D<T, U> {
+        size2(
+            if self.x { a.width } else { b.width },
+            if self.y { a.height } else { b.height },
+        )
+    }
+}
+
+impl BoolVector3D {
+    #[inline]
+    pub fn all(&self) -> bool {
+        self.x && self.y && self.z
+    }
+
+    #[inline]
+    pub fn any(&self) -> bool {
+        self.x || self.y || self.z
+    }
+
+    #[inline]
+    pub fn none(&self) -> bool {
+        !self.any()
+    }
+
+    #[inline]
+    pub fn and(&self, other: Self) -> Self {
+        BoolVector3D {
+            x: self.x && other.x,
+            y: self.y && other.y,
+            z: self.z && other.z,
+        }
+    }
+
+    #[inline]
+    pub fn or(&self, other: Self) -> Self {
+        BoolVector3D {
+            x: self.x || other.x,
+            y: self.y || other.y,
+            z: self.z || other.z,
+        }
+    }
+
+    #[inline]
+    pub fn not(&self) -> Self {
+        BoolVector3D {
+            x: !self.x,
+            y: !self.y,
+            z: !self.z,
+        }
+    }
+
+
+    #[inline]
+    pub fn select_point<T: Copy, U>(&self, a: &TypedPoint3D<T, U>, b: &TypedPoint3D<T, U>) -> TypedPoint3D<T, U> {
+        point3(
+            if self.x { a.x } else { b.x },
+            if self.y { a.y } else { b.y },
+            if self.z { a.z } else { b.z },
+        )
+    }
+
+    #[inline]
+    pub fn select_vector<T: Copy, U>(&self, a: &TypedVector3D<T, U>, b: &TypedVector3D<T, U>) -> TypedVector3D<T, U> {
+        vec3(
+            if self.x { a.x } else { b.x },
+            if self.y { a.y } else { b.y },
+            if self.z { a.z } else { b.z },
+        )
+    }
+
+    #[inline]
+    pub fn xy(&self) -> BoolVector2D {
+        BoolVector2D {
+            x: self.x,
+            y: self.y,
+        }
+    }
+
+    #[inline]
+    pub fn xz(&self) -> BoolVector2D {
+        BoolVector2D {
+            x: self.x,
+            y: self.z,
+        }
+    }
+
+    #[inline]
+    pub fn yz(&self) -> BoolVector2D {
+        BoolVector2D {
+            x: self.y,
+            y: self.z,
+        }
+    }
+}
+
+impl<T: PartialOrd, U> TypedVector2D<T, U> {
+    pub fn greater_than(&self, other: &Self) -> BoolVector2D {
+        BoolVector2D {
+            x: self.x > other.x,
+            y: self.y > other.y,
+        }
+    }
+
+    pub fn lower_than(&self, other: &Self) -> BoolVector2D {
+        BoolVector2D {
+            x: self.x < other.x,
+            y: self.y < other.y,
+        }
+    }
+}
+
+
+impl<T: PartialEq, U> TypedVector2D<T, U> {
+    pub fn equal(&self, other: &Self) -> BoolVector2D {
+        BoolVector2D {
+            x: self.x == other.x,
+            y: self.y == other.y,
+        }
+    }
+
+    pub fn not_equal(&self, other: &Self) -> BoolVector2D {
+        BoolVector2D {
+            x: self.x != other.x,
+            y: self.y != other.y,
+        }
+    }
+}
+
+impl<T: PartialOrd, U> TypedVector3D<T, U> {
+    pub fn greater_than(&self, other: &Self) -> BoolVector3D {
+        BoolVector3D {
+            x: self.x > other.x,
+            y: self.y > other.y,
+            z: self.z > other.z,
+        }
+    }
+
+    pub fn lower_than(&self, other: &Self) -> BoolVector3D {
+        BoolVector3D {
+            x: self.x < other.x,
+            y: self.y < other.y,
+            z: self.z < other.z,
+        }
+    }
+}
+
+
+impl<T: PartialEq, U> TypedVector3D<T, U> {
+    pub fn equal(&self, other: &Self) -> BoolVector3D {
+        BoolVector3D {
+            x: self.x == other.x,
+            y: self.y == other.y,
+            z: self.z == other.z,
+        }
+    }
+
+    pub fn not_equal(&self, other: &Self) -> BoolVector3D {
+        BoolVector3D {
+            x: self.x != other.x,
+            y: self.y != other.y,
+            z: self.z != other.z,
+        }
+    }
+}
+
 /// Convenience constructor.
 #[inline]
 pub fn vec2<T, U>(x: T, y: T) -> TypedVector2D<T, U> {
@@ -880,6 +1115,17 @@ pub fn vec2<T, U>(x: T, y: T) -> TypedVector2D<T, U> {
 pub fn vec3<T, U>(x: T, y: T, z: T) -> TypedVector3D<T, U> {
     TypedVector3D::new(x, y, z)
 }
+
+#[inline]
+pub fn bvec2(x: bool, y: bool) -> BoolVector2D {
+    BoolVector2D { x, y }
+}
+
+#[inline]
+pub fn bvec3(x: bool, y: bool, z: bool) -> BoolVector3D {
+    BoolVector3D { x, y, z }
+}
+
 
 #[cfg(test)]
 mod vector2d {
