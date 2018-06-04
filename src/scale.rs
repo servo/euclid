@@ -13,9 +13,9 @@ use num::One;
 use num_traits::NumCast;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use std::fmt;
-use std::ops::{Add, Div, Mul, Neg, Sub};
-use std::marker::PhantomData;
+use core::fmt;
+use core::ops::{Add, Div, Mul, Neg, Sub};
+use core::marker::PhantomData;
 use {TypedPoint2D, TypedRect, TypedSize2D, TypedVector2D};
 
 /// A scaling factor between two different units of measurement.

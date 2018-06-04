@@ -33,7 +33,7 @@ macro_rules! trig {
             #[inline]
             fn fast_atan2(y: $ty, x: $ty) -> $ty {
                 // See https://math.stackexchange.com/questions/1098487/atan2-faster-approximation#1105038
-                use std::$ty::consts;
+                use core::$ty::consts;
                 let x_abs = x.abs();
                 let y_abs = y.abs();
                 let a = x_abs.min(y_abs) / x_abs.max(y_abs);

@@ -14,9 +14,9 @@ use vector::{TypedVector2D, vec2, BoolVector2D};
 use num::*;
 
 use num_traits::{NumCast, Signed};
-use std::fmt;
-use std::ops::{Add, Div, Mul, Sub};
-use std::marker::PhantomData;
+use core::fmt;
+use core::ops::{Add, Div, Mul, Sub};
+use core::marker::PhantomData;
 
 /// A 2d size tagged with a unit.
 define_matrix! {
