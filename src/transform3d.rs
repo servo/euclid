@@ -17,9 +17,9 @@ use rect::TypedRect;
 use transform2d::TypedTransform2D;
 use scale::TypedScale;
 use num::{One, Zero};
-use std::ops::{Add, Mul, Sub, Div, Neg};
-use std::marker::PhantomData;
-use std::fmt;
+use core::ops::{Add, Mul, Sub, Div, Neg};
+use core::marker::PhantomData;
+use core::fmt;
 use num_traits::NumCast;
 
 define_matrix! {
@@ -727,7 +727,7 @@ mod tests {
     use Angle;
     use super::*;
 
-    use std::f32::consts::{FRAC_PI_2, PI};
+    use core::f32::consts::{FRAC_PI_2, PI};
 
     type Mf32 = Transform3D<f32>;
 
@@ -906,7 +906,7 @@ mod tests {
 
     #[test]
     fn test_size_of() {
-        use std::mem::size_of;
+        use core::mem::size_of;
         assert_eq!(size_of::<Transform3D<f32>>(), 16*size_of::<f32>());
         assert_eq!(size_of::<Transform3D<f64>>(), 16*size_of::<f64>());
     }

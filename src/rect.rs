@@ -20,11 +20,11 @@ use num_traits::NumCast;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-use std::borrow::Borrow;
-use std::cmp::PartialOrd;
-use std::fmt;
-use std::hash::{Hash, Hasher};
-use std::ops::{Add, Div, Mul, Sub};
+use core::borrow::Borrow;
+use core::cmp::PartialOrd;
+use core::fmt;
+use core::hash::{Hash, Hasher};
+use core::ops::{Add, Div, Mul, Sub};
 
 
 /// A 2d Rectangle optionally tagged with a unit.

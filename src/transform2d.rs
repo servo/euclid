@@ -13,11 +13,11 @@ use point::TypedPoint2D;
 use vector::{TypedVector2D, vec2};
 use rect::TypedRect;
 use transform3d::TypedTransform3D;
-use std::ops::{Add, Mul, Div, Sub, Neg};
-use std::marker::PhantomData;
+use core::ops::{Add, Mul, Div, Sub, Neg};
+use core::marker::PhantomData;
 use approxeq::ApproxEq;
 use trig::Trig;
-use std::fmt;
+use core::fmt;
 use num_traits::NumCast;
 
 define_matrix! {
@@ -347,7 +347,7 @@ where T: Copy + Clone +
             self.m21, self.m22,
             self.m31, self.m32,
         )
-    }   
+    }
 }
 
 impl <T, Src, Dst> TypedTransform2D<T, Src, Dst>
@@ -395,7 +395,7 @@ mod test {
     use point::Point2D;
     use Angle;
 
-    use std::f32::consts::FRAC_PI_2;
+    use core::f32::consts::FRAC_PI_2;
 
     type Mat = Transform2D<f32>;
 
@@ -502,7 +502,7 @@ mod test {
 
     #[test]
     fn test_size_of() {
-        use std::mem::size_of;
+        use core::mem::size_of;
         assert_eq!(size_of::<Transform2D<f32>>(), 6*size_of::<f32>());
         assert_eq!(size_of::<Transform2D<f64>>(), 6*size_of::<f64>());
     }

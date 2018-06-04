@@ -15,9 +15,9 @@ use size::TypedSize2D;
 use num::*;
 use num_traits::{Float, NumCast};
 use vector::{TypedVector2D, TypedVector3D, vec2, vec3};
-use std::fmt;
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
-use std::marker::PhantomData;
+use core::fmt;
+use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
+use core::marker::PhantomData;
 
 define_matrix! {
     /// A 2d Point tagged with a unit.

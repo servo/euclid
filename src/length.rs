@@ -15,11 +15,11 @@ use num_traits::{NumCast, Saturating};
 use num::One;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use std::cmp::Ordering;
-use std::ops::{Add, Div, Mul, Neg, Sub};
-use std::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
-use std::marker::PhantomData;
-use std::fmt;
+use core::cmp::Ordering;
+use core::ops::{Add, Div, Mul, Neg, Sub};
+use core::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
+use core::marker::PhantomData;
+use core::fmt;
 
 /// A one-dimensional distance, with value represented by `T` and unit of measurement `Unit`.
 ///
@@ -263,7 +263,7 @@ mod tests {
 
     use num_traits::Saturating;
     use scale::TypedScale;
-    use std::f32::INFINITY;
+    use core::f32::INFINITY;
 
     enum Inch {}
     enum Mm {}

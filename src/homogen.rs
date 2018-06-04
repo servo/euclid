@@ -12,9 +12,9 @@ use vector::{TypedVector2D, TypedVector3D};
 
 use num::{One, Zero};
 
-use std::fmt;
-use std::marker::PhantomData;
-use std::ops::Div;
+use core::fmt;
+use core::marker::PhantomData;
+use core::ops::Div;
 
 
 define_matrix! {

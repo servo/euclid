@@ -59,21 +59,21 @@ macro_rules! define_matrix {
             }
         }
 
-        impl<T, $($phantom),+> ::std::cmp::Eq for $name<T, $($phantom),+>
-            where T: ::std::cmp::Eq {}
+        impl<T, $($phantom),+> ::core::cmp::Eq for $name<T, $($phantom),+>
+            where T: ::core::cmp::Eq {}
 
-        impl<T, $($phantom),+> ::std::cmp::PartialEq for $name<T, $($phantom),+>
-            where T: ::std::cmp::PartialEq
+        impl<T, $($phantom),+> ::core::cmp::PartialEq for $name<T, $($phantom),+>
+            where T: ::core::cmp::PartialEq
         {
             fn eq(&self, other: &Self) -> bool {
                 true $(&& self.$field == other.$field)+
             }
         }
 
-        impl<T, $($phantom),+> ::std::hash::Hash for $name<T, $($phantom),+>
-            where T: ::std::hash::Hash
+        impl<T, $($phantom),+> ::core::hash::Hash for $name<T, $($phantom),+>
+            where T: ::core::hash::Hash
         {
-            fn hash<H: ::std::hash::Hasher>(&self, h: &mut H) {
+            fn hash<H: ::core::hash::Hasher>(&self, h: &mut H) {
                 $(self.$field.hash(h);)+
             }
         }

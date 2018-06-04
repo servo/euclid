@@ -17,9 +17,9 @@ use trig::Trig;
 use Angle;
 use num::*;
 use num_traits::{Float, NumCast, Signed};
-use std::fmt;
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
-use std::marker::PhantomData;
+use core::fmt;
+use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+use core::marker::PhantomData;
 
 define_matrix! {
     /// A 2d Vector tagged with a unit.
@@ -1188,7 +1188,7 @@ mod vector2d {
 
     #[test]
     pub fn test_angle_from_x_axis() {
-        use std::f32::consts::FRAC_PI_2;
+        use core::f32::consts::FRAC_PI_2;
         use approxeq::ApproxEq;
 
         let right: Vec2 = vec2(10.0, 0.0);
