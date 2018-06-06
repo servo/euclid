@@ -822,11 +822,11 @@ fn pre_post() {
     let p1 = r1.post_rotate(&r2).post_rotate(&r3).rotate_point3d(&p);
     let p2 = t1.post_mul(&t2).post_mul(&t3).transform_point3d(&p);
 
-    assert!(p1.approx_eq(&p2));
+    assert!(p1.approx_eq(&p2.unwrap()));
 
     // Check that changing the order indeed matters.
     let p3 = t3.post_mul(&t1).post_mul(&t2).transform_point3d(&p);
-    assert!(!p1.approx_eq(&p3));
+    assert!(!p1.approx_eq(&p3.unwrap()));
 }
 
 #[test]
@@ -856,7 +856,7 @@ fn to_transform3d() {
         for point in &points {
             let p1 = rotation.rotate_point3d(point);
             let p2 = rotation.to_transform().transform_point3d(point);
-            assert!(p1.approx_eq(&p2));
+            assert!(p1.approx_eq(&p2.unwrap()));
         }
     }
 }
