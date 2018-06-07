@@ -711,6 +711,14 @@ impl<T0: NumCast + Copy, Src, Dst> TypedTransform3D<T0, Src, Dst> {
     }
 }
 
+impl <T, Src, Dst> Default for TypedTransform3D<T, Src, Dst>
+    where T: Copy + PartialEq + One + Zero
+{
+    fn default() -> Self {
+        Self::identity()
+    }
+}
+
 impl<T, Src, Dst> fmt::Debug for TypedTransform3D<T, Src, Dst>
 where T: Copy + fmt::Debug +
          PartialEq +
