@@ -367,6 +367,14 @@ where T: Copy + Clone +
 
 }
 
+impl <T, Src, Dst> Default for TypedTransform2D<T, Src, Dst>
+    where T: Copy + PartialEq + One + Zero
+{
+    fn default() -> Self {
+        Self::identity()
+    }
+}
+
 impl<T: ApproxEq<T>, Src, Dst> TypedTransform2D<T, Src, Dst> {
     pub fn approx_eq(&self, other: &Self) -> bool {
         self.m11.approx_eq(&other.m11) && self.m12.approx_eq(&other.m12) &&
