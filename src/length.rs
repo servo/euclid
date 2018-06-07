@@ -211,7 +211,12 @@ impl<U, T: Clone + Neg<Output = T>> Neg for Length<T, U> {
 
 impl<Unit, T0: NumCast + Clone> Length<T0, Unit> {
     /// Cast from one numeric representation to another, preserving the units.
-    pub fn cast<T1: NumCast + Clone>(&self) -> Option<Length<T1, Unit>> {
+    pub fn cast<T1: NumCast + Clone>(&self) -> Length<T1, Unit> {
+        self.try_cast().unwrap()
+    }
+
+    /// Fallible cast from one numeric representation to another, preserving the units.
+    pub fn try_cast<T1: NumCast + Clone>(&self) -> Option<Length<T1, Unit>> {
         NumCast::from(self.get()).map(Length::new)
     }
 }
@@ -461,7 +466,7 @@ mod tests {
     fn test_cast() {
         let length_as_i32: Length<i32, Cm> = Length::new(5);
 
-        let result: Length<f32, Cm> = length_as_i32.cast().unwrap();
+        let result: Length<f32, Cm> = length_as_i32.cast();
 
         let length_as_f32: Length<f32, Cm> = Length::new(5.0);
         assert_eq!(result, length_as_f32);

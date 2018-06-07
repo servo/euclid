@@ -335,7 +335,17 @@ impl<T: NumCast + Copy, U> TypedVector2D<T, U> {
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
     #[inline]
-    pub fn cast<NewT: NumCast + Copy>(&self) -> Option<TypedVector2D<NewT, U>> {
+    pub fn cast<NewT: NumCast + Copy>(&self) -> TypedVector2D<NewT, U> {
+        self.try_cast().unwrap()
+    }
+
+    /// Fallible cast from one numeric representation to another, preserving the units.
+    ///
+    /// When casting from floating vector to integer coordinates, the decimals are truncated
+    /// as one would expect from a simple cast, but this behavior does not always make sense
+    /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
+    #[inline]
+    pub fn try_cast<NewT: NumCast + Copy>(&self) -> Option<TypedVector2D<NewT, U>> {
         match (NumCast::from(self.x), NumCast::from(self.y)) {
             (Some(x), Some(y)) => Some(TypedVector2D::new(x, y)),
             _ => None,
@@ -347,13 +357,13 @@ impl<T: NumCast + Copy, U> TypedVector2D<T, U> {
     /// Cast into an `f32` vector.
     #[inline]
     pub fn to_f32(&self) -> TypedVector2D<f32, U> {
-        self.cast().unwrap()
+        self.cast()
     }
 
     /// Cast into an `f64` vector.
     #[inline]
     pub fn to_f64(&self) -> TypedVector2D<f64, U> {
-        self.cast().unwrap()
+        self.cast()
     }
 
     /// Cast into an `usize` vector, truncating decimals if any.
@@ -363,7 +373,7 @@ impl<T: NumCast + Copy, U> TypedVector2D<T, U> {
     /// the desired conversion behavior.
     #[inline]
     pub fn to_usize(&self) -> TypedVector2D<usize, U> {
-        self.cast().unwrap()
+        self.cast()
     }
 
     /// Cast into an `u32` vector, truncating decimals if any.
@@ -373,7 +383,7 @@ impl<T: NumCast + Copy, U> TypedVector2D<T, U> {
     /// the desired conversion behavior.
     #[inline]
     pub fn to_u32(&self) -> TypedVector2D<u32, U> {
-        self.cast().unwrap()
+        self.cast()
     }
 
     /// Cast into an i32 vector, truncating decimals if any.
@@ -383,7 +393,7 @@ impl<T: NumCast + Copy, U> TypedVector2D<T, U> {
     /// the desired conversion behavior.
     #[inline]
     pub fn to_i32(&self) -> TypedVector2D<i32, U> {
-        self.cast().unwrap()
+        self.cast()
     }
 
     /// Cast into an i64 vector, truncating decimals if any.
@@ -393,7 +403,7 @@ impl<T: NumCast + Copy, U> TypedVector2D<T, U> {
     /// the desired conversion behavior.
     #[inline]
     pub fn to_i64(&self) -> TypedVector2D<i64, U> {
-        self.cast().unwrap()
+        self.cast()
     }
 }
 
@@ -760,7 +770,17 @@ impl<T: NumCast + Copy, U> TypedVector3D<T, U> {
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
     #[inline]
-    pub fn cast<NewT: NumCast + Copy>(&self) -> Option<TypedVector3D<NewT, U>> {
+    pub fn cast<NewT: NumCast + Copy>(&self) -> TypedVector3D<NewT, U> {
+        self.try_cast().unwrap()
+    }
+
+    /// Fallible cast from one numeric representation to another, preserving the units.
+    ///
+    /// When casting from floating vector to integer coordinates, the decimals are truncated
+    /// as one would expect from a simple cast, but this behavior does not always make sense
+    /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
+    #[inline]
+    pub fn try_cast<NewT: NumCast + Copy>(&self) -> Option<TypedVector3D<NewT, U>> {
         match (
             NumCast::from(self.x),
             NumCast::from(self.y),
@@ -776,13 +796,13 @@ impl<T: NumCast + Copy, U> TypedVector3D<T, U> {
     /// Cast into an `f32` vector.
     #[inline]
     pub fn to_f32(&self) -> TypedVector3D<f32, U> {
-        self.cast().unwrap()
+        self.cast()
     }
 
     /// Cast into an `f64` vector.
     #[inline]
     pub fn to_f64(&self) -> TypedVector3D<f64, U> {
-        self.cast().unwrap()
+        self.cast()
     }
 
     /// Cast into an `usize` vector, truncating decimals if any.
@@ -792,7 +812,7 @@ impl<T: NumCast + Copy, U> TypedVector3D<T, U> {
     /// the desired conversion behavior.
     #[inline]
     pub fn to_usize(&self) -> TypedVector3D<usize, U> {
-        self.cast().unwrap()
+        self.cast()
     }
 
     /// Cast into an `u32` vector, truncating decimals if any.
@@ -802,7 +822,7 @@ impl<T: NumCast + Copy, U> TypedVector3D<T, U> {
     /// the desired conversion behavior.
     #[inline]
     pub fn to_u32(&self) -> TypedVector3D<u32, U> {
-        self.cast().unwrap()
+        self.cast()
     }
 
     /// Cast into an `i32` vector, truncating decimals if any.
@@ -812,7 +832,7 @@ impl<T: NumCast + Copy, U> TypedVector3D<T, U> {
     /// the desired conversion behavior.
     #[inline]
     pub fn to_i32(&self) -> TypedVector3D<i32, U> {
-        self.cast().unwrap()
+        self.cast()
     }
 
     /// Cast into an `i64` vector, truncating decimals if any.
@@ -822,7 +842,7 @@ impl<T: NumCast + Copy, U> TypedVector3D<T, U> {
     /// the desired conversion behavior.
     #[inline]
     pub fn to_i64(&self) -> TypedVector3D<i64, U> {
-        self.cast().unwrap()
+        self.cast()
     }
 }
 
