@@ -1323,6 +1323,7 @@ mod vector3d {
     }
 }
 
+#[cfg(test)]
 mod bool_vector {
     use super::*;
     type Vec2 = Vector2D<f32>;
