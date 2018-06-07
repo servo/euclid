@@ -105,6 +105,19 @@ impl<T, U> TypedRect<T, U> {
 
 impl<T, U> TypedRect<T, U>
 where
+    T: Copy + Zero
+{
+    /// Creates a rect of the given size, at offset zero.
+    pub fn from_size(size: TypedSize2D<T, U>) -> Self {
+        TypedRect {
+            origin: TypedPoint2D::zero(),
+            size,
+        }
+    }
+}
+
+impl<T, U> TypedRect<T, U>
+where
     T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output = T> + Sub<T, Output = T>,
 {
     #[inline]
@@ -547,6 +560,14 @@ impl<T: NumCast + Copy, Unit> TypedRect<T, Unit> {
     /// obtain the desired conversion behavior.
     pub fn to_i64(&self) -> TypedRect<i64, Unit> {
         self.cast().unwrap()
+    }
+}
+
+impl<T, U> From<TypedSize2D<T, U>> for TypedRect<T, U>
+where T: Copy + Zero
+{
+    fn from(size: TypedSize2D<T, U>) -> Self {
+        Self::from_size(size)
     }
 }
 
