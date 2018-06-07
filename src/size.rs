@@ -47,8 +47,8 @@ impl<T, U> TypedSize2D<T, U> {
     /// Constructor taking scalar values.
     pub fn new(width: T, height: T) -> Self {
         TypedSize2D {
-            width: width,
-            height: height,
+            width,
+            height,
             _unit: PhantomData,
         }
     }

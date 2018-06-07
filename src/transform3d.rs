@@ -7,6 +7,8 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+#![cfg_attr(feature = "cargo-clippy", allow(just_underscores_and_digits))]
+
 use super::{UnknownUnit, Angle};
 use approxeq::ApproxEq;
 use homogen::HomogeneousVector;
@@ -51,6 +53,7 @@ impl<T, Src, Dst> TypedTransform3D<T, Src, Dst> {
     /// For example, the translation terms m41, m42, m43 on the last row with the
     /// row-major convention) are the 13rd, 14th and 15th parameters.
     #[inline]
+    #[cfg_attr(feature = "cargo-clippy", allow(too_many_arguments))]
     pub fn row_major(
             m11: T, m12: T, m13: T, m14: T,
             m21: T, m22: T, m23: T, m24: T,
@@ -58,10 +61,10 @@ impl<T, Src, Dst> TypedTransform3D<T, Src, Dst> {
             m41: T, m42: T, m43: T, m44: T)
          -> Self {
         TypedTransform3D {
-            m11: m11, m12: m12, m13: m13, m14: m14,
-            m21: m21, m22: m22, m23: m23, m24: m24,
-            m31: m31, m32: m32, m33: m33, m34: m34,
-            m41: m41, m42: m42, m43: m43, m44: m44,
+            m11, m12, m13, m14,
+            m21, m22, m23, m24,
+            m31, m32, m33, m34,
+            m41, m42, m43, m44,
             _unit: PhantomData,
         }
     }
@@ -71,6 +74,7 @@ impl<T, Src, Dst> TypedTransform3D<T, Src, Dst> {
     /// For example, the translation terms m41, m42, m43 on the last column with the
     /// column-major convention) are the 4th, 8th and 12nd parameters.
     #[inline]
+    #[cfg_attr(feature = "cargo-clippy", allow(too_many_arguments))]
     pub fn column_major(
             m11: T, m21: T, m31: T, m41: T,
             m12: T, m22: T, m32: T, m42: T,
@@ -78,10 +82,10 @@ impl<T, Src, Dst> TypedTransform3D<T, Src, Dst> {
             m14: T, m24: T, m34: T, m44: T)
          -> Self {
         TypedTransform3D {
-            m11: m11, m12: m12, m13: m13, m14: m14,
-            m21: m21, m22: m22, m23: m23, m24: m24,
-            m31: m31, m32: m32, m33: m33, m34: m34,
-            m41: m41, m42: m42, m43: m43, m44: m44,
+            m11, m12, m13, m14,
+            m21, m22, m23, m24,
+            m31, m32, m33, m34,
+            m41, m42, m43, m44,
             _unit: PhantomData,
         }
     }

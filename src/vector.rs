@@ -65,8 +65,8 @@ impl<T, U> TypedVector2D<T, U> {
     #[inline]
     pub fn new(x: T, y: T) -> Self {
         TypedVector2D {
-            x: x,
-            y: y,
+            x,
+            y,
             _unit: PhantomData,
         }
     }
@@ -479,9 +479,9 @@ impl<T, U> TypedVector3D<T, U> {
     #[inline]
     pub fn new(x: T, y: T, z: T) -> Self {
         TypedVector3D {
-            x: x,
-            y: y,
-            z: z,
+            x,
+            y,
+            z,
             _unit: PhantomData,
         }
     }
