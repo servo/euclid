@@ -45,10 +45,10 @@ impl<T: Copy, U> TypedSideOffsets2D<T, U> {
     /// Constructor taking a scalar for each side.
     pub fn new(top: T, right: T, bottom: T, left: T) -> Self {
         TypedSideOffsets2D {
-            top: top,
-            right: right,
-            bottom: bottom,
-            left: left,
+            top,
+            right,
+            bottom,
+            left,
             _unit: PhantomData,
         }
     }

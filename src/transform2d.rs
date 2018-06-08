@@ -7,6 +7,8 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+#![cfg_attr(feature = "cargo-clippy", allow(just_underscores_and_digits))]
+
 use super::{UnknownUnit, Angle};
 use num::{One, Zero};
 use point::TypedPoint2D;
@@ -46,9 +48,9 @@ impl<T: Copy, Src, Dst> TypedTransform2D<T, Src, Dst> {
     /// Create a transform specifying its matrix elements in row-major order.
     pub fn row_major(m11: T, m12: T, m21: T, m22: T, m31: T, m32: T) -> Self {
         TypedTransform2D {
-            m11: m11, m12: m12,
-            m21: m21, m22: m22,
-            m31: m31, m32: m32,
+            m11, m12,
+            m21, m22,
+            m31, m32,
             _unit: PhantomData,
         }
     }
@@ -56,9 +58,9 @@ impl<T: Copy, Src, Dst> TypedTransform2D<T, Src, Dst> {
     /// Create a transform specifying its matrix elements in column-major order.
     pub fn column_major(m11: T, m21: T, m31: T, m12: T, m22: T, m32: T) -> Self {
         TypedTransform2D {
-            m11: m11, m12: m12,
-            m21: m21, m22: m22,
-            m31: m31, m32: m32,
+            m11, m12,
+            m21, m22,
+            m31, m32,
             _unit: PhantomData,
         }
     }

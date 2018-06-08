@@ -97,8 +97,8 @@ impl<T, U> TypedRect<T, U> {
     /// Constructor.
     pub fn new(origin: TypedPoint2D<T, U>, size: TypedSize2D<T, U>) -> Self {
         TypedRect {
-            origin: origin,
-            size: size,
+            origin,
+            size,
         }
     }
 }
