@@ -134,16 +134,23 @@ impl<T: Copy, Src, Dst> TypedTransform2D<T, Src, Dst> {
 
 impl<T0: NumCast + Copy, Src, Dst> TypedTransform2D<T0, Src, Dst> {
     /// Cast from one numeric representation to another, preserving the units.
-    pub fn cast<T1: NumCast + Copy>(&self) -> Option<TypedTransform2D<T1, Src, Dst>> {
+    pub fn cast<T1: NumCast + Copy>(&self) -> TypedTransform2D<T1, Src, Dst> {
+        self.try_cast().unwrap()
+    }
+
+    /// Fallible cast from one numeric representation to another, preserving the units.
+    pub fn try_cast<T1: NumCast + Copy>(&self) -> Option<TypedTransform2D<T1, Src, Dst>> {
         match (NumCast::from(self.m11), NumCast::from(self.m12),
                NumCast::from(self.m21), NumCast::from(self.m22),
                NumCast::from(self.m31), NumCast::from(self.m32)) {
             (Some(m11), Some(m12),
              Some(m21), Some(m22),
              Some(m31), Some(m32)) => {
-                Some(TypedTransform2D::row_major(m11, m12,
-                                                 m21, m22,
-                                                 m31, m32))
+                Some(TypedTransform2D::row_major(
+                    m11, m12,
+                    m21, m22,
+                    m31, m32
+                ))
             },
             _ => None
         }

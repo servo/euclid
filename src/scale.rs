@@ -123,7 +123,12 @@ impl<T: Clone + Sub<T, Output = T>, Src, Dst> Sub for TypedScale<T, Src, Dst> {
 
 impl<T: NumCast + Clone, Src, Dst0> TypedScale<T, Src, Dst0> {
     /// Cast from one numeric representation to another, preserving the units.
-    pub fn cast<T1: NumCast + Clone>(&self) -> Option<TypedScale<T1, Src, Dst0>> {
+    pub fn cast<T1: NumCast + Clone>(&self) -> TypedScale<T1, Src, Dst0> {
+        self.try_cast().unwrap()
+    }
+
+    /// Fallible cast from one numeric representation to another, preserving the units.
+    pub fn try_cast<T1: NumCast + Clone>(&self) -> Option<TypedScale<T1, Src, Dst0>> {
         NumCast::from(self.get()).map(TypedScale::new)
     }
 }

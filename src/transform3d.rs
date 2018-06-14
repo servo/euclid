@@ -692,7 +692,12 @@ impl<T: Copy, Src, Dst> TypedTransform3D<T, Src, Dst> {
 
 impl<T0: NumCast + Copy, Src, Dst> TypedTransform3D<T0, Src, Dst> {
     /// Cast from one numeric representation to another, preserving the units.
-    pub fn cast<T1: NumCast + Copy>(&self) -> Option<TypedTransform3D<T1, Src, Dst>> {
+    pub fn cast<T1: NumCast + Copy>(&self) -> TypedTransform3D<T1, Src, Dst> {
+        self.try_cast().unwrap()
+    }
+
+    /// Fallible cast from one numeric representation to another, preserving the units.
+    pub fn try_cast<T1: NumCast + Copy>(&self) -> Option<TypedTransform3D<T1, Src, Dst>> {
         match (NumCast::from(self.m11), NumCast::from(self.m12),
                NumCast::from(self.m13), NumCast::from(self.m14),
                NumCast::from(self.m21), NumCast::from(self.m22),
