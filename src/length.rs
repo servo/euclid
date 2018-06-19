@@ -35,7 +35,7 @@ use core::fmt;
 ///
 /// [`TypedScale`]: struct.TypedScale.html
 #[repr(C)]
-pub struct Length<T, Unit>(pub T, PhantomData<Unit>);
+pub struct Length<T, Unit>(pub T, #[doc(hidden)] pub PhantomData<Unit>);
 
 impl<T: Clone, Unit> Clone for Length<T, Unit> {
     fn clone(&self) -> Self {

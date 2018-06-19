@@ -18,7 +18,12 @@ macro_rules! define_matrix {
         $(#[$attr])*
         pub struct $name<T, $($phantom),+> {
             $(pub $field: T,)+
-            _unit: PhantomData<($($phantom),+)>
+
+            // Keep this (secretly) public for the few cases where we would like to
+            // create static constants which currently can't be initialized with a
+            // function.
+            #[doc(hidden)]
+            pub _unit: PhantomData<($($phantom),+)>
         }
 
         impl<T: Clone, $($phantom),+> Clone for $name<T, $($phantom),+> {

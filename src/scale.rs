@@ -38,7 +38,7 @@ use {TypedPoint2D, TypedRect, TypedSize2D, TypedVector2D};
 /// let one_foot_in_mm: Length<f32, Mm> = one_foot * mm_per_inch;
 /// ```
 #[repr(C)]
-pub struct TypedScale<T, Src, Dst>(pub T, PhantomData<(Src, Dst)>);
+pub struct TypedScale<T, Src, Dst>(pub T, #[doc(hidden)] pub PhantomData<(Src, Dst)>);
 
 #[cfg(feature = "serde")]
 impl<'de, T, Src, Dst> Deserialize<'de> for TypedScale<T, Src, Dst>
