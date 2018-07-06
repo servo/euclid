@@ -169,6 +169,21 @@ where
         self / self.length()
     }
 
+    /// Return the normalized vector even if the length is larger than the max value of Float.
+    #[inline]
+    pub fn robust_normalize(self) -> Self
+    where
+        T: Float,
+    {
+        let length = self.length();
+        if length.is_infinite() {
+            let scaled = self / T::max_value();
+            scaled / scaled.length()
+        } else {
+            self / length
+        }
+    }
+
     #[inline]
     pub fn square_length(&self) -> T {
         self.x * self.x + self.y * self.y
@@ -596,6 +611,21 @@ impl<T: Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T> + Copy, U>
         T: Float,
     {
         self / self.length()
+    }
+
+    /// Return the normalized vector even if the length is larger than the max value of Float.
+    #[inline]
+    pub fn robust_normalize(self) -> Self
+    where
+        T: Float,
+    {
+        let length = self.length();
+        if length.is_infinite() {
+            let scaled = self / T::max_value();
+            scaled / scaled.length()
+        } else {
+            self / length
+        }
     }
 
     #[inline]
@@ -1184,6 +1214,10 @@ mod vector2d {
         assert!(p0.normalize().x.is_nan() && p0.normalize().y.is_nan());
         assert_eq!(p1.normalize(), vec2(1.0, 0.0));
         assert_eq!(p2.normalize(), vec2(0.6, -0.8));
+
+        let p3: Vec2 = vec2(::std::f32::MAX, ::std::f32::MAX);
+        assert_ne!(p3.normalize(), vec2(1.0 / 2.0f32.sqrt(), 1.0 / 2.0f32.sqrt()));
+        assert_eq!(p3.robust_normalize(), vec2(1.0 / 2.0f32.sqrt(), 1.0 / 2.0f32.sqrt()));
     }
 
     #[test]
@@ -1299,6 +1333,10 @@ mod vector3d {
         );
         assert_eq!(p1.normalize(), vec3(0.0, -1.0, 0.0));
         assert_eq!(p2.normalize(), vec3(1.0 / 3.0, 2.0 / 3.0, -2.0 / 3.0));
+
+        let p3: Vec3 = vec3(::std::f32::MAX, ::std::f32::MAX, 0.0);
+        assert_ne!(p3.normalize(), vec3(1.0 / 2.0f32.sqrt(), 1.0 / 2.0f32.sqrt(), 0.0));
+        assert_eq!(p3.robust_normalize(), vec3(1.0 / 2.0f32.sqrt(), 1.0 / 2.0f32.sqrt(), 0.0));
     }
 
     #[test]
