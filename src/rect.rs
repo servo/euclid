@@ -354,7 +354,7 @@ where
 {
     pub fn center(&self) -> TypedPoint2D<T, U> {
         let two = T::one() + T::one();
-        ((self.origin.to_vector() + self.origin.to_vector() + self.size.to_vector()) / two).to_point()
+        self.origin + self.size.to_vector() / two
     }
 }
 
