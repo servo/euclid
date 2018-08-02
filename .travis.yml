@@ -18,7 +18,7 @@ matrix:
     - rust: stable
       env: FEATURES=""
     - rust: stable
-      env: FEATURES="mint"
+      env: FEATURES="--features mint"
     - rust: beta
       env: FEATURES=""
     - rust: nightly
