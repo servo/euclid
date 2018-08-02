@@ -409,8 +409,8 @@ where T: Copy + fmt::Debug +
 }
 
 #[cfg(feature = "mint")]
-impl<T, Src, Dst> From<mint::RowMatrix2x3<T>> for TypedTransform2D<T, Src, Dst> {
-    fn from(m: mint::RowMatrix2x3<T>) -> Self {
+impl<T, Src, Dst> From<mint::RowMatrix3x2<T>> for TypedTransform2D<T, Src, Dst> {
+    fn from(m: mint::RowMatrix3x2<T>) -> Self {
         TypedTransform2D {
             m11: m.x.x, m12: m.x.y,
             m21: m.y.x, m22: m.y.y,
@@ -420,9 +420,9 @@ impl<T, Src, Dst> From<mint::RowMatrix2x3<T>> for TypedTransform2D<T, Src, Dst> 
     }
 }
 #[cfg(feature = "mint")]
-impl<T, Src, Dst> Into<mint::RowMatrix2x3<T>> for TypedTransform2D<T, Src, Dst> {
-    fn into(self) -> mint::RowMatrix2x3<T> {
-        mint::RowMatrix2x3 {
+impl<T, Src, Dst> Into<mint::RowMatrix3x2<T>> for TypedTransform2D<T, Src, Dst> {
+    fn into(self) -> mint::RowMatrix3x2<T> {
+        mint::RowMatrix3x2 {
             x: mint::Vector2 { x: self.m11, y: self.m12 },
             y: mint::Vector2 { x: self.m21, y: self.m22 },
             z: mint::Vector2 { x: self.m31, y: self.m32 },
@@ -572,7 +572,7 @@ mod test {
     #[test]
     pub fn test_mint() {
         let m1 = Mat::create_rotation(rad(FRAC_PI_2));
-        let mm: mint::RowMatrix2x3<_> = m1.into();
+        let mm: mint::RowMatrix3x2<_> = m1.into();
         let m2 = Mat::from(mm);
 
         assert_eq!(m1, m2);

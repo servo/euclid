@@ -15,7 +15,7 @@ unstable = []
 [dependencies]
 num-traits = { version = "0.2" }
 serde = { version = "1.0", features = ["serde_derive"], optional = true }
-mint = {version = "0.4", optional = true}
+mint = {version = "^0.5.1", optional = true}
 
 [dev-dependencies]
 rand = "0.4"
