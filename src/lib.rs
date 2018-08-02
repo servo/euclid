@@ -7,7 +7,8 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#![cfg_attr(feature = "unstable", feature(asm, repr_simd, test))]
+#![cfg_attr(feature = "unstable", feature(fn_must_use))]
+#![cfg_attr(not(test), no_std)]
 
 //! A collection of strongly typed math tools for computer graphics with an inclination
 //! towards 2d graphics and layout.
@@ -24,9 +25,6 @@
 //! Client code typically creates a set of aliases for each type and doesn't need
 //! to deal with the specifics of typed units further. For example:
 //!
-//! All euclid types are marked `#[repr(C)]` in order to facilitate exposing them to
-//! foreign function interfaces (provided the underlying scalar type is also `repr(C)`).
-//!
 //! ```rust
 //! use euclid::*;
 //! pub struct ScreenSpace;
@@ -34,9 +32,12 @@
 //! pub type ScreenSize = TypedSize2D<f32, ScreenSpace>;
 //! pub struct WorldSpace;
 //! pub type WorldPoint = TypedPoint3D<f32, WorldSpace>;
-//! pub type ProjectionMatrix = TypedMatrix4D<f32, WorldSpace, ScreenSpace>;
+//! pub type ProjectionMatrix = TypedTransform3D<f32, WorldSpace, ScreenSpace>;
 //! // etc...
 //! ```
+//!
+//! All euclid types are marked `#[repr(C)]` in order to facilitate exposing them to
+//! foreign function interfaces (provided the underlying scalar type is also `repr(C)`).
 //!
 //! Components are accessed in their scalar form by default for convenience, and most
 //! types additionally implement strongly typed accessors which return typed ```Length``` wrappers.
@@ -55,68 +56,56 @@
 //! assert_eq!(p.x, p.x_typed().get());
 //! ```
 
-extern crate heapsize;
+#[cfg(feature = "serde")]
+#[macro_use]
+extern crate serde;
 
-#[cfg_attr(test, macro_use)]
-extern crate log;
 #[cfg(feature = "mint")]
 extern crate mint;
+
+extern crate num_traits;
 #[cfg(test)]
 extern crate rand;
-extern crate serde;
-#[cfg(feature = "unstable")]
-extern crate test;
-extern crate num_traits;
+
+#[cfg(test)]
+use std as core;
 
 pub use length::Length;
-pub use scale_factor::ScaleFactor;
+pub use scale::TypedScale;
 pub use transform2d::{Transform2D, TypedTransform2D};
 pub use transform3d::{Transform3D, TypedTransform3D};
-pub use point::{
-    Point2D, TypedPoint2D, point2,
-    Point3D, TypedPoint3D, point3,
-};
-pub use vector::{
-    Vector2D, TypedVector2D, vec2,
-    Vector3D, TypedVector3D, vec3,
-};
+pub use point::{Point2D, Point3D, TypedPoint2D, TypedPoint3D, point2, point3};
+pub use vector::{TypedVector2D, TypedVector3D, Vector2D, Vector3D, vec2, vec3};
+pub use vector::{BoolVector2D, BoolVector3D, bvec2, bvec3};
+pub use homogen::HomogeneousVector;
 
-pub use rect::{Rect, TypedRect, rect};
+pub use rect::{rect, Rect, TypedRect};
+pub use rotation::{Angle, Rotation2D, Rotation3D, TypedRotation2D, TypedRotation3D};
 pub use side_offsets::{SideOffsets2D, TypedSideOffsets2D};
-#[cfg(feature = "unstable")] pub use side_offsets::SideOffsets2DSimdI32;
 pub use size::{Size2D, TypedSize2D, size2};
 pub use trig::Trig;
 
-pub mod approxeq;
-pub mod num;
-mod length;
 #[macro_use]
 mod macros;
-mod transform2d;
-mod transform3d;
+
+pub mod approxeq;
+mod homogen;
+pub mod num;
+mod length;
 mod point;
 mod rect;
-mod scale_factor;
+mod rotation;
+mod scale;
 mod side_offsets;
 mod size;
+mod transform2d;
+mod transform3d;
 mod trig;
 mod vector;
 
 /// The default unit.
 #[derive(Clone, Copy)]
 pub struct UnknownUnit;
-
-/// Unit for angles in radians.
-pub struct Rad;
-
-/// Unit for angles in degrees.
-pub struct Deg;
-
-/// A value in radians.
-pub type Radians<T> = Length<T, Rad>;
-
-/// A value in Degrees.
-pub type Degrees<T> = Length<T, Deg>;
 
 /// Temporary alias to facilitate the transition to the new naming scheme
 #[deprecated]
@@ -134,3 +123,10 @@ pub type Matrix4D<T> = Transform3D<T>;
 #[deprecated]
 pub type TypedMatrix4D<T, Src, Dst> = TypedTransform3D<T, Src, Dst>;
 
+/// Temporary alias to facilitate the transition to the new naming scheme
+#[deprecated]
+pub type ScaleFactor<T, Src, Dst> = TypedScale<T, Src, Dst>;
+
+/// Temporary alias to facilitate the transition to the new naming scheme
+#[deprecated]
+pub use Angle as Radians;

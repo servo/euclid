@@ -7,26 +7,31 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::{UnknownUnit, Radians};
+#![cfg_attr(feature = "cargo-clippy", allow(just_underscores_and_digits))]
+
 #[cfg(feature = "mint")]
 use mint;
+
+use super::{UnknownUnit, Angle};
 use num::{One, Zero};
 use point::TypedPoint2D;
 use vector::{TypedVector2D, vec2};
 use rect::TypedRect;
-use std::ops::{Add, Mul, Div, Sub};
-use std::marker::PhantomData;
+use transform3d::TypedTransform3D;
+use core::ops::{Add, Mul, Div, Sub, Neg};
+use core::marker::PhantomData;
 use approxeq::ApproxEq;
 use trig::Trig;
-use std::fmt;
+use core::fmt;
+use num_traits::NumCast;
 
 define_matrix! {
-    /// A 2d transform stored as a 2 by 3 matrix in row-major order in memory.
+    /// A 2d transform stored as a 3 by 2 matrix in row-major order in memory.
     ///
     /// Transforms can be parametrized over the source and destination units, to describe a
     /// transformation from a space to another.
-    /// For example, `TypedTransform2D<f32, WordSpace, ScreenSpace>::transform_point4d`
-    /// takes a `TypedPoint2D<f32, WordSpace>` and returns a `TypedPoint2D<f32, ScreenSpace>`.
+    /// For example, `TypedTransform2D<f32, WorldSpace, ScreenSpace>::transform_point4d`
+    /// takes a `TypedPoint2D<f32, WorldSpace>` and returns a `TypedPoint2D<f32, ScreenSpace>`.
     ///
     /// Transforms expose a set of convenience methods for pre- and post-transformations.
     /// A pre-transformation corresponds to adding an operation that is applied before
@@ -46,9 +51,9 @@ impl<T: Copy, Src, Dst> TypedTransform2D<T, Src, Dst> {
     /// Create a transform specifying its matrix elements in row-major order.
     pub fn row_major(m11: T, m12: T, m21: T, m22: T, m31: T, m32: T) -> Self {
         TypedTransform2D {
-            m11: m11, m12: m12,
-            m21: m21, m22: m22,
-            m31: m31, m32: m32,
+            m11, m12,
+            m21, m22,
+            m31, m32,
             _unit: PhantomData,
         }
     }
@@ -56,9 +61,9 @@ impl<T: Copy, Src, Dst> TypedTransform2D<T, Src, Dst> {
     /// Create a transform specifying its matrix elements in column-major order.
     pub fn column_major(m11: T, m21: T, m31: T, m12: T, m22: T, m32: T) -> Self {
         TypedTransform2D {
-            m11: m11, m12: m12,
-            m21: m21, m22: m22,
-            m31: m31, m32: m32,
+            m11, m12,
+            m21, m22,
+            m31, m32,
             _unit: PhantomData,
         }
     }
@@ -130,6 +135,31 @@ impl<T: Copy, Src, Dst> TypedTransform2D<T, Src, Dst> {
     }
 }
 
+impl<T0: NumCast + Copy, Src, Dst> TypedTransform2D<T0, Src, Dst> {
+    /// Cast from one numeric representation to another, preserving the units.
+    pub fn cast<T1: NumCast + Copy>(&self) -> TypedTransform2D<T1, Src, Dst> {
+        self.try_cast().unwrap()
+    }
+
+    /// Fallible cast from one numeric representation to another, preserving the units.
+    pub fn try_cast<T1: NumCast + Copy>(&self) -> Option<TypedTransform2D<T1, Src, Dst>> {
+        match (NumCast::from(self.m11), NumCast::from(self.m12),
+               NumCast::from(self.m21), NumCast::from(self.m22),
+               NumCast::from(self.m31), NumCast::from(self.m32)) {
+            (Some(m11), Some(m12),
+             Some(m21), Some(m22),
+             Some(m31), Some(m32)) => {
+                Some(TypedTransform2D::row_major(
+                    m11, m12,
+                    m21, m22,
+                    m31, m32
+                ))
+            },
+            _ => None
+        }
+    }
+}
+
 impl<T, Src, Dst> TypedTransform2D<T, Src, Dst>
 where T: Copy +
          PartialEq +
@@ -163,7 +193,7 @@ where T: Copy + Clone +
 
     /// Returns the multiplication of the two matrices such that mat's transformation
     /// applies after self's transformation.
-    #[must_use]
+    #[cfg_attr(feature = "unstable", must_use)]
     pub fn post_mul<NewDst>(&self, mat: &TypedTransform2D<T, Dst, NewDst>) -> TypedTransform2D<T, Src, NewDst> {
         TypedTransform2D::row_major(
             self.m11 * mat.m11 + self.m12 * mat.m21,
@@ -177,7 +207,7 @@ where T: Copy + Clone +
 
     /// Returns the multiplication of the two matrices such that mat's transformation
     /// applies before self's transformation.
-    #[must_use]
+    #[cfg_attr(feature = "unstable", must_use)]
     pub fn pre_mul<NewSrc>(&self, mat: &TypedTransform2D<T, NewSrc, Src>) -> TypedTransform2D<T, NewSrc, Dst> {
         mat.post_mul(self)
     }
@@ -193,13 +223,13 @@ where T: Copy + Clone +
     }
 
     /// Applies a translation after self's transformation and returns the resulting transform.
-    #[must_use]
+    #[cfg_attr(feature = "unstable", must_use)]
     pub fn post_translate(&self, v: TypedVector2D<T, Dst>) -> Self {
         self.post_mul(&TypedTransform2D::create_translation(v.x, v.y))
     }
 
     /// Applies a translation before self's transformation and returns the resulting transform.
-    #[must_use]
+    #[cfg_attr(feature = "unstable", must_use)]
     pub fn pre_translate(&self, v: TypedVector2D<T, Src>) -> Self {
         self.pre_mul(&TypedTransform2D::create_translation(v.x, v.y))
     }
@@ -215,13 +245,13 @@ where T: Copy + Clone +
     }
 
     /// Applies a scale after self's transformation and returns the resulting transform.
-    #[must_use]
+    #[cfg_attr(feature = "unstable", must_use)]
     pub fn post_scale(&self, x: T, y: T) -> Self {
         self.post_mul(&TypedTransform2D::create_scale(x, y))
     }
 
     /// Applies a scale before self's transformation and returns the resulting transform.
-    #[must_use]
+    #[cfg_attr(feature = "unstable", must_use)]
     pub fn pre_scale(&self, x: T, y: T) -> Self {
         TypedTransform2D::row_major(
             self.m11 * x, self.m12,
@@ -231,7 +261,7 @@ where T: Copy + Clone +
     }
 
     /// Returns a rotation transform.
-    pub fn create_rotation(theta: Radians<T>) -> Self {
+    pub fn create_rotation(theta: Angle<T>) -> Self {
         let _0 = Zero::zero();
         let cos = theta.get().cos();
         let sin = theta.get().sin();
@@ -243,20 +273,20 @@ where T: Copy + Clone +
     }
 
     /// Applies a rotation after self's transformation and returns the resulting transform.
-    #[must_use]
-    pub fn post_rotate(&self, theta: Radians<T>) -> Self {
+    #[cfg_attr(feature = "unstable", must_use)]
+    pub fn post_rotate(&self, theta: Angle<T>) -> Self {
         self.post_mul(&TypedTransform2D::create_rotation(theta))
     }
 
     /// Applies a rotation after self's transformation and returns the resulting transform.
-    #[must_use]
-    pub fn pre_rotate(&self, theta: Radians<T>) -> Self {
+    #[cfg_attr(feature = "unstable", must_use)]
+    pub fn pre_rotate(&self, theta: Angle<T>) -> Self {
         self.pre_mul(&TypedTransform2D::create_rotation(theta))
     }
 
     /// Returns the given point transformed by this transform.
     #[inline]
-    #[must_use]
+    #[cfg_attr(feature = "unstable", must_use)]
     pub fn transform_point(&self, point: &TypedPoint2D<T, Src>) -> TypedPoint2D<T, Dst> {
         TypedPoint2D::new(point.x * self.m11 + point.y * self.m21 + self.m31,
                           point.x * self.m12 + point.y * self.m22 + self.m32)
@@ -264,7 +294,7 @@ where T: Copy + Clone +
 
     /// Returns the given vector transformed by this matrix.
     #[inline]
-    #[must_use]
+    #[cfg_attr(feature = "unstable", must_use)]
     pub fn transform_vector(&self, vec: &TypedVector2D<T, Src>) -> TypedVector2D<T, Dst> {
         vec2(vec.x * self.m11 + vec.y * self.m21,
              vec.x * self.m12 + vec.y * self.m22)
@@ -273,7 +303,7 @@ where T: Copy + Clone +
     /// Returns a rectangle that encompasses the result of transforming the given rectangle by this
     /// transform.
     #[inline]
-    #[must_use]
+    #[cfg_attr(feature = "unstable", must_use)]
     pub fn transform_rect(&self, rect: &TypedRect<T, Src>) -> TypedRect<T, Dst> {
         TypedRect::from_points(&[
             self.transform_point(&rect.origin),
@@ -289,7 +319,7 @@ where T: Copy + Clone +
     }
 
     /// Returns the inverse transform if possible.
-    #[must_use]
+    #[cfg_attr(feature = "unstable", must_use)]
     pub fn inverse(&self) -> Option<TypedTransform2D<T, Dst, Src>> {
         let det = self.determinant();
 
@@ -329,6 +359,31 @@ where T: Copy + Clone +
             self.m21, self.m22,
             self.m31, self.m32,
         )
+    }
+}
+
+impl <T, Src, Dst> TypedTransform2D<T, Src, Dst>
+where T: Copy + Clone +
+         Add<T, Output=T> +
+         Sub<T, Output=T> +
+         Mul<T, Output=T> +
+         Div<T, Output=T> +
+         Neg<Output=T> +
+         PartialOrd +
+         Trig +
+         One + Zero {
+    /// Create a 3D transform from the current transform
+    pub fn to_3d(&self) -> TypedTransform3D<T, Src, Dst> {
+        TypedTransform3D::row_major_2d(self.m11, self.m12, self.m21, self.m22, self.m31, self.m32)
+    }
+
+}
+
+impl <T, Src, Dst> Default for TypedTransform2D<T, Src, Dst>
+    where T: Copy + PartialEq + One + Zero
+{
+    fn default() -> Self {
+        Self::identity()
     }
 }
 
@@ -381,15 +436,15 @@ mod test {
     use super::*;
     use approxeq::ApproxEq;
     use point::Point2D;
-    use Radians;
+    use Angle;
     #[cfg(feature = "mint")]
     use mint;
 
-    use std::f32::consts::FRAC_PI_2;
+    use core::f32::consts::FRAC_PI_2;
 
     type Mat = Transform2D<f32>;
 
-    fn rad(v: f32) -> Radians<f32> { Radians::new(v) }
+    fn rad(v: f32) -> Angle<f32> { Angle::radians(v) }
 
     #[test]
     pub fn test_translation() {
@@ -492,7 +547,7 @@ mod test {
 
     #[test]
     fn test_size_of() {
-        use std::mem::size_of;
+        use core::mem::size_of;
         assert_eq!(size_of::<Transform2D<f32>>(), 6*size_of::<f32>());
         assert_eq!(size_of::<Transform2D<f64>>(), 6*size_of::<f64>());
     }
