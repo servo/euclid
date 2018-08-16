@@ -8,6 +8,8 @@
 // except according to those terms.
 
 use super::UnknownUnit;
+#[cfg(feature = "mint")]
+use mint;
 use length::Length;
 use scale::TypedScale;
 use vector::{TypedVector2D, vec2, BoolVector2D};
@@ -331,6 +333,27 @@ impl<T: PartialEq, U> TypedSize2D<T, U> {
 pub fn size2<T, U>(w: T, h: T) -> TypedSize2D<T, U> {
     TypedSize2D::new(w, h)
 }
+
+#[cfg(feature = "mint")]
+impl<T, U> From<mint::Vector2<T>> for TypedSize2D<T, U> {
+    fn from(v: mint::Vector2<T>) -> Self {
+        TypedSize2D {
+            width: v.x,
+            height: v.y,
+            _unit: PhantomData,
+        }
+    }
+}
+#[cfg(feature = "mint")]
+impl<T, U> Into<mint::Vector2<T>> for TypedSize2D<T, U> {
+    fn into(self) -> mint::Vector2<T> {
+        mint::Vector2 {
+            x: self.width,
+            y: self.height,
+        }
+    }
+}
+
 
 #[cfg(test)]
 mod size2d {
