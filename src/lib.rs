@@ -63,7 +63,8 @@ extern crate serde;
 extern crate num_traits;
 #[cfg(test)]
 extern crate rand;
-
+#[cfg(feature = "minted")]
+extern crate mint;
 #[cfg(test)]
 use std as core;
 

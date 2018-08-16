@@ -10,6 +10,8 @@
 #![cfg_attr(feature = "cargo-clippy", allow(just_underscores_and_digits))]
 
 use super::{UnknownUnit, Angle};
+#[cfg(feature = "mint")]
+use mint;
 use num::{One, Zero};
 use point::TypedPoint2D;
 use vector::{TypedVector2D, vec2};
@@ -404,6 +406,29 @@ where T: Copy + fmt::Debug +
         }
     }
 }
+
+#[cfg(feature = "minted")]
+impl<T, Src, Dst> From<mint::RowMatrix2x3<T>> for TypedTransform2D<T, Src, Dst> {
+    fn from(m: mint::RowMatrix2x3<T>) -> Self {
+        TypedTransform2D {
+            m11: m.x.x, m12: m.x.y,
+            m21: m.y.x, m22: m.y.y,
+            m31: m.z.x, m32: m.z.y,
+            _unit: PhantomData,
+        }
+    }
+}
+#[cfg(feature = "minted")]
+impl<T, Src, Dst> Into<mint::RowMatrix2x3<T>> for TypedTransform2D<T, Src, Dst> {
+    fn into(self) -> mint::RowMatrix2x3<T> {
+        mint::RowMatrix2x3 {
+            x: mint::Vector2 { x: self.m11, y: self.m12 },
+            y: mint::Vector2 { x: self.m21, y: self.m22 },
+            z: mint::Vector2 { x: self.m31, y: self.m32 },
+        }
+    }
+}
+
 
 #[cfg(test)]
 mod test {
