@@ -12,7 +12,7 @@
 use super::{UnknownUnit, Angle};
 use approxeq::ApproxEq;
 use homogen::HomogeneousVector;
-#[cfg(feature = "minted")]
+#[cfg(feature = "mint")]
 use mint;
 use trig::Trig;
 use point::{TypedPoint2D, TypedPoint3D};
@@ -743,7 +743,7 @@ where T: Copy + fmt::Debug +
     }
 }
 
-#[cfg(feature = "minted")]
+#[cfg(feature = "mint")]
 impl<T, Src, Dst> From<mint::RowMatrix4<T>> for TypedTransform3D<T, Src, Dst> {
     fn from(m: mint::RowMatrix4<T>) -> Self {
         TypedTransform3D {
@@ -755,7 +755,7 @@ impl<T, Src, Dst> From<mint::RowMatrix4<T>> for TypedTransform3D<T, Src, Dst> {
         }
     }
 }
-#[cfg(feature = "minted")]
+#[cfg(feature = "mint")]
 impl<T, Src, Dst> Into<mint::RowMatrix4<T>> for TypedTransform3D<T, Src, Dst> {
     fn into(self) -> mint::RowMatrix4<T> {
         mint::RowMatrix4 {

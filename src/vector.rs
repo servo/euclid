@@ -10,7 +10,7 @@
 use super::UnknownUnit;
 use approxeq::ApproxEq;
 use length::Length;
-#[cfg(feature = "minted")]
+#[cfg(feature = "mint")]
 use mint;
 use point::{TypedPoint2D, TypedPoint3D, point2, point3};
 use size::{TypedSize2D, size2};

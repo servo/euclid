@@ -407,24 +407,23 @@ where T: Copy + fmt::Debug +
     }
 }
 
-#[cfg(feature = "minted")]
+#[cfg(feature = "mint")]
 impl<T, Src, Dst> From<mint::RowMatrix2x3<T>> for TypedTransform2D<T, Src, Dst> {
     fn from(m: mint::RowMatrix2x3<T>) -> Self {
         TypedTransform2D {
-            m11: m.x.x, m12: m.x.y,
-            m21: m.y.x, m22: m.y.y,
-            m31: m.z.x, m32: m.z.y,
+            m11: m.x.x, m12: m.y.x,
+            m21: m.x.y, m22: m.y.y,
+            m31: m.x.z, m32: m.y.z,
             _unit: PhantomData,
         }
     }
 }
-#[cfg(feature = "minted")]
+#[cfg(feature = "mint")]
 impl<T, Src, Dst> Into<mint::RowMatrix2x3<T>> for TypedTransform2D<T, Src, Dst> {
     fn into(self) -> mint::RowMatrix2x3<T> {
         mint::RowMatrix2x3 {
-            x: mint::Vector2 { x: self.m11, y: self.m12 },
-            y: mint::Vector2 { x: self.m21, y: self.m22 },
-            z: mint::Vector2 { x: self.m31, y: self.m32 },
+            x: mint::Vector3 { x: self.m11, y: self.m21, z: self.m31 },
+            y: mint::Vector3 { x: self.m12, y: self.m22, z: self.m32 },
         }
     }
 }

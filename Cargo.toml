@@ -10,7 +10,6 @@ categories = ["science"]
 license = "MIT / Apache-2.0"
 
 [features]
-minted = ["mint"]
 unstable = []
 
 [dependencies]
