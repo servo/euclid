@@ -14,6 +14,8 @@ use approxeq::ApproxEq;
 #[cfg(feature = "mint")]
 use mint;
 use homogen::HomogeneousVector;
+#[cfg(feature = "mint")]
+use mint;
 use trig::Trig;
 use point::{TypedPoint2D, TypedPoint3D};
 use vector::{TypedVector2D, TypedVector3D, vec2, vec3};

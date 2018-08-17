@@ -13,6 +13,8 @@
 use mint;
 
 use super::{UnknownUnit, Angle};
+#[cfg(feature = "mint")]
+use mint;
 use num::{One, Zero};
 use point::TypedPoint2D;
 use vector::{TypedVector2D, vec2};

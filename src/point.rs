@@ -14,6 +14,8 @@ use length::Length;
 use mint;
 use scale::TypedScale;
 use size::TypedSize2D;
+#[cfg(feature = "mint")]
+use mint;
 use num::*;
 use num_traits::{Float, NumCast};
 use vector::{TypedVector2D, TypedVector3D, vec2, vec3};
