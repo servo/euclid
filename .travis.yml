@@ -15,6 +15,12 @@ env:
 
 matrix:
   include:
+    - rust: stable
+      env: FEATURES=""
+    - rust: stable
+      env: FEATURES="--features mint"
+    - rust: beta
+      env: FEATURES=""
     - rust: nightly
       env: FEATURES="--features unstable"
     - rust: nightly
