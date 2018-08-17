@@ -8,6 +8,8 @@
 // except according to those terms.
 
 use super::UnknownUnit;
+#[cfg(feature = "mint")]
+use mint;
 use length::Length;
 use scale::TypedScale;
 use vector::{TypedVector2D, vec2, BoolVector2D};
@@ -332,9 +334,32 @@ pub fn size2<T, U>(w: T, h: T) -> TypedSize2D<T, U> {
     TypedSize2D::new(w, h)
 }
 
+#[cfg(feature = "mint")]
+impl<T, U> From<mint::Vector2<T>> for TypedSize2D<T, U> {
+    fn from(v: mint::Vector2<T>) -> Self {
+        TypedSize2D {
+            width: v.x,
+            height: v.y,
+            _unit: PhantomData,
+        }
+    }
+}
+#[cfg(feature = "mint")]
+impl<T, U> Into<mint::Vector2<T>> for TypedSize2D<T, U> {
+    fn into(self) -> mint::Vector2<T> {
+        mint::Vector2 {
+            x: self.width,
+            y: self.height,
+        }
+    }
+}
+
+
 #[cfg(test)]
 mod size2d {
     use super::Size2D;
+    #[cfg(feature = "mint")]
+    use mint;
 
     #[test]
     pub fn test_add() {
@@ -378,5 +403,15 @@ mod size2d {
     pub fn test_area() {
         let p = Size2D::new(1.5, 2.0);
         assert_eq!(p.area(), 3.0);
+    }
+
+    #[cfg(feature = "mint")]
+    #[test]
+    pub fn test_mint() {
+        let s1 = Size2D::new(1.0, 2.0);
+        let sm: mint::Vector2<_> = s1.into();
+        let s2 = Size2D::from(sm);
+
+        assert_eq!(s1, s2);
     }
 }
