@@ -10,6 +10,8 @@
 use super::UnknownUnit;
 use approxeq::ApproxEq;
 use length::Length;
+#[cfg(feature = "mint")]
+use mint;
 use point::{TypedPoint2D, TypedPoint3D, point2, point3};
 use size::{TypedSize2D, size2};
 use scale::TypedScale;
@@ -28,6 +30,7 @@ define_matrix! {
         pub y: T,
     }
 }
+mint_vec!(TypedVector2D[x, y] = Vector2);
 
 /// Default 2d vector type with no unit.
 ///
@@ -468,6 +471,7 @@ define_matrix! {
         pub z: T,
     }
 }
+mint_vec!(TypedVector3D[x, y, z] = Vector3);
 
 /// Default 3d vector type with no unit.
 ///
@@ -1180,6 +1184,8 @@ pub fn bvec3(x: bool, y: bool, z: bool) -> BoolVector3D {
 #[cfg(test)]
 mod vector2d {
     use super::{Vector2D, vec2};
+    #[cfg(feature = "mint")]
+    use mint;
     type Vec2 = Vector2D<f32>;
 
     #[test]
@@ -1239,7 +1245,6 @@ mod vector2d {
 
         assert_eq!(result, vec2(2.0, 3.0));
     }
-
     #[test]
     pub fn test_angle_from_x_axis() {
         use core::f32::consts::FRAC_PI_2;
@@ -1252,6 +1257,16 @@ mod vector2d {
         assert!(right.angle_from_x_axis().get().approx_eq(&0.0));
         assert!(down.angle_from_x_axis().get().approx_eq(&FRAC_PI_2));
         assert!(up.angle_from_x_axis().get().approx_eq(&-FRAC_PI_2));
+    }
+
+    #[cfg(feature = "mint")]
+    #[test]
+    pub fn test_mint() {
+        let v1 = Vec2::new(1.0, 3.0);
+        let vm: mint::Vector2<_> = v1.into();
+        let v2 = Vec2::from(vm);
+
+        assert_eq!(v1, v2);
     }
 }
 
@@ -1303,6 +1318,8 @@ mod typedvector2d {
 
 #[cfg(test)]
 mod vector3d {
+    #[cfg(feature = "mint")]
+    use mint;
     use super::{TypedVector3D, Vector3D, vec2, vec3};
     use scale::TypedScale;
 
@@ -1378,6 +1395,16 @@ mod vector3d {
         assert_eq!(p.xy(), vec2(1, 2));
         assert_eq!(p.xz(), vec2(1, 3));
         assert_eq!(p.yz(), vec2(2, 3));
+    }
+
+    #[cfg(feature = "mint")]
+    #[test]
+    pub fn test_mint() {
+        let v1 = Vec3::new(1.0, 3.0, 5.0);
+        let vm: mint::Vector3<_> = v1.into();
+        let v2 = Vec3::from(vm);
+
+        assert_eq!(v1, v2);
     }
 }
 

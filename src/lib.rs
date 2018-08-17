@@ -60,10 +60,14 @@
 #[macro_use]
 extern crate serde;
 
+#[cfg(feature = "mint")]
+extern crate mint;
+
 extern crate num_traits;
 #[cfg(test)]
 extern crate rand;
-
+#[cfg(feature = "mint")]
+extern crate mint;
 #[cfg(test)]
 use std as core;
 
