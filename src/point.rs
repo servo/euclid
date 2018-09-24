@@ -198,6 +198,11 @@ impl<T: Float, U> TypedPoint2D<T, U> {
     pub fn max(self, other: Self) -> Self {
         point2(self.x.max(other.x), self.y.max(other.y))
     }
+
+    #[inline]
+    pub fn clamp(&self, start: Self, end: Self) -> Self {
+        self.max(start).min(end)
+    }
 }
 
 impl<T: Copy + Mul<T, Output = T>, U> Mul<T> for TypedPoint2D<T, U> {
@@ -620,6 +625,11 @@ impl<T: Float, U> TypedPoint3D<T, U> {
             self.y.max(other.y),
             self.z.max(other.z),
         )
+    }
+
+    #[inline]
+    pub fn clamp(&self, start: Self, end: Self) -> Self {
+        self.max(start).min(end)
     }
 }
 

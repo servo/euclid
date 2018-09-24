@@ -262,6 +262,11 @@ impl<T: Float, U> TypedVector2D<T, U> {
     pub fn max(self, other: Self) -> Self {
         vec2(self.x.max(other.x), self.y.max(other.y))
     }
+
+    #[inline]
+    pub fn clamp(&self, start: Self, end: Self) -> Self {
+        self.max(start).min(end)
+    }
 }
 
 impl<T: Copy + Mul<T, Output = T>, U> Mul<T> for TypedVector2D<T, U> {
@@ -745,6 +750,11 @@ impl<T: Float, U> TypedVector3D<T, U> {
             self.y.max(other.y),
             self.z.max(other.z),
         )
+    }
+
+    #[inline]
+    pub fn clamp(&self, start: Self, end: Self) -> Self {
+        self.max(start).min(end)
     }
 }
 
@@ -1374,6 +1384,17 @@ mod vector3d {
         let result = p1.max(p2);
 
         assert_eq!(result, vec3(2.0, 3.0, 5.0));
+    }
+
+    #[test]
+    pub fn test_clamp() {
+        let p1: Vec3 = vec3(1.0, -1.0, 5.0);
+        let p2: Vec3 = vec3(2.0, 5.0, 10.0);
+        let p3: Vec3 = vec3(-1.0, 2.0, 20.0);
+
+        let result = p3.clamp(p1, p2);
+
+        assert_eq!(result, vec3(1.0, 2.0, 10.0));
     }
 
     #[test]

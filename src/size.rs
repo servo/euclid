@@ -15,7 +15,7 @@ use scale::TypedScale;
 use vector::{TypedVector2D, vec2, BoolVector2D};
 use num::*;
 
-use num_traits::{NumCast, Signed};
+use num_traits::{Float, NumCast, Signed};
 use core::fmt;
 use core::ops::{Add, Div, Mul, Sub};
 use core::marker::PhantomData;
@@ -328,6 +328,30 @@ impl<T: PartialEq, U> TypedSize2D<T, U> {
         }
     }
 }
+
+impl<T: Float, U> TypedSize2D<T, U> {
+    #[inline]
+    pub fn min(self, other: Self) -> Self {
+        size2(
+            self.width.min(other.width),
+            self.height.min(other.height),
+        )
+    }
+
+    #[inline]
+    pub fn max(self, other: Self) -> Self {
+        size2(
+            self.width.max(other.width),
+            self.height.max(other.height),
+        )
+    }
+
+    #[inline]
+    pub fn clamp(&self, start: Self, end: Self) -> Self {
+        self.max(start).min(end)
+    }
+}
+
 
 /// Shorthand for `TypedSize2D::new(w, h)`.
 pub fn size2<T, U>(w: T, h: T) -> TypedSize2D<T, U> {
