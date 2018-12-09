@@ -11,7 +11,7 @@ use super::UnknownUnit;
 use approxeq::ApproxEq;
 use length::Length;
 use scale::TypedScale;
-use size::TypedSize2D;
+use size::{TypedSize2D, TypedSize3D};
 #[cfg(feature = "mint")]
 use mint;
 use num::*;
@@ -435,6 +435,11 @@ impl<T: Copy + Zero, U> TypedPoint3D<T, U> {
     pub fn origin() -> Self {
         point3(Zero::zero(), Zero::zero(), Zero::zero())
     }
+
+    #[inline]
+    pub fn zero() -> Self {
+        Self::origin()
+    }
 }
 
 impl<T: Copy + One, U> TypedPoint3D<T, U> {
@@ -560,6 +565,13 @@ impl<T: Copy, U> TypedPoint3D<T, U> {
     }
 }
 
+impl<T: Copy + Add<T, Output = T>, U> TypedPoint3D<T, U> {
+    #[inline]
+    pub fn add_size(&self, other: &TypedSize3D<T, U>) -> Self {
+        point3(self.x + other.width, self.y + other.height, self.z + other.depth)
+    }
+}
+
 impl<T: Copy + Add<T, Output = T>, U> AddAssign<TypedVector3D<T, U>> for TypedPoint3D<T, U> {
     #[inline]
     fn add_assign(&mut self, other: TypedVector3D<T, U>) {
@@ -606,11 +618,27 @@ impl<T: Copy + Mul<T, Output = T>, U> Mul<T> for TypedPoint3D<T, U> {
     }
 }
 
+impl<T: Copy + Mul<T, Output = T>, U1, U2> Mul<TypedScale<T, U1, U2>> for TypedPoint3D<T, U1> {
+    type Output = TypedPoint3D<T, U2>;
+    #[inline]
+    fn mul(self, scale: TypedScale<T, U1, U2>) -> TypedPoint3D<T, U2> {
+        point3(self.x * scale.get(), self.y * scale.get(), self.z * scale.get())
+    }
+}
+
 impl<T: Copy + Div<T, Output = T>, U> Div<T> for TypedPoint3D<T, U> {
     type Output = Self;
     #[inline]
     fn div(self, scale: T) -> Self {
         point3(self.x / scale, self.y / scale, self.z / scale)
+    }
+}
+
+impl<T: Copy + Div<T, Output = T>, U1, U2> Div<TypedScale<T, U1, U2>> for TypedPoint3D<T, U2> {
+    type Output = TypedPoint3D<T, U1>;
+    #[inline]
+    fn div(self, scale: TypedScale<T, U1, U2>) -> TypedPoint3D<T, U1> {
+        point3(self.x / scale.get(), self.y / scale.get(), self.z / scale.get())
     }
 }
 

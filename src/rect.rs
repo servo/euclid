@@ -15,6 +15,7 @@ use point::TypedPoint2D;
 use vector::TypedVector2D;
 use side_offsets::TypedSideOffsets2D;
 use size::TypedSize2D;
+use approxord::{min, max};
 
 use num_traits::NumCast;
 #[cfg(feature = "serde")]
@@ -428,22 +429,6 @@ impl<T: Copy + PartialEq + Zero, U> TypedRect<T, U> {
     }
 }
 
-pub fn min<T: Clone + PartialOrd>(x: T, y: T) -> T {
-    if x <= y {
-        x
-    } else {
-        y
-    }
-}
-
-pub fn max<T: Clone + PartialOrd>(x: T, y: T) -> T {
-    if x >= y {
-        x
-    } else {
-        y
-    }
-}
-
 impl<T: Copy + Mul<T, Output = T>, U> Mul<T> for TypedRect<T, U> {
     type Output = Self;
     #[inline]
@@ -622,15 +607,6 @@ mod tests {
     use side_offsets::SideOffsets2D;
     use size::Size2D;
     use super::*;
-
-    #[test]
-    fn test_min_max() {
-        assert!(min(0u32, 1u32) == 0u32);
-        assert!(min(-1.0f32, 0.0f32) == -1.0f32);
-
-        assert!(max(0u32, 1u32) == 1u32);
-        assert!(max(-1.0f32, 0.0f32) == 0.0f32);
-    }
 
     #[test]
     fn test_translate() {
