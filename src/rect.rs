@@ -289,7 +289,7 @@ where
         )
     }
 
-    /// Returns the smallest rectangle defined by the top/bottom/left/right-most
+    /// Returns the largest rectangle defined by the top/bottom/left/right-most
     /// points provided as parameter.
     ///
     /// Note: This function has a behavior that can be surprising because
