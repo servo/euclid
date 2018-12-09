@@ -429,6 +429,11 @@ impl<T: Copy + Zero, U> TypedPoint3D<T, U> {
     pub fn origin() -> Self {
         point3(Zero::zero(), Zero::zero(), Zero::zero())
     }
+
+    #[inline]
+    pub fn zero() -> Self {
+        Self::origin()
+    }
 }
 
 impl<T: Copy + One, U> TypedPoint3D<T, U> {
