@@ -78,12 +78,12 @@ pub use vector::{BoolVector2D, BoolVector3D, bvec2, bvec3};
 pub use homogen::HomogeneousVector;
 
 pub use rect::{rect, Rect, TypedRect};
+pub use cuboid::{cuboid, Cuboid, TypedCuboid};
 pub use translation::{TypedTranslation2D, TypedTranslation3D};
 pub use rotation::{Angle, Rotation2D, Rotation3D, TypedRotation2D, TypedRotation3D};
-pub use side_offsets::{SideOffsets2D, TypedSideOffsets2D};
+pub use side_offsets::{SideOffsets2D, TypedSideOffsets2D, SideOffsets3D, TypedSideOffsets3D};
 pub use size::{Size2D, TypedSize2D, size2};
 pub use trig::Trig;
-pub use cuboid::{cuboid, Cuboid, TypedCuboid};
 
 #[macro_use]
 mod macros;

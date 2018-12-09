@@ -559,7 +559,7 @@ impl<T: Floor + Ceil + Round + Add<T, Output = T> + Sub<T, Output = T>, U> Typed
     pub fn round(&self) -> Self {
         let origin = self.origin.round();
         let size = self.origin.add_size(&self.size).round() - origin;
-        TypedCuboid::new(origin, TypedSize3D::new(size.x, size.y))
+        TypedCuboid::new(origin, TypedSize3D::new(size.x, size.y, size.z))
     }
 
     /// Return a cuboid with faces/edges rounded to integer coordinates, such that
@@ -568,7 +568,7 @@ impl<T: Floor + Ceil + Round + Add<T, Output = T> + Sub<T, Output = T>, U> Typed
     pub fn round_in(&self) -> Self {
         let origin = self.origin.ceil();
         let size = self.origin.add_size(&self.size).floor() - origin;
-        TypedCuboid::new(origin, TypedSize3D::new(size.x, size.y))
+        TypedCuboid::new(origin, TypedSize3D::new(size.x, size.y, size.z))
     }
 
     /// Return a cuboid with faces/edges rounded to integer coordinates, such that
@@ -577,7 +577,7 @@ impl<T: Floor + Ceil + Round + Add<T, Output = T> + Sub<T, Output = T>, U> Typed
     pub fn round_out(&self) -> Self {
         let origin = self.origin.floor();
         let size = self.origin.add_size(&self.size).ceil() - origin;
-        TypedCuboid::new(origin, TypedSize3D::new(size.x, size.y))
+        TypedCuboid::new(origin, TypedSize3D::new(size.x, size.y, size.z))
     }
 }
 
