@@ -83,11 +83,13 @@ pub use rotation::{Angle, Rotation2D, Rotation3D, TypedRotation2D, TypedRotation
 pub use side_offsets::{SideOffsets2D, TypedSideOffsets2D};
 pub use size::{Size2D, TypedSize2D, size2};
 pub use trig::Trig;
+pub use cuboid::{cuboid, Cuboid, TypedCuboid};
 
 #[macro_use]
 mod macros;
 
 pub mod approxeq;
+pub mod approxord;
 mod homogen;
 pub mod num;
 mod length;
@@ -102,6 +104,7 @@ mod transform3d;
 mod translation;
 mod trig;
 mod vector;
+mod cuboid;
 
 /// The default unit.
 #[derive(Clone, Copy)]

@@ -15,6 +15,7 @@ use point::TypedPoint2D;
 use vector::TypedVector2D;
 use side_offsets::TypedSideOffsets2D;
 use size::TypedSize2D;
+use approxord::{min, max};
 
 use num_traits::NumCast;
 #[cfg(feature = "serde")]
@@ -415,22 +416,6 @@ impl<T: Copy + PartialEq + Zero, U> TypedRect<T, U> {
     /// Returns true if the size is zero, regardless of the origin's value.
     pub fn is_empty(&self) -> bool {
         self.size.width == Zero::zero() || self.size.height == Zero::zero()
-    }
-}
-
-pub fn min<T: Clone + PartialOrd>(x: T, y: T) -> T {
-    if x <= y {
-        x
-    } else {
-        y
-    }
-}
-
-pub fn max<T: Clone + PartialOrd>(x: T, y: T) -> T {
-    if x >= y {
-        x
-    } else {
-        y
     }
 }
 
