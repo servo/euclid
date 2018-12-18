@@ -78,7 +78,7 @@ pub use vector::{BoolVector2D, BoolVector3D, bvec2, bvec3};
 pub use homogen::HomogeneousVector;
 
 pub use rect::{rect, Rect, TypedRect};
-pub use cuboid::{cuboid, Cuboid, TypedCuboid};
+pub use box3d::{box3d, Box3D, TypedBox3D};
 pub use translation::{TypedTranslation2D, TypedTranslation3D};
 pub use rotation::{Angle, Rotation2D, Rotation3D, TypedRotation2D, TypedRotation3D};
 pub use side_offsets::{SideOffsets2D, TypedSideOffsets2D, SideOffsets3D, TypedSideOffsets3D};
@@ -104,7 +104,7 @@ mod transform3d;
 mod translation;
 mod trig;
 mod vector;
-mod cuboid;
+mod box3d;
 
 /// The default unit.
 #[derive(Clone, Copy)]
