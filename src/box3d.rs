@@ -152,7 +152,7 @@ where
 
 impl<T, U> TypedBox3D<T, U>
 where
-    T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output = T> + Sub<T, Output = T>,
+    T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output = T> + Sub<T, Output = T> + Div<T, Output = T> + One,
 {
     #[inline]
     pub fn intersects(&self, other: &Self) -> bool {
@@ -279,13 +279,10 @@ where
     #[inline]
     #[cfg_attr(feature = "unstable", must_use)]
     pub fn inflate(&self, width: T, height: T, depth: T) -> Self {
+        let two = T::one() + T::one();
         TypedBox3D::new(
-            TypedPoint3D::new(self.a.x - width, self.a.y - height, self.a.z - depth),
-            TypedSize3D::new(
-                self.b.width + width + width,
-                self.b.height + height + height,
-                self.b.depth + depth + depth,
-            ),
+            TypedPoint3D::new(self.a.x - width / two, self.a.y + height / two, self.a.z + depth / two),
+            TypedPoint3D::new(self.a.x + width / two, self.a.y - height / two, self.a.z - depth / two),
         )
     }
 
@@ -297,37 +294,37 @@ where
 
     #[inline]
     pub fn top_right_front(&self) -> TypedPoint3D<T, U> {
-        TypedPoint3D::new(self.max_x(), self.a.y, self.a.z)
+        TypedPoint3D::new(self.max_x(), self.max_y(), self.max_z())
     }
 
     #[inline]
     pub fn bottom_left_front(&self) -> TypedPoint3D<T, U> {
-        TypedPoint3D::new(self.a.x, self.max_y(), self.a.z)
+        TypedPoint3D::new(self.min_x(), self.min_y(), self.max_z())
     }
 
     #[inline]
     pub fn bottom_right_front(&self) -> TypedPoint3D<T, U> {
-        TypedPoint3D::new(self.max_x(), self.max_y(), self.a.z)
+        TypedPoint3D::new(self.max_x(), self.min_y(), self.max_z())
     }
 
     #[inline]
     pub fn top_left_back(&self) -> TypedPoint3D<T, U> {
-        TypedPoint3D::new(self.a.x, self.a.y, self.max_z())
+        TypedPoint3D::new(self.min_x(), self.max_y(), self.min_z())
     }
 
     #[inline]
     pub fn top_right_back(&self) -> TypedPoint3D<T, U> {
-        TypedPoint3D::new(self.max_x(), self.a.y, self.max_z())
+        TypedPoint3D::new(self.max_x(), self.max_y(), self.min_z())
     }
 
     #[inline]
     pub fn bottom_left_back(&self) -> TypedPoint3D<T, U> {
-        TypedPoint3D::new(self.a.x, self.max_y(), self.max_z())
+        TypedPoint3D::new(self.min_x(), self.min_y(), self.min_z())
     }
 
     #[inline]
     pub fn bottom_right_back(&self) -> TypedPoint3D<T, U> {
-        TypedPoint3D::new(self.max_x(), self.max_y(), self.max_z())
+        TypedPoint3D::new(self.max_x(), self.min_y(), self.min_z())
     }
 
     #[inline]
@@ -336,26 +333,35 @@ where
         self.translate(&b.to_vector())
     }
 
-    /// Calculate the b and position of an inner box3d.
+    #[inline]
+    pub fn size(&self)-> TypedSize3D<T, U> {
+        TypedSize3D::new(
+            self.max_x() - self.min_x(),
+            self.max_y() - self.min_y(),
+            self.max_z() - self.min_z(),
+        )
+    }
+
+    /// Calculate the size and position of an inner box3d.
     ///
-    /// Subtracts the side offsets from all sides. The horizontal and vertical
-    /// offsets must not be larger than the original side length.
+    /// Subtracts the side offsets from all sides. The horizontal, vertical
+    /// and applicate offsets must not be larger than the original side length.
     pub fn inner_box(&self, offsets: TypedSideOffsets3D<T, U>) -> Self {
         let box3d = TypedBox3D::new(
             TypedPoint3D::new(
                 self.a.x + offsets.left,
-                self.a.y + offsets.top,
-                self.a.z + offsets.front,
+                self.a.y - offsets.top,
+                self.a.z - offsets.front,
             ),
-            TypedSize3D::new(
-                self.b.width - offsets.horizontal(),
-                self.b.height - offsets.vertical(),
-                self.b.depth - offsets.applicate(),
-            )
+            TypedPoint3D::new(
+                self.b.x - offsets.right,
+                self.b.y + offsets.bottom,
+                self.b.z + offsets.back,
+            ),
         );
-        debug_assert!(box3d.b.width >= Zero::zero());
-        debug_assert!(box3d.b.height >= Zero::zero());
-        debug_assert!(box3d.b.depth >= Zero::zero());
+        debug_assert!(box3d.size().width >= Zero::zero());
+        debug_assert!(box3d.size().height >= Zero::zero());
+        debug_assert!(box3d.size().depth >= Zero::zero());
         box3d
     }
 
@@ -366,14 +372,14 @@ where
         TypedBox3D::new(
             TypedPoint3D::new(
                 self.a.x - offsets.left,
-                self.a.y - offsets.top,
-                self.a.z - offsets.front,
+                self.a.y + offsets.top,
+                self.a.z + offsets.front,
             ),
-            TypedSize3D::new(
-                self.b.width + offsets.horizontal(),
-                self.b.height + offsets.vertical(),
-                self.b.depth + offsets.applicate(),
-            )
+            TypedPoint3D::new(
+                self.b.x + offsets.right,
+                self.b.y - offsets.bottom,
+                self.b.z - offsets.back,
+            ),
         )
     }
 
