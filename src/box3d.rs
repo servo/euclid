@@ -36,6 +36,8 @@ use core::ops::{Add, Div, Mul, Sub, Neg};
 /// Axis directions: x axis positive going left to right.
 ///                  y axis positive going bottom to top.
 ///                  z axis positive going from back to front (out of the page).
+/// The axis directions follows those recommended by Microsoft:
+/// https://docs.microsoft.com/en-us/dotnet/framework/wpf/graphics-multimedia/3-d-transformations-overview
 #[repr(C)]
 pub struct TypedBox3D<T, U = UnknownUnit> {
     pub a: TypedPoint3D<T, U>, 
@@ -111,34 +113,9 @@ impl<T, U> TypedBox3D<T, U> {
     }
 }
 
-impl<T, U> TypedBox3D<T, U> 
-where
-    T: Copy + Clone + PartialOrd 
-{
-    /// Fix coordinates so that a and b represent the corners described.
-    pub fn fix(&self) -> Self {
-        let true_a = TypedPoint3D::new(
-            min(self.a.x, self.b.x),
-            max(self.a.y, self.b.y),
-            max(self.a.z, self.b.z),
-        );
-
-        let true_b = TypedPoint3D::new(
-            min(self.a.x, self.b.x),
-            max(self.a.y, self.b.y),
-            max(self.a.z, self.b.z),
-        );
-
-        TypedBox3D {
-            a: true_a,
-            b: true_b,
-        }
-    }
-}
-
 impl<T, U> TypedBox3D<T, U>
 where
-    T: Copy + Div<T, Output = T> + Neg<Output = T> + Add<T, Output = T> + One
+    T: Copy + Div<T, Output = T> + Neg<Output = T> + Add<T, Output = T> + One,
 {
     /// Creates a box3d of the given size, so that the centroid is at zero origin.
     pub fn from_size(size: TypedSize3D<T, U>) -> Self {
@@ -152,18 +129,8 @@ where
 
 impl<T, U> TypedBox3D<T, U>
 where
-    T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output = T> + Sub<T, Output = T> + Div<T, Output = T> + One,
+    T: Copy,
 {
-    #[inline]
-    pub fn intersects(&self, other: &Self) -> bool {
-        self.a.x < other.b.x
-            && self.b.x > other.a.x
-            && self.a.y < other.b.y
-            && self.b.y > other.a.y
-            && self.a.z < other.b.z
-            && self.b.z > other.a.z
-    }
-
     #[inline]
     pub fn max_x(&self) -> T {
         self.b.x
@@ -193,103 +160,10 @@ where
     pub fn min_z(&self) -> T {
         self.b.z
     }
-
+    
     #[inline]
-    pub fn max_x_typed(&self) -> Length<T, U> {
-        Length::new(self.max_x())
-    }
-
-    #[inline]
-    pub fn min_x_typed(&self) -> Length<T, U> {
-        Length::new(self.min_x())
-    }
-
-    #[inline]
-    pub fn max_y_typed(&self) -> Length<T, U> {
-        Length::new(self.max_y())
-    }
-
-    #[inline]
-    pub fn min_y_typed(&self) -> Length<T, U> {
-        Length::new(self.min_y())
-    }
-
-    #[inline]
-    pub fn max_z_typed(&self) -> Length<T, U> {
-        Length::new(self.max_z())
-    }
-
-    #[inline]
-    pub fn min_z_typed(&self) -> Length<T, U> {
-        Length::new(self.min_z())
-    }
-
-    #[inline]
-    pub fn intersection(&self, other: &Self) -> Option<Self> {
-        if !self.intersects(other) {
-            return None;
-        }
-
-        let intersection_a = TypedPoint3D::new(
-            max(self.min_x(), other.min_x()),
-            min(self.max_y(), other.max_y()),
-            min(self.max_z(), other.max_z()),
-        );
-
-        let intersection_b = TypedPoint3D::new(
-            min(self.max_x(), other.max_x()),
-            max(self.min_y(), other.min_y()),
-            max(self.min_z(), other.min_z()),
-        );
-
-        Some(TypedBox3D::new(
-            intersection_a, 
-            intersection_b,
-        ))
-    }
-
-    /// Returns the same box3d, translated by a vector.
-    #[inline]
-    #[cfg_attr(feature = "unstable", must_use)]
-    pub fn translate(&self, by: &TypedVector3D<T, U>) -> Self {
-        Self::new(self.a + *by, self.b + *by)
-    }
-
-    /// Returns true if this box3d contains the point. Points are considered
-    /// in the box3d if they are on the front, left or top faces, but outside if they
-    /// are on the back, right or bottom faces.
-    #[inline]
-    pub fn contains(&self, other: &TypedPoint3D<T, U>) -> bool {
-        self.a.x <= other.x && other.x < self.b.x
-            && self.a.y >= other.y && other.y > self.b.y
-            && self.a.z >= other.z && other.z > self.b.z
-    }
-
-    /// Returns true if this box3d contains the interior of the other box3d. Always
-    /// returns true if other is empty, and always returns false if other is
-    /// nonempty but this box3d is empty.
-    #[inline]
-    pub fn contains_box(&self, other: &Self) -> bool {
-        other.is_empty()
-            || (self.min_x() <= other.min_x() && other.max_x() <= self.max_x()
-                && self.min_y() <= other.min_y() && other.max_y() <= self.max_y()
-                && self.min_z() <= other.min_z() && other.max_z() <= self.max_z())
-    }
-
-    #[inline]
-    #[cfg_attr(feature = "unstable", must_use)]
-    pub fn inflate(&self, width: T, height: T, depth: T) -> Self {
-        let two = T::one() + T::one();
-        TypedBox3D::new(
-            TypedPoint3D::new(self.a.x - width / two, self.a.y + height / two, self.a.z + depth / two),
-            TypedPoint3D::new(self.a.x + width / two, self.a.y - height / two, self.a.z - depth / two),
-        )
-    }
-
-    #[inline]
-    #[cfg_attr(feature = "unstable", must_use)]
-    pub fn inflate_typed(&self, width: Length<T, U>, height: Length<T, U>, depth: Length<T, U>) -> Self {
-        self.inflate(width.get(), height.get(), depth.get())
+    pub fn top_left_front(&self) -> TypedPoint3D<T, U> {
+        TypedPoint3D::new(self.min_x(), self.max_y(), self.max_z())
     }
 
     #[inline]
@@ -328,11 +202,128 @@ where
     }
 
     #[inline]
+    pub fn max_x_typed(&self) -> Length<T, U> {
+        Length::new(self.max_x())
+    }
+
+    #[inline]
+    pub fn min_x_typed(&self) -> Length<T, U> {
+        Length::new(self.min_x())
+    }
+
+    #[inline]
+    pub fn max_y_typed(&self) -> Length<T, U> {
+        Length::new(self.max_y())
+    }
+
+    #[inline]
+    pub fn min_y_typed(&self) -> Length<T, U> {
+        Length::new(self.min_y())
+    }
+
+    #[inline]
+    pub fn max_z_typed(&self) -> Length<T, U> {
+        Length::new(self.max_z())
+    }
+
+    #[inline]
+    pub fn min_z_typed(&self) -> Length<T, U> {
+        Length::new(self.min_z())
+    }
+}
+
+impl<T, U> TypedBox3D<T, U>
+where
+    T: Copy + PartialOrd,
+{
+    #[inline]
+    pub fn intersects(&self, other: &Self) -> bool {
+        self.a.x < other.b.x
+            && self.b.x > other.a.x
+            && self.a.y < other.b.y
+            && self.b.y > other.a.y
+            && self.a.z < other.b.z
+            && self.b.z > other.a.z
+    }
+
+    #[inline]
+    pub fn intersection(&self, other: &Self) -> Option<Self> {
+        if !self.intersects(other) {
+            return None;
+        }
+
+        let intersection_a = TypedPoint3D::new(
+            max(self.min_x(), other.min_x()),
+            min(self.max_y(), other.max_y()),
+            min(self.max_z(), other.max_z()),
+        );
+
+        let intersection_b = TypedPoint3D::new(
+            min(self.max_x(), other.max_x()),
+            max(self.min_y(), other.min_y()),
+            max(self.min_z(), other.min_z()),
+        );
+
+        Some(TypedBox3D::new(
+            intersection_a, 
+            intersection_b,
+        ))
+    }
+}
+
+impl<T, U> TypedBox3D<T, U>
+where
+    T: Copy + Add<T, Output = T>,
+{
+    /// Returns the same box3d, translated by a vector.
+    #[inline]
+    #[cfg_attr(feature = "unstable", must_use)]
+    pub fn translate(&self, by: &TypedVector3D<T, U>) -> Self {
+        Self::new(self.a + *by, self.b + *by)
+    }
+
+    #[inline]
     #[cfg_attr(feature = "unstable", must_use)]
     pub fn translate_by_size(&self, b: &TypedPoint3D<T, U>) -> Self {
         self.translate(&b.to_vector())
     }
+}
 
+impl<T, U> TypedBox3D<T, U>
+where
+    T: Copy + PartialOrd + Zero,
+{
+    /// Returns true if this box3d contains the point. Points are considered
+    /// in the box3d if they are on the front, left or top faces, but outside if they
+    /// are on the back, right or bottom faces.
+    #[inline]
+    pub fn contains(&self, other: &TypedPoint3D<T, U>) -> bool {
+        self.a.x <= other.x && other.x < self.b.x
+            && self.a.y >= other.y && other.y > self.b.y
+            && self.a.z >= other.z && other.z > self.b.z
+    }
+}
+
+impl<T, U> TypedBox3D<T, U>
+where
+    T: Copy + PartialOrd + Zero + Sub<T, Output = T>,
+{
+    /// Returns true if this box3d contains the interior of the other box3d. Always
+    /// returns true if other is empty, and always returns false if other is
+    /// nonempty but this box3d is empty.
+    #[inline]
+    pub fn contains_box(&self, other: &Self) -> bool {
+        other.is_empty()
+            || (self.min_x() <= other.min_x() && other.max_x() <= self.max_x()
+                && self.min_y() <= other.min_y() && other.max_y() <= self.max_y()
+                && self.min_z() <= other.min_z() && other.max_z() <= self.max_z())
+    }
+}
+
+impl<T, U> TypedBox3D<T, U>
+where
+    T: Copy + Sub<T, Output = T>,
+{
     #[inline]
     pub fn size(&self)-> TypedSize3D<T, U> {
         TypedSize3D::new(
@@ -341,7 +332,33 @@ where
             self.max_z() - self.min_z(),
         )
     }
+}
 
+impl<T, U> TypedBox3D<T, U>
+where
+    T: Copy + PartialEq + Add<T, Output = T> + Sub<T, Output = T> + Div<T, Output = T> + One,
+{
+    #[inline]
+    #[cfg_attr(feature = "unstable", must_use)]
+    pub fn inflate(&self, width: T, height: T, depth: T) -> Self {
+        let two = T::one() + T::one();
+        TypedBox3D::new(
+            TypedPoint3D::new(self.a.x - width / two, self.a.y + height / two, self.a.z + depth / two),
+            TypedPoint3D::new(self.a.x + width / two, self.a.y - height / two, self.a.z - depth / two),
+        )
+    }
+
+    #[inline]
+    #[cfg_attr(feature = "unstable", must_use)]
+    pub fn inflate_typed(&self, width: Length<T, U>, height: Length<T, U>, depth: Length<T, U>) -> Self {
+        self.inflate(width.get(), height.get(), depth.get())
+    }
+}
+
+impl<T, U> TypedBox3D<T, U>
+where
+    T: Copy + Zero + PartialOrd + Add<T, Output = T> + Sub<T, Output = T>,
+{
     /// Calculate the size and position of an inner box3d.
     ///
     /// Subtracts the side offsets from all sides. The horizontal, vertical
@@ -359,9 +376,9 @@ where
                 self.b.z + offsets.back,
             ),
         );
-        debug_assert!(box3d.size().width >= Zero::zero());
-        debug_assert!(box3d.size().height >= Zero::zero());
-        debug_assert!(box3d.size().depth >= Zero::zero());
+        debug_assert!(box3d.size().width >= T::zero());
+        debug_assert!(box3d.size().height >= T::zero());
+        debug_assert!(box3d.size().depth >= T::zero());
         box3d
     }
 
@@ -382,7 +399,13 @@ where
             ),
         )
     }
+}
 
+
+impl<T, U> TypedBox3D<T, U>
+where
+    T: Copy + Zero + PartialOrd,
+{
     /// Returns the largest box3d defined by the outer-most
     /// points provided.
     pub fn from_points<I>(points: I) -> Self
@@ -392,36 +415,62 @@ where
     {
         let mut points = points.into_iter();
 
+        // Need at least 2 different points for a valid box3d (ie: volume > 0).
         let (mut min_x, mut min_y, mut min_z) = match points.next() {
             Some(first) => (first.borrow().x, first.borrow().y, first.borrow().z),
             None => return TypedBox3D::zero(),
         };
-
         let (mut max_x, mut max_y, mut max_z) = (min_x, min_y, min_z);
-        for point in points {
-            let p = point.borrow();
-            if p.x < min_x {
-                min_x = p.x
+
+        {
+            let mut assign_min_max = |point: I::Item| {
+                let p = point.borrow();
+                if p.x < min_x {
+                    min_x = p.x
+                }
+                if p.x > max_x {
+                    max_x = p.x
+                }
+                if p.y < min_y {
+                    min_y = p.y
+                }
+                if p.y > max_y {
+                    max_y = p.y
+                }
+                if p.z < min_z {
+                    min_z = p.z
+                }
+                if p.y > max_y {
+                    max_z = p.z
+                }
+            };
+                    
+            match points.next() {
+                Some(second) => assign_min_max(second),
+                None => return TypedBox3D::zero(),
             }
-            if p.x > max_x {
-                max_x = p.x
-            }
-            if p.y < min_y {
-                min_y = p.y
-            }
-            if p.y > max_y {
-                max_y = p.y
-            }
-            if p.z < min_z {
-                min_z = p.z
-            }
-            if p.y > max_y {
-                max_z = p.z
+
+            for point in points {
+                assign_min_max(point);
             }
         }
-        TypedBox3D::new(
-            TypedPoint3D::new(min_x, min_y, min_z),
-            TypedSize3D::new(max_x - min_x, max_y - min_y, max_z - min_z),
+
+        Self::from_min_max(min_x, min_y, min_z, max_x, max_y, max_z)
+    }
+}
+
+impl<T, U> TypedBox3D<T, U>
+where
+    T: Copy + PartialOrd,
+{
+    pub fn from_min_max(min_x: T, min_y: T, min_z: T, max_x: T, max_y: T, max_z: T) -> Self {
+        debug_assert!(min_x < max_x);
+        debug_assert!(min_y < max_y);
+        debug_assert!(min_z < max_z);
+
+        Self::new(
+            TypedPoint3D::new(min_x, max_y, max_z),
+            TypedPoint3D::new(max_x, min_y, min_z),
         )
     }
 }
@@ -448,7 +497,7 @@ where
 {
     pub fn center(&self) -> TypedPoint3D<T, U> {
         let two = T::one() + T::one();
-        self.a + self.b.to_vector() / two
+        (self.a + self.b.to_vector()) / two
     }
 }
 
@@ -458,63 +507,69 @@ where
 {
     #[inline]
     pub fn union(&self, other: &Self) -> Self {
-        if self.b == Zero::zero() {
-            return *other;
-        }
-        if other.b == Zero::zero() {
-            return *self;
-        }
-
-        let upper_left_front = TypedPoint3D::new(
+        TypedBox3D::from_min_max(
             min(self.min_x(), other.min_x()),
             min(self.min_y(), other.min_y()),
             min(self.min_z(), other.min_z()),
-        );
-
-        let lower_right_back_x = max(self.max_x(), other.max_x());
-        let lower_right_back_y = max(self.max_y(), other.max_y());
-        let lower_right_back_z = max(self.max_z(), other.max_z());
-
-        TypedBox3D::new(
-            upper_left_front,
-            TypedSize3D::new(lower_right_back_x - upper_left_front.x, lower_right_back_y - upper_left_front.y, lower_right_back_z - upper_left_front.z),
+            max(self.max_x(), other.max_x()),
+            max(self.max_y(), other.max_z()),
+            max(self.max_y(), other.max_z()),
         )
     }
 }
 
-impl<T, U> TypedBox3D<T, U> {
+impl<T, U> TypedBox3D<T, U>
+where
+    T: Copy,
+{
     #[inline]
     pub fn scale<S: Copy>(&self, x: S, y: S, z: S) -> Self
     where
-        T: Copy + Clone + Mul<S, Output = T>,
+        T: Mul<S, Output = T>
     {
         TypedBox3D::new(
             TypedPoint3D::new(self.a.x * x, self.a.y * y, self.a.z * z),
-            TypedSize3D::new(self.b.width * x, self.b.height * y, self.b.depth * z),
+            TypedPoint3D::new(self.b.x * x, self.b.y * y, self.b.z * z),
         )
     }
 }
 
-impl<T: Copy + Clone + Mul<T, Output = T>, U> TypedBox3D<T, U> {
+impl<T, U> TypedBox3D<T, U>
+where
+    T: Copy + Mul<T, Output = T> + Sub<T, Output = T>,
+{
     #[inline]
     pub fn volume(&self) -> T {
-        self.b.volume()
+        let size = self.size();
+        size.width * size.height * size.depth
     }
 }
 
-impl<T: Copy + PartialEq + Zero, U> TypedBox3D<T, U> {
+impl<T, U> TypedBox3D<T, U> 
+where
+    T: Copy + Zero,
+{
     /// Constructor, setting all sides to zero.
     pub fn zero() -> Self {
-        TypedBox3D::new(TypedPoint3D::a(), TypedSize3D::zero())
-    }
-
-    /// Returns true if the b is zero, regardless of the a's value.
-    pub fn is_empty(&self) -> bool {
-        self.b.width == Zero::zero() || self.b.height == Zero::zero() || self.b.depth == Zero::zero()
+        TypedBox3D::new(TypedPoint3D::zero(), TypedPoint3D::zero())
     }
 }
 
-impl<T: Copy + Mul<T, Output = T>, U> Mul<T> for TypedBox3D<T, U> {
+impl<T, U> TypedBox3D<T, U> 
+where
+    T: Copy + PartialEq + Zero + Sub<T, Output = T>,
+{
+    /// Returns true if the size is zero, regardless of a or b's value.
+    pub fn is_empty(&self) -> bool {
+        let size = self.size();
+        size.width == Zero::zero() || size.height == Zero::zero() || size.depth == Zero::zero()
+    }
+}
+
+impl<T, U> Mul<T> for TypedBox3D<T, U> 
+where
+    T: Copy + Mul<T, Output = T>,
+{
     type Output = Self;
     #[inline]
     fn mul(self, scale: T) -> Self {
@@ -522,7 +577,10 @@ impl<T: Copy + Mul<T, Output = T>, U> Mul<T> for TypedBox3D<T, U> {
     }
 }
 
-impl<T: Copy + Div<T, Output = T>, U> Div<T> for TypedBox3D<T, U> {
+impl<T, U> Div<T> for TypedBox3D<T, U> 
+where
+    T: Copy + Div<T, Output = T>,
+{
     type Output = Self;
     #[inline]
     fn div(self, scale: T) -> Self {
@@ -530,7 +588,10 @@ impl<T: Copy + Div<T, Output = T>, U> Div<T> for TypedBox3D<T, U> {
     }
 }
 
-impl<T: Copy + Mul<T, Output = T>, U1, U2> Mul<TypedScale<T, U1, U2>> for TypedBox3D<T, U1> {
+impl<T, U1, U2> Mul<TypedScale<T, U1, U2>> for TypedBox3D<T, U1> 
+where
+    T: Copy + Mul<T, Output = T>,
+{
     type Output = TypedBox3D<T, U2>;
     #[inline]
     fn mul(self, scale: TypedScale<T, U1, U2>) -> TypedBox3D<T, U2> {
@@ -538,7 +599,10 @@ impl<T: Copy + Mul<T, Output = T>, U1, U2> Mul<TypedScale<T, U1, U2>> for TypedB
     }
 }
 
-impl<T: Copy + Div<T, Output = T>, U1, U2> Div<TypedScale<T, U1, U2>> for TypedBox3D<T, U2> {
+impl<T, U1, U2> Div<TypedScale<T, U1, U2>> for TypedBox3D<T, U2> 
+where
+    T: Copy + Div<T, Output = T>,
+{
     type Output = TypedBox3D<T, U1>;
     #[inline]
     fn div(self, scale: TypedScale<T, U1, U2>) -> TypedBox3D<T, U1> {
@@ -546,7 +610,10 @@ impl<T: Copy + Div<T, Output = T>, U1, U2> Div<TypedScale<T, U1, U2>> for TypedB
     }
 }
 
-impl<T: Copy, Unit> TypedBox3D<T, Unit> {
+impl<T, Unit> TypedBox3D<T, Unit> 
+where
+    T: Copy,
+{
     /// Drop the units, preserving only the numeric value.
     pub fn to_untyped(&self) -> Box3D<T> {
         TypedBox3D::new(self.a.to_untyped(), self.b.to_untyped())
@@ -556,12 +623,15 @@ impl<T: Copy, Unit> TypedBox3D<T, Unit> {
     pub fn from_untyped(c: &Box3D<T>) -> TypedBox3D<T, Unit> {
         TypedBox3D::new(
             TypedPoint3D::from_untyped(&c.a),
-            TypedSize3D::from_untyped(&c.b),
+            TypedPoint3D::from_untyped(&c.b),
         )
     }
 }
 
-impl<T0: NumCast + Copy, Unit> TypedBox3D<T0, Unit> {
+impl<T0, Unit> TypedBox3D<T0, Unit> 
+where
+    T0: NumCast + Copy,
+{
     /// Cast from one numeric representation to another, preserving the units.
     ///
     /// When casting from floating point to integer coordinates, the decimals are truncated
@@ -587,7 +657,10 @@ impl<T0: NumCast + Copy, Unit> TypedBox3D<T0, Unit> {
     }
 }
 
-impl<T: Floor + Ceil + Round + Add<T, Output = T> + Sub<T, Output = T>, U> TypedBox3D<T, U> {
+impl<T, U> TypedBox3D<T, U> 
+where
+    T: Floor + Ceil + Round,
+{
     /// Return a box3d with edges rounded to integer coordinates, such that
     /// the returned box3d has the same set of pixel centers as the original
     /// one.
@@ -599,27 +672,39 @@ impl<T: Floor + Ceil + Round + Add<T, Output = T> + Sub<T, Output = T>, U> Typed
     /// They are always rounding as floor(n + 0.5).
     #[cfg_attr(feature = "unstable", must_use)]
     pub fn round(&self) -> Self {
-        let a = self.a.round();
-        let b = self.a.add_size(&self.b).round() - a;
-        TypedBox3D::new(a, TypedSize3D::new(b.x, b.y, b.z))
+        TypedBox3D::new(self.a.round(), self.b.round())
     }
 
     /// Return a box3d with faces/edges rounded to integer coordinates, such that
     /// the original box3d contains the resulting box3d.
     #[cfg_attr(feature = "unstable", must_use)]
     pub fn round_in(&self) -> Self {
-        let a = self.a.ceil();
-        let b = self.a.add_size(&self.b).floor() - a;
-        TypedBox3D::new(a, TypedSize3D::new(b.x, b.y, b.z))
+        let a_x = self.a.x.ceil();
+        let a_y = self.a.y.floor();
+        let a_z = self.a.z.floor();
+        let b_x = self.b.x.floor();
+        let b_y = self.b.y.ceil();
+        let b_z = self.b.z.ceil();
+        TypedBox3D::new(
+            TypedPoint3D::new(a_x, a_y, a_z), 
+            TypedPoint3D::new(b_x, b_y, b_z),
+        )
     }
 
     /// Return a box3d with faces/edges rounded to integer coordinates, such that
     /// the original box3d is contained in the resulting box3d.
     #[cfg_attr(feature = "unstable", must_use)]
     pub fn round_out(&self) -> Self {
-        let a = self.a.floor();
-        let b = self.a.add_size(&self.b).ceil() - a;
-        TypedBox3D::new(a, TypedSize3D::new(b.x, b.y, b.z))
+        let a_x = self.a.x.floor();
+        let a_y = self.a.y.ceil();
+        let a_z = self.a.z.ceil();
+        let b_x = self.b.x.ceil();
+        let b_y = self.b.y.floor();
+        let b_z = self.b.z.floor();
+        TypedBox3D::new(
+            TypedPoint3D::new(a_x, a_y, a_z), 
+            TypedPoint3D::new(b_x, b_y, b_z),
+        )
     }
 }
 
@@ -673,14 +758,15 @@ impl<T: NumCast + Copy, Unit> TypedBox3D<T, Unit> {
 }
 
 impl<T, U> From<TypedSize3D<T, U>> for TypedBox3D<T, U>
-where T: Copy + Zero
+where 
+    T: Copy + Div<T, Output = T> + Neg<Output = T> + Add<T, Output = T> + One,
 {
     fn from(b: TypedSize3D<T, U>) -> Self {
         Self::from_size(b)
     }
 }
 
-/// Shorthand for `TypedBox3D::new(TypedPoint3D::new(x, y, z), TypedSize3D::new(w, h, d))`.
-pub fn box3d<T: Copy, U>(x: T, y: T, z: T, w: T, h: T, d: T) -> TypedBox3D<T, U> {
-    TypedBox3D::new(TypedPoint3D::new(x, y, z), TypedSize3D::new(w, h, d))
+/// Shorthand for `TypedBox3D::new(TypedPoint3D::new(x1, y1, z1), TypedPoint3D::new(x2, y2, z2))`.
+pub fn box3d<T: Copy, U>(tlf_x: T, tlf_y: T, tlf_z: T, brb_x: T, brb_y: T, brb_z: T) -> TypedBox3D<T, U> {
+    TypedBox3D::new(TypedPoint3D::new(tlf_x, tlf_y, tlf_z), TypedPoint3D::new(brb_x, brb_y, brb_z))
 }
