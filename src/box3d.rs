@@ -808,3 +808,132 @@ where
 pub fn box3d<T: Copy, U>(tlf_x: T, tlf_y: T, tlf_z: T, brb_x: T, brb_y: T, brb_z: T) -> TypedBox3D<T, U> {
     TypedBox3D::new(TypedPoint3D::new(tlf_x, tlf_y, tlf_z), TypedPoint3D::new(brb_x, brb_y, brb_z))
 }
+
+#[cfg(test)]
+mod tests {
+    use side_offsets::SideOffsets3D;
+    use size::size3;
+    use point::{point3, Point3D};
+    use super::*;
+
+    #[test]
+    fn test_new() {
+        let b = Box3D::new(point3(-1.0, 1.0, 1.0), point3(1.0, -1.0, -1.0));
+        assert!(b.a.x == -1.0);
+        assert!(b.a.y == 1.0);
+        assert!(b.a.z == 1.0);
+        assert!(b.b.x == 1.0);
+        assert!(b.b.y == -1.0);
+        assert!(b.b.z == -1.0);
+    }
+
+    #[test]
+    fn test_size() {
+        let b = Box3D::new(point3(-10.0, 10.0, 10.0), point3(10.0, -10.0, -10.0));
+        assert!(b.size().width == 20.0);
+        assert!(b.size().height == 20.0);
+        assert!(b.size().depth == 20.0);
+    }
+
+    #[test]
+    fn test_center() {
+        let b = Box3D::new(point3(-10.0, 10.0, 10.0), point3(10.0, -10.0, -10.0));
+        assert!(b.center() == Point3D::zero());
+    }
+
+    #[test]
+    fn test_volume() {
+        let b = Box3D::new(point3(-10.0, 10.0, 10.0), point3(10.0, -10.0, -10.0));
+        assert!(b.volume() == 8000.0);
+    }
+
+    #[test]
+    fn test_area() {
+        let b = Box3D::new(point3(-10.0, 10.0, 10.0), point3(10.0, -10.0, -10.0));
+        assert!(b.front_area() == 400.0);
+        assert!(b.left_area() == 400.0);
+        assert!(b.right_area() == 400.0);
+        assert!(b.back_area() == 400.0);
+        assert!(b.top_area() == 400.0);
+        assert!(b.bottom_area() == 400.0);
+    }
+
+    #[test]
+    fn test_from_points() {
+        let b = Box3D::from_points(&[point3(50.0, 25.0, 12.5), point3(100.0, 160.0, 200.0)]);
+        assert!(b.a == point3(50.0, 160.0, 200.0));
+        assert!(b.b == point3(100.0, 25.0, 12.5));
+    }
+
+    #[test]
+    fn test_min_max() {
+        let b = Box3D::from_points(&[point3(50.0, 25.0, 12.5), point3(100.0, 160.0, 200.0)]);
+        assert!(b.min_x() == 50.0);
+        assert!(b.min_y() == 25.0);
+        assert!(b.min_z() == 12.5);
+        assert!(b.max_x() == 100.0);
+        assert!(b.max_y() == 160.0);
+        assert!(b.max_z() == 200.0);
+    }
+
+    #[test]
+    fn test_from_min_max() {
+        let b = Box3D::from_min_max(10.0, 20.0, 30.0, 40.0, 50.0, 60.0);
+        assert!(b.a == point3(10.0, 50.0, 60.0));
+        assert!(b.b == point3(40.0, 20.0, 30.0));
+    }
+
+    #[test]
+    fn test_round_in() {
+        let b = Box3D::from_points(&[point3(-25.5, -40.4, -70.9), point3(60.3, 36.5, 89.8)]).round_in();
+        assert!(b.min_x() == -25.0);
+        assert!(b.min_y() == -40.0);
+        assert!(b.min_z() == -70.0);
+        assert!(b.max_x() == 60.0);
+        assert!(b.max_y() == 36.0);
+        assert!(b.max_z() == 89.0);
+    }
+
+    #[test]
+    fn test_round_out() {
+        let b = Box3D::from_points(&[point3(-25.5, -40.4, -70.9), point3(60.3, 36.5, 89.8)]).round_out();
+        assert!(b.min_x() == -26.0);
+        assert!(b.min_y() == -41.0);
+        assert!(b.min_z() == -71.0);
+        assert!(b.max_x() == 61.0);
+        assert!(b.max_y() == 37.0);
+        assert!(b.max_z() == 90.0);
+    }
+
+    #[test]
+    fn test_round() {
+        let b = Box3D::from_points(&[point3(-25.5, -40.4, -70.9), point3(60.3, 36.5, 89.8)]).round();
+        assert!(b.min_x() == -26.0);
+        assert!(b.min_y() == -40.0);
+        assert!(b.min_z() == -71.0);
+        assert!(b.max_x() == 60.0);
+        assert!(b.max_y() == 37.0);
+        assert!(b.max_z() == 90.0);
+    }
+
+    #[test]
+    fn test_from_size() {
+        let b = Box3D::from_size(size3(30.0, 40.0, 50.0));
+        assert!(b.center() == Point3D::zero());
+        assert!(b.size().width == 30.0);
+        assert!(b.size().height == 40.0);
+        assert!(b.size().depth == 50.0);
+    }
+
+    #[test]
+    fn test_inner_box() {
+        let b = Box3D::from_points(&[point3(50.0, 25.0, 12.5), point3(100.0, 160.0, 200.0)]);
+        let b = b.inner_box(SideOffsets3D::new(10.0, 20.0, 5.0, 10.0, 20.0, 5.0));
+        assert!(b.max_x() == 80.0);
+        assert!(b.max_y() == 150.0);
+        assert!(b.max_z() == 180.0);
+        assert!(b.min_x() == 60.0);
+        assert!(b.min_y() == 30.0);
+        assert!(b.min_z() == 17.5);
+    }
+}
