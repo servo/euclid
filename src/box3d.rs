@@ -36,7 +36,7 @@ use core::ops::{Add, Div, Mul, Sub, Neg};
 /// Axis directions: x axis positive going left to right.
 ///                  y axis positive going bottom to top.
 ///                  z axis positive going from back to front (out of the page).
-/// The axis directions follows those recommended by Microsoft:
+/// The axis directions follows those used by Microsoft:
 /// https://docs.microsoft.com/en-us/dotnet/framework/wpf/graphics-multimedia/3-d-transformations-overview
 #[repr(C)]
 pub struct TypedBox3D<T, U = UnknownUnit> {
@@ -440,7 +440,7 @@ where
                 if p.z < min_z {
                     min_z = p.z
                 }
-                if p.y > max_y {
+                if p.z > max_z {
                     max_z = p.z
                 }
             };
@@ -542,6 +542,39 @@ where
     pub fn volume(&self) -> T {
         let size = self.size();
         size.width * size.height * size.depth
+    }
+
+    #[inline]
+    pub fn front_area(&self) -> T {
+        let size = self.size();
+        size.width * size.height
+    }
+
+    #[inline]
+    pub fn left_area(&self) -> T {
+        let size = self.size();
+        size.depth * size.height
+    }
+
+    #[inline]
+    pub fn top_area(&self) -> T {
+        let size = self.size();
+        size.depth * size.width
+    }
+
+    #[inline]
+    pub fn back_area(&self) -> T {
+        self.front_area()
+    }
+
+    #[inline]
+    pub fn right_area(&self) -> T {
+        self.left_area()
+    }
+
+    #[inline]
+    pub fn bottom_area(&self) -> T {
+        self.top_area()
     }
 }
 
@@ -659,7 +692,7 @@ where
 
 impl<T, U> TypedBox3D<T, U> 
 where
-    T: Floor + Ceil + Round,
+    T: Round,
 {
     /// Return a box3d with edges rounded to integer coordinates, such that
     /// the returned box3d has the same set of pixel centers as the original
@@ -674,7 +707,12 @@ where
     pub fn round(&self) -> Self {
         TypedBox3D::new(self.a.round(), self.b.round())
     }
+}
 
+impl<T, U> TypedBox3D<T, U> 
+where
+    T: Floor + Ceil,
+{
     /// Return a box3d with faces/edges rounded to integer coordinates, such that
     /// the original box3d contains the resulting box3d.
     #[cfg_attr(feature = "unstable", must_use)]
