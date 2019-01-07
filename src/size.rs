@@ -789,7 +789,7 @@ impl<T: Float, U> TypedSize3D<T, U> {
 }
 
 
-/// Shorthand for `TypedSize2D::new(w, h)`.
+/// Shorthand for `TypedSize3D::new(w, h, d)`.
 pub fn size3<T, U>(w: T, h: T, d: T) -> TypedSize3D<T, U> {
     TypedSize3D::new(w, h, d)
 }
