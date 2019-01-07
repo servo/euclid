@@ -344,7 +344,7 @@ where
         let two = T::one() + T::one();
         TypedBox3D::new(
             TypedPoint3D::new(self.a.x - width / two, self.a.y + height / two, self.a.z + depth / two),
-            TypedPoint3D::new(self.a.x + width / two, self.a.y - height / two, self.a.z - depth / two),
+            TypedPoint3D::new(self.b.x + width / two, self.b.y - height / two, self.b.z - depth / two),
         )
     }
 
@@ -464,9 +464,9 @@ where
     T: Copy + PartialOrd,
 {
     pub fn from_min_max(min_x: T, min_y: T, min_z: T, max_x: T, max_y: T, max_z: T) -> Self {
-        debug_assert!(min_x < max_x);
-        debug_assert!(min_y < max_y);
-        debug_assert!(min_z < max_z);
+        debug_assert!(min_x <= max_x);
+        debug_assert!(min_y <= max_y);
+        debug_assert!(min_z <= max_z);
 
         Self::new(
             TypedPoint3D::new(min_x, max_y, max_z),
@@ -1037,5 +1037,27 @@ mod tests {
         let b1 = Box3D::from_points(&[point3(-20.0, -20.0, -20.0), point3(20.0, 20.0, 20.0)]);
         let b2 = Box3D::from_points(&[point3(-14.3, -16.5, -19.3), point3(6.7, 17.6, 2.5)]);
         assert!(b1.contains_box(&b2));
+    }
+
+    #[test]
+    fn test_inflate() {
+        let b = Box3D::from_points(&[point3(-20.0, -20.0, -20.0), point3(20.0, 20.0, 20.0)]);
+        let b = b.inflate(10.0, 5.0, 2.0);
+        assert!(b.size().width == 50.0);
+        assert!(b.size().height == 45.0);
+        assert!(b.size().depth == 42.0);
+        assert!(b.center() == Point3D::zero());
+    }
+
+    #[test]
+    fn test_is_empty() {
+        for i in 0..3 {
+            let mut coords_neg = [-20.0, -20.0, -20.0];
+            let mut coords_pos = [20.0, 20.0, 20.0];
+            coords_neg[i] = 0.0;
+            coords_pos[i] = 0.0;
+            let b = Box3D::from_points(&[Point3D::from(coords_neg), Point3D::from(coords_pos)]);
+            assert!(b.is_empty());
+        }
     }
 }
