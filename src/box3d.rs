@@ -25,7 +25,7 @@ use core::borrow::Borrow;
 use core::cmp::PartialOrd;
 use core::fmt;
 use core::hash::{Hash, Hasher};
-use core::ops::{Add, Div, Mul, Sub, Neg};
+use core::ops::{Add, Div, Mul, Sub};
 
 
 /// A 3d box optionally tagged with a unit. 
@@ -115,15 +115,14 @@ impl<T, U> TypedBox3D<T, U> {
 
 impl<T, U> TypedBox3D<T, U>
 where
-    T: Copy + Div<T, Output = T> + Neg<Output = T> + Add<T, Output = T> + One,
+    T: Copy + Zero + PartialOrd,
 {
-    /// Creates a box3d of the given size, so that the centroid is at zero origin.
+    /// Creates a Box3D of the given size, at offset zero.
+    #[inline]
     pub fn from_size(size: TypedSize3D<T, U>) -> Self {
-        let two = T::one() + T::one();
-        TypedBox3D {
-            a: TypedPoint3D::new(-size.width / two, size.height / two, size.depth / two),
-            b: TypedPoint3D::new(size.width / two, -size.height / two, -size.depth / two)
-        }
+        let zero = TypedPoint3D::zero();
+        let point = size.to_vector().to_point();
+        TypedBox3D::from_points(&[zero, point])
     }
 }
 
@@ -790,7 +789,7 @@ impl<T: NumCast + Copy, Unit> TypedBox3D<T, Unit> {
 
 impl<T, U> From<TypedSize3D<T, U>> for TypedBox3D<T, U>
 where 
-    T: Copy + Div<T, Output = T> + Neg<Output = T> + Add<T, Output = T> + One,
+    T: Copy + Zero + PartialOrd,
 {
     fn from(b: TypedSize3D<T, U>) -> Self {
         Self::from_size(b)
@@ -913,7 +912,7 @@ mod tests {
     #[test]
     fn test_from_size() {
         let b = Box3D::from_size(size3(30.0, 40.0, 50.0));
-        assert!(b.center() == Point3D::zero());
+        assert!(b.bottom_left_back() == Point3D::zero());
         assert!(b.size().width == 30.0);
         assert!(b.size().height == 40.0);
         assert!(b.size().depth == 50.0);
