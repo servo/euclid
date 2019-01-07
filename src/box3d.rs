@@ -944,16 +944,20 @@ mod tests {
 
     #[test]
     fn test_translate() {
-        let b = Box3D::from_size(size3(15.0, 15.0, 200.0));
-        assert!(b.center() == Point3D::zero());
-        let b = b.translate(&vec3(10.0, 0.0, 0.0));
-        assert!(b.center() == point3(10.0, 0.0, 0.0));
-        assert!(b.max_x() == 17.5);
-        assert!(b.max_y() == 7.5);
-        assert!(b.max_z() == 100.0);
-        assert!(b.min_x() == 2.5);
-        assert!(b.min_y() == -7.5);
-        assert!(b.min_z() == -100.0);
+        let size = size3(15.0, 15.0, 200.0);
+        let mut center = (size / 2.0).to_vector().to_point();
+        let b = Box3D::from_size(size);
+        assert!(b.center() == center);
+        let translation = vec3(10.0, 2.5, 9.5);
+        let b = b.translate(&translation);
+        center += translation;
+        assert!(b.center() == center);
+        assert!(b.max_x() == 25.0);
+        assert!(b.max_y() == 17.5);
+        assert!(b.max_z() == 209.5);
+        assert!(b.min_x() == 10.0);
+        assert!(b.min_y() == 2.5);
+        assert!(b.min_z() == 9.5);
     }
 
     #[test]
