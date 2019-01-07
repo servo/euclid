@@ -281,12 +281,6 @@ where
     pub fn translate(&self, by: &TypedVector3D<T, U>) -> Self {
         Self::new(self.a + *by, self.b + *by)
     }
-
-    #[inline]
-    #[cfg_attr(feature = "unstable", must_use)]
-    pub fn translate_by_size(&self, b: &TypedPoint3D<T, U>) -> Self {
-        self.translate(&b.to_vector())
-    }
 }
 
 impl<T, U> TypedBox3D<T, U>
