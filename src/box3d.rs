@@ -238,12 +238,12 @@ where
 {
     #[inline]
     pub fn intersects(&self, other: &Self) -> bool {
-        self.a.x < other.b.x
-            && self.b.x > other.a.x
-            && self.a.y < other.b.y
-            && self.b.y > other.a.y
-            && self.a.z < other.b.z
-            && self.b.z > other.a.z
+        self.min_x() < other.max_x()
+            && self.max_x() > other.min_x()
+            && self.min_y() < other.max_y()
+            && self.max_y() > other.min_y()
+            && self.min_z() < other.max_z()
+            && self.max_z() > other.min_z()
     }
 
     #[inline]
@@ -811,6 +811,7 @@ pub fn box3d<T: Copy, U>(tlf_x: T, tlf_y: T, tlf_z: T, brb_x: T, brb_y: T, brb_z
 
 #[cfg(test)]
 mod tests {
+    use vector::vec3;
     use side_offsets::SideOffsets3D;
     use size::size3;
     use point::{point3, Point3D};
@@ -935,5 +936,106 @@ mod tests {
         assert!(b.min_x() == 60.0);
         assert!(b.min_y() == 30.0);
         assert!(b.min_z() == 17.5);
+    }
+
+    #[test]
+    fn test_outer_box() {
+        let b = Box3D::from_points(&[point3(50.0, 25.0, 12.5), point3(100.0, 160.0, 200.0)]);
+        let b = b.outer_box(SideOffsets3D::new(10.0, 20.0, 5.0, 10.0, 20.0, 5.0));
+        assert!(b.max_x() == 120.0);
+        assert!(b.max_y() == 170.0);
+        assert!(b.max_z() == 220.0);
+        assert!(b.min_x() == 40.0);
+        assert!(b.min_y() == 20.0);
+        assert!(b.min_z() == 7.5);
+    }
+
+    #[test]
+    fn test_translate() {
+        let b = Box3D::from_size(size3(15.0, 15.0, 200.0));
+        assert!(b.center() == Point3D::zero());
+        let b = b.translate(&vec3(10.0, 0.0, 0.0));
+        assert!(b.center() == point3(10.0, 0.0, 0.0));
+        assert!(b.max_x() == 17.5);
+        assert!(b.max_y() == 7.5);
+        assert!(b.max_z() == 100.0);
+        assert!(b.min_x() == 2.5);
+        assert!(b.min_y() == -7.5);
+        assert!(b.min_z() == -100.0);
+    }
+
+    #[test]
+    fn test_union() {
+        let b1 = Box3D::from_points(&[point3(-20.0, -20.0, -20.0), point3(0.0, 20.0, 20.0)]);
+        let b2 = Box3D::from_points(&[point3(0.0, 20.0, 20.0), point3(20.0, -20.0, -20.0)]);
+        let b = b1.union(&b2);
+        assert!(b.max_x() == 20.0);
+        assert!(b.max_y() == 20.0);
+        assert!(b.max_z() == 20.0);
+        assert!(b.min_x() == -20.0);
+        assert!(b.min_y() == -20.0);
+        assert!(b.min_z() == -20.0);
+        assert!(b.volume() == (40.0 * 40.0 * 40.0));
+    }
+
+    #[test]
+    fn test_intersection() {
+        let b1 = Box3D::from_points(&[point3(-15.0, -20.0, -20.0), point3(10.0, 20.0, 20.0)]);
+        let b2 = Box3D::from_points(&[point3(-10.0, 20.0, 20.0), point3(15.0, -20.0, -20.0)]);
+        let b = b1.intersection(&b2).unwrap();
+        assert!(b.max_x() == 10.0);
+        assert!(b.max_y() == 20.0);
+        assert!(b.max_z() == 20.0);
+        assert!(b.min_x() == -10.0);
+        assert!(b.min_y() == -20.0);
+        assert!(b.min_z() == -20.0);
+        assert!(b.volume() == (20.0 * 40.0 * 40.0));
+    }
+
+    #[test]
+    fn test_scale() {
+        let b = Box3D::from_points(&[point3(-10.0, -10.0, -10.0), point3(10.0, 10.0, 10.0)]);
+        let b = b.scale(0.5, 0.5, 0.5);
+        assert!(b.max_x() == 5.0);
+        assert!(b.max_y() == 5.0);
+        assert!(b.max_z() == 5.0);
+        assert!(b.min_x() == -5.0);
+        assert!(b.min_y() == -5.0);
+        assert!(b.min_z() == -5.0);
+    }
+
+    #[test]
+    fn test_zero() {
+        let b = Box3D::<f64>::zero();
+        assert!(b.max_x() == 0.0);
+        assert!(b.max_y() == 0.0);
+        assert!(b.max_z() == 0.0);
+        assert!(b.min_x() == 0.0);
+        assert!(b.min_y() == 0.0);
+        assert!(b.min_z() == 0.0);
+    }
+
+    #[test]
+    fn test_lerp() {
+        let b1 = Box3D::from_points(&[point3(-20.0, -20.0, -20.0), point3(-10.0, -10.0, -10.0)]);
+        let b2 = Box3D::from_points(&[point3(10.0, 10.0, 10.0), point3(20.0, 20.0, 20.0)]);
+        let b = b1.lerp(b2, 0.5);
+        assert!(b.center() == Point3D::zero());
+        assert!(b.size().width == 10.0);
+        assert!(b.size().height == 10.0);
+        assert!(b.size().depth == 10.0);
+    }
+
+    #[test]
+    fn test_contains() {
+        let b = Box3D::from_points(&[point3(-20.0, -20.0, -20.0), point3(20.0, 20.0, 20.0)]);
+        assert!(b.contains(&point3(-15.3, 10.5, 18.4)));
+    }
+
+    #[test]
+    fn test_contains_box() {
+        let b1 = Box3D::from_points(&[point3(-20.0, -20.0, -20.0), point3(20.0, 20.0, 20.0)]);
+        let b2 = Box3D::from_points(&[point3(-14.3, -16.5, -19.3), point3(6.7, 17.6, 2.5)]);
+        assert!(b1.contains_box(&b2));
     }
 }
