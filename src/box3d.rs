@@ -406,8 +406,7 @@ impl<T, U> TypedBox3D<T, U>
 where
     T: Copy + Zero + PartialOrd,
 {
-    /// Returns the largest box3d defined by the outer-most
-    /// points provided.
+    /// Returns the smallest box containing all of the provided points.
     pub fn from_points<I>(points: I) -> Self
     where
         I: IntoIterator,
