@@ -30,8 +30,8 @@ use core::ops::{Add, Div, Mul, Sub};
 
 /// A 3d box optionally tagged with a unit. 
 /// 
-/// a is the upper left front corner position.
-/// b is the lower right back corner position.
+/// min is the lower left back corner position.
+/// max is the upper right front corner position.
 /// 
 /// Axis directions: x axis positive going left to right.
 ///                  y axis positive going bottom to top.
@@ -40,8 +40,8 @@ use core::ops::{Add, Div, Mul, Sub};
 /// https://docs.microsoft.com/en-us/dotnet/framework/wpf/graphics-multimedia/3-d-transformations-overview
 #[repr(C)]
 pub struct TypedBox3D<T, U = UnknownUnit> {
-    pub a: TypedPoint3D<T, U>, 
-    pub b: TypedPoint3D<T, U>,
+    pub min: TypedPoint3D<T, U>, 
+    pub max: TypedPoint3D<T, U>,
 }
 
 /// The default box 3d type with no unit.
@@ -53,8 +53,8 @@ impl<'de, T: Copy + Deserialize<'de>, U> Deserialize<'de> for TypedBox3D<T, U> {
     where
         D: Deserializer<'de>,
     {
-        let (a, b) = try!(Deserialize::deserialize(deserializer));
-        Ok(TypedBox3D::new(a, b))
+        let (min, max) = try!(Deserialize::deserialize(deserializer));
+        Ok(TypedBox3D::new(min, max))
     }
 }
 
@@ -64,14 +64,14 @@ impl<T: Serialize, U> Serialize for TypedBox3D<T, U> {
     where
         S: Serializer,
     {
-        (&self.a, &self.b).serialize(serializer)
+        (&self.min, &self.max).serialize(serializer)
     }
 }
 
 impl<T: Hash, U> Hash for TypedBox3D<T, U> {
     fn hash<H: Hasher>(&self, h: &mut H) {
-        self.a.hash(h);
-        self.b.hash(h);
+        self.min.hash(h);
+        self.max.hash(h);
     }
 }
 
@@ -85,7 +85,7 @@ impl<T: Copy, U> Clone for TypedBox3D<T, U> {
 
 impl<T: PartialEq, U> PartialEq<TypedBox3D<T, U>> for TypedBox3D<T, U> {
     fn eq(&self, other: &Self) -> bool {
-        self.a.eq(&other.a) && self.b.eq(&other.b)
+        self.min.eq(&other.min) && self.max.eq(&other.max)
     }
 }
 
@@ -93,22 +93,22 @@ impl<T: Eq, U> Eq for TypedBox3D<T, U> {}
 
 impl<T: fmt::Debug, U> fmt::Debug for TypedBox3D<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "TypedBox3D({:?}, {:?})", self.a, self.b)
+        write!(f, "TypedBox3D({:?}, {:?})", self.min, self.max)
     }
 }
 
 impl<T: fmt::Display, U> fmt::Display for TypedBox3D<T, U> {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        write!(formatter, "Box3D({}, {})", self.a, self.b)
+        write!(formatter, "Box3D({}, {})", self.min, self.max)
     }
 }
 
 impl<T, U> TypedBox3D<T, U> {
     /// Constructor.
-    pub fn new(a: TypedPoint3D<T, U>, b: TypedPoint3D<T, U>) -> Self {
+    pub fn new(min: TypedPoint3D<T, U>, max: TypedPoint3D<T, U>) -> Self {
         TypedBox3D {
-            a,
-            b,
+            min,
+            max,
         }
     }
 }
@@ -132,32 +132,32 @@ where
 {
     #[inline]
     pub fn max_x(&self) -> T {
-        self.b.x
+        self.max.x
     }
 
     #[inline]
     pub fn min_x(&self) -> T {
-        self.a.x
+        self.min.x
     }
 
     #[inline]
     pub fn max_y(&self) -> T {
-        self.a.y
+        self.max.y
     }
 
     #[inline]
     pub fn min_y(&self) -> T {
-        self.b.y
+        self.min.y
     }
 
     #[inline]
     pub fn max_z(&self) -> T {
-        self.a.z
+        self.max.z
     }
 
     #[inline]
     pub fn min_z(&self) -> T {
-        self.b.z
+        self.min.z
     }
     
     #[inline]
@@ -251,21 +251,21 @@ where
             return None;
         }
 
-        let intersection_a = TypedPoint3D::new(
+        let intersection_min = TypedPoint3D::new(
             max(self.min_x(), other.min_x()),
-            min(self.max_y(), other.max_y()),
-            min(self.max_z(), other.max_z()),
-        );
-
-        let intersection_b = TypedPoint3D::new(
-            min(self.max_x(), other.max_x()),
             max(self.min_y(), other.min_y()),
             max(self.min_z(), other.min_z()),
         );
 
+        let intersection_max = TypedPoint3D::new(
+            min(self.max_x(), other.max_x()),
+            min(self.max_y(), other.max_y()),
+            min(self.max_z(), other.max_z()),
+        );
+
         Some(TypedBox3D::new(
-            intersection_a, 
-            intersection_b,
+            intersection_min, 
+            intersection_max,
         ))
     }
 }
@@ -278,7 +278,7 @@ where
     #[inline]
     #[cfg_attr(feature = "unstable", must_use)]
     pub fn translate(&self, by: &TypedVector3D<T, U>) -> Self {
-        Self::new(self.a + *by, self.b + *by)
+        Self::new(self.min + *by, self.max + *by)
     }
 }
 
@@ -291,9 +291,9 @@ where
     /// are on the back, right or bottom faces.
     #[inline]
     pub fn contains(&self, other: &TypedPoint3D<T, U>) -> bool {
-        self.a.x <= other.x && other.x < self.b.x
-            && self.a.y >= other.y && other.y > self.b.y
-            && self.a.z >= other.z && other.z > self.b.z
+        self.min_x() <= other.x && other.x < self.max_x()
+            && self.min_y() < other.y && other.y <= self.max_y()
+            && self.min_z() < other.z && other.z <= self.max_z()
     }
 }
 
@@ -331,13 +331,17 @@ impl<T, U> TypedBox3D<T, U>
 where
     T: Copy + PartialEq + Add<T, Output = T> + Sub<T, Output = T> + Div<T, Output = T> + One,
 {
+    /// Inflates the box by the specified sizes.
+    /// 
+    /// The sizes are applied as a total - the individual sides are inflated by
+    /// half the amount. The resulting box will have the same centroid position.
     #[inline]
     #[cfg_attr(feature = "unstable", must_use)]
     pub fn inflate(&self, width: T, height: T, depth: T) -> Self {
         let two = T::one() + T::one();
         TypedBox3D::new(
-            TypedPoint3D::new(self.a.x - width / two, self.a.y + height / two, self.a.z + depth / two),
-            TypedPoint3D::new(self.b.x + width / two, self.b.y - height / two, self.b.z - depth / two),
+            TypedPoint3D::new(self.min_x() - width / two, self.min_y() - height / two, self.min_z() - depth / two),
+            TypedPoint3D::new(self.max_x() + width / two, self.max_x() + height / two, self.max_z() + depth / two),
         )
     }
 
@@ -359,14 +363,14 @@ where
     pub fn inner_box(&self, offsets: TypedSideOffsets3D<T, U>) -> Self {
         let box3d = TypedBox3D::new(
             TypedPoint3D::new(
-                self.a.x + offsets.left,
-                self.a.y - offsets.top,
-                self.a.z - offsets.front,
+                self.min_x() + offsets.left,
+                self.min_y() + offsets.bottom,
+                self.min_z() + offsets.back,
             ),
             TypedPoint3D::new(
-                self.b.x - offsets.right,
-                self.b.y + offsets.bottom,
-                self.b.z + offsets.back,
+                self.max_x() - offsets.right,
+                self.max_y() - offsets.top,
+                self.max_z() - offsets.front,
             ),
         );
         debug_assert!(box3d.size().width >= T::zero());
@@ -381,14 +385,14 @@ where
     pub fn outer_box(&self, offsets: TypedSideOffsets3D<T, U>) -> Self {
         TypedBox3D::new(
             TypedPoint3D::new(
-                self.a.x - offsets.left,
-                self.a.y + offsets.top,
-                self.a.z + offsets.front,
+                self.min_x() - offsets.left,
+                self.min_y() - offsets.bottom,
+                self.min_z() - offsets.back,
             ),
             TypedPoint3D::new(
-                self.b.x + offsets.right,
-                self.b.y - offsets.bottom,
-                self.b.z - offsets.back,
+                self.max_x() + offsets.right,
+                self.max_y() + offsets.top,
+                self.max_z() + offsets.front,
             ),
         )
     }
@@ -447,23 +451,7 @@ where
             }
         }
 
-        Self::from_min_max(min_x, min_y, min_z, max_x, max_y, max_z)
-    }
-}
-
-impl<T, U> TypedBox3D<T, U>
-where
-    T: Copy + PartialOrd,
-{
-    pub fn from_min_max(min_x: T, min_y: T, min_z: T, max_x: T, max_y: T, max_z: T) -> Self {
-        debug_assert!(min_x <= max_x);
-        debug_assert!(min_y <= max_y);
-        debug_assert!(min_z <= max_z);
-
-        Self::new(
-            TypedPoint3D::new(min_x, max_y, max_z),
-            TypedPoint3D::new(max_x, min_y, min_z),
-        )
+        Self::new(TypedPoint3D::new(min_x, min_y, min_z), TypedPoint3D::new(max_x, max_y, max_z))
     }
 }
 
@@ -477,8 +465,8 @@ where
     #[inline]
     pub fn lerp(&self, other: Self, t: T) -> Self {
         Self::new(
-            self.a.lerp(other.a, t),
-            self.b.lerp(other.b, t),
+            self.min.lerp(other.min, t),
+            self.max.lerp(other.max, t),
         )
     }
 }
@@ -489,7 +477,7 @@ where
 {
     pub fn center(&self) -> TypedPoint3D<T, U> {
         let two = T::one() + T::one();
-        (self.a + self.b.to_vector()) / two
+        (self.min + self.max.to_vector()) / two
     }
 }
 
@@ -499,13 +487,17 @@ where
 {
     #[inline]
     pub fn union(&self, other: &Self) -> Self {
-        TypedBox3D::from_min_max(
-            min(self.min_x(), other.min_x()),
-            min(self.min_y(), other.min_y()),
-            min(self.min_z(), other.min_z()),
-            max(self.max_x(), other.max_x()),
-            max(self.max_y(), other.max_z()),
-            max(self.max_y(), other.max_z()),
+        TypedBox3D::new(
+            TypedPoint3D::new(
+                min(self.min_x(), other.min_x()),
+                min(self.min_y(), other.min_y()),
+                min(self.min_z(), other.min_z()),
+            ),
+            TypedPoint3D::new(
+                max(self.max_x(), other.max_x()),
+                max(self.max_y(), other.max_z()),
+                max(self.max_y(), other.max_z()),
+            ),
         )
     }
 }
@@ -520,8 +512,8 @@ where
         T: Mul<S, Output = T>
     {
         TypedBox3D::new(
-            TypedPoint3D::new(self.a.x * x, self.a.y * y, self.a.z * z),
-            TypedPoint3D::new(self.b.x * x, self.b.y * y, self.b.z * z),
+            TypedPoint3D::new(self.min.x * x, self.min.y * y, self.min.z * z),
+            TypedPoint3D::new(self.max.x * x, self.max.y * y, self.max.z * z),
         )
     }
 }
@@ -598,7 +590,7 @@ where
     type Output = Self;
     #[inline]
     fn mul(self, scale: T) -> Self {
-        TypedBox3D::new(self.a * scale, self.b * scale)
+        TypedBox3D::new(self.min * scale, self.max * scale)
     }
 }
 
@@ -609,7 +601,7 @@ where
     type Output = Self;
     #[inline]
     fn div(self, scale: T) -> Self {
-        TypedBox3D::new(self.a / scale, self.b / scale)
+        TypedBox3D::new(self.min / scale, self.max / scale)
     }
 }
 
@@ -620,7 +612,7 @@ where
     type Output = TypedBox3D<T, U2>;
     #[inline]
     fn mul(self, scale: TypedScale<T, U1, U2>) -> TypedBox3D<T, U2> {
-        TypedBox3D::new(self.a * scale, self.b * scale)
+        TypedBox3D::new(self.min * scale, self.max * scale)
     }
 }
 
@@ -631,7 +623,7 @@ where
     type Output = TypedBox3D<T, U1>;
     #[inline]
     fn div(self, scale: TypedScale<T, U1, U2>) -> TypedBox3D<T, U1> {
-        TypedBox3D::new(self.a / scale, self.b / scale)
+        TypedBox3D::new(self.min / scale, self.max / scale)
     }
 }
 
@@ -641,14 +633,14 @@ where
 {
     /// Drop the units, preserving only the numeric value.
     pub fn to_untyped(&self) -> Box3D<T> {
-        TypedBox3D::new(self.a.to_untyped(), self.b.to_untyped())
+        TypedBox3D::new(self.min.to_untyped(), self.max.to_untyped())
     }
 
     /// Tag a unitless value with units.
     pub fn from_untyped(c: &Box3D<T>) -> TypedBox3D<T, Unit> {
         TypedBox3D::new(
-            TypedPoint3D::from_untyped(&c.a),
-            TypedPoint3D::from_untyped(&c.b),
+            TypedPoint3D::from_untyped(&c.min),
+            TypedPoint3D::from_untyped(&c.max),
         )
     }
 }
@@ -664,8 +656,8 @@ where
     /// geometrically. Consider using round(), round_in or round_out() before casting.
     pub fn cast<T1: NumCast + Copy>(&self) -> TypedBox3D<T1, Unit> {
         TypedBox3D::new(
-            self.a.cast(),
-            self.b.cast(),
+            self.min.cast(),
+            self.max.cast(),
         )
     }
 
@@ -675,7 +667,7 @@ where
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using round(), round_in or round_out() before casting.
     pub fn try_cast<T1: NumCast + Copy>(&self) -> Option<TypedBox3D<T1, Unit>> {
-        match (self.a.try_cast(), self.b.try_cast()) {
+        match (self.min.try_cast(), self.max.try_cast()) {
             (Some(a), Some(b)) => Some(TypedBox3D::new(a, b)),
             _ => None,
         }
@@ -697,7 +689,7 @@ where
     /// They are always rounding as floor(n + 0.5).
     #[cfg_attr(feature = "unstable", must_use)]
     pub fn round(&self) -> Self {
-        TypedBox3D::new(self.a.round(), self.b.round())
+        TypedBox3D::new(self.min.round(), self.max.round())
     }
 }
 
@@ -709,15 +701,15 @@ where
     /// the original box3d contains the resulting box3d.
     #[cfg_attr(feature = "unstable", must_use)]
     pub fn round_in(&self) -> Self {
-        let a_x = self.a.x.ceil();
-        let a_y = self.a.y.floor();
-        let a_z = self.a.z.floor();
-        let b_x = self.b.x.floor();
-        let b_y = self.b.y.ceil();
-        let b_z = self.b.z.ceil();
+        let min_x = self.min.x.ceil();
+        let min_y = self.min.y.ceil();
+        let min_z = self.min.z.ceil();
+        let max_x = self.max.x.floor();
+        let max_y = self.max.y.floor();
+        let max_z = self.max.z.floor();
         TypedBox3D::new(
-            TypedPoint3D::new(a_x, a_y, a_z), 
-            TypedPoint3D::new(b_x, b_y, b_z),
+            TypedPoint3D::new(min_x, min_y, min_z), 
+            TypedPoint3D::new(max_x, max_y, max_z),
         )
     }
 
@@ -725,15 +717,15 @@ where
     /// the original box3d is contained in the resulting box3d.
     #[cfg_attr(feature = "unstable", must_use)]
     pub fn round_out(&self) -> Self {
-        let a_x = self.a.x.floor();
-        let a_y = self.a.y.ceil();
-        let a_z = self.a.z.ceil();
-        let b_x = self.b.x.ceil();
-        let b_y = self.b.y.floor();
-        let b_z = self.b.z.floor();
+        let min_x = self.min.x.floor();
+        let min_y = self.min.y.floor();
+        let min_z = self.min.z.floor();
+        let max_x = self.max.x.ceil();
+        let max_y = self.max.y.ceil();
+        let max_z = self.max.z.ceil();
         TypedBox3D::new(
-            TypedPoint3D::new(a_x, a_y, a_z), 
-            TypedPoint3D::new(b_x, b_y, b_z),
+            TypedPoint3D::new(min_x, min_y, min_z), 
+            TypedPoint3D::new(max_x, max_y, max_z),
         )
     }
 }
@@ -797,8 +789,8 @@ where
 }
 
 /// Shorthand for `TypedBox3D::new(TypedPoint3D::new(x1, y1, z1), TypedPoint3D::new(x2, y2, z2))`.
-pub fn box3d<T: Copy, U>(tlf_x: T, tlf_y: T, tlf_z: T, brb_x: T, brb_y: T, brb_z: T) -> TypedBox3D<T, U> {
-    TypedBox3D::new(TypedPoint3D::new(tlf_x, tlf_y, tlf_z), TypedPoint3D::new(brb_x, brb_y, brb_z))
+pub fn box3d<T: Copy, U>(min_x: T, min_y: T, min_z: T, max_x: T, max_y: T, max_z: T) -> TypedBox3D<T, U> {
+    TypedBox3D::new(TypedPoint3D::new(min_x, min_y, min_z), TypedPoint3D::new(max_x, max_y, max_z))
 }
 
 #[cfg(test)]
@@ -811,18 +803,18 @@ mod tests {
 
     #[test]
     fn test_new() {
-        let b = Box3D::new(point3(-1.0, 1.0, 1.0), point3(1.0, -1.0, -1.0));
-        assert!(b.a.x == -1.0);
-        assert!(b.a.y == 1.0);
-        assert!(b.a.z == 1.0);
-        assert!(b.b.x == 1.0);
-        assert!(b.b.y == -1.0);
-        assert!(b.b.z == -1.0);
+        let b = Box3D::new(point3(-1.0, -1.0, -1.0), point3(1.0, 1.0, 1.0));
+        assert!(b.min.x == -1.0);
+        assert!(b.min.y == -1.0);
+        assert!(b.min.z == -1.0);
+        assert!(b.max.x == 1.0);
+        assert!(b.max.y == 1.0);
+        assert!(b.max.z == 1.0);
     }
 
     #[test]
     fn test_size() {
-        let b = Box3D::new(point3(-10.0, 10.0, 10.0), point3(10.0, -10.0, -10.0));
+        let b = Box3D::new(point3(-10.0, -10.0, -10.0), point3(10.0, 10.0, 10.0));
         assert!(b.size().width == 20.0);
         assert!(b.size().height == 20.0);
         assert!(b.size().depth == 20.0);
@@ -830,19 +822,19 @@ mod tests {
 
     #[test]
     fn test_center() {
-        let b = Box3D::new(point3(-10.0, 10.0, 10.0), point3(10.0, -10.0, -10.0));
+        let b = Box3D::new(point3(-10.0, -10.0, -10.0), point3(10.0, 10.0, 10.0));
         assert!(b.center() == Point3D::zero());
     }
 
     #[test]
     fn test_volume() {
-        let b = Box3D::new(point3(-10.0, 10.0, 10.0), point3(10.0, -10.0, -10.0));
+        let b = Box3D::new(point3(-10.0, -10.0, -10.0), point3(10.0, 10.0, 10.0));
         assert!(b.volume() == 8000.0);
     }
 
     #[test]
     fn test_area() {
-        let b = Box3D::new(point3(-10.0, 10.0, 10.0), point3(10.0, -10.0, -10.0));
+        let b = Box3D::new(point3(-10.0, -10.0, -10.0), point3(10.0, 10.0, 10.0));
         assert!(b.front_area() == 400.0);
         assert!(b.left_area() == 400.0);
         assert!(b.right_area() == 400.0);
@@ -853,9 +845,9 @@ mod tests {
 
     #[test]
     fn test_from_points() {
-        let b = Box3D::from_points(&[point3(50.0, 25.0, 12.5), point3(100.0, 160.0, 200.0)]);
-        assert!(b.a == point3(50.0, 160.0, 200.0));
-        assert!(b.b == point3(100.0, 25.0, 12.5));
+        let b = Box3D::from_points(&[point3(50.0, 160.0, 12.5), point3(100.0, 25.0, 200.0)]);
+        assert!(b.min == point3(50.0, 25.0, 12.5));
+        assert!(b.max == point3(100.0, 160.0, 200.0));
     }
 
     #[test]
@@ -867,13 +859,6 @@ mod tests {
         assert!(b.max_x() == 100.0);
         assert!(b.max_y() == 160.0);
         assert!(b.max_z() == 200.0);
-    }
-
-    #[test]
-    fn test_from_min_max() {
-        let b = Box3D::from_min_max(10.0, 20.0, 30.0, 40.0, 50.0, 60.0);
-        assert!(b.a == point3(10.0, 50.0, 60.0));
-        assert!(b.b == point3(40.0, 20.0, 30.0));
     }
 
     #[test]
