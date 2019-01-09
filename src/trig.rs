@@ -19,6 +19,7 @@ pub trait Trig {
 
 macro_rules! trig {
     ($ty:ident) => (
+        #[cfg(feature = "std")]
         impl Trig for $ty {
             #[inline]
             fn sin(self) -> $ty { self.sin() }

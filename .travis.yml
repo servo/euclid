@@ -15,6 +15,8 @@ matrix:
     - rust: stable
       env: FEATURES=""
     - rust: stable
+      env: FEATURES="--no-default-features" TEST=no
+    - rust: stable
       env: FEATURES="--features mint"
     - rust: beta
       env: FEATURES=""
@@ -25,4 +27,4 @@ matrix:
 
 script:
   - cargo build $FEATURES
-  - cargo test --verbose $FEATURES
+  - if [ $TEST != "no" ]; then cargo test --verbose $FEATURES; fi

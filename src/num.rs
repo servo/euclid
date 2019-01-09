@@ -10,6 +10,9 @@
 
 use num_traits;
 
+#[cfg(not(feature = "std"))]
+use num_traits::float::FloatCore;
+
 pub trait Zero {
     fn zero() -> Self;
 }
@@ -56,6 +59,26 @@ macro_rules! num_int {
         }
     )
 }
+
+#[cfg(not(any(feature = "std", test)))]
+macro_rules! num_float {
+    ($ty:ty) => (
+        impl Round for $ty {
+            #[inline]
+            fn round(self) -> $ty { <$ty as FloatCore>::round(self) }
+        }
+        impl Floor for $ty {
+            #[inline]
+            fn floor(self) -> $ty { <$ty as FloatCore>::floor(self) }
+        }
+        impl Ceil for $ty {
+            #[inline]
+            fn ceil(self) -> $ty { <$ty as FloatCore>::ceil(self) }
+        }
+    )
+}
+
+#[cfg(any(feature = "std", test))]
 macro_rules! num_float {
     ($ty:ty) => (
         impl Round for $ty {

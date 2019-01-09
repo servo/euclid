@@ -18,7 +18,11 @@ use scale::TypedScale;
 use trig::Trig;
 use Angle;
 use num::*;
-use num_traits::{Float, NumCast, Signed};
+
+#[cfg(feature = "std")]
+use num_traits::Float;
+use num_traits::{NumCast, Signed};
+use num_traits::float::FloatCore;
 use core::fmt;
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 use core::marker::PhantomData;
@@ -165,6 +169,7 @@ where
     }
 
     #[inline]
+    #[cfg(feature = "std")]
     pub fn normalize(self) -> Self
     where
         T: Float,
@@ -174,6 +179,7 @@ where
 
     /// Return the normalized vector even if the length is larger than the max value of Float.
     #[inline]
+    #[cfg(feature = "std")]
     pub fn robust_normalize(self) -> Self
     where
         T: Float,
@@ -193,6 +199,7 @@ where
     }
 
     #[inline]
+    #[cfg(feature = "std")]
     pub fn length(&self) -> T
     where
         T: Float,
@@ -252,7 +259,7 @@ impl<T: Copy + Neg<Output = T>, U> Neg for TypedVector2D<T, U> {
     }
 }
 
-impl<T: Float, U> TypedVector2D<T, U> {
+impl<T: FloatCore, U> TypedVector2D<T, U> {
     #[inline]
     pub fn min(self, other: Self) -> Self {
         vec2(self.x.min(other.x), self.y.min(other.y))
@@ -615,6 +622,7 @@ impl<T: Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T> + Copy, U>
     }
 
     #[inline]
+    #[cfg(feature = "std")]
     pub fn normalize(self) -> Self
     where
         T: Float,
@@ -624,6 +632,7 @@ impl<T: Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T> + Copy, U>
 
     /// Return the normalized vector even if the length is larger than the max value of Float.
     #[inline]
+    #[cfg(feature = "std")]
     pub fn robust_normalize(self) -> Self
     where
         T: Float,
@@ -643,6 +652,7 @@ impl<T: Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T> + Copy, U>
     }
 
     #[inline]
+    #[cfg(feature = "std")]
     pub fn length(&self) -> T
     where
         T: Float,
@@ -733,6 +743,7 @@ impl<T: Copy + Div<T, Output = T>, U> DivAssign<T> for TypedVector3D<T, U> {
     }
 }
 
+#[cfg(feature = "std")]
 impl<T: Float, U> TypedVector3D<T, U> {
     #[inline]
     pub fn min(self, other: Self) -> Self {

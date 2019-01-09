@@ -14,8 +14,8 @@ use length::Length;
 use scale::TypedScale;
 use vector::{TypedVector2D, vec2, BoolVector2D};
 use num::*;
-
-use num_traits::{Float, NumCast, Signed};
+use num_traits::{NumCast, Signed};
+use num_traits::float::FloatCore;
 use core::fmt;
 use core::ops::{Add, Div, Mul, Sub};
 use core::marker::PhantomData;
@@ -329,7 +329,7 @@ impl<T: PartialEq, U> TypedSize2D<T, U> {
     }
 }
 
-impl<T: Float, U> TypedSize2D<T, U> {
+impl<T: FloatCore, U> TypedSize2D<T, U> {
     #[inline]
     pub fn min(self, other: Self) -> Self {
         size2(

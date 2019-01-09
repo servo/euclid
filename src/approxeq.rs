@@ -7,6 +7,9 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+#[cfg(not(feature = "std"))]
+use num_traits::float::FloatCore;
+
 /// Trait for testing approximate equality
 pub trait ApproxEq<Eps> {
     fn approx_epsilon() -> Eps;

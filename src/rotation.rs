@@ -8,13 +8,19 @@
 // except according to those terms.
 
 use approxeq::ApproxEq;
-use num_traits::{Float, FloatConst, One, Zero};
+#[cfg(feature = "std")]
+use num_traits::Float;
+use num_traits::{FloatConst, One, Zero};
 use core::fmt;
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, Sub, SubAssign};
 use core::marker::PhantomData;
 use trig::Trig;
-use {TypedPoint2D, TypedPoint3D, TypedVector2D, TypedVector3D, Vector3D, point2, point3, vec3};
-use {TypedTransform2D, TypedTransform3D, UnknownUnit};
+#[cfg(feature = "std")]
+use {TypedPoint2D, TypedPoint3D, TypedVector2D, TypedVector3D, point2, point3};
+use {Vector3D, vec3};
+#[cfg(feature = "std")]
+use TypedTransform3D;
+use {TypedTransform2D, UnknownUnit};
 
 /// An angle in radians
 #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Hash)]
@@ -72,6 +78,7 @@ where
     }
 }
 
+#[cfg(feature = "std")]
 impl<T> Angle<T>
 where
     T: Float,
@@ -229,6 +236,7 @@ where
     }
 }
 
+#[cfg(feature = "std")]
 impl<T, Src, Dst> TypedRotation2D<T, Src, Dst>
 where
     T: Copy
@@ -367,6 +375,7 @@ where
     }
 }
 
+#[cfg(feature = "std")]
 impl<T, Src, Dst> TypedRotation3D<T, Src, Dst>
 where
     T: Float,

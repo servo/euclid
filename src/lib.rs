@@ -8,7 +8,7 @@
 // except according to those terms.
 
 #![cfg_attr(feature = "unstable", feature(fn_must_use))]
-#![cfg_attr(not(test), no_std)]
+#![cfg_attr(not(any(feature = "std", test)), no_std)]
 
 //! A collection of strongly typed math tools for computer graphics with an inclination
 //! towards 2d graphics and layout.
@@ -65,7 +65,7 @@ pub extern crate mint;
 extern crate num_traits;
 #[cfg(test)]
 extern crate rand;
-#[cfg(test)]
+#[cfg(any(test, feature = "std"))]
 use std as core;
 
 pub use length::Length;

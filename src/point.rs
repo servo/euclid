@@ -15,7 +15,8 @@ use size::TypedSize2D;
 #[cfg(feature = "mint")]
 use mint;
 use num::*;
-use num_traits::{Float, NumCast};
+use num_traits::NumCast;
+use num_traits::float::FloatCore;
 use vector::{TypedVector2D, TypedVector3D, vec2, vec3};
 use core::fmt;
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
@@ -188,7 +189,7 @@ impl<T: Copy + Sub<T, Output = T>, U> Sub<TypedVector2D<T, U>> for TypedPoint2D<
     }
 }
 
-impl<T: Float, U> TypedPoint2D<T, U> {
+impl<T: FloatCore, U> TypedPoint2D<T, U> {
     #[inline]
     pub fn min(self, other: Self) -> Self {
         point2(self.x.min(other.x), self.y.min(other.y))
@@ -608,7 +609,7 @@ impl<T: Copy + Div<T, Output = T>, U> Div<T> for TypedPoint3D<T, U> {
     }
 }
 
-impl<T: Float, U> TypedPoint3D<T, U> {
+impl<T: FloatCore, U> TypedPoint3D<T, U> {
     #[inline]
     pub fn min(self, other: Self) -> Self {
         point3(

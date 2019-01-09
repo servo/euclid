@@ -1,6 +1,6 @@
 [package]
 name = "euclid"
-version = "0.19.4"
+version = "0.19.5"
 authors = ["The Servo Project Developers"]
 description = "Geometry primitives"
 documentation = "https://docs.rs/euclid/"
@@ -11,9 +11,11 @@ license = "MIT / Apache-2.0"
 
 [features]
 unstable = []
+std = ["num-traits/std"]
+default = ["std"]
 
 [dependencies]
-num-traits = { version = "0.2" }
+num-traits = { version = "0.2", default-features = false }
 serde = { version = "1.0", features = ["serde_derive"], optional = true }
 mint = {version = "0.5.1", optional = true}
 
