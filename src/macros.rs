@@ -27,15 +27,6 @@ macro_rules! define_matrix {
             pub _unit: PhantomData<($($phantom),+)>
         }
 
-        impl<T: Clone, $($phantom),+> Clone for $name<T, $($phantom),+> {
-            fn clone(&self) -> Self {
-                $name {
-                    $($field: self.$field.clone(),)+
-                    _unit: PhantomData,
-                }
-            }
-        }
-
         impl<T: Copy, $($phantom),+> Copy for $name<T, $($phantom),+> {}
 
         #[cfg(feature = "serde")]
