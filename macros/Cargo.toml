@@ -1,0 +1,9 @@
+[package]
+name = "euclid_macros"
+version = "0.1.0"
+authors = ["Emilio Cobos Álvarez <emilio@crisal.io>", "The Servo project developers"]
+
+[lib]
+proc-macro = true
+
+[dependencies]

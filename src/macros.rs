@@ -16,6 +16,7 @@ macro_rules! define_matrix {
     ) => (
         #[repr(C)]
         $(#[$attr])*
+        #[derive(EuclidMatrix)]
         pub struct $name<T, $($phantom),+> {
             $(pub $field: T,)+
 
