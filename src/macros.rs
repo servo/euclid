@@ -27,8 +27,6 @@ macro_rules! define_matrix {
             pub _unit: PhantomData<($($phantom),+)>
         }
 
-        impl<T: Copy, $($phantom),+> Copy for $name<T, $($phantom),+> {}
-
         #[cfg(feature = "serde")]
         impl<'de, T, $($phantom),+> ::serde::Deserialize<'de> for $name<T, $($phantom),+>
             where T: ::serde::Deserialize<'de>

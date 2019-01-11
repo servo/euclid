@@ -7,41 +7,61 @@ use proc_macro2::TokenStream;
 use quote::TokenStreamExt;
 use syn::{self, DeriveInput, Path};
 
+fn derive_trait(
+    input: &DeriveInput,
+    trait_name: TokenStream,
+    t: &syn::TypeParam,
+    body: impl FnOnce() -> TokenStream,
+) -> TokenStream {
+    let struct_name = &input.ident;
+    let mut generics = input.generics.clone();
+    generics
+        .where_clause
+        .get_or_insert(parse_quote!(where))
+        .predicates
+        .push(parse_quote!(#t: #trait_name));
+    let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
+    let body = body();
+    quote! {
+        impl #impl_generics #trait_name for #struct_name #ty_generics #where_clause {
+            #body
+        }
+    }
+}
+
 fn clone_impl(
     input: &DeriveInput,
     fields: &syn::punctuated::Punctuated<syn::Field, syn::token::Comma>,
     unit: &syn::Field,
     t: &syn::TypeParam,
 ) -> TokenStream {
-    let name = &input.ident;
-    let mut generics = input.generics.clone();
-    generics
-        .where_clause
-        .get_or_insert(parse_quote!(where))
-        .predicates
-        .push(parse_quote!(#t: Clone));
-    let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
+    derive_trait(input, quote! { Clone }, t, || {
+        let body = fields.iter().fold(quote! {}, |body, field| {
+            let name = field.ident.as_ref().unwrap();
+            let expr = if field.ident == unit.ident {
+                quote! { PhantomData }
+            } else {
+                quote! { self.#name.clone() }
+            };
 
-    let mut body = quote! {};
-    for field in fields.iter().filter(|f| f.ident != unit.ident) {
-        let name = field.ident.as_ref().unwrap();
-        body = quote! {
-            #body
-            #name: self.#name.clone(),
-        }
-    }
+            quote! {
+                #body
+                #name: #expr,
+            }
+        });
 
-    let unit_name = unit.ident.as_ref().unwrap();
-    quote! {
-        impl #impl_generics Clone for #name #ty_generics #where_clause {
+        quote! {
             fn clone(&self) -> Self {
                 Self {
                     #body
-                    #unit_name: PhantomData,
                 }
             }
         }
-    }
+    })
+}
+
+fn copy_impl(input: &DeriveInput, t: &syn::TypeParam) -> TokenStream {
+    derive_trait(input, quote!{ Copy }, t, || quote! {})
 }
 
 pub fn derive(input: DeriveInput) -> TokenStream {
@@ -67,5 +87,11 @@ pub fn derive(input: DeriveInput) -> TokenStream {
     let type_param =
         input.generics.type_params().next().cloned().expect("Need a T");
 
-    clone_impl(&input, fields, unit_field.value(), &type_param)
+    let clone = clone_impl(&input, fields, unit_field.value(), &type_param);
+    let copy = copy_impl(&input, &type_param);
+
+    quote! {
+        #clone
+        #copy
+    }
 }
