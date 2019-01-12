@@ -7,12 +7,15 @@ use syn::{self, DeriveInput};
 
 type Fields = syn::punctuated::Punctuated<syn::Field, syn::token::Comma>;
 
-fn derive_trait(
+fn derive_trait<F>(
     input: &DeriveInput,
     trait_name: TokenStream,
     generics: &syn::Generics,
-    body: impl FnOnce() -> TokenStream,
-) -> TokenStream {
+    body: F
+) -> TokenStream
+where
+    F: FnOnce() -> TokenStream,
+{
     let struct_name = &input.ident;
 
     let (impl_generics, _, where_clause) = generics.split_for_impl();
@@ -26,12 +29,15 @@ fn derive_trait(
     }
 }
 
-fn derive_simple_trait(
+fn derive_simple_trait<F>(
     input: &DeriveInput,
     trait_name: TokenStream,
     t: &syn::TypeParam,
-    body: impl FnOnce() -> TokenStream,
-) -> TokenStream {
+    body: F,
+) -> TokenStream
+where
+    F: FnOnce() -> TokenStream,
+{
     let mut generics = input.generics.clone();
     generics
         .make_where_clause()
@@ -40,11 +46,14 @@ fn derive_simple_trait(
     derive_trait(input, trait_name, &generics, body)
 }
 
-fn each_field_except_unit(
+fn each_field_except_unit<F>(
     fields: &Fields,
     unit: &syn::Field,
-    mut field_expr: impl FnMut(&syn::Ident) -> TokenStream,
-) -> TokenStream {
+    mut field_expr: F,
+) -> TokenStream
+where
+    F: FnMut(&syn::Ident) -> TokenStream,
+{
     fields.iter().filter(|f| f.ident != unit.ident).fold(quote! {}, |body, field| {
         let name = field.ident.as_ref().unwrap();
         let expr = field_expr(name);
@@ -56,11 +65,14 @@ fn each_field_except_unit(
 }
 
 
-fn derive_struct_body(
+fn derive_struct_body<F>(
     fields: &Fields,
     unit: &syn::Field,
-    mut field_expr: impl FnMut(&syn::Ident) -> TokenStream,
-) -> TokenStream {
+    mut field_expr: F,
+) -> TokenStream
+where
+    F: FnMut(&syn::Ident) -> TokenStream,
+{
     let body = each_field_except_unit(fields, unit, |name| {
         let expr = field_expr(name);
         quote! {
@@ -209,7 +221,7 @@ pub fn derive(input: DeriveInput) -> TokenStream {
             syn::Meta::NameValue(..) => false,
             syn::Meta::List(ref list) => {
                 list.ident == "repr" && list.nested.iter().any(|meta| {
-                    match meta {
+                    match *meta {
                         syn::NestedMeta::Meta(syn::Meta::Word(ref w)) => w == "C",
                         _ => false,
                     }
