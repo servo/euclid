@@ -7,28 +7,6 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-macro_rules! define_matrix {
-    (
-        $(#[$attr:meta])*
-        pub struct $name:ident<T, $($phantom:ident),+> {
-            $(pub $field:ident: T,)+
-        }
-    ) => (
-        #[repr(C)]
-        $(#[$attr])*
-        #[derive(EuclidMatrix)]
-        pub struct $name<T, $($phantom),+> {
-            $(pub $field: T,)+
-
-            // Keep this (secretly) public for the few cases where we would like to
-            // create static constants which currently can't be initialized with a
-            // function.
-            #[doc(hidden)]
-            pub _unit: PhantomData<($($phantom),+)>
-        }
-    )
-}
-
 macro_rules! mint_vec {
     ($name:ident [ $($field:ident),* ] = $std_name:ident) => {
         #[cfg(feature = "mint")]
