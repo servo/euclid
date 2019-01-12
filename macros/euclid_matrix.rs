@@ -198,6 +198,26 @@ pub fn derive(input: DeriveInput) -> TokenStream {
         "You need to have a _unit field to derive this trait",
     );
 
+    assert!(match unit_field.value().vis {
+        syn::Visibility::Public(..) => true,
+        _ => false,
+    }, "Unit field should be public");
+
+    assert!(input.attrs.iter().filter_map(|attr| attr.interpret_meta()).any(|attr| {
+        match attr {
+            syn::Meta::Word(..) |
+            syn::Meta::NameValue(..) => false,
+            syn::Meta::List(ref list) => {
+                list.ident == "repr" && list.nested.iter().any(|meta| {
+                    match meta {
+                        syn::NestedMeta::Meta(syn::Meta::Word(ref w)) => w == "C",
+                        _ => false,
+                    }
+                })
+            }
+        }
+    }), "struct should be #[repr(C)]");
+
     let type_param =
         input.generics.type_params().next().cloned().expect("Need a T");
 
