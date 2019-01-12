@@ -7,20 +7,19 @@ use proc_macro2::TokenStream;
 use quote::TokenStreamExt;
 use syn::{self, DeriveInput, Path};
 
+type Fields = syn::punctuated::Punctuated<syn::Field, syn::token::Comma>;
+
 fn derive_trait(
     input: &DeriveInput,
     trait_name: TokenStream,
-    t: &syn::TypeParam,
+    generics: &syn::Generics,
     body: impl FnOnce() -> TokenStream,
 ) -> TokenStream {
     let struct_name = &input.ident;
-    let mut generics = input.generics.clone();
-    generics
-        .where_clause
-        .get_or_insert(parse_quote!(where))
-        .predicates
-        .push(parse_quote!(#t: #trait_name));
-    let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
+
+    let (impl_generics, _, where_clause) = generics.split_for_impl();
+    let (_, ty_generics, _) = input.generics.split_for_impl();
+
     let body = body();
     quote! {
         impl #impl_generics #trait_name for #struct_name #ty_generics #where_clause {
@@ -29,39 +28,129 @@ fn derive_trait(
     }
 }
 
+fn derive_simple_trait(
+    input: &DeriveInput,
+    trait_name: TokenStream,
+    t: &syn::TypeParam,
+    body: impl FnOnce() -> TokenStream,
+) -> TokenStream {
+    let mut generics = input.generics.clone();
+    generics
+        .make_where_clause()
+        .predicates
+        .push(parse_quote!(#t: #trait_name));
+    derive_trait(input, trait_name, &generics, body)
+}
+
+fn each_field_except_unit(
+    fields: &Fields,
+    unit: &syn::Field,
+    mut field_expr: impl FnMut(&syn::Ident) -> TokenStream,
+) -> TokenStream {
+    fields.iter().filter(|f| f.ident != unit.ident).fold(quote! {}, |body, field| {
+        let name = field.ident.as_ref().unwrap();
+        let expr = field_expr(name);
+        quote! {
+            #body
+            #expr
+        }
+    })
+}
+
+
+fn derive_struct_body(
+    fields: &Fields,
+    unit: &syn::Field,
+    mut field_expr: impl FnMut(&syn::Ident) -> TokenStream,
+) -> TokenStream {
+    let body = each_field_except_unit(fields, unit, |name| {
+        let expr = field_expr(name);
+        quote! {
+            #name: #expr,
+        }
+    });
+
+    let unit_name = unit.ident.as_ref().unwrap();
+    quote! {
+        Self {
+            #body
+            #unit_name: PhantomData,
+        }
+    }
+}
+
 fn clone_impl(
     input: &DeriveInput,
-    fields: &syn::punctuated::Punctuated<syn::Field, syn::token::Comma>,
+    fields: &Fields,
     unit: &syn::Field,
     t: &syn::TypeParam,
 ) -> TokenStream {
-    derive_trait(input, quote! { Clone }, t, || {
-        let body = fields.iter().fold(quote! {}, |body, field| {
-            let name = field.ident.as_ref().unwrap();
-            let expr = if field.ident == unit.ident {
-                quote! { PhantomData }
-            } else {
-                quote! { self.#name.clone() }
-            };
-
-            quote! {
-                #body
-                #name: #expr,
-            }
+    derive_simple_trait(input, quote! { Clone }, t, || {
+        let body = derive_struct_body(fields, unit, |name| {
+            quote! { self.#name.clone() }
         });
-
         quote! {
             fn clone(&self) -> Self {
-                Self {
-                    #body
-                }
+                #body
             }
         }
     })
 }
 
 fn copy_impl(input: &DeriveInput, t: &syn::TypeParam) -> TokenStream {
-    derive_trait(input, quote!{ Copy }, t, || quote! {})
+    derive_simple_trait(input, quote!{ Copy }, t, || quote! {})
+}
+
+fn serde_impl(
+    input: &DeriveInput,
+    fields: &Fields,
+    unit: &syn::Field,
+    t: &syn::TypeParam,
+) -> TokenStream {
+    let deserialize_impl = {
+        let mut generics = input.generics.clone();
+        generics.params.insert(0, parse_quote!('de));
+        generics
+            .make_where_clause()
+            .predicates
+            .push(parse_quote!(#t: ::serde::Deserialize<'de>));
+        derive_trait(input, quote!{ ::serde::Deserialize<'de> }, &generics, || {
+            let tuple = each_field_except_unit(fields, unit, |name| {
+                quote! { #name, }
+            });
+            let body = derive_struct_body(fields, unit, |name| quote! { #name });
+            quote! {
+                fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+                where
+                    D: ::serde::Deserializer<'de>,
+                {
+                    let (#tuple) = ::serde::Deserialize::deserialize(deserializer)?;
+                    Ok(#body)
+                }
+            }
+        })
+    };
+
+    let serialize_impl = derive_simple_trait(input, quote! { ::serde::Serialize }, t, || {
+        let tuple = each_field_except_unit(fields, unit, |name| {
+            quote! { &self.#name, }
+        });
+        quote! {
+            fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+            where
+                S: ::serde::Serializer,
+            {
+                (#tuple).serialize(serializer)
+            }
+        }
+    });
+
+    quote! {
+        #[cfg(feature = "serde")]
+        #serialize_impl
+        #[cfg(feature = "serde")]
+        #deserialize_impl
+    }
 }
 
 pub fn derive(input: DeriveInput) -> TokenStream {
@@ -89,9 +178,11 @@ pub fn derive(input: DeriveInput) -> TokenStream {
 
     let clone = clone_impl(&input, fields, unit_field.value(), &type_param);
     let copy = copy_impl(&input, &type_param);
+    let serde = serde_impl(&input, fields, unit_field.value(), &type_param);
 
     quote! {
         #clone
         #copy
+        #serde
     }
 }

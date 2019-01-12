@@ -27,33 +27,6 @@ macro_rules! define_matrix {
             pub _unit: PhantomData<($($phantom),+)>
         }
 
-        #[cfg(feature = "serde")]
-        impl<'de, T, $($phantom),+> ::serde::Deserialize<'de> for $name<T, $($phantom),+>
-            where T: ::serde::Deserialize<'de>
-        {
-            fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-                where D: ::serde::Deserializer<'de>
-            {
-                let ($($field,)+) =
-                    try!(::serde::Deserialize::deserialize(deserializer));
-                Ok($name {
-                    $($field: $field,)+
-                    _unit: PhantomData,
-                })
-            }
-        }
-
-        #[cfg(feature = "serde")]
-        impl<T, $($phantom),+> ::serde::Serialize for $name<T, $($phantom),+>
-            where T: ::serde::Serialize
-        {
-            fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-                where S: ::serde::Serializer
-            {
-                ($(&self.$field,)+).serialize(serializer)
-            }
-        }
-
         impl<T, $($phantom),+> ::core::cmp::Eq for $name<T, $($phantom),+>
             where T: ::core::cmp::Eq {}
 
