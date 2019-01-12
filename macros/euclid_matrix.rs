@@ -79,12 +79,7 @@ fn derive_struct_body(
     }
 }
 
-fn clone_impl(
-    input: &DeriveInput,
-    fields: &Fields,
-    unit: &syn::Field,
-    t: &syn::TypeParam,
-) -> TokenStream {
+fn clone_impl(input: &DeriveInput, fields: &Fields, unit: &syn::Field, t: &syn::TypeParam) -> TokenStream {
     derive_simple_trait(input, quote! { Clone }, t, || {
         let body = derive_struct_body(fields, unit, |name| {
             quote! { self.#name.clone() }
@@ -99,6 +94,38 @@ fn clone_impl(
 
 fn copy_impl(input: &DeriveInput, t: &syn::TypeParam) -> TokenStream {
     derive_simple_trait(input, quote!{ Copy }, t, || quote! {})
+}
+
+fn eq_impl(input: &DeriveInput, t: &syn::TypeParam) -> TokenStream {
+    derive_simple_trait(input, quote!{ ::core::cmp::Eq }, t, || quote! {})
+}
+
+fn partialeq_impl(input: &DeriveInput, fields: &Fields, unit: &syn::Field, t: &syn::TypeParam) -> TokenStream {
+    derive_simple_trait(input, quote!{ ::core::cmp::PartialEq }, t, || {
+        let body = each_field_except_unit(fields, unit, |name| {
+            quote! { && self.#name == other.#name }
+        });
+
+        quote! {
+            fn eq(&self, other: &Self) -> bool {
+                true #body
+            }
+        }
+    })
+}
+
+fn hash_impl(input: &DeriveInput, fields: &Fields, unit: &syn::Field, t: &syn::TypeParam) -> TokenStream {
+    derive_simple_trait(input, quote!{ ::core::hash::Hash }, t, || {
+        let body = each_field_except_unit(fields, unit, |name| {
+            quote! { self.#name.hash(h); }
+        });
+
+        quote! {
+            fn hash<H: ::core::hash::Hasher>(&self, h: &mut H) {
+                #body
+            }
+        }
+    })
 }
 
 fn serde_impl(
@@ -179,10 +206,16 @@ pub fn derive(input: DeriveInput) -> TokenStream {
     let clone = clone_impl(&input, fields, unit_field.value(), &type_param);
     let copy = copy_impl(&input, &type_param);
     let serde = serde_impl(&input, fields, unit_field.value(), &type_param);
+    let eq = eq_impl(&input, &type_param);
+    let partialeq = partialeq_impl(&input, fields, unit_field.value(), &type_param);
+    let hash = hash_impl(&input, fields, unit_field.value(), &type_param);
 
     quote! {
         #clone
         #copy
         #serde
+        #eq
+        #partialeq
+        #hash
     }
 }
