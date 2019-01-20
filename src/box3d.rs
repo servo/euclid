@@ -1027,9 +1027,9 @@ mod tests {
     fn test_inflate() {
         let b = Box3D::from_points(&[point3(-20.0, -20.0, -20.0), point3(20.0, 20.0, 20.0)]);
         let b = b.inflate(10.0, 5.0, 2.0);
-        assert!(b.size().width == 50.0);
-        assert!(b.size().height == 45.0);
-        assert!(b.size().depth == 42.0);
+        assert!(b.size().width == 60.0);
+        assert!(b.size().height == 50.0);
+        assert!(b.size().depth == 44.0);
         assert!(b.center() == Point3D::zero());
     }
 
