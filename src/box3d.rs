@@ -525,36 +525,21 @@ where
     }
 
     #[inline]
-    pub fn front_area(&self) -> T {
+    pub fn xy_area(&self) -> T {
         let size = self.size();
         size.width * size.height
     }
 
     #[inline]
-    pub fn left_area(&self) -> T {
+    pub fn yz_area(&self) -> T {
         let size = self.size();
         size.depth * size.height
     }
 
     #[inline]
-    pub fn top_area(&self) -> T {
+    pub fn xz_area(&self) -> T {
         let size = self.size();
         size.depth * size.width
-    }
-
-    #[inline]
-    pub fn back_area(&self) -> T {
-        self.front_area()
-    }
-
-    #[inline]
-    pub fn right_area(&self) -> T {
-        self.left_area()
-    }
-
-    #[inline]
-    pub fn bottom_area(&self) -> T {
-        self.top_area()
     }
 }
 
@@ -831,12 +816,9 @@ mod tests {
     #[test]
     fn test_area() {
         let b = Box3D::new(point3(-10.0, -10.0, -10.0), point3(10.0, 10.0, 10.0));
-        assert!(b.front_area() == 400.0);
-        assert!(b.left_area() == 400.0);
-        assert!(b.right_area() == 400.0);
-        assert!(b.back_area() == 400.0);
-        assert!(b.top_area() == 400.0);
-        assert!(b.bottom_area() == 400.0);
+        assert!(b.xy_area() == 400.0);
+        assert!(b.yz_area() == 400.0);
+        assert!(b.xz_area() == 400.0);
     }
 
     #[test]
