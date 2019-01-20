@@ -329,19 +329,15 @@ where
 
 impl<T, U> TypedBox3D<T, U>
 where
-    T: Copy + PartialEq + Add<T, Output = T> + Sub<T, Output = T> + Div<T, Output = T> + One,
+    T: Copy + PartialEq + Add<T, Output = T> + Sub<T, Output = T>,
 {
-    /// Inflates the box by the specified sizes.
-    /// 
-    /// The sizes are applied as a total - the individual sides are inflated by
-    /// half the amount. The resulting box will have the same centroid position.
+    /// Inflates the box by the specified sizes on each side respectively.
     #[inline]
     #[cfg_attr(feature = "unstable", must_use)]
     pub fn inflate(&self, width: T, height: T, depth: T) -> Self {
-        let two = T::one() + T::one();
         TypedBox3D::new(
-            TypedPoint3D::new(self.min_x() - width / two, self.min_y() - height / two, self.min_z() - depth / two),
-            TypedPoint3D::new(self.max_x() + width / two, self.max_x() + height / two, self.max_z() + depth / two),
+            TypedPoint3D::new(self.min_x() - width, self.min_y() - height, self.min_z() - depth),
+            TypedPoint3D::new(self.max_x() + width, self.max_x() + height, self.max_z() + depth),
         )
     }
 
