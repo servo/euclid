@@ -246,11 +246,15 @@ where
     }
 
     #[inline]
-    pub fn intersection(&self, other: &Self) -> Option<Self> {
+    pub fn try_intersection(&self, other: &Self) -> Option<Self> {
         if !self.intersects(other) {
             return None;
         }
 
+        Some(self.intersection(other))
+    }
+
+    pub fn intersection(&self, other: &Self) -> Self {
         let intersection_min = TypedPoint3D::new(
             max(self.min_x(), other.min_x()),
             max(self.min_y(), other.min_y()),
@@ -263,10 +267,10 @@ where
             min(self.max_z(), other.max_z()),
         );
 
-        Some(TypedBox3D::new(
+        TypedBox3D::new(
             intersection_min, 
             intersection_max,
-        ))
+        )
     }
 }
 
@@ -948,7 +952,7 @@ mod tests {
     fn test_intersection() {
         let b1 = Box3D::from_points(&[point3(-15.0, -20.0, -20.0), point3(10.0, 20.0, 20.0)]);
         let b2 = Box3D::from_points(&[point3(-10.0, 20.0, 20.0), point3(15.0, -20.0, -20.0)]);
-        let b = b1.intersection(&b2).unwrap();
+        let b = b1.intersection(&b2);
         assert!(b.max_x() == 10.0);
         assert!(b.max_y() == 20.0);
         assert!(b.max_z() == 20.0);
@@ -956,6 +960,17 @@ mod tests {
         assert!(b.min_y() == -20.0);
         assert!(b.min_z() == -20.0);
         assert!(b.volume() == (20.0 * 40.0 * 40.0));
+    }
+
+    #[test]
+    fn test_try_intersection() {
+        let b1 = Box3D::from_points(&[point3(-15.0, -20.0, -20.0), point3(10.0, 20.0, 20.0)]);
+        let b2 = Box3D::from_points(&[point3(-10.0, 20.0, 20.0), point3(15.0, -20.0, -20.0)]);
+        assert!(b1.try_intersection(&b2).is_some());
+    
+        let b1 = Box3D::from_points(&[point3(-15.0, -20.0, -20.0), point3(-10.0, 20.0, 20.0)]);
+        let b2 = Box3D::from_points(&[point3(10.0, 20.0, 20.0), point3(15.0, -20.0, -20.0)]);
+        assert!(b1.try_intersection(&b2).is_none());
     }
 
     #[test]
