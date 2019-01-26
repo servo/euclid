@@ -159,46 +159,6 @@ where
     pub fn min_z(&self) -> T {
         self.min.z
     }
-    
-    #[inline]
-    pub fn top_left_front(&self) -> TypedPoint3D<T, U> {
-        TypedPoint3D::new(self.min_x(), self.max_y(), self.max_z())
-    }
-
-    #[inline]
-    pub fn top_right_front(&self) -> TypedPoint3D<T, U> {
-        TypedPoint3D::new(self.max_x(), self.max_y(), self.max_z())
-    }
-
-    #[inline]
-    pub fn bottom_left_front(&self) -> TypedPoint3D<T, U> {
-        TypedPoint3D::new(self.min_x(), self.min_y(), self.max_z())
-    }
-
-    #[inline]
-    pub fn bottom_right_front(&self) -> TypedPoint3D<T, U> {
-        TypedPoint3D::new(self.max_x(), self.min_y(), self.max_z())
-    }
-
-    #[inline]
-    pub fn top_left_back(&self) -> TypedPoint3D<T, U> {
-        TypedPoint3D::new(self.min_x(), self.max_y(), self.min_z())
-    }
-
-    #[inline]
-    pub fn top_right_back(&self) -> TypedPoint3D<T, U> {
-        TypedPoint3D::new(self.max_x(), self.max_y(), self.min_z())
-    }
-
-    #[inline]
-    pub fn bottom_left_back(&self) -> TypedPoint3D<T, U> {
-        TypedPoint3D::new(self.min_x(), self.min_y(), self.min_z())
-    }
-
-    #[inline]
-    pub fn bottom_right_back(&self) -> TypedPoint3D<T, U> {
-        TypedPoint3D::new(self.max_x(), self.min_y(), self.min_z())
-    }
 
     #[inline]
     pub fn max_x_typed(&self) -> Length<T, U> {
@@ -879,7 +839,7 @@ mod tests {
     #[test]
     fn test_from_size() {
         let b = Box3D::from_size(size3(30.0, 40.0, 50.0));
-        assert!(b.bottom_left_back() == Point3D::zero());
+        assert!(b.min == Point3D::zero());
         assert!(b.size().width == 30.0);
         assert!(b.size().height == 40.0);
         assert!(b.size().depth == 50.0);
@@ -1040,18 +1000,5 @@ mod tests {
             let b = Box3D::from_points(&[Point3D::from(coords_neg), Point3D::from(coords_pos)]);
             assert!(b.is_empty());
         }
-    }
-
-    #[test]
-    fn test_points_at_corners() {
-        let b = Box3D::from_points(&[point3(-25.5, -40.4, -70.9), point3(60.3, 36.5, 89.8)]);
-        assert!(b.top_left_front() == point3(-25.5, 36.5, 89.8));
-        assert!(b.top_right_front() == point3(60.3, 36.5, 89.8));
-        assert!(b.bottom_left_front() == point3(-25.5, -40.4, 89.8));
-        assert!(b.bottom_right_front() == point3(60.3, -40.4, 89.8));
-        assert!(b.top_left_back() == point3(-25.5, 36.5, -70.9));
-        assert!(b.top_right_back() == point3(60.3, 36.5, -70.9));
-        assert!(b.bottom_left_back() == point3(-25.5, -40.4, -70.9));
-        assert!(b.bottom_right_back() == point3(60.3, -40.4, -70.9));
     }
 }
