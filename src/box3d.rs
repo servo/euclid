@@ -28,16 +28,7 @@ use core::hash::{Hash, Hasher};
 use core::ops::{Add, Div, Mul, Sub};
 
 
-/// A 3d box optionally tagged with a unit. 
-/// 
-/// min is the lower left back corner position.
-/// max is the upper right front corner position.
-/// 
-/// Axis directions: x axis positive going left to right.
-///                  y axis positive going bottom to top.
-///                  z axis positive going from back to front (out of the page).
-/// The axis directions follows those used by Microsoft:
-/// https://docs.microsoft.com/en-us/dotnet/framework/wpf/graphics-multimedia/3-d-transformations-overview
+/// An axis aligned 3D box represented by its minimum and maximum coordinates.
 #[repr(C)]
 pub struct TypedBox3D<T, U = UnknownUnit> {
     pub min: TypedPoint3D<T, U>, 
