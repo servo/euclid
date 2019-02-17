@@ -106,7 +106,7 @@ mod trig;
 mod vector;
 
 /// The default unit.
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct UnknownUnit;
 
 /// Temporary alias to facilitate the transition to the new naming scheme
