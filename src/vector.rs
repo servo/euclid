@@ -139,6 +139,11 @@ impl<T: Copy, U> TypedVector2D<T, U> {
     pub fn to_array(&self) -> [T; 2] {
         [self.x, self.y]
     }
+
+    #[inline]
+    pub fn to_tuple(&self) -> (T, T) {
+        (self.x, self.y)
+    }
 }
 
 impl<T, U> TypedVector2D<T, U>
@@ -500,6 +505,11 @@ impl<T: Copy + Zero, U> TypedVector3D<T, U> {
     pub fn to_array_4d(&self) -> [T; 4] {
         [self.x, self.y, self.z, Zero::zero()]
     }
+
+    #[inline]
+    pub fn to_tuple_4d(&self) -> (T, T, T, T) {
+        (self.x, self.y, self.z, Zero::zero())
+    }
 }
 
 impl<T: fmt::Debug, U> fmt::Debug for TypedVector3D<T, U> {
@@ -581,6 +591,11 @@ impl<T: Copy, U> TypedVector3D<T, U> {
     #[inline]
     pub fn to_array(&self) -> [T; 3] {
         [self.x, self.y, self.z]
+    }
+
+    #[inline]
+    pub fn to_tuple(&self) -> (T, T, T) {
+        (self.x, self.y, self.z)
     }
 
     /// Drop the units, preserving only the numeric value.
