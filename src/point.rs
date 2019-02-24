@@ -136,6 +136,11 @@ impl<T: Copy, U> TypedPoint2D<T, U> {
     pub fn to_array(&self) -> [T; 2] {
         [self.x, self.y]
     }
+
+    #[inline]
+    pub fn to_tuple(&self) -> (T, T) {
+        (self.x, self.y)
+    }
 }
 
 impl<T: Copy + Add<T, Output = T>, U> TypedPoint2D<T, U> {
@@ -442,6 +447,11 @@ impl<T: Copy + One, U> TypedPoint3D<T, U> {
     pub fn to_array_4d(&self) -> [T; 4] {
         [self.x, self.y, self.z, One::one()]
     }
+
+    #[inline]
+    pub fn to_tuple_4d(&self) -> (T, T, T, T) {
+        (self.x, self.y, self.z, One::one())
+    }
 }
 
 impl<T, U> TypedPoint3D<T, U>
@@ -539,6 +549,11 @@ impl<T: Copy, U> TypedPoint3D<T, U> {
     #[inline]
     pub fn to_array(&self) -> [T; 3] {
         [self.x, self.y, self.z]
+    }
+
+    #[inline]
+    pub fn to_tuple(&self) -> (T, T, T) {
+        (self.x, self.y, self.z)
     }
 
     /// Drop the units, preserving only the numeric value.
