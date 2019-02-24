@@ -199,6 +199,11 @@ impl<T: Copy, U> TypedSize2D<T, U> {
     }
 
     #[inline]
+    pub fn to_tuple(&self) -> (T, T) {
+        (self.width, self.height)
+    }
+
+    #[inline]
     pub fn to_vector(&self) -> TypedVector2D<T, U> {
         vec2(self.width, self.height)
     }
