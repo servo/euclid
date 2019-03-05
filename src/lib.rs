@@ -70,6 +70,7 @@ extern crate rand;
 #[cfg(test)]
 use std as core;
 
+pub use box2d::{TypedBox2D, Box2D};
 pub use length::Length;
 pub use scale::TypedScale;
 pub use transform2d::{Transform2D, TypedTransform2D};
@@ -92,6 +93,7 @@ mod macros;
 
 pub mod approxeq;
 pub mod approxord;
+mod box2d;
 mod homogen;
 pub mod num;
 mod length;
