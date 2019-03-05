@@ -9,7 +9,7 @@
 
 /// Utilities for testing approximate ordering - especially true for 
 /// floating point types, where NaN's cannot be ordered. 
-pub fn min<T: Clone + PartialOrd>(x: T, y: T) -> T {
+pub fn min<T: PartialOrd>(x: T, y: T) -> T {
     if x <= y {
         x
     } else {
@@ -17,7 +17,7 @@ pub fn min<T: Clone + PartialOrd>(x: T, y: T) -> T {
     }
 }
 
-pub fn max<T: Clone + PartialOrd>(x: T, y: T) -> T {
+pub fn max<T: PartialOrd>(x: T, y: T) -> T {
     if x >= y {
         x
     } else {
