@@ -11,6 +11,7 @@ use super::UnknownUnit;
 use length::Length;
 use scale::TypedScale;
 use num::*;
+use box2d::TypedBox2D;
 use point::TypedPoint2D;
 use vector::TypedVector2D;
 use side_offsets::TypedSideOffsets2D;
@@ -255,6 +256,14 @@ where
     #[inline]
     pub fn bottom_right(&self) -> TypedPoint2D<T, U> {
         TypedPoint2D::new(self.max_x(), self.max_y())
+    }
+
+    #[inline]
+    pub fn to_box2d(&self) -> TypedBox2D<T, U> {
+        TypedBox2D {
+            min: self.origin,
+            max: self.bottom_right(),
+        }
     }
 
     #[inline]
