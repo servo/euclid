@@ -19,7 +19,7 @@ use approxord::{min, max};
 
 use num_traits::NumCast;
 #[cfg(feature = "serde")]
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use serde::{Deserialize, Serialize};
 
 use core::borrow::Borrow;
 use core::cmp::PartialOrd;
@@ -30,6 +30,8 @@ use core::ops::{Add, Div, Mul, Sub};
 
 /// An axis aligned rectangle represented by its minimum and maximum coordinates.
 #[repr(C)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(bound(serialize = "T: Serialize", deserialize = "T: Deserialize<'de>")))]
 pub struct TypedBox2D<T, U> {
     pub min: TypedPoint2D<T, U>,
     pub max: TypedPoint2D<T, U>,
@@ -37,27 +39,6 @@ pub struct TypedBox2D<T, U> {
 
 /// The default box 2d type with no unit.
 pub type Box2D<T> = TypedBox2D<T, UnknownUnit>;
-
-#[cfg(feature = "serde")]
-impl<'de, T: Copy + Deserialize<'de>, U> Deserialize<'de> for TypedBox2D<T, U> {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        let (min, max) = try!(Deserialize::deserialize(deserializer));
-        Ok(TypedBox2D::new(min, max))
-    }
-}
-
-#[cfg(feature = "serde")]
-impl<T: Serialize, U> Serialize for TypedBox2D<T, U> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        (&self.min, &self.max).serialize(serializer)
-    }
-}
 
 impl<T: Hash, U> Hash for TypedBox2D<T, U> {
     fn hash<H: Hasher>(&self, h: &mut H) {
