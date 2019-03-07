@@ -101,6 +101,22 @@ impl<T, U> TypedBox3D<T, U>
 where
     T: Copy + PartialOrd,
 {
+    /// Returns true if the box has a negative volume.
+    ///
+    /// The common interpretation for a negative box is to consider it empty. It can be obtained
+    /// by calculating the intersection of two boxes that do not intersect.
+    #[inline]
+    pub fn is_negative(&self) -> bool {
+        self.max.x < self.min.x || self.max.y < self.min.y || self.max.z < self.min.z
+    }
+
+    /// Returns true if the size is zero or negative.
+    #[inline]
+    pub fn is_empty_or_negative(&self) -> bool {
+        self.max.x <= self.min.x || self.max.y <= self.min.y || self.max.z <= self.min.z
+    }
+
+
     #[inline]
     pub fn intersects(&self, other: &Self) -> bool {
         self.min.x < other.max.x
@@ -176,7 +192,7 @@ where
     /// nonempty but this box3d is empty.
     #[inline]
     pub fn contains_box(&self, other: &Self) -> bool {
-        other.is_empty()
+        other.is_empty_or_negative()
             || (self.min.x <= other.min.x && other.max.x <= self.max.x
                 && self.min.y <= other.min.y && other.max.y <= self.max.y
                 && self.min.z <= other.min.z && other.max.z <= self.max.z)
@@ -376,14 +392,14 @@ where
     }
 }
 
-impl<T, U> TypedBox3D<T, U> 
+impl<T, U> TypedBox3D<T, U>
 where
-    T: Copy + PartialEq + Zero + Sub<T, Output = T>,
+    T: PartialEq,
 {
-    /// Returns true if the size is zero, regardless of a or b's value.
+    /// Returns true if the volume is zero.
+    #[inline]
     pub fn is_empty(&self) -> bool {
-        let size = self.size();
-        size.width == Zero::zero() || size.height == Zero::zero() || size.depth == Zero::zero()
+        self.min.x == self.max.x || self.min.y == self.max.y || self.min.z == self.max.z
     }
 }
 
@@ -505,32 +521,20 @@ where
     /// the original box3d contains the resulting box3d.
     #[cfg_attr(feature = "unstable", must_use)]
     pub fn round_in(&self) -> Self {
-        let min_x = self.min.x.ceil();
-        let min_y = self.min.y.ceil();
-        let min_z = self.min.z.ceil();
-        let max_x = self.max.x.floor();
-        let max_y = self.max.y.floor();
-        let max_z = self.max.z.floor();
-        TypedBox3D::new(
-            TypedPoint3D::new(min_x, min_y, min_z), 
-            TypedPoint3D::new(max_x, max_y, max_z),
-        )
+        TypedBox3D {
+            min: self.min.ceil(),
+            max: self.max.floor(),
+        }
     }
 
     /// Return a box3d with faces/edges rounded to integer coordinates, such that
     /// the original box3d is contained in the resulting box3d.
     #[cfg_attr(feature = "unstable", must_use)]
     pub fn round_out(&self) -> Self {
-        let min_x = self.min.x.floor();
-        let min_y = self.min.y.floor();
-        let min_z = self.min.z.floor();
-        let max_x = self.max.x.ceil();
-        let max_y = self.max.y.ceil();
-        let max_z = self.max.z.ceil();
-        TypedBox3D::new(
-            TypedPoint3D::new(min_x, min_y, min_z), 
-            TypedPoint3D::new(max_x, max_y, max_z),
-        )
+        TypedBox3D {
+            min: self.min.floor(),
+            max: self.max.ceil(),
+        }
     }
 }
 
