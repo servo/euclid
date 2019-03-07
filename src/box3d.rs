@@ -246,8 +246,8 @@ where
     #[inline]
     pub fn contains(&self, other: &TypedPoint3D<T, U>) -> bool {
         self.min_x() <= other.x && other.x < self.max_x()
-            && self.min_y() < other.y && other.y <= self.max_y()
-            && self.min_z() < other.z && other.z <= self.max_z()
+            && self.min_y() <= other.y && other.y < self.max_y()
+            && self.min_z() <= other.z && other.z < self.max_z()
     }
 }
 
