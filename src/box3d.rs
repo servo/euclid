@@ -99,81 +99,16 @@ where
 
 impl<T, U> TypedBox3D<T, U>
 where
-    T: Copy,
-{
-    #[inline]
-    pub fn max_x(&self) -> T {
-        self.max.x
-    }
-
-    #[inline]
-    pub fn min_x(&self) -> T {
-        self.min.x
-    }
-
-    #[inline]
-    pub fn max_y(&self) -> T {
-        self.max.y
-    }
-
-    #[inline]
-    pub fn min_y(&self) -> T {
-        self.min.y
-    }
-
-    #[inline]
-    pub fn max_z(&self) -> T {
-        self.max.z
-    }
-
-    #[inline]
-    pub fn min_z(&self) -> T {
-        self.min.z
-    }
-
-    #[inline]
-    pub fn max_x_typed(&self) -> Length<T, U> {
-        Length::new(self.max_x())
-    }
-
-    #[inline]
-    pub fn min_x_typed(&self) -> Length<T, U> {
-        Length::new(self.min_x())
-    }
-
-    #[inline]
-    pub fn max_y_typed(&self) -> Length<T, U> {
-        Length::new(self.max_y())
-    }
-
-    #[inline]
-    pub fn min_y_typed(&self) -> Length<T, U> {
-        Length::new(self.min_y())
-    }
-
-    #[inline]
-    pub fn max_z_typed(&self) -> Length<T, U> {
-        Length::new(self.max_z())
-    }
-
-    #[inline]
-    pub fn min_z_typed(&self) -> Length<T, U> {
-        Length::new(self.min_z())
-    }
-}
-
-impl<T, U> TypedBox3D<T, U>
-where
     T: Copy + PartialOrd,
 {
     #[inline]
     pub fn intersects(&self, other: &Self) -> bool {
-        self.min_x() < other.max_x()
-            && self.max_x() > other.min_x()
-            && self.min_y() < other.max_y()
-            && self.max_y() > other.min_y()
-            && self.min_z() < other.max_z()
-            && self.max_z() > other.min_z()
+        self.min.x < other.max.x
+            && self.max.x > other.min.x
+            && self.min.y < other.max.y
+            && self.max.y > other.min.y
+            && self.min.z < other.max.z
+            && self.max.z > other.min.z
     }
 
     #[inline]
@@ -187,15 +122,15 @@ where
 
     pub fn intersection(&self, other: &Self) -> Self {
         let intersection_min = TypedPoint3D::new(
-            max(self.min_x(), other.min_x()),
-            max(self.min_y(), other.min_y()),
-            max(self.min_z(), other.min_z()),
+            max(self.min.x, other.min.x),
+            max(self.min.y, other.min.y),
+            max(self.min.z, other.min.z),
         );
 
         let intersection_max = TypedPoint3D::new(
-            min(self.max_x(), other.max_x()),
-            min(self.max_y(), other.max_y()),
-            min(self.max_z(), other.max_z()),
+            min(self.max.x, other.max.x),
+            min(self.max.y, other.max.y),
+            min(self.max.z, other.max.z),
         );
 
         TypedBox3D::new(
@@ -226,9 +161,9 @@ where
     /// are on the back, right or bottom faces.
     #[inline]
     pub fn contains(&self, other: &TypedPoint3D<T, U>) -> bool {
-        self.min_x() <= other.x && other.x < self.max_x()
-            && self.min_y() <= other.y && other.y < self.max_y()
-            && self.min_z() <= other.z && other.z < self.max_z()
+        self.min.x <= other.x && other.x < self.max.x
+            && self.min.y <= other.y && other.y < self.max.y
+            && self.min.z <= other.z && other.z < self.max.z
     }
 }
 
@@ -242,9 +177,9 @@ where
     #[inline]
     pub fn contains_box(&self, other: &Self) -> bool {
         other.is_empty()
-            || (self.min_x() <= other.min_x() && other.max_x() <= self.max_x()
-                && self.min_y() <= other.min_y() && other.max_y() <= self.max_y()
-                && self.min_z() <= other.min_z() && other.max_z() <= self.max_z())
+            || (self.min.x <= other.min.x && other.max.x <= self.max.x
+                && self.min.y <= other.min.y && other.max.y <= self.max.y
+                && self.min.z <= other.min.z && other.max.z <= self.max.z)
     }
 }
 
@@ -255,9 +190,9 @@ where
     #[inline]
     pub fn size(&self)-> TypedSize3D<T, U> {
         TypedSize3D::new(
-            self.max_x() - self.min_x(),
-            self.max_y() - self.min_y(),
-            self.max_z() - self.min_z(),
+            self.max.x - self.min.x,
+            self.max.y - self.min.y,
+            self.max.z - self.min.z,
         )
     }
 }
@@ -271,8 +206,8 @@ where
     #[cfg_attr(feature = "unstable", must_use)]
     pub fn inflate(&self, width: T, height: T, depth: T) -> Self {
         TypedBox3D::new(
-            TypedPoint3D::new(self.min_x() - width, self.min_y() - height, self.min_z() - depth),
-            TypedPoint3D::new(self.max_x() + width, self.max_x() + height, self.max_z() + depth),
+            TypedPoint3D::new(self.min.x - width, self.min.y - height, self.min.z - depth),
+            TypedPoint3D::new(self.max.x + width, self.max.x + height, self.max.z + depth),
         )
     }
 
@@ -373,14 +308,14 @@ where
     pub fn union(&self, other: &Self) -> Self {
         TypedBox3D::new(
             TypedPoint3D::new(
-                min(self.min_x(), other.min_x()),
-                min(self.min_y(), other.min_y()),
-                min(self.min_z(), other.min_z()),
+                min(self.min.x, other.min.x),
+                min(self.min.y, other.min.y),
+                min(self.min.z, other.min.z),
             ),
             TypedPoint3D::new(
-                max(self.max_x(), other.max_x()),
-                max(self.max_y(), other.max_y()),
-                max(self.max_z(), other.max_z()),
+                max(self.max.x, other.max.x),
+                max(self.max.y, other.max.y),
+                max(self.max.z, other.max.z),
             ),
         )
     }
@@ -718,45 +653,45 @@ mod tests {
     #[test]
     fn test_min_max() {
         let b = Box3D::from_points(&[point3(50.0, 25.0, 12.5), point3(100.0, 160.0, 200.0)]);
-        assert!(b.min_x() == 50.0);
-        assert!(b.min_y() == 25.0);
-        assert!(b.min_z() == 12.5);
-        assert!(b.max_x() == 100.0);
-        assert!(b.max_y() == 160.0);
-        assert!(b.max_z() == 200.0);
+        assert!(b.min.x == 50.0);
+        assert!(b.min.y == 25.0);
+        assert!(b.min.z == 12.5);
+        assert!(b.max.x == 100.0);
+        assert!(b.max.y == 160.0);
+        assert!(b.max.z == 200.0);
     }
 
     #[test]
     fn test_round_in() {
         let b = Box3D::from_points(&[point3(-25.5, -40.4, -70.9), point3(60.3, 36.5, 89.8)]).round_in();
-        assert!(b.min_x() == -25.0);
-        assert!(b.min_y() == -40.0);
-        assert!(b.min_z() == -70.0);
-        assert!(b.max_x() == 60.0);
-        assert!(b.max_y() == 36.0);
-        assert!(b.max_z() == 89.0);
+        assert!(b.min.x == -25.0);
+        assert!(b.min.y == -40.0);
+        assert!(b.min.z == -70.0);
+        assert!(b.max.x == 60.0);
+        assert!(b.max.y == 36.0);
+        assert!(b.max.z == 89.0);
     }
 
     #[test]
     fn test_round_out() {
         let b = Box3D::from_points(&[point3(-25.5, -40.4, -70.9), point3(60.3, 36.5, 89.8)]).round_out();
-        assert!(b.min_x() == -26.0);
-        assert!(b.min_y() == -41.0);
-        assert!(b.min_z() == -71.0);
-        assert!(b.max_x() == 61.0);
-        assert!(b.max_y() == 37.0);
-        assert!(b.max_z() == 90.0);
+        assert!(b.min.x == -26.0);
+        assert!(b.min.y == -41.0);
+        assert!(b.min.z == -71.0);
+        assert!(b.max.x == 61.0);
+        assert!(b.max.y == 37.0);
+        assert!(b.max.z == 90.0);
     }
 
     #[test]
     fn test_round() {
         let b = Box3D::from_points(&[point3(-25.5, -40.4, -70.9), point3(60.3, 36.5, 89.8)]).round();
-        assert!(b.min_x() == -26.0);
-        assert!(b.min_y() == -40.0);
-        assert!(b.min_z() == -71.0);
-        assert!(b.max_x() == 60.0);
-        assert!(b.max_y() == 37.0);
-        assert!(b.max_z() == 90.0);
+        assert!(b.min.x == -26.0);
+        assert!(b.min.y == -40.0);
+        assert!(b.min.z == -71.0);
+        assert!(b.max.x == 60.0);
+        assert!(b.max.y == 37.0);
+        assert!(b.max.z == 90.0);
     }
 
     #[test]
@@ -778,12 +713,12 @@ mod tests {
         let b = b.translate(&translation);
         center += translation;
         assert!(b.center() == center);
-        assert!(b.max_x() == 25.0);
-        assert!(b.max_y() == 17.5);
-        assert!(b.max_z() == 209.5);
-        assert!(b.min_x() == 10.0);
-        assert!(b.min_y() == 2.5);
-        assert!(b.min_z() == 9.5);
+        assert!(b.max.x == 25.0);
+        assert!(b.max.y == 17.5);
+        assert!(b.max.z == 209.5);
+        assert!(b.min.x == 10.0);
+        assert!(b.min.y == 2.5);
+        assert!(b.min.z == 9.5);
     }
 
     #[test]
@@ -791,12 +726,12 @@ mod tests {
         let b1 = Box3D::from_points(&[point3(-20.0, -20.0, -20.0), point3(0.0, 20.0, 20.0)]);
         let b2 = Box3D::from_points(&[point3(0.0, 20.0, 20.0), point3(20.0, -20.0, -20.0)]);
         let b = b1.union(&b2);
-        assert!(b.max_x() == 20.0);
-        assert!(b.max_y() == 20.0);
-        assert!(b.max_z() == 20.0);
-        assert!(b.min_x() == -20.0);
-        assert!(b.min_y() == -20.0);
-        assert!(b.min_z() == -20.0);
+        assert!(b.max.x == 20.0);
+        assert!(b.max.y == 20.0);
+        assert!(b.max.z == 20.0);
+        assert!(b.min.x == -20.0);
+        assert!(b.min.y == -20.0);
+        assert!(b.min.z == -20.0);
         assert!(b.volume() == (40.0 * 40.0 * 40.0));
     }
 
@@ -812,12 +747,12 @@ mod tests {
         let b1 = Box3D::from_points(&[point3(-15.0, -20.0, -20.0), point3(10.0, 20.0, 20.0)]);
         let b2 = Box3D::from_points(&[point3(-10.0, 20.0, 20.0), point3(15.0, -20.0, -20.0)]);
         let b = b1.intersection(&b2);
-        assert!(b.max_x() == 10.0);
-        assert!(b.max_y() == 20.0);
-        assert!(b.max_z() == 20.0);
-        assert!(b.min_x() == -10.0);
-        assert!(b.min_y() == -20.0);
-        assert!(b.min_z() == -20.0);
+        assert!(b.max.x == 10.0);
+        assert!(b.max.y == 20.0);
+        assert!(b.max.z == 20.0);
+        assert!(b.min.x == -10.0);
+        assert!(b.min.y == -20.0);
+        assert!(b.min.z == -20.0);
         assert!(b.volume() == (20.0 * 40.0 * 40.0));
     }
 
@@ -836,23 +771,23 @@ mod tests {
     fn test_scale() {
         let b = Box3D::from_points(&[point3(-10.0, -10.0, -10.0), point3(10.0, 10.0, 10.0)]);
         let b = b.scale(0.5, 0.5, 0.5);
-        assert!(b.max_x() == 5.0);
-        assert!(b.max_y() == 5.0);
-        assert!(b.max_z() == 5.0);
-        assert!(b.min_x() == -5.0);
-        assert!(b.min_y() == -5.0);
-        assert!(b.min_z() == -5.0);
+        assert!(b.max.x == 5.0);
+        assert!(b.max.y == 5.0);
+        assert!(b.max.z == 5.0);
+        assert!(b.min.x == -5.0);
+        assert!(b.min.y == -5.0);
+        assert!(b.min.z == -5.0);
     }
 
     #[test]
     fn test_zero() {
         let b = Box3D::<f64>::zero();
-        assert!(b.max_x() == 0.0);
-        assert!(b.max_y() == 0.0);
-        assert!(b.max_z() == 0.0);
-        assert!(b.min_x() == 0.0);
-        assert!(b.min_y() == 0.0);
-        assert!(b.min_z() == 0.0);
+        assert!(b.max.x == 0.0);
+        assert!(b.max.y == 0.0);
+        assert!(b.max.z == 0.0);
+        assert!(b.min.x == 0.0);
+        assert!(b.min.y == 0.0);
+        assert!(b.min.z == 0.0);
     }
 
     #[test]
