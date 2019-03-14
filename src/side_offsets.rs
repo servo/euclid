@@ -18,11 +18,13 @@ use core::marker::PhantomData;
 use core::cmp::{Eq, PartialEq};
 use core::hash::{Hash};
 #[cfg(feature = "serde")]
-use serde;
+use serde::{Deserialize, Serialize};
 
 /// A group of 2D side offsets, which correspond to top/left/bottom/right for borders, padding,
 /// and margins in CSS, optionally tagged with a unit.
 #[repr(C)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(bound(serialize = "T: Serialize", deserialize = "T: Deserialize<'de>")))]
 pub struct SideOffsets2D<T, U> {
     pub top: T,
     pub right: T,
@@ -43,29 +45,6 @@ impl<T: Clone, U> Clone for SideOffsets2D<T, U> {
             left: self.left.clone(),
             _unit: PhantomData,
         }
-    }
-}
-
-#[cfg(feature = "serde")]
-impl<'de, T, U> serde::Deserialize<'de> for SideOffsets2D<T, U>
-    where T: serde::Deserialize<'de>
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-        where D: serde::Deserializer<'de>
-    {
-        let (top, right, bottom, left) = try!(serde::Deserialize::deserialize(deserializer));
-        Ok(SideOffsets2D { top, right, bottom, left, _unit: PhantomData })
-    }
-}
-
-#[cfg(feature = "serde")]
-impl<T, U> serde::Serialize for SideOffsets2D<T, U>
-    where T: serde::Serialize
-{
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where S: serde::Serializer
-    {
-        (&self.top, &self.right, &self.bottom, &self.left).serialize(serializer)
     }
 }
 

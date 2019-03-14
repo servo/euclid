@@ -20,7 +20,7 @@ use approxord::{min, max};
 
 use num_traits::NumCast;
 #[cfg(feature = "serde")]
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use serde::{Deserialize, Serialize};
 
 use core::borrow::Borrow;
 use core::cmp::PartialOrd;
@@ -31,30 +31,11 @@ use core::ops::{Add, Div, Mul, Sub, Range};
 
 /// A 2d Rectangle optionally tagged with a unit.
 #[repr(C)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(bound(serialize = "T: Serialize", deserialize = "T: Deserialize<'de>")))]
 pub struct Rect<T, U = UnknownUnit> {
     pub origin: Point2D<T, U>,
     pub size: Size2D<T, U>,
-}
-
-#[cfg(feature = "serde")]
-impl<'de, T: Copy + Deserialize<'de>, U> Deserialize<'de> for Rect<T, U> {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        let (origin, size) = try!(Deserialize::deserialize(deserializer));
-        Ok(Rect::new(origin, size))
-    }
-}
-
-#[cfg(feature = "serde")]
-impl<T: Serialize, U> Serialize for Rect<T, U> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        (&self.origin, &self.size).serialize(serializer)
-    }
 }
 
 impl<T: Hash, U> Hash for Rect<T, U> {
