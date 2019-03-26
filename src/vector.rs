@@ -137,6 +137,12 @@ impl<T: Copy, U> TypedVector2D<T, U> {
         vec2(p.x, p.y)
     }
 
+    /// Cast the unit
+    #[inline]
+    pub fn cast_unit<V>(&self) -> TypedVector2D<T, V> {
+        vec2(self.x, self.y)
+    }
+
     #[inline]
     pub fn to_array(&self) -> [T; 2] {
         [self.x, self.y]
