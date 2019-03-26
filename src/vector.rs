@@ -16,6 +16,7 @@ use point::{TypedPoint2D, TypedPoint3D, point2, point3};
 use size::{TypedSize2D, size2};
 use scale::TypedScale;
 use transform2d::TypedTransform2D;
+use transform3d::TypedTransform3D;
 use trig::Trig;
 use Angle;
 use num::*;
@@ -633,6 +634,25 @@ impl<T: Copy, U> TypedVector3D<T, U> {
     #[inline]
     pub fn to_2d(&self) -> TypedVector2D<T, U> {
         self.xy()
+    }
+}
+
+impl<T, U> TypedVector3D<T, U>
+where
+    T: Copy
+        + Clone
+        + Add<T, Output = T>
+        + Mul<T, Output = T>
+        + Div<T, Output = T>
+        + Sub<T, Output = T>
+        + Trig
+        + PartialOrd
+        + One
+        + Zero
+        + Neg<Output = T> {
+    #[inline]
+    pub fn to_transform(&self) -> TypedTransform3D<T, U, U> {
+        TypedTransform3D::create_translation(self.x, self.y, self.z)
     }
 }
 
