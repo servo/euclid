@@ -560,7 +560,7 @@ where
         self.rotate_point3d(&point.to_3d()).xy()
     }
 
-    /// Returns the given 3d vector transformed by this rotation then projected on the xy plane.
+    /// Returns the given 3d vector transformed by this rotation.
     ///
     /// The input vector must be use the unit Src, and the returned point has the unit Dst.
     #[inline]
