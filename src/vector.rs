@@ -15,6 +15,7 @@ use mint;
 use point::{TypedPoint2D, TypedPoint3D, point2, point3};
 use size::{TypedSize2D, size2};
 use scale::TypedScale;
+use transform2d::TypedTransform2D;
 use trig::Trig;
 use Angle;
 use num::*;
@@ -143,6 +144,24 @@ impl<T: Copy, U> TypedVector2D<T, U> {
     #[inline]
     pub fn to_tuple(&self) -> (T, T) {
         (self.x, self.y)
+    }
+}
+
+impl<T, U> TypedVector2D<T, U>
+where
+    T: Copy
+        + Clone
+        + Add<T, Output = T>
+        + Mul<T, Output = T>
+        + Div<T, Output = T>
+        + Sub<T, Output = T>
+        + Trig
+        + PartialOrd
+        + One
+        + Zero {
+    #[inline]
+    pub fn to_transform(&self) -> TypedTransform2D<T, U, U> {
+        TypedTransform2D::create_translation(self.x, self.y)
     }
 }
 
