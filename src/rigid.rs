@@ -30,6 +30,14 @@ impl<T: Float + ApproxEq<T>, U> TypedRigidTransform3D<T, U> {
         }
     }
 
+    /// Construct an identity transform
+    pub fn identity() -> Self {
+        Self {
+            rotation: TypedRotation3D::identity(),
+            translation: TypedVector3D::zero(),
+        }
+    }
+
     /// Construct a new rigid transformation, where the `translation` applies first
     pub fn new_from_reversed(
         translation: TypedVector3D<T, U>,
@@ -163,5 +171,76 @@ impl<T: Float + ApproxEq<T>, U> From<TypedRotation3D<T, U, U>> for TypedRigidTra
 impl<T: Float + ApproxEq<T>, U> From<TypedVector3D<T, U>> for TypedRigidTransform3D<T, U> {
     fn from(t: TypedVector3D<T, U>) -> Self {
         Self::from_translation(t)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::RigidTransform3D;
+    use {Rotation3D, TypedTransform3D, Vector3D};
+
+    #[test]
+    fn test_rigid_construction() {
+        let translation = Vector3D::new(12.1, 17.8, -5.5);
+        let rotation = Rotation3D::unit_quaternion(0.5, -7.8, 2.2, 4.3);
+
+        let rigid = RigidTransform3D::new(rotation, translation);
+        assert!(rigid
+            .to_transform()
+            .approx_eq(&translation.to_transform().pre_mul(&rotation.to_transform())));
+
+        let rigid = RigidTransform3D::new_from_reversed(translation, rotation);
+        assert!(rigid.to_transform().approx_eq(
+            &translation
+                .to_transform()
+                .post_mul(&rotation.to_transform())
+        ));
+    }
+
+    #[test]
+    fn test_rigid_decomposition() {
+        let translation = Vector3D::new(12.1, 17.8, -5.5);
+        let rotation = Rotation3D::unit_quaternion(0.5, -7.8, 2.2, 4.3);
+
+        let rigid = RigidTransform3D::new(rotation, translation);
+        let (t2, r2) = rigid.decompose_reversed();
+        assert!(rigid
+            .to_transform()
+            .approx_eq(&t2.to_transform().post_mul(&r2.to_transform())));
+    }
+
+    #[test]
+    fn test_rigid_inverse() {
+        let translation = Vector3D::new(12.1, 17.8, -5.5);
+        let rotation = Rotation3D::unit_quaternion(0.5, -7.8, 2.2, 4.3);
+
+        let rigid = RigidTransform3D::new(rotation, translation);
+        let inverse = rigid.inverse();
+        assert!(rigid
+            .post_mul(&inverse)
+            .to_transform()
+            .approx_eq(&TypedTransform3D::identity()));
+        assert!(inverse
+            .to_transform()
+            .approx_eq(&rigid.to_transform().inverse().unwrap()));
+    }
+
+    #[test]
+    fn test_rigid_multiply() {
+        let translation = Vector3D::new(12.1, 17.8, -5.5);
+        let rotation = Rotation3D::unit_quaternion(0.5, -7.8, 2.2, 4.3);
+        let translation2 = Vector3D::new(9.3, -3.9, 1.1);
+        let rotation2 = Rotation3D::unit_quaternion(0.1, 0.2, 0.3, -0.4);
+        let rigid = RigidTransform3D::new(rotation, translation);
+        let rigid2 = RigidTransform3D::new(rotation2, translation2);
+
+        assert!(rigid
+            .post_mul(&rigid2)
+            .to_transform()
+            .approx_eq(&rigid.to_transform().post_mul(&rigid2.to_transform())));
+        assert!(rigid
+            .pre_mul(&rigid2)
+            .to_transform()
+            .approx_eq(&rigid.to_transform().pre_mul(&rigid2.to_transform())));
     }
 }
