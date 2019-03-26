@@ -81,6 +81,7 @@ pub use vector::{BoolVector2D, BoolVector3D, bvec2, bvec3};
 pub use homogen::HomogeneousVector;
 
 pub use rect::{rect, Rect, TypedRect};
+pub use rigid::RigidTransform3D;
 pub use box3d::{box3d, Box3D, TypedBox3D};
 pub use translation::{TypedTranslation2D, TypedTranslation3D};
 pub use rotation::{Angle, Rotation2D, Rotation3D, TypedRotation2D, TypedRotation3D};
@@ -99,6 +100,7 @@ pub mod num;
 mod length;
 mod point;
 mod rect;
+mod rigid;
 mod rotation;
 mod scale;
 mod side_offsets;
