@@ -7,7 +7,7 @@ use {TypedRotation3D, TypedTransform3D, TypedVector3D, UnknownUnit};
 ///
 ///
 /// Internally, this is a rotation and a translation, with the rotation
-/// applied first (i.e. `Translation * Rotation`)
+/// applied first (i.e. `Rotation * Translation`, in row-vector notation)
 ///
 /// This can be more efficient to use over full matrices, especially if you
 /// have to deal with the decomposed quantities often.
@@ -20,6 +20,10 @@ pub struct TypedRigidTransform3D<T, Src, Dst> {
 }
 
 pub type RigidTransform3D<T> = TypedRigidTransform3D<T, UnknownUnit, UnknownUnit>;
+
+// All matrix multiplication in this file is in row-vector notation,
+// i.e. a vector `v` is transformed with `v * T`, and if you want to apply `T1`
+// before `T2` you use `T1 * T2`
 
 impl<T: Float + ApproxEq<T>, Src, Dst> TypedRigidTransform3D<T, Src, Dst> {
     /// Construct a new rigid transformation, where the `rotation` applies first
@@ -46,12 +50,12 @@ impl<T: Float + ApproxEq<T>, Src, Dst> TypedRigidTransform3D<T, Src, Dst> {
         translation: TypedVector3D<T, Src>,
         rotation: TypedRotation3D<T, Src, Dst>,
     ) -> Self {
-        // R * T
-        //   = R * T * (R^-1 * R)
-        //   = (R * T * R^-1) * R
-        //   = T' * R
+        // T * R
+        //   = (R * R^-1) * T * R
+        //   = R * (R^-1 * T * R)
+        //   = R * T'
         //
-        // T' = (R * T * R^-1) is also a translation matrix
+        // T' = (R^-1 * T * R) is also a translation matrix
         // It is equivalent to the translation matrix obtained by rotating the
         // translation by R
 
@@ -81,12 +85,12 @@ impl<T: Float + ApproxEq<T>, Src, Dst> TypedRigidTransform3D<T, Src, Dst> {
     /// Decompose this into a position and an orientation to be applied in the opposite order
     #[inline]
     pub fn decompose_reversed(&self) -> (TypedVector3D<T, Src>, TypedRotation3D<T, Src, Dst>) {
-        // self = T * R
-        //      = R * R^-1 * T * R
-        //      = R * (R^-1 * T * R)
-        //      = R * T'
+        // self = R * T
+        //      = R * T * (R^-1 * R)
+        //      = (R * T * R^-1) * R)
+        //      = T' * R
         //
-        // T' = (R^-1 * T * R) is T rotated by R^-1
+        // T' = (R^ * T * R^-1) is T rotated by R^-1
 
         let translation = self.rotation.inverse().rotate_vector3d(&self.translation);
         (translation, self.rotation)
@@ -95,27 +99,27 @@ impl<T: Float + ApproxEq<T>, Src, Dst> TypedRigidTransform3D<T, Src, Dst> {
     /// Returns the multiplication of the two transforms such that
     /// other's transformation applies after self's transformation.
     ///
-    /// i.e., this produces `other * self`, postmultiplying self to other
+    /// i.e., this produces `self * other` in row-vector notation
     #[inline]
     pub fn post_mul<Dst2>(
         &self,
         other: &TypedRigidTransform3D<T, Dst, Dst2>,
     ) -> TypedRigidTransform3D<T, Src, Dst2> {
-        // self = T1 * R1
-        // other = T2 * R2
-        // result = T2 * R2 * T1 * R1
-        //        = T2 * R2 * R1 * R1^-1 * T1 * R1
-        //        = T2 * R2 * R1 * (R1^-1 * T1 * R1)
-        //        = T2 * R' * T'
-        //        = T2 * R' * T' * R'^-1 * R'
-        //        = T2 * (R' * T' * R'^-1) * R'
-        //        = T2 * T'' * R'
-        //        = T'' * R'
+        // self = R1 * T1
+        // other = R2 * T2
+        // result = R1 * T1 * R2 * T2
+        //        = R1 * T1 * (R1^-1 * R1) * R2 * T2
+        //        = (R1 * T1 * R1^-1) * R1 * R2 * T2
+        //        = T' * R' * T2
+        //        = (R' * R'^-1) * T' * R' * T2
+        //        = R' * (R'^-1 * T' * R') * T2
+        //        = R' * T'' * T2
+        //        = R * T''
         //
-        // (R1^-1 * T1 * R1) = T' = T1 rotated by R1^-1
-        // R2 * R1  = R'
-        // (R' * T' * R'^-1) = T'' = T' rotated by R'
-        // T2 * T'' = T''' = T2 + T'
+        // (R1 * T1 * R1^-1) = T' = T1 rotated by R1^-1
+        // R1 * R2  = R'
+        // (R'^-1 * T' * R') = T'' = T' rotated by R'
+        // T'' * T2 = T''' = T2 + T'
 
         let t_prime = self
             .rotation
@@ -133,7 +137,7 @@ impl<T: Float + ApproxEq<T>, Src, Dst> TypedRigidTransform3D<T, Src, Dst> {
     /// Returns the multiplication of the two transforms such that
     /// self's transformation applies after other's transformation.
     ///
-    /// i.e., this produces `self * other`, premultiplying self to other
+    /// i.e., this produces `other * self` in row-vector notation
     #[inline]
     pub fn pre_mul<Src2>(
         &self,
@@ -146,13 +150,13 @@ impl<T: Float + ApproxEq<T>, Src, Dst> TypedRigidTransform3D<T, Src, Dst> {
     #[inline]
     pub fn inverse(&self) -> TypedRigidTransform3D<T, Dst, Src> {
         // result = (self)^-1
-        //        = (T * R)^-1
-        //        = R^-1 * T^-1
-        //        = R^-1 * T^-1 * R * R^-1
-        //        = (R^-1 * T^-1 * R) * R^-1
-        //        = T' * R'
+        //        = (R * T)^-1
+        //        = T^-1 * R^-1
+        //        = (R^-1 * R) * T^-1 * R^-1
+        //        = R^-1 * (R * T^-1 * R^-1)
+        //        = R' * T'
         //
-        // T' = (R^-1 * T^-1 * R) = (-T) rotated by R^-1
+        // T' = (R * T^-1 * R^-1) = (-T) rotated by R^-1
         // R' = R^-1
         //
         // An easier way of writing this is to use new_from_reversed() with R^-1 and T^-1
