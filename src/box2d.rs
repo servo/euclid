@@ -224,7 +224,7 @@ where
     pub fn inflate(&self, width: T, height: T) -> Self {
         TypedBox2D {
             min: point2(self.min.x - width, self.min.y - height),
-            max: point2(self.max.x + width, self.max.x + height),
+            max: point2(self.max.x + width, self.max.y + height),
         }
     }
 }
