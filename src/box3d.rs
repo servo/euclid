@@ -223,7 +223,7 @@ where
     pub fn inflate(&self, width: T, height: T, depth: T) -> Self {
         TypedBox3D::new(
             TypedPoint3D::new(self.min.x - width, self.min.y - height, self.min.z - depth),
-            TypedPoint3D::new(self.max.x + width, self.max.x + height, self.max.z + depth),
+            TypedPoint3D::new(self.max.x + width, self.max.y + height, self.max.z + depth),
         )
     }
 
