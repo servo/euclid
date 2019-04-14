@@ -467,6 +467,18 @@ impl<T: Copy, U> From<[T; 2]> for TypedVector2D<T, U> {
     }
 }
 
+impl<T: Copy, U> Into<(T, T)> for TypedVector2D<T, U> {
+    fn into(self) -> (T, T) {
+        self.to_tuple()
+    }
+}
+
+impl<T: Copy, U> From<(T, T)> for TypedVector2D<T, U> {
+    fn from(tuple: (T, T)) -> Self {
+        vec2(tuple.0, tuple.1)
+    }
+}
+
 impl<T, U> TypedVector2D<T, U>
 where
     T: Signed,
@@ -942,6 +954,18 @@ impl<T: Copy, U> Into<[T; 3]> for TypedVector3D<T, U> {
 impl<T: Copy, U> From<[T; 3]> for TypedVector3D<T, U> {
     fn from(array: [T; 3]) -> Self {
         vec3(array[0], array[1], array[2])
+    }
+}
+
+impl<T: Copy, U> Into<(T, T, T)> for TypedVector3D<T, U> {
+    fn into(self) -> (T, T, T) {
+        self.to_tuple()
+    }
+}
+
+impl<T: Copy, U> From<(T, T, T)> for TypedVector3D<T, U> {
+    fn from(tuple: (T, T, T)) -> Self {
+        vec3(tuple.0, tuple.1, tuple.2)
     }
 }
 
