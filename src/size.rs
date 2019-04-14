@@ -385,6 +385,29 @@ impl<T, U> Into<mint::Vector2<T>> for TypedSize2D<T, U> {
     }
 }
 
+impl<T: Copy, U> Into<[T; 2]> for TypedSize2D<T, U> {
+    fn into(self) -> [T; 2] {
+        self.to_array()
+    }
+}
+
+impl<T: Copy, U> From<[T; 2]> for TypedSize2D<T, U> {
+    fn from(array: [T; 2]) -> Self {
+        size2(array[0], array[1])
+    }
+}
+
+impl<T: Copy, U> Into<(T, T)> for TypedSize2D<T, U> {
+    fn into(self) -> (T, T) {
+        self.to_tuple()
+    }
+}
+
+impl<T: Copy, U> From<(T, T)> for TypedSize2D<T, U> {
+    fn from(tuple: (T, T)) -> Self {
+        size2(tuple.0, tuple.1)
+    }
+}
 
 #[cfg(test)]
 mod size2d {
