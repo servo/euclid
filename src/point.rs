@@ -416,6 +416,18 @@ impl<T: Copy, U> From<[T; 2]> for TypedPoint2D<T, U> {
     }
 }
 
+impl<T: Copy, U> Into<(T, T)> for TypedPoint2D<T, U> {
+    fn into(self) -> (T, T) {
+        self.to_tuple()
+    }
+}
+
+impl<T: Copy, U> From<(T, T)> for TypedPoint2D<T, U> {
+    fn from(tuple: (T, T)) -> Self {
+        point2(tuple.0, tuple.1)
+    }
+}
+
 /// A 3d Point tagged with a unit.
 #[derive(EuclidMatrix)]
 #[repr(C)]
@@ -829,6 +841,18 @@ impl<T: Copy, U> Into<[T; 3]> for TypedPoint3D<T, U> {
 impl<T: Copy, U> From<[T; 3]> for TypedPoint3D<T, U> {
     fn from(array: [T; 3]) -> Self {
         point3(array[0], array[1], array[2])
+    }
+}
+
+impl<T: Copy, U> Into<(T, T, T)> for TypedPoint3D<T, U> {
+    fn into(self) -> (T, T, T) {
+        self.to_tuple()
+    }
+}
+
+impl<T: Copy, U> From<(T, T, T)> for TypedPoint3D<T, U> {
+    fn from(tuple: (T, T, T)) -> Self {
+        point3(tuple.0, tuple.1, tuple.2)
     }
 }
 
