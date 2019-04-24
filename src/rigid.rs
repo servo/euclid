@@ -110,29 +110,23 @@ impl<T: Float + ApproxEq<T>, Src, Dst> TypedRigidTransform3D<T, Src, Dst> {
         // self = R1 * T1
         // other = R2 * T2
         // result = R1 * T1 * R2 * T2
-        //        = R1 * T1 * (R1^-1 * R1) * R2 * T2
-        //        = (R1 * T1 * R1^-1) * R1 * R2 * T2
-        //        = T' * R' * T2
-        //        = (R' * R'^-1) * T' * R' * T2
-        //        = R' * (R'^-1 * T' * R') * T2
-        //        = R' * T'' * T2
-        //        = R' * T'''
+        //        = R1 * (R2 * R2^-1) * T1 * R2 * T2
+        //        = (R1 * R2) * (R2^-1 * T1 * R2) * T2
+        //        = R' * T' * T2
+        //        = R' * T''
         //
-        // (R1 * T1 * R1^-1) = T' = T1 rotated by R1^-1
+        // (R2^-1 * T2 * R2^) = T' = T2 rotated by R2
         // R1 * R2  = R'
-        // (R'^-1 * T' * R') = T'' = T' rotated by R'
-        // T'' * T2 = T''' = vector addition of translations T2 and T''
+        // T' * T2 = T' = vector addition of translations T2 and T'
 
-        let t_prime = self
+        let t_prime = other
             .rotation
-            .inverse()
             .rotate_vector3d(&self.translation);
         let r_prime = self.rotation.post_rotate(&other.rotation);
-        let t_prime2 = r_prime.rotate_vector3d(&t_prime);
-        let t_prime3 = t_prime2 + other.translation;
+        let t_prime2 = t_prime + other.translation;
         TypedRigidTransform3D {
             rotation: r_prime,
-            translation: t_prime3,
+            translation: t_prime2,
         }
     }
 
