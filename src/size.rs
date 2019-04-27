@@ -48,6 +48,12 @@ impl<T: fmt::Display, U> fmt::Display for TypedSize2D<T, U> {
     }
 }
 
+impl<T: Default, U> Default for TypedSize2D<T, U> {
+    fn default() -> Self {
+        TypedSize2D::new(Default::default(), Default::default())
+    }
+}
+
 impl<T, U> TypedSize2D<T, U> {
     /// Constructor taking scalar values.
     pub fn new(width: T, height: T) -> Self {
@@ -496,6 +502,12 @@ impl<T: fmt::Debug, U> fmt::Debug for TypedSize3D<T, U> {
 impl<T: fmt::Display, U> fmt::Display for TypedSize3D<T, U> {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         write!(formatter, "({}x{}x{})", self.width, self.height, self.depth)
+    }
+}
+
+impl<T: Default, U> Default for TypedSize3D<T, U> {
+    fn default() -> Self {
+        TypedSize3D::new(Default::default(), Default::default(), Default::default())
     }
 }
 
