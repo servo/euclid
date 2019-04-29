@@ -68,6 +68,12 @@ impl<T: fmt::Display, U> fmt::Display for TypedVector2D<T, U> {
     }
 }
 
+impl<T: Default, U> Default for TypedVector2D<T, U> {
+    fn default() -> Self {
+        TypedVector2D::new(Default::default(), Default::default())
+    }
+}
+
 impl<T, U> TypedVector2D<T, U> {
     /// Constructor taking scalar values directly.
     #[inline]
@@ -559,6 +565,12 @@ impl<T: fmt::Debug, U> fmt::Debug for TypedVector3D<T, U> {
 impl<T: fmt::Display, U> fmt::Display for TypedVector3D<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "({},{},{})", self.x, self.y, self.z)
+    }
+}
+
+impl<T: Default, U> Default for TypedVector3D<T, U> {
+    fn default() -> Self {
+        TypedVector3D::new(Default::default(), Default::default(), Default::default())
     }
 }
 

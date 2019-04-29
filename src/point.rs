@@ -69,6 +69,12 @@ impl<T: fmt::Display, U> fmt::Display for TypedPoint2D<T, U> {
     }
 }
 
+impl<T: Default, U> Default for TypedPoint2D<T, U> {
+    fn default() -> Self {
+        TypedPoint2D::new(Default::default(), Default::default())
+    }
+}
+
 impl<T, U> TypedPoint2D<T, U> {
     /// Constructor taking scalar values directly.
     #[inline]
@@ -498,6 +504,12 @@ impl<T: fmt::Debug, U> fmt::Debug for TypedPoint3D<T, U> {
 impl<T: fmt::Display, U> fmt::Display for TypedPoint3D<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "({},{},{})", self.x, self.y, self.z)
+    }
+}
+
+impl<T: Copy + Default, U> Default for TypedPoint3D<T, U> {
+    fn default() -> Self {
+        TypedPoint3D::new(Default::default(), Default::default(), Default::default())
     }
 }
 
