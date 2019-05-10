@@ -124,7 +124,8 @@ where
 {
     #[inline]
     pub fn intersects(&self, other: &Self) -> bool {
-        self.origin.x < other.origin.x + other.size.width
+        !self.is_empty() && !other.is_empty()
+            && self.origin.x < other.origin.x + other.size.width
             && other.origin.x < self.origin.x + self.size.width
             && self.origin.y < other.origin.y + other.size.height
             && other.origin.y < self.origin.y + self.size.height
@@ -680,6 +681,7 @@ mod tests {
         let p = Rect::new(Point2D::new(0, 0), Size2D::new(10, 20));
         let q = Rect::new(Point2D::new(5, 15), Size2D::new(10, 10));
         let r = Rect::new(Point2D::new(-5, -5), Size2D::new(8, 8));
+        let e = Rect::new(Point2D::new(5, 10), Size2D::new(0, 0));
 
         let pq = p.intersection(&q);
         assert!(pq.is_some());
@@ -695,6 +697,12 @@ mod tests {
 
         let qr = q.intersection(&r);
         assert!(qr.is_none());
+
+        let ep = e.intersection(&p);
+        assert!(ep.is_none());
+
+        let pe = p.intersection(&e);
+        assert!(pe.is_none());
     }
 
     #[test]
