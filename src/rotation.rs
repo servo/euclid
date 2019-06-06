@@ -8,7 +8,7 @@
 // except according to those terms.
 
 use approxeq::ApproxEq;
-use num_traits::{Float, FloatConst, One, Zero};
+use num_traits::{Float, FloatConst, One, Zero, NumCast};
 use core::fmt;
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, Sub, SubAssign};
 use core::marker::PhantomData;
@@ -475,8 +475,8 @@ where
     where
         T: ApproxEq<T>,
     {
-        // TODO: we might need to relax the threshold here, because of floating point imprecision.
-        self.square_norm().approx_eq(&T::one())
+        let eps = NumCast::from(1.0e-5).unwrap();
+        self.square_norm().approx_eq_eps(&T::one(), &eps)
     }
 
     /// Spherical linear interpolation between this rotation and another rotation.
