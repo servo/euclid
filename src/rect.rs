@@ -95,6 +95,12 @@ impl<T: fmt::Display, U> fmt::Display for TypedRect<T, U> {
     }
 }
 
+impl<T: Default, U> Default for TypedRect<T, U> {
+    fn default() -> Self {
+        TypedRect::new(Default::default(), Default::default())
+    }
+}
+
 impl<T, U> TypedRect<T, U> {
     /// Constructor.
     pub fn new(origin: TypedPoint2D<T, U>, size: TypedSize2D<T, U>) -> Self {
