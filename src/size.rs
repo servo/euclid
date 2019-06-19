@@ -20,15 +20,72 @@ use num_traits::{Float, NumCast, Signed};
 use core::fmt;
 use core::ops::{Add, Div, Mul, Sub};
 use core::marker::PhantomData;
+use core::cmp::{Eq, PartialEq};
+use core::hash::{Hash};
+#[cfg(feature = "serde")]
+use serde;
 
 /// A 2d size tagged with a unit.
-#[derive(EuclidMatrix)]
 #[repr(C)]
 pub struct TypedSize2D<T, U> {
     pub width: T,
     pub height: T,
     #[doc(hidden)]
     pub _unit: PhantomData<U>,
+}
+
+impl<T: Copy, U> Copy for TypedSize2D<T, U> {}
+
+impl<T: Clone, U> Clone for TypedSize2D<T, U> {
+    fn clone(&self) -> Self {
+        TypedSize2D {
+            width: self.width.clone(),
+            height: self.height.clone(),
+            _unit: PhantomData,
+        }
+    }
+}
+
+#[cfg(feature = "serde")]
+impl<'de, T, U> serde::Deserialize<'de> for TypedSize2D<T, U>
+    where T: serde::Deserialize<'de>
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+        where D: serde::Deserializer<'de>
+    {
+        let (width, height) = try!(serde::Deserialize::deserialize(deserializer));
+        Ok(TypedSize2D { width, height, _unit: PhantomData })
+    }
+}
+
+#[cfg(feature = "serde")]
+impl<T, U> serde::Serialize for TypedSize2D<T, U>
+    where T: serde::Serialize
+{
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+        where S: serde::Serializer
+    {
+        (&self.width, &self.height).serialize(serializer)
+    }
+}
+
+impl<T, U> Eq for TypedSize2D<T, U> where T: Eq {}
+
+impl<T, U> PartialEq for TypedSize2D<T, U>
+    where T: PartialEq
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.width == other.width && self.height == other.height
+    }
+}
+
+impl<T, U> Hash for TypedSize2D<T, U>
+    where T: Hash
+{
+    fn hash<H: ::core::hash::Hasher>(&self, h: &mut H) {
+        self.width.hash(h);
+        self.height.hash(h);
+    }
 }
 
 /// Default 2d size type with no unit.
@@ -478,7 +535,6 @@ mod size2d {
 }
 
 /// A 3d size tagged with a unit.
-#[derive(EuclidMatrix)]
 #[repr(C)]
 pub struct TypedSize3D<T, U> {
     pub width: T,
@@ -486,6 +542,62 @@ pub struct TypedSize3D<T, U> {
     pub depth: T,
     #[doc(hidden)]
     pub _unit: PhantomData<U>,
+}
+
+impl<T: Copy, U> Copy for TypedSize3D<T, U> {}
+
+impl<T: Clone, U> Clone for TypedSize3D<T, U> {
+    fn clone(&self) -> Self {
+        TypedSize3D {
+            width: self.width.clone(),
+            height: self.height.clone(),
+            depth: self.depth.clone(),
+            _unit: PhantomData,
+        }
+    }
+}
+
+#[cfg(feature = "serde")]
+impl<'de, T, U> serde::Deserialize<'de> for TypedSize3D<T, U>
+    where T: serde::Deserialize<'de>
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+        where D: serde::Deserializer<'de>
+    {
+        let (width, height, depth) = try!(serde::Deserialize::deserialize(deserializer));
+        Ok(TypedSize3D { width, height, depth, _unit: PhantomData })
+    }
+}
+
+#[cfg(feature = "serde")]
+impl<T, U> serde::Serialize for TypedSize3D<T, U>
+    where T: serde::Serialize
+{
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+        where S: serde::Serializer
+    {
+        (&self.width, &self.height, &self.depth).serialize(serializer)
+    }
+}
+
+impl<T, U> Eq for TypedSize3D<T, U> where T: Eq {}
+
+impl<T, U> PartialEq for TypedSize3D<T, U>
+    where T: PartialEq
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.width == other.width && self.height == other.height && self.depth == other.depth
+    }
+}
+
+impl<T, U> Hash for TypedSize3D<T, U>
+    where T: Hash
+{
+    fn hash<H: ::core::hash::Hasher>(&self, h: &mut H) {
+        self.width.hash(h);
+        self.height.hash(h);
+        self.depth.hash(h);
+    }
 }
 
 /// Default 3d size type with no unit.

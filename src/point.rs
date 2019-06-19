@@ -20,15 +20,72 @@ use vector::{TypedVector2D, TypedVector3D, vec2, vec3};
 use core::fmt;
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 use core::marker::PhantomData;
+use core::cmp::{Eq, PartialEq};
+use core::hash::{Hash};
+#[cfg(feature = "serde")]
+use serde;
 
 /// A 2d Point tagged with a unit.
-#[derive(EuclidMatrix)]
 #[repr(C)]
 pub struct TypedPoint2D<T, U> {
     pub x: T,
     pub y: T,
     #[doc(hidden)]
     pub _unit: PhantomData<U>,
+}
+
+impl<T: Copy, U> Copy for TypedPoint2D<T, U> {}
+
+impl<T: Clone, U> Clone for TypedPoint2D<T, U> {
+    fn clone(&self) -> Self {
+        TypedPoint2D {
+            x: self.x.clone(),
+            y: self.y.clone(),
+            _unit: PhantomData,
+        }
+    }
+}
+
+#[cfg(feature = "serde")]
+impl<'de, T, U> serde::Deserialize<'de> for TypedPoint2D<T, U>
+    where T: serde::Deserialize<'de>
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+        where D: serde::Deserializer<'de>
+    {
+        let (x, y) = try!(serde::Deserialize::deserialize(deserializer));
+        Ok(TypedPoint2D { x, y, _unit: PhantomData })
+    }
+}
+
+#[cfg(feature = "serde")]
+impl<T, U> serde::Serialize for TypedPoint2D<T, U>
+    where T: serde::Serialize
+{
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+        where S: serde::Serializer
+    {
+        (&self.x, &self.y).serialize(serializer)
+    }
+}
+
+impl<T, U> Eq for TypedPoint2D<T, U> where T: Eq {}
+
+impl<T, U> PartialEq for TypedPoint2D<T, U>
+    where T: PartialEq
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.x == other.x && self.y == other.y
+    }
+}
+
+impl<T, U> Hash for TypedPoint2D<T, U>
+    where T: Hash
+{
+    fn hash<H: ::core::hash::Hasher>(&self, h: &mut H) {
+        self.x.hash(h);
+        self.y.hash(h);
+    }
 }
 
 mint_vec!(TypedPoint2D[x, y] = Point2);
@@ -435,7 +492,6 @@ impl<T: Copy, U> From<(T, T)> for TypedPoint2D<T, U> {
 }
 
 /// A 3d Point tagged with a unit.
-#[derive(EuclidMatrix)]
 #[repr(C)]
 pub struct TypedPoint3D<T, U> {
     pub x: T,
@@ -446,6 +502,62 @@ pub struct TypedPoint3D<T, U> {
 }
 
 mint_vec!(TypedPoint3D[x, y, z] = Point3);
+
+impl<T: Copy, U> Copy for TypedPoint3D<T, U> {}
+
+impl<T: Clone, U> Clone for TypedPoint3D<T, U> {
+    fn clone(&self) -> Self {
+        TypedPoint3D {
+            x: self.x.clone(),
+            y: self.y.clone(),
+            z: self.z.clone(),
+            _unit: PhantomData,
+        }
+    }
+}
+
+#[cfg(feature = "serde")]
+impl<'de, T, U> serde::Deserialize<'de> for TypedPoint3D<T, U>
+    where T: serde::Deserialize<'de>
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+        where D: serde::Deserializer<'de>
+    {
+        let (x, y, z) = try!(serde::Deserialize::deserialize(deserializer));
+        Ok(TypedPoint3D { x, y, z, _unit: PhantomData })
+    }
+}
+
+#[cfg(feature = "serde")]
+impl<T, U> serde::Serialize for TypedPoint3D<T, U>
+    where T: serde::Serialize
+{
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+        where S: serde::Serializer
+    {
+        (&self.x, &self.y, &self.z).serialize(serializer)
+    }
+}
+
+impl<T, U> Eq for TypedPoint3D<T, U> where T: Eq {}
+
+impl<T, U> PartialEq for TypedPoint3D<T, U>
+    where T: PartialEq
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.x == other.x && self.y == other.y && self.z == other.z
+    }
+}
+
+impl<T, U> Hash for TypedPoint3D<T, U>
+    where T: Hash
+{
+    fn hash<H: ::core::hash::Hasher>(&self, h: &mut H) {
+        self.x.hash(h);
+        self.y.hash(h);
+        self.z.hash(h);
+    }
+}
 
 /// Default 3d point type with no unit.
 ///

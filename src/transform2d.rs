@@ -19,10 +19,14 @@ use rect::TypedRect;
 use transform3d::TypedTransform3D;
 use core::ops::{Add, Mul, Div, Sub, Neg};
 use core::marker::PhantomData;
+use core::cmp::{Eq, PartialEq};
+use core::hash::{Hash};
 use approxeq::ApproxEq;
 use trig::Trig;
 use core::fmt;
 use num_traits::NumCast;
+#[cfg(feature = "serde")]
+use serde;
 
 /// A 2d transform stored as a 3 by 2 matrix in row-major order in memory.
 ///
@@ -40,7 +44,6 @@ use num_traits::NumCast;
 /// a vector is `v * T`. If your library is using column vectors, use `row_major` functions when you
 /// are asked for `column_major` representations and vice versa.
 #[repr(C)]
-#[derive(EuclidMatrix)]
 pub struct TypedTransform2D<T, Src, Dst> {
     pub m11: T, pub m12: T,
     pub m21: T, pub m22: T,
@@ -51,6 +54,86 @@ pub struct TypedTransform2D<T, Src, Dst> {
 
 /// The default 2d transform type with no units.
 pub type Transform2D<T> = TypedTransform2D<T, UnknownUnit, UnknownUnit>;
+
+impl<T: Copy, Src, Dst> Copy for TypedTransform2D<T, Src, Dst> {}
+
+impl<T: Clone, Src, Dst> Clone for TypedTransform2D<T, Src, Dst> {
+    fn clone(&self) -> Self {
+        TypedTransform2D {
+            m11: self.m11.clone(),
+            m12: self.m12.clone(),
+            m21: self.m21.clone(),
+            m22: self.m22.clone(),
+            m31: self.m31.clone(),
+            m32: self.m32.clone(),
+            _unit: PhantomData,
+        }
+    }
+}
+
+#[cfg(feature = "serde")]
+impl<'de, T, Src, Dst> serde::Deserialize<'de> for TypedTransform2D<T, Src, Dst>
+    where T: serde::Deserialize<'de>
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+        where D: serde::Deserializer<'de>
+    {
+        let (
+            m11, m12,
+            m21, m22,
+            m31, m32,
+        ) = try!(serde::Deserialize::deserialize(deserializer));
+        Ok(TypedTransform2D {
+            m11, m12,
+            m21, m22,
+            m31, m32,
+            _unit: PhantomData
+        })
+    }
+}
+
+#[cfg(feature = "serde")]
+impl<T, Src, Dst> serde::Serialize for TypedTransform2D<T, Src, Dst>
+    where T: serde::Serialize
+{
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+        where S: serde::Serializer
+    {
+        (
+            &self.m11, &self.m12,
+            &self.m21, &self.m22,
+            &self.m31, &self.m32,
+        ).serialize(serializer)
+    }
+}
+
+impl<T, Src, Dst> Eq for TypedTransform2D<T, Src, Dst> where T: Eq {}
+
+impl<T, Src, Dst> PartialEq for TypedTransform2D<T, Src, Dst>
+    where T: PartialEq
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.m11 == other.m11 &&
+            self.m12 == other.m12 &&
+            self.m21 == other.m21 &&
+            self.m22 == other.m22 &&
+            self.m31 == other.m31 &&
+            self.m32 == other.m32
+    }
+}
+
+impl<T, Src, Dst> Hash for TypedTransform2D<T, Src, Dst>
+    where T: Hash
+{
+    fn hash<H: ::core::hash::Hasher>(&self, h: &mut H) {
+        self.m11.hash(h);
+        self.m12.hash(h);
+        self.m21.hash(h);
+        self.m22.hash(h);
+        self.m31.hash(h);
+        self.m32.hash(h);
+    }
+}
 
 impl<T: Copy, Src, Dst> TypedTransform2D<T, Src, Dst> {
     /// Create a transform specifying its matrix elements in row-major order.

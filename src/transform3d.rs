@@ -24,7 +24,11 @@ use num::{One, Zero};
 use core::ops::{Add, Mul, Sub, Div, Neg};
 use core::marker::PhantomData;
 use core::fmt;
+use core::cmp::{Eq, PartialEq};
+use core::hash::{Hash};
 use num_traits::NumCast;
+#[cfg(feature = "serde")]
+use serde;
 
 /// A 3d transform stored as a 4 by 4 matrix in row-major order in memory.
 ///
@@ -41,7 +45,6 @@ use num_traits::NumCast;
 /// These transforms are for working with _row vectors_, so the matrix math for transforming
 /// a vector is `v * T`. If your library is using column vectors, use `row_major` functions when you
 /// are asked for `column_major` representations and vice versa.
-#[derive(EuclidMatrix)]
 #[repr(C)]
 pub struct TypedTransform3D<T, Src, Dst> {
     pub m11: T, pub m12: T, pub m13: T, pub m14: T,
@@ -54,6 +57,119 @@ pub struct TypedTransform3D<T, Src, Dst> {
 
 /// The default 3d transform type with no units.
 pub type Transform3D<T> = TypedTransform3D<T, UnknownUnit, UnknownUnit>;
+
+impl<T: Copy, Src, Dst> Copy for TypedTransform3D<T, Src, Dst> {}
+
+impl<T: Clone, Src, Dst> Clone for TypedTransform3D<T, Src, Dst> {
+    fn clone(&self) -> Self {
+        TypedTransform3D {
+            m11: self.m11.clone(),
+            m12: self.m12.clone(),
+            m13: self.m13.clone(),
+            m14: self.m14.clone(),
+            m21: self.m21.clone(),
+            m22: self.m22.clone(),
+            m23: self.m23.clone(),
+            m24: self.m24.clone(),
+            m31: self.m31.clone(),
+            m32: self.m32.clone(),
+            m33: self.m33.clone(),
+            m34: self.m34.clone(),
+            m41: self.m41.clone(),
+            m42: self.m42.clone(),
+            m43: self.m43.clone(),
+            m44: self.m44.clone(),
+            _unit: PhantomData,
+        }
+    }
+}
+
+#[cfg(feature = "serde")]
+impl<'de, T, Src, Dst> serde::Deserialize<'de> for TypedTransform3D<T, Src, Dst>
+    where T: serde::Deserialize<'de>
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+        where D: serde::Deserializer<'de>
+    {
+        let (
+            m11, m12, m13, m14,
+            m21, m22, m23, m24,
+            m31, m32, m33, m34,
+            m41, m42, m43, m44,
+        ) = try!(serde::Deserialize::deserialize(deserializer));
+        Ok(TypedTransform3D {
+            m11, m12, m13, m14,
+            m21, m22, m23, m24,
+            m31, m32, m33, m34,
+            m41, m42, m43, m44,
+            _unit: PhantomData
+        })
+    }
+}
+
+#[cfg(feature = "serde")]
+impl<T, Src, Dst> serde::Serialize for TypedTransform3D<T, Src, Dst>
+    where T: serde::Serialize
+{
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+        where S: serde::Serializer
+    {
+        (
+            &self.m11, &self.m12, &self.m13, &self.m14,
+            &self.m21, &self.m22, &self.m23, &self.m24,
+            &self.m31, &self.m32, &self.m33, &self.m34,
+            &self.m41, &self.m42, &self.m43, &self.m44,
+        ).serialize(serializer)
+    }
+}
+
+impl<T, Src, Dst> Eq for TypedTransform3D<T, Src, Dst> where T: Eq {}
+
+impl<T, Src, Dst> PartialEq for TypedTransform3D<T, Src, Dst>
+    where T: PartialEq
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.m11 == other.m11 &&
+            self.m12 == other.m12 &&
+            self.m13 == other.m13 &&
+            self.m14 == other.m14 &&
+            self.m21 == other.m21 &&
+            self.m22 == other.m22 &&
+            self.m23 == other.m23 &&
+            self.m24 == other.m24 &&
+            self.m31 == other.m31 &&
+            self.m32 == other.m32 &&
+            self.m33 == other.m33 &&
+            self.m34 == other.m34 &&
+            self.m41 == other.m41 &&
+            self.m42 == other.m42 &&
+            self.m43 == other.m43 &&
+            self.m44 == other.m44
+    }
+}
+
+impl<T, Src, Dst> Hash for TypedTransform3D<T, Src, Dst>
+    where T: Hash
+{
+    fn hash<H: ::core::hash::Hasher>(&self, h: &mut H) {
+        self.m11.hash(h);
+        self.m12.hash(h);
+        self.m13.hash(h);
+        self.m14.hash(h);
+        self.m21.hash(h);
+        self.m22.hash(h);
+        self.m23.hash(h);
+        self.m24.hash(h);
+        self.m31.hash(h);
+        self.m32.hash(h);
+        self.m33.hash(h);
+        self.m34.hash(h);
+        self.m41.hash(h);
+        self.m42.hash(h);
+        self.m43.hash(h);
+        self.m44.hash(h);
+    }
+}
 
 impl<T, Src, Dst> TypedTransform3D<T, Src, Dst> {
     /// Create a transform specifying its components in row-major order.
