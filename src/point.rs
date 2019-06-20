@@ -162,7 +162,11 @@ impl<T: Copy, U> TypedPoint2D<T, U> {
     /// Equivalent to subtracting the origin from this point.
     #[inline]
     pub fn to_vector(&self) -> TypedVector2D<T, U> {
-        vec2(self.x, self.y)
+        TypedVector2D {
+            x: self.x,
+            y: self.y,
+            _unit: PhantomData,
+        }
     }
 
     /// Swap x and y.
@@ -648,7 +652,12 @@ impl<T: Copy, U> TypedPoint3D<T, U> {
     /// Equivalent to subtracting the origin to this point.
     #[inline]
     pub fn to_vector(&self) -> TypedVector3D<T, U> {
-        vec3(self.x, self.y, self.z)
+        TypedVector3D {
+            x: self.x,
+            y: self.y,
+            z: self.z,
+            _unit: PhantomData,
+        }
     }
 
     /// Returns a 2d point using this point's x and y coordinates
@@ -980,12 +989,23 @@ impl<T: Copy, U> From<(T, T, T)> for TypedPoint3D<T, U> {
     }
 }
 
+#[inline]
 pub fn point2<T: Copy, U>(x: T, y: T) -> TypedPoint2D<T, U> {
-    TypedPoint2D::new(x, y)
+    TypedPoint2D {
+        x,
+        y,
+        _unit: PhantomData,
+    }
 }
 
+#[inline]
 pub fn point3<T: Copy, U>(x: T, y: T, z: T) -> TypedPoint3D<T, U> {
-    TypedPoint3D::new(x, y, z)
+    TypedPoint3D {
+        x,
+        y,
+        z,
+        _unit: PhantomData,
+    }
 }
 
 
