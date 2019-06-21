@@ -15,10 +15,13 @@ use num::{One, Zero};
 use core::fmt;
 use core::marker::PhantomData;
 use core::ops::Div;
+use core::cmp::{Eq, PartialEq};
+use core::hash::{Hash};
+#[cfg(feature = "serde")]
+use serde;
 
 
 /// Homogeneous vector in 3D space.
-#[derive(EuclidMatrix)]
 #[repr(C)]
 pub struct HomogeneousVector<T, U> {
     pub x: T,
@@ -29,6 +32,63 @@ pub struct HomogeneousVector<T, U> {
     pub _unit: PhantomData<U>,
 }
 
+impl<T: Copy, U> Copy for HomogeneousVector<T, U> {}
+
+impl<T: Clone, U> Clone for HomogeneousVector<T, U> {
+    fn clone(&self) -> Self {
+        HomogeneousVector {
+            x: self.x.clone(),
+            y: self.y.clone(),
+            z: self.z.clone(),
+            w: self.w.clone(),
+            _unit: PhantomData,
+        }
+    }
+}
+
+#[cfg(feature = "serde")]
+impl<'de, T, U> serde::Deserialize<'de> for HomogeneousVector<T, U>
+    where T: serde::Deserialize<'de>
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+        where D: serde::Deserializer<'de>
+    {
+        let (x, y, z, w) = try!(serde::Deserialize::deserialize(deserializer));
+        Ok(HomogeneousVector { x, y, z, w, _unit: PhantomData })
+    }
+}
+
+#[cfg(feature = "serde")]
+impl<T, U> serde::Serialize for HomogeneousVector<T, U>
+    where T: serde::Serialize
+{
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+        where S: serde::Serializer
+    {
+        (&self.x, &self.y, &self.z, &self.w).serialize(serializer)
+    }
+}
+
+impl<T, U> Eq for HomogeneousVector<T, U> where T: Eq {}
+
+impl<T, U> PartialEq for HomogeneousVector<T, U>
+    where T: PartialEq
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.x == other.x && self.y == other.y && self.z == other.z && self.w == other.w
+    }
+}
+
+impl<T, U> Hash for HomogeneousVector<T, U>
+    where T: Hash
+{
+    fn hash<H: ::core::hash::Hasher>(&self, h: &mut H) {
+        self.x.hash(h);
+        self.y.hash(h);
+        self.z.hash(h);
+        self.w.hash(h);
+    }
+}
 
 impl<T, U> HomogeneousVector<T, U> {
     /// Constructor taking scalar values directly.

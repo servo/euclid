@@ -12,9 +12,13 @@ use num_traits::{Float, FloatConst, One, Zero, NumCast};
 use core::fmt;
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, Sub, SubAssign};
 use core::marker::PhantomData;
+use core::cmp::{Eq, PartialEq};
+use core::hash::{Hash};
 use trig::Trig;
 use {TypedPoint2D, TypedPoint3D, TypedVector2D, TypedVector3D, Vector3D, point2, point3, vec3};
 use {TypedTransform2D, TypedTransform3D, UnknownUnit};
+#[cfg(feature = "serde")]
+use serde;
 
 /// An angle in radians
 #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Hash)]
@@ -186,7 +190,6 @@ impl<T: Neg<Output = T>> Neg for Angle<T> {
 }
 
 /// A transform that can represent rotations in 2d, represented as an angle in radians.
-#[derive(EuclidMatrix)]
 #[repr(C)]
 pub struct TypedRotation2D<T, Src, Dst> {
     pub angle : T,
@@ -196,6 +199,58 @@ pub struct TypedRotation2D<T, Src, Dst> {
 
 /// The default 2d rotation type with no units.
 pub type Rotation2D<T> = TypedRotation2D<T, UnknownUnit, UnknownUnit>;
+
+impl<T: Copy, Src, Dst> Copy for TypedRotation2D<T, Src, Dst> {}
+
+impl<T: Clone, Src, Dst> Clone for TypedRotation2D<T, Src, Dst> {
+    fn clone(&self) -> Self {
+        TypedRotation2D {
+            angle: self.angle.clone(),
+            _unit: PhantomData,
+        }
+    }
+}
+
+#[cfg(feature = "serde")]
+impl<'de, T, Src, Dst> serde::Deserialize<'de> for TypedRotation2D<T, Src, Dst>
+    where T: serde::Deserialize<'de>
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+        where D: serde::Deserializer<'de>
+    {
+        let (angle,) = try!(serde::Deserialize::deserialize(deserializer));
+        Ok(TypedRotation2D { angle, _unit: PhantomData })
+    }
+}
+
+#[cfg(feature = "serde")]
+impl<T, Src, Dst> serde::Serialize for TypedRotation2D<T, Src, Dst>
+    where T: serde::Serialize
+{
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+        where S: serde::Serializer
+    {
+        (&self.angle,).serialize(serializer)
+    }
+}
+
+impl<T, Src, Dst> Eq for TypedRotation2D<T, Src, Dst> where T: Eq {}
+
+impl<T, Src, Dst> PartialEq for TypedRotation2D<T, Src, Dst>
+    where T: PartialEq
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.angle == other.angle
+    }
+}
+
+impl<T, Src, Dst> Hash for TypedRotation2D<T, Src, Dst>
+    where T: Hash
+{
+    fn hash<H: ::core::hash::Hasher>(&self, h: &mut H) {
+        self.angle.hash(h);
+    }
+}
 
 impl<T, Src, Dst> TypedRotation2D<T, Src, Dst> {
     #[inline]
@@ -322,7 +377,6 @@ where
 /// Some people use the `x, y, z, w` (or `w, x, y, z`) notations. The equivalence is
 /// as follows: `x -> i`, `y -> j`, `z -> k`, `w -> r`.
 /// The memory layout of this type corresponds to the `x, y, z, w` notation
-#[derive(EuclidMatrix)]
 #[repr(C)]
 pub struct TypedRotation3D<T, Src, Dst> {
     /// Component multiplied by the imaginary number `i`.
@@ -339,6 +393,67 @@ pub struct TypedRotation3D<T, Src, Dst> {
 
 /// The default 3d rotation type with no units.
 pub type Rotation3D<T> = TypedRotation3D<T, UnknownUnit, UnknownUnit>;
+
+impl<T: Copy, Src, Dst> Copy for TypedRotation3D<T, Src, Dst> {}
+
+impl<T: Clone, Src, Dst> Clone for TypedRotation3D<T, Src, Dst> {
+    fn clone(&self) -> Self {
+        TypedRotation3D {
+            i: self.i.clone(),
+            j: self.j.clone(),
+            k: self.k.clone(),
+            r: self.r.clone(),
+            _unit: PhantomData,
+        }
+    }
+}
+
+#[cfg(feature = "serde")]
+impl<'de, T, Src, Dst> serde::Deserialize<'de> for TypedRotation3D<T, Src, Dst>
+    where T: serde::Deserialize<'de>
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+        where D: serde::Deserializer<'de>
+    {
+        let (i, j, k, r) = try!(serde::Deserialize::deserialize(deserializer));
+        Ok(TypedRotation3D { i, j, k, r, _unit: PhantomData })
+    }
+}
+
+#[cfg(feature = "serde")]
+impl<T, Src, Dst> serde::Serialize for TypedRotation3D<T, Src, Dst>
+    where T: serde::Serialize
+{
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+        where S: serde::Serializer
+    {
+        (&self.i, &self.j, &self.k, &self.r).serialize(serializer)
+    }
+}
+
+impl<T, Src, Dst> Eq for TypedRotation3D<T, Src, Dst> where T: Eq {}
+
+impl<T, Src, Dst> PartialEq for TypedRotation3D<T, Src, Dst>
+    where T: PartialEq
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.i == other.i &&
+            self.j == other.j &&
+            self.k == other.k &&
+            self.r == other.r
+    }
+}
+
+impl<T, Src, Dst> Hash for TypedRotation3D<T, Src, Dst>
+    where T: Hash
+{
+    fn hash<H: ::core::hash::Hasher>(&self, h: &mut H) {
+        self.i.hash(h);
+        self.j.hash(h);
+        self.k.hash(h);
+        self.r.hash(h);
+    }
+}
 
 impl<T, Src, Dst> TypedRotation3D<T, Src, Dst> {
     /// Creates a rotation around from a quaternion representation.

@@ -16,10 +16,13 @@ use num::Zero;
 use core::fmt;
 use core::ops::Add;
 use core::marker::PhantomData;
+use core::cmp::{Eq, PartialEq};
+use core::hash::{Hash};
+#[cfg(feature = "serde")]
+use serde;
 
 /// A group of 2D side offsets, which correspond to top/left/bottom/right for borders, padding,
 /// and margins in CSS, optionally tagged with a unit.
-#[derive(EuclidMatrix)]
 #[repr(C)]
 pub struct TypedSideOffsets2D<T, U> {
     pub top: T,
@@ -28,6 +31,67 @@ pub struct TypedSideOffsets2D<T, U> {
     pub left: T,
     #[doc(hidden)]
     pub _unit: PhantomData<U>,
+}
+
+impl<T: Copy, U> Copy for TypedSideOffsets2D<T, U> {}
+
+impl<T: Clone, U> Clone for TypedSideOffsets2D<T, U> {
+    fn clone(&self) -> Self {
+        TypedSideOffsets2D {
+            top: self.top.clone(),
+            right: self.right.clone(),
+            bottom: self.bottom.clone(),
+            left: self.left.clone(),
+            _unit: PhantomData,
+        }
+    }
+}
+
+#[cfg(feature = "serde")]
+impl<'de, T, U> serde::Deserialize<'de> for TypedSideOffsets2D<T, U>
+    where T: serde::Deserialize<'de>
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+        where D: serde::Deserializer<'de>
+    {
+        let (top, right, bottom, left) = try!(serde::Deserialize::deserialize(deserializer));
+        Ok(TypedSideOffsets2D { top, right, bottom, left, _unit: PhantomData })
+    }
+}
+
+#[cfg(feature = "serde")]
+impl<T, U> serde::Serialize for TypedSideOffsets2D<T, U>
+    where T: serde::Serialize
+{
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+        where S: serde::Serializer
+    {
+        (&self.top, &self.right, &self.bottom, &self.left).serialize(serializer)
+    }
+}
+
+impl<T, U> Eq for TypedSideOffsets2D<T, U> where T: Eq {}
+
+impl<T, U> PartialEq for TypedSideOffsets2D<T, U>
+    where T: PartialEq
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.top == other.top &&
+            self.right == other.right &&
+            self.bottom == other.bottom &&
+            self.left == other.left
+    }
+}
+
+impl<T, U> Hash for TypedSideOffsets2D<T, U>
+    where T: Hash
+{
+    fn hash<H: ::core::hash::Hasher>(&self, h: &mut H) {
+        self.top.hash(h);
+        self.right.hash(h);
+        self.bottom.hash(h);
+        self.left.hash(h);
+    }
 }
 
 impl<T: fmt::Debug, U> fmt::Debug for TypedSideOffsets2D<T, U> {

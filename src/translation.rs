@@ -14,6 +14,10 @@ use trig::Trig;
 use core::ops::{Add, Sub, Neg, Mul, Div};
 use core::marker::PhantomData;
 use core::fmt;
+use core::cmp::{Eq, PartialEq};
+use core::hash::{Hash};
+#[cfg(feature = "serde")]
+use serde;
 
 /// A 2d transformation from a space to another that can only express translations.
 ///
@@ -35,13 +39,66 @@ use core::fmt;
 /// let p2: ChildPoint = scrolling.transform_point(&p1);
 /// ```
 ///
-#[derive(EuclidMatrix)]
 #[repr(C)]
 pub struct TypedTranslation2D<T, Src, Dst> {
     pub x: T,
     pub y: T,
     #[doc(hidden)]
     pub _unit: PhantomData<(Src, Dst)>,
+}
+
+impl<T: Copy, Src, Dst> Copy for TypedTranslation2D<T, Src, Dst> {}
+
+impl<T: Clone, Src, Dst> Clone for TypedTranslation2D<T, Src, Dst> {
+    fn clone(&self) -> Self {
+        TypedTranslation2D {
+            x: self.x.clone(),
+            y: self.y.clone(),
+            _unit: PhantomData,
+        }
+    }
+}
+
+#[cfg(feature = "serde")]
+impl<'de, T, Src, Dst> serde::Deserialize<'de> for TypedTranslation2D<T, Src, Dst>
+    where T: serde::Deserialize<'de>
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+        where D: serde::Deserializer<'de>
+    {
+        let (x, y) = try!(serde::Deserialize::deserialize(deserializer));
+        Ok(TypedTranslation2D { x, y, _unit: PhantomData })
+    }
+}
+
+#[cfg(feature = "serde")]
+impl<T, Src, Dst> serde::Serialize for TypedTranslation2D<T, Src, Dst>
+    where T: serde::Serialize
+{
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+        where S: serde::Serializer
+    {
+        (&self.x, &self.y).serialize(serializer)
+    }
+}
+
+impl<T, Src, Dst> Eq for TypedTranslation2D<T, Src, Dst> where T: Eq {}
+
+impl<T, Src, Dst> PartialEq for TypedTranslation2D<T, Src, Dst>
+    where T: PartialEq
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.x == other.x && self.y == other.y
+    }
+}
+
+impl<T, Src, Dst> Hash for TypedTranslation2D<T, Src, Dst>
+    where T: Hash
+{
+    fn hash<H: ::core::hash::Hasher>(&self, h: &mut H) {
+        self.x.hash(h);
+        self.y.hash(h);
+    }
 }
 
 impl<T, Src, Dst> TypedTranslation2D<T, Src, Dst> {
@@ -239,7 +296,6 @@ where T: Copy + fmt::Debug {
 ///
 /// The main benefit of this type over a TypedVector3D is the ability to cast
 /// between a source and a destination spaces.
-#[derive(EuclidMatrix)]
 #[repr(C)]
 pub struct TypedTranslation3D<T, Src, Dst> {
     pub x: T,
@@ -247,6 +303,62 @@ pub struct TypedTranslation3D<T, Src, Dst> {
     pub z: T,
     #[doc(hidden)]
     pub _unit: PhantomData<(Src, Dst)>,
+}
+
+impl<T: Copy, Src, Dst> Copy for TypedTranslation3D<T, Src, Dst> {}
+
+impl<T: Clone, Src, Dst> Clone for TypedTranslation3D<T, Src, Dst> {
+    fn clone(&self) -> Self {
+        TypedTranslation3D {
+            x: self.x.clone(),
+            y: self.y.clone(),
+            z: self.z.clone(),
+            _unit: PhantomData,
+        }
+    }
+}
+
+#[cfg(feature = "serde")]
+impl<'de, T, Src, Dst> serde::Deserialize<'de> for TypedTranslation3D<T, Src, Dst>
+    where T: serde::Deserialize<'de>
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+        where D: serde::Deserializer<'de>
+    {
+        let (x, y, z) = try!(serde::Deserialize::deserialize(deserializer));
+        Ok(TypedTranslation3D { x, y, z, _unit: PhantomData })
+    }
+}
+
+#[cfg(feature = "serde")]
+impl<T, Src, Dst> serde::Serialize for TypedTranslation3D<T, Src, Dst>
+    where T: serde::Serialize
+{
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+        where S: serde::Serializer
+    {
+        (&self.x, &self.y, &self.z).serialize(serializer)
+    }
+}
+
+impl<T, Src, Dst> Eq for TypedTranslation3D<T, Src, Dst> where T: Eq {}
+
+impl<T, Src, Dst> PartialEq for TypedTranslation3D<T, Src, Dst>
+    where T: PartialEq
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.x == other.x && self.y == other.y && self.z == other.z
+    }
+}
+
+impl<T, Src, Dst> Hash for TypedTranslation3D<T, Src, Dst>
+    where T: Hash
+{
+    fn hash<H: ::core::hash::Hasher>(&self, h: &mut H) {
+        self.x.hash(h);
+        self.y.hash(h);
+        self.z.hash(h);
+    }
 }
 
 impl<T, Src, Dst> TypedTranslation3D<T, Src, Dst> {
