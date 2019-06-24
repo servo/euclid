@@ -161,7 +161,11 @@ impl<T: Copy, U> TypedVector2D<T, U> {
     /// Equivalent to adding this vector to the origin.
     #[inline]
     pub fn to_point(&self) -> TypedPoint2D<T, U> {
-        point2(self.x, self.y)
+        TypedPoint2D {
+            x: self.x,
+            y: self.y,
+            _unit: PhantomData,
+        }
     }
 
     /// Swap x and y.
@@ -1385,13 +1389,22 @@ impl<T: PartialEq, U> TypedVector3D<T, U> {
 /// Convenience constructor.
 #[inline]
 pub fn vec2<T, U>(x: T, y: T) -> TypedVector2D<T, U> {
-    TypedVector2D::new(x, y)
+    TypedVector2D {
+        x,
+        y,
+        _unit: PhantomData,
+    }
 }
 
 /// Convenience constructor.
 #[inline]
 pub fn vec3<T, U>(x: T, y: T, z: T) -> TypedVector3D<T, U> {
-    TypedVector3D::new(x, y, z)
+    TypedVector3D {
+        x,
+        y,
+        z,
+        _unit: PhantomData,
+    }
 }
 
 #[inline]
