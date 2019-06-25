@@ -330,26 +330,6 @@ where T: Copy + Clone +
         mat.post_transform(self)
     }
 
-    /// Returns the multiplication of the two matrices such that mat's transformation
-    /// applies after self's transformation.
-    ///
-    /// Assuming row vectors, this is equivalent to self * mat
-    #[deprecated]
-    #[must_use]
-    pub fn post_mul<NewDst>(&self, mat: &Transform2D<T, Dst, NewDst>) -> Transform2D<T, Src, NewDst> {
-        self.post_transform(mat)
-    }
-
-    /// Returns the multiplication of the two matrices such that mat's transformation
-    /// applies before self's transformation.
-    ///
-    /// Assuming row vectors, this is equivalent to mat * self
-    #[deprecated]
-    #[must_use]
-    pub fn pre_mul<NewSrc>(&self, mat: &Transform2D<T, NewSrc, Src>) -> Transform2D<T, NewSrc, Dst> {
-        self.pre_transform(mat)
-    }
-
     /// Returns a translation transform.
     #[inline]
     pub fn create_translation(x: T, y: T) -> Self {
