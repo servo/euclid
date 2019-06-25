@@ -7,7 +7,6 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#![cfg_attr(feature = "unstable", feature(fn_must_use))]
 #![cfg_attr(not(test), no_std)]
 
 //! A collection of strongly typed math tools for computer graphics with an inclination

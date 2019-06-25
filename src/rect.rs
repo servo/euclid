@@ -207,7 +207,6 @@ where
 
     /// Returns the same rectangle, translated by a vector.
     #[inline]
-    #[cfg_attr(feature = "unstable", must_use)]
     pub fn translate(&self, by: &TypedVector2D<T, U>) -> Self {
         Self::new(self.origin + *by, self.size)
     }
@@ -232,7 +231,6 @@ where
     }
 
     #[inline]
-    #[cfg_attr(feature = "unstable", must_use)]
     pub fn inflate(&self, width: T, height: T) -> Self {
         TypedRect::new(
             TypedPoint2D::new(self.origin.x - width, self.origin.y - height),
@@ -244,7 +242,6 @@ where
     }
 
     #[inline]
-    #[cfg_attr(feature = "unstable", must_use)]
     pub fn inflate_typed(&self, width: Length<T, U>, height: Length<T, U>) -> Self {
         self.inflate(width.get(), height.get())
     }
@@ -273,7 +270,6 @@ where
     }
 
     #[inline]
-    #[cfg_attr(feature = "unstable", must_use)]
     pub fn translate_by_size(&self, size: &TypedSize2D<T, U>) -> Self {
         self.translate(&size.to_vector())
     }
@@ -527,7 +523,6 @@ impl<T: Floor + Ceil + Round + Add<T, Output = T> + Sub<T, Output = T>, U> Typed
     /// avoid pixel rounding errors.
     /// Note that this is *not* rounding to nearest integer if the values are negative.
     /// They are always rounding as floor(n + 0.5).
-    #[cfg_attr(feature = "unstable", must_use)]
     pub fn round(&self) -> Self {
         let origin = self.origin.round();
         let size = self.origin.add_size(&self.size).round() - origin;
@@ -536,7 +531,6 @@ impl<T: Floor + Ceil + Round + Add<T, Output = T> + Sub<T, Output = T>, U> Typed
 
     /// Return a rectangle with edges rounded to integer coordinates, such that
     /// the original rectangle contains the resulting rectangle.
-    #[cfg_attr(feature = "unstable", must_use)]
     pub fn round_in(&self) -> Self {
         let origin = self.origin.ceil();
         let size = self.origin.add_size(&self.size).floor() - origin;
@@ -545,7 +539,6 @@ impl<T: Floor + Ceil + Round + Add<T, Output = T> + Sub<T, Output = T>, U> Typed
 
     /// Return a rectangle with edges rounded to integer coordinates, such that
     /// the original rectangle is contained in the resulting rectangle.
-    #[cfg_attr(feature = "unstable", must_use)]
     pub fn round_out(&self) -> Self {
         let origin = self.origin.floor();
         let size = self.origin.add_size(&self.size).ceil() - origin;
