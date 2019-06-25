@@ -7,8 +7,8 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use point::{TypedPoint2D, TypedPoint3D};
-use vector::{TypedVector2D, TypedVector3D};
+use point::{Point2D, Point3D};
+use vector::{Vector2D, Vector3D};
 
 use num::{One, Zero};
 
@@ -104,9 +104,9 @@ impl<T: Copy + Div<T, Output=T> + Zero + PartialOrd, U> HomogeneousVector<T, U> 
     ///
     /// Returns None if the point is on or behind the W=0 hemisphere.
     #[inline]
-    pub fn to_point2d(&self) -> Option<TypedPoint2D<T, U>> {
+    pub fn to_point2d(&self) -> Option<Point2D<T, U>> {
         if self.w > T::zero() {
-            Some(TypedPoint2D::new(self.x / self.w, self.y / self.w))
+            Some(Point2D::new(self.x / self.w, self.y / self.w))
         } else {
             None
         }
@@ -116,39 +116,39 @@ impl<T: Copy + Div<T, Output=T> + Zero + PartialOrd, U> HomogeneousVector<T, U> 
     ///
     /// Returns None if the point is on or behind the W=0 hemisphere.
     #[inline]
-    pub fn to_point3d(&self) -> Option<TypedPoint3D<T, U>> {
+    pub fn to_point3d(&self) -> Option<Point3D<T, U>> {
         if self.w > T::zero() {
-            Some(TypedPoint3D::new(self.x / self.w, self.y / self.w, self.z / self.w))
+            Some(Point3D::new(self.x / self.w, self.y / self.w, self.z / self.w))
         } else {
             None
         }
     }
 }
 
-impl<T: Zero, U> From<TypedVector2D<T, U>> for HomogeneousVector<T, U> {
+impl<T: Zero, U> From<Vector2D<T, U>> for HomogeneousVector<T, U> {
     #[inline]
-    fn from(v: TypedVector2D<T, U>) -> Self {
+    fn from(v: Vector2D<T, U>) -> Self {
         HomogeneousVector::new(v.x, v.y, T::zero(), T::zero())
     }
 }
 
-impl<T: Zero, U> From<TypedVector3D<T, U>> for HomogeneousVector<T, U> {
+impl<T: Zero, U> From<Vector3D<T, U>> for HomogeneousVector<T, U> {
     #[inline]
-    fn from(v: TypedVector3D<T, U>) -> Self {
+    fn from(v: Vector3D<T, U>) -> Self {
         HomogeneousVector::new(v.x, v.y, v.z, T::zero())
     }
 }
 
-impl<T: Zero + One, U> From<TypedPoint2D<T, U>> for HomogeneousVector<T, U> {
+impl<T: Zero + One, U> From<Point2D<T, U>> for HomogeneousVector<T, U> {
     #[inline]
-    fn from(p: TypedPoint2D<T, U>) -> Self {
+    fn from(p: Point2D<T, U>) -> Self {
         HomogeneousVector::new(p.x, p.y, T::zero(), T::one())
     }
 }
 
-impl<T: One, U> From<TypedPoint3D<T, U>> for HomogeneousVector<T, U> {
+impl<T: One, U> From<Point3D<T, U>> for HomogeneousVector<T, U> {
     #[inline]
-    fn from(p: TypedPoint3D<T, U>) -> Self {
+    fn from(p: Point3D<T, U>) -> Self {
         HomogeneousVector::new(p.x, p.y, p.z, T::one())
     }
 }
@@ -169,7 +169,7 @@ impl<T: fmt::Display, U> fmt::Display for HomogeneousVector<T, U> {
 #[cfg(test)]
 mod homogeneous {
     use super::HomogeneousVector;
-    use point::{Point2D, Point3D};
+    use default::{Point2D, Point3D};
 
     #[test]
     fn roundtrip() {
