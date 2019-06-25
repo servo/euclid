@@ -162,7 +162,7 @@ where
 {
     /// Returns the same box3d, translated by a vector.
     #[inline]
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn translate(&self, by: &TypedVector3D<T, U>) -> Self {
         Self::new(self.min + *by, self.max + *by)
     }
@@ -219,7 +219,7 @@ where
 {
     /// Inflates the box by the specified sizes on each side respectively.
     #[inline]
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn inflate(&self, width: T, height: T, depth: T) -> Self {
         TypedBox3D::new(
             TypedPoint3D::new(self.min.x - width, self.min.y - height, self.min.z - depth),
@@ -228,7 +228,7 @@ where
     }
 
     #[inline]
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn inflate_typed(&self, width: Length<T, U>, height: Length<T, U>, depth: Length<T, U>) -> Self {
         self.inflate(width.get(), height.get(), depth.get())
     }
@@ -507,7 +507,7 @@ where
     /// avoid pixel rounding errors.
     /// Note that this is *not* rounding to nearest integer if the values are negative.
     /// They are always rounding as floor(n + 0.5).
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn round(&self) -> Self {
         TypedBox3D::new(self.min.round(), self.max.round())
     }
@@ -519,7 +519,7 @@ where
 {
     /// Return a box3d with faces/edges rounded to integer coordinates, such that
     /// the original box3d contains the resulting box3d.
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn round_in(&self) -> Self {
         TypedBox3D {
             min: self.min.ceil(),
@@ -529,7 +529,7 @@ where
 
     /// Return a box3d with faces/edges rounded to integer coordinates, such that
     /// the original box3d is contained in the resulting box3d.
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn round_out(&self) -> Self {
         TypedBox3D {
             min: self.min.floor(),

@@ -311,6 +311,7 @@ where T: Copy + Clone +
     /// applies after self's transformation.
     ///
     /// Assuming row vectors, this is equivalent to self * mat
+    #[must_use]
     pub fn post_transform<NewDst>(&self, mat: &TypedTransform2D<T, Dst, NewDst>) -> TypedTransform2D<T, Src, NewDst> {
         TypedTransform2D::row_major(
             self.m11 * mat.m11 + self.m12 * mat.m21,
@@ -327,6 +328,7 @@ where T: Copy + Clone +
     ///
     /// Assuming row vectors, this is equivalent to mat * self
     #[inline]
+    #[must_use]
     pub fn pre_transform<NewSrc>(&self, mat: &TypedTransform2D<T, NewSrc, Src>) -> TypedTransform2D<T, NewSrc, Dst> {
         mat.post_transform(self)
     }
@@ -336,6 +338,7 @@ where T: Copy + Clone +
     ///
     /// Assuming row vectors, this is equivalent to self * mat
     #[deprecated]
+    #[must_use]
     pub fn post_mul<NewDst>(&self, mat: &TypedTransform2D<T, Dst, NewDst>) -> TypedTransform2D<T, Src, NewDst> {
         self.post_transform(mat)
     }
@@ -345,6 +348,7 @@ where T: Copy + Clone +
     ///
     /// Assuming row vectors, this is equivalent to mat * self
     #[deprecated]
+    #[must_use]
     pub fn pre_mul<NewSrc>(&self, mat: &TypedTransform2D<T, NewSrc, Src>) -> TypedTransform2D<T, NewSrc, Dst> {
         self.pre_transform(mat)
     }
@@ -361,15 +365,15 @@ where T: Copy + Clone +
     }
 
     /// Applies a translation after self's transformation and returns the resulting transform.
-    #[cfg_attr(feature = "unstable", must_use)]
     #[inline]
+    #[must_use]
     pub fn post_translate(&self, v: TypedVector2D<T, Dst>) -> Self {
         self.post_transform(&TypedTransform2D::create_translation(v.x, v.y))
     }
 
     /// Applies a translation before self's transformation and returns the resulting transform.
-    #[cfg_attr(feature = "unstable", must_use)]
     #[inline]
+    #[must_use]
     pub fn pre_translate(&self, v: TypedVector2D<T, Src>) -> Self {
         self.pre_transform(&TypedTransform2D::create_translation(v.x, v.y))
     }
@@ -385,15 +389,15 @@ where T: Copy + Clone +
     }
 
     /// Applies a scale after self's transformation and returns the resulting transform.
-    #[cfg_attr(feature = "unstable", must_use)]
     #[inline]
+    #[must_use]
     pub fn post_scale(&self, x: T, y: T) -> Self {
         self.post_transform(&TypedTransform2D::create_scale(x, y))
     }
 
     /// Applies a scale before self's transformation and returns the resulting transform.
-    #[cfg_attr(feature = "unstable", must_use)]
     #[inline]
+    #[must_use]
     pub fn pre_scale(&self, x: T, y: T) -> Self {
         TypedTransform2D::row_major(
             self.m11 * x, self.m12,
@@ -417,14 +421,14 @@ where T: Copy + Clone +
 
     /// Applies a rotation after self's transformation and returns the resulting transform.
     #[inline]
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn post_rotate(&self, theta: Angle<T>) -> Self {
         self.post_transform(&TypedTransform2D::create_rotation(theta))
     }
 
     /// Applies a rotation after self's transformation and returns the resulting transform.
     #[inline]
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn pre_rotate(&self, theta: Angle<T>) -> Self {
         self.pre_transform(&TypedTransform2D::create_rotation(theta))
     }
@@ -433,7 +437,7 @@ where T: Copy + Clone +
     ///
     /// Assuming row vectors, this is equivalent to `p * self`
     #[inline]
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn transform_point(&self, point: &TypedPoint2D<T, Src>) -> TypedPoint2D<T, Dst> {
         TypedPoint2D::new(point.x * self.m11 + point.y * self.m21 + self.m31,
                           point.x * self.m12 + point.y * self.m22 + self.m32)
@@ -443,7 +447,7 @@ where T: Copy + Clone +
     ///
     /// Assuming row vectors, this is equivalent to `v * self`
     #[inline]
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn transform_vector(&self, vec: &TypedVector2D<T, Src>) -> TypedVector2D<T, Dst> {
         vec2(vec.x * self.m11 + vec.y * self.m21,
              vec.x * self.m12 + vec.y * self.m22)
@@ -452,7 +456,7 @@ where T: Copy + Clone +
     /// Returns a rectangle that encompasses the result of transforming the given rectangle by this
     /// transform.
     #[inline]
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn transform_rect(&self, rect: &TypedRect<T, Src>) -> TypedRect<T, Dst> {
         TypedRect::from_points(&[
             self.transform_point(&rect.origin),
@@ -468,7 +472,7 @@ where T: Copy + Clone +
     }
 
     /// Returns the inverse transform if possible.
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn inverse(&self) -> Option<TypedTransform2D<T, Dst, Src>> {
         let det = self.determinant();
 

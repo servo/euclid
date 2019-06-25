@@ -386,6 +386,7 @@ where T: Copy + Clone +
     /// applies after self's transformation.
     ///
     /// Assuming row vectors, this is equivalent to self * mat
+    #[must_use]
     pub fn post_transform<NewDst>(&self, mat: &TypedTransform3D<T, Dst, NewDst>) -> TypedTransform3D<T, Src, NewDst> {
         TypedTransform3D::row_major(
             self.m11 * mat.m11  +  self.m12 * mat.m21  +  self.m13 * mat.m31  +  self.m14 * mat.m41,
@@ -412,6 +413,7 @@ where T: Copy + Clone +
     ///
     /// Assuming row vectors, this is equivalent to mat * self
     #[inline]
+    #[must_use]
     pub fn pre_transform<NewSrc>(&self, mat: &TypedTransform3D<T, NewSrc, Src>) -> TypedTransform3D<T, NewSrc, Dst> {
         mat.post_transform(self)
     }
@@ -420,6 +422,7 @@ where T: Copy + Clone +
     /// applies after self's transformation.
     ///
     /// Assuming row vectors, this is equivalent to self * mat
+    #[must_use]
     pub fn post_mul<NewDst>(&self, mat: &TypedTransform3D<T, Dst, NewDst>) -> TypedTransform3D<T, Src, NewDst> {
         self.post_transform(mat)
     }
@@ -428,6 +431,7 @@ where T: Copy + Clone +
     /// applies before self's transformation.
     ///
     /// Assuming row vectors, this is equivalent to mat * self
+    #[must_use]
     pub fn pre_mul<NewSrc>(&self, mat: &TypedTransform3D<T, NewSrc, Src>) -> TypedTransform3D<T, NewSrc, Dst> {
         self.pre_transform(mat)
     }
@@ -541,7 +545,7 @@ where T: Copy + Clone +
     }
 
     /// Multiplies all of the transform's component by a scalar and returns the result.
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn mul_s(&self, x: T) -> Self {
         TypedTransform3D::row_major(
             self.m11 * x, self.m12 * x, self.m13 * x, self.m14 * x,
@@ -671,13 +675,13 @@ where T: Copy + Clone +
     }
 
     /// Returns a transform with a translation applied before self's transformation.
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn pre_translate(&self, v: TypedVector3D<T, Src>) -> Self {
         self.pre_transform(&TypedTransform3D::create_translation(v.x, v.y, v.z))
     }
 
     /// Returns a transform with a translation applied after self's transformation.
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn post_translate(&self, v: TypedVector3D<T, Dst>) -> Self {
         self.post_transform(&TypedTransform3D::create_translation(v.x, v.y, v.z))
     }
@@ -730,7 +734,7 @@ where T: Copy + Clone +
     }
 
     /// Returns a transform with a scale applied before self's transformation.
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn pre_scale(&self, x: T, y: T, z: T) -> Self {
         TypedTransform3D::row_major(
             self.m11 * x, self.m12,     self.m13,     self.m14,
@@ -741,7 +745,7 @@ where T: Copy + Clone +
     }
 
     /// Returns a transform with a scale applied after self's transformation.
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn post_scale(&self, x: T, y: T, z: T) -> Self {
         self.post_transform(&TypedTransform3D::create_scale(x, y, z))
     }
@@ -784,13 +788,13 @@ where T: Copy + Clone +
     }
 
     /// Returns a transform with a rotation applied after self's transformation.
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn post_rotate(&self, x: T, y: T, z: T, theta: Angle<T>) -> Self {
         self.post_transform(&TypedTransform3D::create_rotation(x, y, z, theta))
     }
 
     /// Returns a transform with a rotation applied before self's transformation.
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn pre_rotate(&self, x: T, y: T, z: T, theta: Angle<T>) -> Self {
         self.pre_transform(&TypedTransform3D::create_rotation(x, y, z, theta))
     }
