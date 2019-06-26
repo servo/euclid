@@ -205,7 +205,7 @@ where
     /// nonempty but this rectangle is empty.
     #[inline]
     pub fn contains_rect(&self, rect: &Self) -> bool {
-        rect.is_empty()
+        rect.is_empty_or_negative()
             || (self.min_x() <= rect.min_x() && rect.max_x() <= self.max_x()
                 && self.min_y() <= rect.min_y() && rect.max_y() <= self.max_y())
     }
