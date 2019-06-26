@@ -8,7 +8,6 @@
 // except according to those terms.
 
 use super::UnknownUnit;
-use length::Length;
 use scale::Scale;
 use num::*;
 use box2d::Box2D;
@@ -154,26 +153,6 @@ where
     }
 
     #[inline]
-    pub fn max_x_typed(&self) -> Length<T, U> {
-        Length::new(self.max_x())
-    }
-
-    #[inline]
-    pub fn min_x_typed(&self) -> Length<T, U> {
-        Length::new(self.min_x())
-    }
-
-    #[inline]
-    pub fn max_y_typed(&self) -> Length<T, U> {
-        Length::new(self.max_y())
-    }
-
-    #[inline]
-    pub fn min_y_typed(&self) -> Length<T, U> {
-        Length::new(self.min_y())
-    }
-
-    #[inline]
     pub fn x_range(&self) -> Range<T> {
         self.min_x()..self.max_x()
     }
@@ -238,12 +217,6 @@ where
                 self.size.height + height + height,
             ),
         )
-    }
-
-    #[inline]
-    #[must_use]
-    pub fn inflate_typed(&self, width: Length<T, U>, height: Length<T, U>) -> Self {
-        self.inflate(width.get(), height.get())
     }
 
     #[inline]

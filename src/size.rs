@@ -242,17 +242,6 @@ impl<T: Copy + Div<T, Output = T>, U1, U2> Div<Scale<T, U1, U2>> for Size2D<T, U
 impl<T: Copy, U> Size2D<T, U> {
     /// Returns self.width as a Length carrying the unit.
     #[inline]
-    pub fn width_typed(&self) -> Length<T, U> {
-        Length::new(self.width)
-    }
-
-    /// Returns self.height as a Length carrying the unit.
-    #[inline]
-    pub fn height_typed(&self) -> Length<T, U> {
-        Length::new(self.height)
-    }
-
-    #[inline]
     pub fn to_array(&self) -> [T; 2] {
         [self.width, self.height]
     }
@@ -750,23 +739,6 @@ impl<T: Copy + Div<T, Output = T>, U1, U2> Div<Scale<T, U1, U2>> for Size3D<T, U
 
 impl<T: Copy, U> Size3D<T, U> {
     /// Returns self.width as a Length carrying the unit.
-    #[inline]
-    pub fn width_typed(&self) -> Length<T, U> {
-        Length::new(self.width)
-    }
-
-    /// Returns self.height as a Length carrying the unit.
-    #[inline]
-    pub fn height_typed(&self) -> Length<T, U> {
-        Length::new(self.height)
-    }
-
-    /// Returns self.depth as a Length carrying the unit.
-    #[inline]
-    pub fn depth_typed(&self) -> Length<T, U> {
-        Length::new(self.depth)
-    }
-
     #[inline]
     pub fn to_array(&self) -> [T; 3] {
         [self.width, self.height, self.depth]

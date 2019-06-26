@@ -38,22 +38,6 @@
 //! All euclid types are marked `#[repr(C)]` in order to facilitate exposing them to
 //! foreign function interfaces (provided the underlying scalar type is also `repr(C)`).
 //!
-//! Components are accessed in their scalar form by default for convenience, and most
-//! types additionally implement strongly typed accessors which return typed ```Length``` wrappers.
-//! For example:
-//!
-//! ```rust
-//! # use euclid::*;
-//! # pub struct WorldSpace;
-//! # pub type WorldPoint = Point3D<f32, WorldSpace>;
-//! let p = WorldPoint::new(0.0, 1.0, 1.0);
-//! // p.x is an f32.
-//! println!("p.x = {:?} ", p.x);
-//! // p.x is a Length<f32, WorldSpace>.
-//! println!("p.x_typed() = {:?} ", p.x_typed());
-//! // Length::get returns the scalar value (f32).
-//! assert_eq!(p.x, p.x_typed().get());
-//! ```
 
 #[cfg(feature = "serde")]
 #[macro_use]
