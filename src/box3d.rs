@@ -14,6 +14,7 @@ use point::Point3D;
 use vector::Vector3D;
 use size::Size3D;
 use approxord::{min, max};
+use nonempty::NonEmpty;
 
 use num_traits::NumCast;
 #[cfg(feature = "serde")]
@@ -112,6 +113,14 @@ where
         self.max.x <= self.min.x || self.max.y <= self.min.y || self.max.z <= self.min.z
     }
 
+    #[inline]
+    pub fn to_non_empty(&self) -> Option<NonEmpty<Self>> {
+        if self.is_empty_or_negative() {
+            return None;
+        }
+
+        Some(NonEmpty(*self))
+    }
 
     #[inline]
     pub fn intersects(&self, other: &Self) -> bool {
@@ -124,12 +133,12 @@ where
     }
 
     #[inline]
-    pub fn try_intersection(&self, other: &Self) -> Option<Self> {
+    pub fn try_intersection(&self, other: &Self) -> Option<NonEmpty<Self>> {
         if !self.intersects(other) {
             return None;
         }
 
-        Some(self.intersection(other))
+        Some(NonEmpty(self.intersection(other)))
     }
 
     pub fn intersection(&self, other: &Self) -> Self {
