@@ -82,9 +82,10 @@ pub use rigid::{RigidTransform3D};
 pub use box3d::{box3d, Box3D};
 pub use translation::{Translation2D, Translation3D};
 pub use rotation::{Angle, Rotation2D, Rotation3D};
-pub use side_offsets::SideOffsets2D;
 pub use size::{Size2D, Size3D, size2, size3};
 pub use trig::Trig;
+#[cfg(feature = "y_down")]
+pub use side_offsets::SideOffsets2D;
 
 #[macro_use]
 mod macros;
@@ -125,7 +126,6 @@ pub mod default {
     pub type Rect<T> = super::Rect<T, UnknownUnit>;
     pub type Box2D<T> = super::Box2D<T, UnknownUnit>;
     pub type Box3D<T> = super::Box3D<T, UnknownUnit>;
-    pub type SideOffsets2D<T> = super::SideOffsets2D<T, UnknownUnit>;
     pub type Transform2D<T> = super::Transform2D<T, UnknownUnit, UnknownUnit>;
     pub type Transform3D<T> = super::Transform3D<T, UnknownUnit, UnknownUnit>;
     pub type Rotation2D<T> = super::Rotation2D<T, UnknownUnit, UnknownUnit>;
@@ -133,4 +133,6 @@ pub mod default {
     pub type Translation3D<T> = super::Translation3D<T, UnknownUnit, UnknownUnit>;
     pub type Scale<T> = super::Scale<T, UnknownUnit, UnknownUnit>;
     pub type RigidTransform3D<T> = super::RigidTransform3D<T, UnknownUnit, UnknownUnit>;
+    #[cfg(feature = "y_down")]
+    pub type SideOffsets2D<T> = super::SideOffsets2D<T, UnknownUnit>;
 }

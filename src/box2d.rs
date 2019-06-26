@@ -581,6 +581,32 @@ impl<T: NumCast + Copy, Unit> Box2D<T, Unit> {
     }
 }
 
+#[cfg(feature = "y_down")]
+impl<T:, U> Box2D<T, U>
+where
+    T: Copy
+{
+    #[inline]
+    pub fn top_left(&self) -> Point2D<T, U> {
+        self.min
+    }
+
+    #[inline]
+    pub fn top_right(&self) -> Point2D<T, U> {
+        Point2D::new(self.max.x, self.min.y)
+    }
+
+    #[inline]
+    pub fn bottom_left(&self) -> Point2D<T, U> {
+        Point2D::new(self.min.x, self.max.y)
+    }
+
+    #[inline]
+    pub fn bottom_right(&self) -> Point2D<T, U> {
+        self.max
+    }
+}
+
 impl<T, U> From<Size2D<T, U>> for Box2D<T, U>
 where
     T: Copy + Zero + PartialOrd,

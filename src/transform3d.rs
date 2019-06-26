@@ -15,7 +15,7 @@ use homogen::HomogeneousVector;
 #[cfg(feature = "mint")]
 use mint;
 use trig::Trig;
-use point::{Point2D, Point3D};
+use point::{Point2D, Point3D, point2};
 use vector::{Vector2D, Vector3D, vec2, vec3};
 use rect::Rect;
 use transform2d::Transform2D;
@@ -652,11 +652,13 @@ where T: Copy + Clone +
     /// Returns a rectangle that encompasses the result of transforming the given rectangle by this
     /// transform, if the transform makes sense for it, or `None` otherwise.
     pub fn transform_rect(&self, rect: &Rect<T, Src>) -> Option<Rect<T, Dst>> {
+        let min = rect.origin;
+        let max = rect.origin + rect.size;
         Some(Rect::from_points(&[
-            self.transform_point2d(&rect.origin)?,
-            self.transform_point2d(&rect.top_right())?,
-            self.transform_point2d(&rect.bottom_left())?,
-            self.transform_point2d(&rect.bottom_right())?,
+            self.transform_point2d(&min)?,
+            self.transform_point2d(&point2(max.x, min.y))?,
+            self.transform_point2d(&point2(min.x, max.y))?,
+            self.transform_point2d(&max)?,
         ]))
     }
 

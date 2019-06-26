@@ -14,9 +14,10 @@ use num::*;
 use box2d::Box2D;
 use point::Point2D;
 use vector::Vector2D;
-use side_offsets::SideOffsets2D;
 use size::Size2D;
 use approxord::{min, max};
+#[cfg(feature = "y_down")]
+use side_offsets::SideOffsets2D;
 
 use num_traits::NumCast;
 #[cfg(feature = "serde")]
@@ -247,25 +248,10 @@ where
     }
 
     #[inline]
-    pub fn top_right(&self) -> Point2D<T, U> {
-        Point2D::new(self.max_x(), self.origin.y)
-    }
-
-    #[inline]
-    pub fn bottom_left(&self) -> Point2D<T, U> {
-        Point2D::new(self.origin.x, self.max_y())
-    }
-
-    #[inline]
-    pub fn bottom_right(&self) -> Point2D<T, U> {
-        Point2D::new(self.max_x(), self.max_y())
-    }
-
-    #[inline]
     pub fn to_box2d(&self) -> Box2D<T, U> {
         Box2D {
             min: self.origin,
-            max: self.bottom_right(),
+            max: self.origin + self.size,
         }
     }
 
@@ -279,6 +265,7 @@ where
     ///
     /// Subtracts the side offsets from all sides. The horizontal and vertical
     /// offsets must not be larger than the original side length.
+    #[cfg(feature = "y_down")]
     pub fn inner_rect(&self, offsets: SideOffsets2D<T, U>) -> Self {
         let rect = Rect::new(
             Point2D::new(
@@ -298,6 +285,7 @@ where
     /// Calculate the size and position of an outer rectangle.
     ///
     /// Add the offsets to all sides. The expanded rectangle is returned.
+    #[cfg(feature = "y_down")]
     pub fn outer_rect(&self, offsets: SideOffsets2D<T, U>) -> Self {
         Rect::new(
             Point2D::new(
@@ -352,6 +340,32 @@ where
             Point2D::new(min_x, min_y),
             Size2D::new(max_x - min_x, max_y - min_y),
         )
+    }
+}
+
+#[cfg(feature = "y_down")]
+impl<T:, U> Rect<T, U>
+where
+    T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output = T> + Sub<T, Output = T>
+{
+    #[inline]
+    pub fn top_left(&self) -> Point2D<T, U> {
+        self.origin
+    }
+
+    #[inline]
+    pub fn top_right(&self) -> Point2D<T, U> {
+        Point2D::new(self.max_x(), self.origin.y)
+    }
+
+    #[inline]
+    pub fn bottom_left(&self) -> Point2D<T, U> {
+        Point2D::new(self.origin.x, self.max_y())
+    }
+
+    #[inline]
+    pub fn bottom_right(&self) -> Point2D<T, U> {
+        Point2D::new(self.max_x(), self.max_y())
     }
 }
 
@@ -616,6 +630,7 @@ pub fn rect<T: Copy, U>(x: T, y: T, w: T, h: T) -> Rect<T, U> {
 mod tests {
     use default::{Point2D, Rect, Size2D};
     use {point2, vec2, rect};
+    #[cfg(feature = "y_down")]
     use side_offsets::SideOffsets2D;
 
     #[test]
@@ -780,6 +795,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "y_down")]
     fn test_inner_outer_rect() {
         let inner_rect: Rect<i32> = Rect::new(Point2D::new(20, 40), Size2D::new(80, 100));
         let offsets = SideOffsets2D::new(20, 10, 10, 10);
