@@ -15,6 +15,7 @@ use point::{point2, Point2D};
 use vector::{vec2, Vector2D};
 use side_offsets::SideOffsets2D;
 use size::Size2D;
+use nonempty::NonEmpty;
 use approxord::{min, max};
 
 use num_traits::NumCast;
@@ -114,6 +115,15 @@ where
         self.max.x <= self.min.x || self.max.y <= self.min.y
     }
 
+    #[inline]
+    pub fn to_non_empty(&self) -> Option<NonEmpty<Self>> {
+        if self.is_empty_or_negative() {
+            return None;
+        }
+
+        Some(NonEmpty(*self))
+    }
+
     /// Returns true if the two boxes intersect.
     #[inline]
     pub fn intersects(&self, other: &Self) -> bool {
@@ -142,14 +152,14 @@ where
 
     /// Computes the intersection of two boxes, returning `None` if the boxes do not intersect.
     #[inline]
-    pub fn try_intersection(&self, other: &Self) -> Option<Self> {
+    pub fn try_intersection(&self, other: &Self) -> Option<NonEmpty<Self>> {
         let intersection = self.intersection(other);
 
         if intersection.is_negative() {
             return None;
         }
 
-        Some(intersection)
+        Some(NonEmpty(intersection))
     }
 }
 
