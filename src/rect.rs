@@ -165,15 +165,15 @@ where
     /// Returns the same rectangle, translated by a vector.
     #[inline]
     #[must_use]
-    pub fn translate(&self, by: &Vector2D<T, U>) -> Self {
-        Self::new(self.origin + *by, self.size)
+    pub fn translate(&self, by: Vector2D<T, U>) -> Self {
+        Self::new(self.origin + by, self.size)
     }
 
     /// Returns true if this rectangle contains the point. Points are considered
     /// in the rectangle if they are on the left or top edge, but outside if they
     /// are on the right or bottom edge.
     #[inline]
-    pub fn contains(&self, other: &Point2D<T, U>) -> bool {
+    pub fn contains(&self, other: Point2D<T, U>) -> bool {
         self.origin.x <= other.x && other.x < self.origin.x + self.size.width
             && self.origin.y <= other.y && other.y < self.origin.y + self.size.height
     }
@@ -423,15 +423,17 @@ impl<T: Copy + Div<T, Output = T>, U1, U2> Div<Scale<T, U1, U2>> for Rect<T, U2>
 
 impl<T: Copy, Unit> Rect<T, Unit> {
     /// Drop the units, preserving only the numeric value.
+    #[inline]
     pub fn to_untyped(&self) -> Rect<T, UnknownUnit> {
         Rect::new(self.origin.to_untyped(), self.size.to_untyped())
     }
 
     /// Tag a unitless value with units.
+    #[inline]
     pub fn from_untyped(r: &Rect<T, UnknownUnit>) -> Rect<T, Unit> {
         Rect::new(
-            Point2D::from_untyped(&r.origin),
-            Size2D::from_untyped(&r.size),
+            Point2D::from_untyped(r.origin),
+            Size2D::from_untyped(r.size),
         )
     }
 }
@@ -569,7 +571,7 @@ mod tests {
     #[test]
     fn test_translate() {
         let p = Rect::new(Point2D::new(0u32, 0u32), Size2D::new(50u32, 40u32));
-        let pp = p.translate(&vec2(10, 15));
+        let pp = p.translate(vec2(10, 15));
 
         assert!(pp.size.width == 50);
         assert!(pp.size.height == 40);
@@ -577,7 +579,7 @@ mod tests {
         assert!(pp.origin.y == 15);
 
         let r = Rect::new(Point2D::new(-10, -5), Size2D::new(50, 40));
-        let rr = r.translate(&vec2(0, -10));
+        let rr = r.translate(vec2(0, -10));
 
         assert!(rr.size.width == 50);
         assert!(rr.size.height == 40);
@@ -631,42 +633,42 @@ mod tests {
     fn test_contains() {
         let r = Rect::new(Point2D::new(-20, 15), Size2D::new(100, 200));
 
-        assert!(r.contains(&Point2D::new(0, 50)));
-        assert!(r.contains(&Point2D::new(-10, 200)));
+        assert!(r.contains(Point2D::new(0, 50)));
+        assert!(r.contains(Point2D::new(-10, 200)));
 
         // The `contains` method is inclusive of the top/left edges, but not the
         // bottom/right edges.
-        assert!(r.contains(&Point2D::new(-20, 15)));
-        assert!(!r.contains(&Point2D::new(80, 15)));
-        assert!(!r.contains(&Point2D::new(80, 215)));
-        assert!(!r.contains(&Point2D::new(-20, 215)));
+        assert!(r.contains(Point2D::new(-20, 15)));
+        assert!(!r.contains(Point2D::new(80, 15)));
+        assert!(!r.contains(Point2D::new(80, 215)));
+        assert!(!r.contains(Point2D::new(-20, 215)));
 
         // Points beyond the top-left corner.
-        assert!(!r.contains(&Point2D::new(-25, 15)));
-        assert!(!r.contains(&Point2D::new(-15, 10)));
+        assert!(!r.contains(Point2D::new(-25, 15)));
+        assert!(!r.contains(Point2D::new(-15, 10)));
 
         // Points beyond the top-right corner.
-        assert!(!r.contains(&Point2D::new(85, 20)));
-        assert!(!r.contains(&Point2D::new(75, 10)));
+        assert!(!r.contains(Point2D::new(85, 20)));
+        assert!(!r.contains(Point2D::new(75, 10)));
 
         // Points beyond the bottom-right corner.
-        assert!(!r.contains(&Point2D::new(85, 210)));
-        assert!(!r.contains(&Point2D::new(75, 220)));
+        assert!(!r.contains(Point2D::new(85, 210)));
+        assert!(!r.contains(Point2D::new(75, 220)));
 
         // Points beyond the bottom-left corner.
-        assert!(!r.contains(&Point2D::new(-25, 210)));
-        assert!(!r.contains(&Point2D::new(-15, 220)));
+        assert!(!r.contains(Point2D::new(-25, 210)));
+        assert!(!r.contains(Point2D::new(-15, 220)));
 
         let r = Rect::new(Point2D::new(-20.0, 15.0), Size2D::new(100.0, 200.0));
         assert!(r.contains_rect(&r));
-        assert!(!r.contains_rect(&r.translate(&vec2(0.1, 0.0))));
-        assert!(!r.contains_rect(&r.translate(&vec2(-0.1, 0.0))));
-        assert!(!r.contains_rect(&r.translate(&vec2(0.0, 0.1))));
-        assert!(!r.contains_rect(&r.translate(&vec2(0.0, -0.1))));
+        assert!(!r.contains_rect(&r.translate(vec2(0.1, 0.0))));
+        assert!(!r.contains_rect(&r.translate(vec2(-0.1, 0.0))));
+        assert!(!r.contains_rect(&r.translate(vec2(0.0, 0.1))));
+        assert!(!r.contains_rect(&r.translate(vec2(0.0, -0.1))));
         // Empty rectangles are always considered as contained in other rectangles,
         // even if their origin is not.
         let p = Point2D::new(1.0, 1.0);
-        assert!(!r.contains(&p));
+        assert!(!r.contains(p));
         assert!(r.contains_rect(&Rect::new(p, Size2D::zero())));
     }
 

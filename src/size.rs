@@ -262,7 +262,7 @@ impl<T: Copy, U> Size2D<T, U> {
     }
 
     /// Tag a unitless value with units.
-    pub fn from_untyped(p: &Size2D<T, UnknownUnit>) -> Self {
+    pub fn from_untyped(p: Size2D<T, UnknownUnit>) -> Self {
         Size2D::new(p.width, p.height)
     }
 }
@@ -352,14 +352,14 @@ where
 }
 
 impl<T: PartialOrd, U> Size2D<T, U> {
-    pub fn greater_than(&self, other: &Self) -> BoolVector2D {
+    pub fn greater_than(&self, other: Self) -> BoolVector2D {
         BoolVector2D {
             x: self.width > other.width,
             y: self.height > other.height,
         }
     }
 
-    pub fn lower_than(&self, other: &Self) -> BoolVector2D {
+    pub fn lower_than(&self, other: Self) -> BoolVector2D {
         BoolVector2D {
             x: self.width < other.width,
             y: self.height < other.height,
@@ -369,14 +369,14 @@ impl<T: PartialOrd, U> Size2D<T, U> {
 
 
 impl<T: PartialEq, U> Size2D<T, U> {
-    pub fn equal(&self, other: &Self) -> BoolVector2D {
+    pub fn equal(&self, other: Self) -> BoolVector2D {
         BoolVector2D {
             x: self.width == other.width,
             y: self.height == other.height,
         }
     }
 
-    pub fn not_equal(&self, other: &Self) -> BoolVector2D {
+    pub fn not_equal(&self, other: Self) -> BoolVector2D {
         BoolVector2D {
             x: self.width != other.width,
             y: self.height != other.height,
@@ -765,7 +765,7 @@ impl<T: Copy, U> Size3D<T, U> {
     }
 
     /// Tag a unitless value with units.
-    pub fn from_untyped(p: &Size3D<T, UnknownUnit>) -> Self {
+    pub fn from_untyped(p: Size3D<T, UnknownUnit>) -> Self {
         Size3D::new(p.width, p.height, p.depth)
     }
 }
@@ -855,7 +855,7 @@ where
 }
 
 impl<T: PartialOrd, U> Size3D<T, U> {
-    pub fn greater_than(&self, other: &Self) -> BoolVector3D {
+    pub fn greater_than(&self, other: Self) -> BoolVector3D {
         BoolVector3D {
             x: self.width > other.width,
             y: self.height > other.height,
@@ -863,7 +863,7 @@ impl<T: PartialOrd, U> Size3D<T, U> {
         }
     }
 
-    pub fn lower_than(&self, other: &Self) -> BoolVector3D {
+    pub fn lower_than(&self, other: Self) -> BoolVector3D {
         BoolVector3D {
             x: self.width < other.width,
             y: self.height < other.height,
@@ -874,7 +874,7 @@ impl<T: PartialOrd, U> Size3D<T, U> {
 
 
 impl<T: PartialEq, U> Size3D<T, U> {
-    pub fn equal(&self, other: &Self) -> BoolVector3D {
+    pub fn equal(&self, other: Self) -> BoolVector3D {
         BoolVector3D {
             x: self.width == other.width,
             y: self.height == other.height,
@@ -882,7 +882,7 @@ impl<T: PartialEq, U> Size3D<T, U> {
         }
     }
 
-    pub fn not_equal(&self, other: &Self) -> BoolVector3D {
+    pub fn not_equal(&self, other: Self) -> BoolVector3D {
         BoolVector3D {
             x: self.width != other.width,
             y: self.height != other.height,

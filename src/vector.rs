@@ -183,7 +183,7 @@ impl<T: Copy, U> Vector2D<T, U> {
 
     /// Tag a unit-less value with units.
     #[inline]
-    pub fn from_untyped(p: &Vector2D<T, UnknownUnit>) -> Self {
+    pub fn from_untyped(p: Vector2D<T, UnknownUnit>) -> Self {
         vec2(p.x, p.y)
     }
 
@@ -738,7 +738,7 @@ impl<T: Copy, U> Vector3D<T, U> {
 
     /// Tag a unitless value with units.
     #[inline]
-    pub fn from_untyped(p: &Vector3D<T, UnknownUnit>) -> Self {
+    pub fn from_untyped(p: Vector3D<T, UnknownUnit>) -> Self {
         vec3(p.x, p.y, p.z)
     }
 
@@ -1171,7 +1171,7 @@ impl BoolVector2D {
     }
 
     #[inline]
-    pub fn select_point<T: Copy, U>(&self, a: &Point2D<T, U>, b: &Point2D<T, U>) -> Point2D<T, U> {
+    pub fn select_point<T: Copy, U>(&self, a: Point2D<T, U>, b: Point2D<T, U>) -> Point2D<T, U> {
         point2(
             if self.x { a.x } else { b.x },
             if self.y { a.y } else { b.y },
@@ -1179,7 +1179,7 @@ impl BoolVector2D {
     }
 
     #[inline]
-    pub fn select_vector<T: Copy, U>(&self, a: &Vector2D<T, U>, b: &Vector2D<T, U>) -> Vector2D<T, U> {
+    pub fn select_vector<T: Copy, U>(&self, a: Vector2D<T, U>, b: Vector2D<T, U>) -> Vector2D<T, U> {
         vec2(
             if self.x { a.x } else { b.x },
             if self.y { a.y } else { b.y },
@@ -1187,7 +1187,7 @@ impl BoolVector2D {
     }
 
     #[inline]
-    pub fn select_size<T: Copy, U>(&self, a: &Size2D<T, U>, b: &Size2D<T, U>) -> Size2D<T, U> {
+    pub fn select_size<T: Copy, U>(&self, a: Size2D<T, U>, b: Size2D<T, U>) -> Size2D<T, U> {
         size2(
             if self.x { a.width } else { b.width },
             if self.y { a.height } else { b.height },
@@ -1240,7 +1240,7 @@ impl BoolVector3D {
 
 
     #[inline]
-    pub fn select_point<T: Copy, U>(&self, a: &Point3D<T, U>, b: &Point3D<T, U>) -> Point3D<T, U> {
+    pub fn select_point<T: Copy, U>(&self, a: Point3D<T, U>, b: Point3D<T, U>) -> Point3D<T, U> {
         point3(
             if self.x { a.x } else { b.x },
             if self.y { a.y } else { b.y },
@@ -1249,7 +1249,7 @@ impl BoolVector3D {
     }
 
     #[inline]
-    pub fn select_vector<T: Copy, U>(&self, a: &Vector3D<T, U>, b: &Vector3D<T, U>) -> Vector3D<T, U> {
+    pub fn select_vector<T: Copy, U>(&self, a: Vector3D<T, U>, b: Vector3D<T, U>) -> Vector3D<T, U> {
         vec3(
             if self.x { a.x } else { b.x },
             if self.y { a.y } else { b.y },
@@ -1283,14 +1283,16 @@ impl BoolVector3D {
 }
 
 impl<T: PartialOrd, U> Vector2D<T, U> {
-    pub fn greater_than(&self, other: &Self) -> BoolVector2D {
+    #[inline]
+    pub fn greater_than(&self, other: Self) -> BoolVector2D {
         BoolVector2D {
             x: self.x > other.x,
             y: self.y > other.y,
         }
     }
 
-    pub fn lower_than(&self, other: &Self) -> BoolVector2D {
+    #[inline]
+    pub fn lower_than(&self, other: Self) -> BoolVector2D {
         BoolVector2D {
             x: self.x < other.x,
             y: self.y < other.y,
@@ -1300,14 +1302,16 @@ impl<T: PartialOrd, U> Vector2D<T, U> {
 
 
 impl<T: PartialEq, U> Vector2D<T, U> {
-    pub fn equal(&self, other: &Self) -> BoolVector2D {
+    #[inline]
+    pub fn equal(&self, other: Self) -> BoolVector2D {
         BoolVector2D {
             x: self.x == other.x,
             y: self.y == other.y,
         }
     }
 
-    pub fn not_equal(&self, other: &Self) -> BoolVector2D {
+    #[inline]
+    pub fn not_equal(&self, other: Self) -> BoolVector2D {
         BoolVector2D {
             x: self.x != other.x,
             y: self.y != other.y,
@@ -1316,7 +1320,8 @@ impl<T: PartialEq, U> Vector2D<T, U> {
 }
 
 impl<T: PartialOrd, U> Vector3D<T, U> {
-    pub fn greater_than(&self, other: &Self) -> BoolVector3D {
+    #[inline]
+    pub fn greater_than(&self, other: Self) -> BoolVector3D {
         BoolVector3D {
             x: self.x > other.x,
             y: self.y > other.y,
@@ -1324,7 +1329,8 @@ impl<T: PartialOrd, U> Vector3D<T, U> {
         }
     }
 
-    pub fn lower_than(&self, other: &Self) -> BoolVector3D {
+    #[inline]
+    pub fn lower_than(&self, other: Self) -> BoolVector3D {
         BoolVector3D {
             x: self.x < other.x,
             y: self.y < other.y,
@@ -1335,7 +1341,8 @@ impl<T: PartialOrd, U> Vector3D<T, U> {
 
 
 impl<T: PartialEq, U> Vector3D<T, U> {
-    pub fn equal(&self, other: &Self) -> BoolVector3D {
+    #[inline]
+    pub fn equal(&self, other: Self) -> BoolVector3D {
         BoolVector3D {
             x: self.x == other.x,
             y: self.y == other.y,
@@ -1343,7 +1350,8 @@ impl<T: PartialEq, U> Vector3D<T, U> {
         }
     }
 
-    pub fn not_equal(&self, other: &Self) -> BoolVector3D {
+    #[inline]
+    pub fn not_equal(&self, other: Self) -> BoolVector3D {
         BoolVector3D {
             x: self.x != other.x,
             y: self.y != other.y,
@@ -1629,22 +1637,22 @@ mod bool_vector {
     fn test_bvec2() {
 
         assert_eq!(
-            Vec2::new(1.0, 2.0).greater_than(&Vec2::new(2.0, 1.0)),
+            Vec2::new(1.0, 2.0).greater_than(Vec2::new(2.0, 1.0)),
             bvec2(false, true),
         );
 
         assert_eq!(
-            Vec2::new(1.0, 2.0).lower_than(&Vec2::new(2.0, 1.0)),
+            Vec2::new(1.0, 2.0).lower_than(Vec2::new(2.0, 1.0)),
             bvec2(true, false),
         );
 
         assert_eq!(
-            Vec2::new(1.0, 2.0).equal(&Vec2::new(1.0, 3.0)),
+            Vec2::new(1.0, 2.0).equal(Vec2::new(1.0, 3.0)),
             bvec2(true, false),
         );
 
         assert_eq!(
-            Vec2::new(1.0, 2.0).not_equal(&Vec2::new(1.0, 3.0)),
+            Vec2::new(1.0, 2.0).not_equal(Vec2::new(1.0, 3.0)),
             bvec2(false, true),
         );
 
@@ -1663,7 +1671,7 @@ mod bool_vector {
         assert_eq!(bvec2(true, false).or(bvec2(true, true)), bvec2(true, true));
 
         assert_eq!(
-            bvec2(true, false).select_vector(&Vec2::new(1.0, 2.0), &Vec2::new(3.0, 4.0)),
+            bvec2(true, false).select_vector(Vec2::new(1.0, 2.0), Vec2::new(3.0, 4.0)),
             Vec2::new(1.0, 4.0),
         );
     }
@@ -1672,22 +1680,22 @@ mod bool_vector {
     fn test_bvec3() {
 
         assert_eq!(
-            Vec3::new(1.0, 2.0, 3.0).greater_than(&Vec3::new(3.0, 2.0, 1.0)),
+            Vec3::new(1.0, 2.0, 3.0).greater_than(Vec3::new(3.0, 2.0, 1.0)),
             bvec3(false, false, true),
         );
 
         assert_eq!(
-            Vec3::new(1.0, 2.0, 3.0).lower_than(&Vec3::new(3.0, 2.0, 1.0)),
+            Vec3::new(1.0, 2.0, 3.0).lower_than(Vec3::new(3.0, 2.0, 1.0)),
             bvec3(true, false, false),
         );
 
         assert_eq!(
-            Vec3::new(1.0, 2.0, 3.0).equal(&Vec3::new(3.0, 2.0, 1.0)),
+            Vec3::new(1.0, 2.0, 3.0).equal(Vec3::new(3.0, 2.0, 1.0)),
             bvec3(false, true, false),
         );
 
         assert_eq!(
-            Vec3::new(1.0, 2.0, 3.0).not_equal(&Vec3::new(3.0, 2.0, 1.0)),
+            Vec3::new(1.0, 2.0, 3.0).not_equal(Vec3::new(3.0, 2.0, 1.0)),
             bvec3(true, false, true),
         );
 
@@ -1706,7 +1714,7 @@ mod bool_vector {
         assert_eq!(bvec3(true, false, false).or(bvec3(true, true, false)), bvec3(true, true, false));
 
         assert_eq!(
-            bvec3(true, false, true).select_vector(&Vec3::new(1.0, 2.0, 3.0), &Vec3::new(4.0, 5.0, 6.0)),
+            bvec3(true, false, true).select_vector(Vec3::new(1.0, 2.0, 3.0), Vec3::new(4.0, 5.0, 6.0)),
             Vec3::new(1.0, 5.0, 3.0),
         );
     }
