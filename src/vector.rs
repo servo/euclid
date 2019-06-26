@@ -555,6 +555,12 @@ impl<T: Copy, U> From<(T, T)> for Vector2D<T, U> {
     }
 }
 
+impl<T: Copy, U> From<Size2D<T, U>> for Vector2D<T, U> {
+    fn from(size: Size2D<T, U>) -> Self {
+        size.to_vector()
+    }
+}
+
 impl<T, U> Vector2D<T, U>
 where
     T: Signed,
