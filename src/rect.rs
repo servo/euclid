@@ -269,12 +269,6 @@ where
         }
     }
 
-    #[inline]
-    #[must_use]
-    pub fn translate_by_size(&self, size: &Size2D<T, U>) -> Self {
-        self.translate(&size.to_vector())
-    }
-
     /// Calculate the size and position of an inner rectangle.
     ///
     /// Subtracts the side offsets from all sides. The horizontal and vertical
@@ -630,25 +624,6 @@ mod tests {
 
         let r = Rect::new(Point2D::new(-10, -5), Size2D::new(50, 40));
         let rr = r.translate(&vec2(0, -10));
-
-        assert!(rr.size.width == 50);
-        assert!(rr.size.height == 40);
-        assert!(rr.origin.x == -10);
-        assert!(rr.origin.y == -15);
-    }
-
-    #[test]
-    fn test_translate_by_size() {
-        let p = Rect::new(Point2D::new(0u32, 0u32), Size2D::new(50u32, 40u32));
-        let pp = p.translate_by_size(&Size2D::new(10, 15));
-
-        assert!(pp.size.width == 50);
-        assert!(pp.size.height == 40);
-        assert!(pp.origin.x == 10);
-        assert!(pp.origin.y == 15);
-
-        let r = Rect::new(Point2D::new(-10, -5), Size2D::new(50, 40));
-        let rr = r.translate_by_size(&Size2D::new(0, -10));
 
         assert!(rr.size.width == 50);
         assert!(rr.size.height == 40);
