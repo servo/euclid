@@ -433,6 +433,22 @@ impl<T, U> Into<mint::Vector2<T>> for Size2D<T, U> {
     }
 }
 
+impl<T, U> From<Vector2D<T, U>> for Size2D<T, U> {
+    fn from(v: Vector2D<T, U>) -> Self {
+        Size2D {
+            width: v.x,
+            height: v.y,
+            _unit: PhantomData,
+        }
+    }
+}
+
+impl<T: Copy, U> Into<Vector2D<T, U>> for Size2D<T, U> {
+    fn into(self) -> Vector2D<T, U> {
+        self.to_vector()
+    }
+}
+
 impl<T: Copy, U> Into<[T; 2]> for Size2D<T, U> {
     fn into(self) -> [T; 2] {
         self.to_array()
