@@ -12,7 +12,7 @@ use num::One;
 
 use num_traits::NumCast;
 #[cfg(feature = "serde")]
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use serde;
 use core::fmt;
 use core::ops::{Add, Div, Mul, Neg, Sub};
 use core::marker::PhantomData;
@@ -38,36 +38,9 @@ use {Point2D, Rect, Size2D, Vector2D};
 /// let one_foot_in_mm: Length<f32, Mm> = one_foot * mm_per_inch;
 /// ```
 #[repr(C)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(bound(serialize = "T: serde::Serialize", deserialize = "T: serde::Deserialize<'de>")))]
 pub struct Scale<T, Src, Dst>(pub T, #[doc(hidden)] pub PhantomData<(Src, Dst)>);
-
-#[cfg(feature = "serde")]
-impl<'de, T, Src, Dst> Deserialize<'de> for Scale<T, Src, Dst>
-where
-    T: Deserialize<'de>,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Scale<T, Src, Dst>, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        Ok(Scale(
-            try!(Deserialize::deserialize(deserializer)),
-            PhantomData,
-        ))
-    }
-}
-
-#[cfg(feature = "serde")]
-impl<T, Src, Dst> Serialize for Scale<T, Src, Dst>
-where
-    T: Serialize,
-{
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        self.0.serialize(serializer)
-    }
-}
 
 impl<T, Src, Dst> Scale<T, Src, Dst> {
     pub fn new(x: T) -> Self {
