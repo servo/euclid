@@ -386,7 +386,8 @@ where T: Copy + Clone +
     /// applies after self's transformation.
     ///
     /// Assuming row vectors, this is equivalent to self * mat
-    pub fn post_mul<NewDst>(&self, mat: &TypedTransform3D<T, Dst, NewDst>) -> TypedTransform3D<T, Src, NewDst> {
+    #[must_use]
+    pub fn post_transform<NewDst>(&self, mat: &TypedTransform3D<T, Dst, NewDst>) -> TypedTransform3D<T, Src, NewDst> {
         TypedTransform3D::row_major(
             self.m11 * mat.m11  +  self.m12 * mat.m21  +  self.m13 * mat.m31  +  self.m14 * mat.m41,
             self.m11 * mat.m12  +  self.m12 * mat.m22  +  self.m13 * mat.m32  +  self.m14 * mat.m42,
@@ -411,8 +412,28 @@ where T: Copy + Clone +
     /// applies before self's transformation.
     ///
     /// Assuming row vectors, this is equivalent to mat * self
+    #[inline]
+    #[must_use]
+    pub fn pre_transform<NewSrc>(&self, mat: &TypedTransform3D<T, NewSrc, Src>) -> TypedTransform3D<T, NewSrc, Dst> {
+        mat.post_transform(self)
+    }
+
+    /// Returns the multiplication of the two matrices such that mat's transformation
+    /// applies after self's transformation.
+    ///
+    /// Assuming row vectors, this is equivalent to self * mat
+    #[must_use]
+    pub fn post_mul<NewDst>(&self, mat: &TypedTransform3D<T, Dst, NewDst>) -> TypedTransform3D<T, Src, NewDst> {
+        self.post_transform(mat)
+    }
+
+    /// Returns the multiplication of the two matrices such that mat's transformation
+    /// applies before self's transformation.
+    ///
+    /// Assuming row vectors, this is equivalent to mat * self
+    #[must_use]
     pub fn pre_mul<NewSrc>(&self, mat: &TypedTransform3D<T, NewSrc, Src>) -> TypedTransform3D<T, NewSrc, Dst> {
-        mat.post_mul(self)
+        self.pre_transform(mat)
     }
 
     /// Returns the inverse transform if possible.
@@ -524,7 +545,7 @@ where T: Copy + Clone +
     }
 
     /// Multiplies all of the transform's component by a scalar and returns the result.
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn mul_s(&self, x: T) -> Self {
         TypedTransform3D::row_major(
             self.m11 * x, self.m12 * x, self.m13 * x, self.m14 * x,
@@ -654,15 +675,15 @@ where T: Copy + Clone +
     }
 
     /// Returns a transform with a translation applied before self's transformation.
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn pre_translate(&self, v: TypedVector3D<T, Src>) -> Self {
-        self.pre_mul(&TypedTransform3D::create_translation(v.x, v.y, v.z))
+        self.pre_transform(&TypedTransform3D::create_translation(v.x, v.y, v.z))
     }
 
     /// Returns a transform with a translation applied after self's transformation.
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn post_translate(&self, v: TypedVector3D<T, Dst>) -> Self {
-        self.post_mul(&TypedTransform3D::create_translation(v.x, v.y, v.z))
+        self.post_transform(&TypedTransform3D::create_translation(v.x, v.y, v.z))
     }
 
     /// Returns a projection of this transform in 2d space.
@@ -713,7 +734,7 @@ where T: Copy + Clone +
     }
 
     /// Returns a transform with a scale applied before self's transformation.
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn pre_scale(&self, x: T, y: T, z: T) -> Self {
         TypedTransform3D::row_major(
             self.m11 * x, self.m12,     self.m13,     self.m14,
@@ -724,9 +745,9 @@ where T: Copy + Clone +
     }
 
     /// Returns a transform with a scale applied after self's transformation.
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn post_scale(&self, x: T, y: T, z: T) -> Self {
-        self.post_mul(&TypedTransform3D::create_scale(x, y, z))
+        self.post_transform(&TypedTransform3D::create_scale(x, y, z))
     }
 
     /// Create a 3d rotation transform from an angle / axis.
@@ -767,15 +788,15 @@ where T: Copy + Clone +
     }
 
     /// Returns a transform with a rotation applied after self's transformation.
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn post_rotate(&self, x: T, y: T, z: T, theta: Angle<T>) -> Self {
-        self.post_mul(&TypedTransform3D::create_rotation(x, y, z, theta))
+        self.post_transform(&TypedTransform3D::create_rotation(x, y, z, theta))
     }
 
     /// Returns a transform with a rotation applied before self's transformation.
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn pre_rotate(&self, x: T, y: T, z: T, theta: Angle<T>) -> Self {
-        self.pre_mul(&TypedTransform3D::create_rotation(x, y, z, theta))
+        self.pre_transform(&TypedTransform3D::create_rotation(x, y, z, theta))
     }
 
     /// Create a 2d skew transform.
@@ -999,7 +1020,7 @@ mod tests {
         assert_eq!(t1.transform_point3d(&point3(1.0, 1.0, 1.0)), Some(point3(2.0, 3.0, 4.0)));
         assert_eq!(t1.transform_point2d(&point2(1.0, 1.0)), Some(point2(2.0, 3.0)));
 
-        assert_eq!(t1.post_mul(&t1), Mf32::create_translation(2.0, 4.0, 6.0));
+        assert_eq!(t1.post_transform(&t1), Mf32::create_translation(2.0, 4.0, 6.0));
 
         assert!(!t1.is_2d());
         assert_eq!(Mf32::create_translation(1.0, 2.0, 3.0).to_2d(), Transform2D::create_translation(1.0, 2.0));
@@ -1016,7 +1037,7 @@ mod tests {
         assert!(r1.transform_point3d(&point3(1.0, 2.0, 3.0)).unwrap().approx_eq(&point3(2.0, -1.0, 3.0)));
         assert!(r1.transform_point2d(&point2(1.0, 2.0)).unwrap().approx_eq(&point2(2.0, -1.0)));
 
-        assert!(r1.post_mul(&r1).approx_eq(&Mf32::create_rotation(0.0, 0.0, 1.0, rad(FRAC_PI_2*2.0))));
+        assert!(r1.post_transform(&r1).approx_eq(&Mf32::create_rotation(0.0, 0.0, 1.0, rad(FRAC_PI_2*2.0))));
 
         assert!(r1.is_2d());
         assert!(r1.to_2d().approx_eq(&Transform2D::create_rotation(rad(FRAC_PI_2))));
@@ -1033,7 +1054,7 @@ mod tests {
         assert!(s1.transform_point3d(&point3(2.0, 2.0, 2.0)).unwrap().approx_eq(&point3(4.0, 6.0, 8.0)));
         assert!(s1.transform_point2d(&point2(2.0, 2.0)).unwrap().approx_eq(&point2(4.0, 6.0)));
 
-        assert_eq!(s1.post_mul(&s1), Mf32::create_scale(4.0, 9.0, 16.0));
+        assert_eq!(s1.post_transform(&s1), Mf32::create_scale(4.0, 9.0, 16.0));
 
         assert!(!s1.is_2d());
         assert_eq!(Mf32::create_scale(2.0, 3.0, 0.0).to_2d(), Transform2D::create_scale(2.0, 3.0));
@@ -1101,28 +1122,28 @@ mod tests {
     pub fn test_inverse_scale() {
         let m1 = Mf32::create_scale(1.5, 0.3, 2.1);
         let m2 = m1.inverse().unwrap();
-        assert!(m1.pre_mul(&m2).approx_eq(&Mf32::identity()));
+        assert!(m1.pre_transform(&m2).approx_eq(&Mf32::identity()));
     }
 
     #[test]
     pub fn test_inverse_translate() {
         let m1 = Mf32::create_translation(-132.0, 0.3, 493.0);
         let m2 = m1.inverse().unwrap();
-        assert!(m1.pre_mul(&m2).approx_eq(&Mf32::identity()));
+        assert!(m1.pre_transform(&m2).approx_eq(&Mf32::identity()));
     }
 
     #[test]
     pub fn test_inverse_rotate() {
         let m1 = Mf32::create_rotation(0.0, 1.0, 0.0, rad(1.57));
         let m2 = m1.inverse().unwrap();
-        assert!(m1.pre_mul(&m2).approx_eq(&Mf32::identity()));
+        assert!(m1.pre_transform(&m2).approx_eq(&Mf32::identity()));
     }
 
     #[test]
     pub fn test_inverse_transform_point_2d() {
         let m1 = Mf32::create_translation(100.0, 200.0, 0.0);
         let m2 = m1.inverse().unwrap();
-        assert!(m1.pre_mul(&m2).approx_eq(&Mf32::identity()));
+        assert!(m1.pre_transform(&m2).approx_eq(&Mf32::identity()));
 
         let p1 = point2(1000.0, 2000.0);
         let p2 = m1.transform_point2d(&p1);
@@ -1149,13 +1170,13 @@ mod tests {
 
         let a = point3(1.0, 1.0, 1.0);
 
-        assert!(r.post_mul(&t).transform_point3d(&a).unwrap().approx_eq(&point3(3.0, 2.0, 1.0)));
-        assert!(t.post_mul(&r).transform_point3d(&a).unwrap().approx_eq(&point3(4.0, -3.0, 1.0)));
-        assert!(t.post_mul(&r).transform_point3d(&a).unwrap().approx_eq(&r.transform_point3d(&t.transform_point3d(&a).unwrap()).unwrap()));
+        assert!(r.post_transform(&t).transform_point3d(&a).unwrap().approx_eq(&point3(3.0, 2.0, 1.0)));
+        assert!(t.post_transform(&r).transform_point3d(&a).unwrap().approx_eq(&point3(4.0, -3.0, 1.0)));
+        assert!(t.post_transform(&r).transform_point3d(&a).unwrap().approx_eq(&r.transform_point3d(&t.transform_point3d(&a).unwrap()).unwrap()));
 
-        assert!(r.pre_mul(&t).transform_point3d(&a).unwrap().approx_eq(&point3(4.0, -3.0, 1.0)));
-        assert!(t.pre_mul(&r).transform_point3d(&a).unwrap().approx_eq(&point3(3.0, 2.0, 1.0)));
-        assert!(t.pre_mul(&r).transform_point3d(&a).unwrap().approx_eq(&t.transform_point3d(&r.transform_point3d(&a).unwrap()).unwrap()));
+        assert!(r.pre_transform(&t).transform_point3d(&a).unwrap().approx_eq(&point3(4.0, -3.0, 1.0)));
+        assert!(t.pre_transform(&r).transform_point3d(&a).unwrap().approx_eq(&point3(3.0, 2.0, 1.0)));
+        assert!(t.pre_transform(&r).transform_point3d(&a).unwrap().approx_eq(&t.transform_point3d(&r.transform_point3d(&a).unwrap()).unwrap()));
     }
 
     #[test]
@@ -1177,7 +1198,7 @@ mod tests {
                                  -2.5, 6.0, 1.0, 1.0);
 
         let p = point3(1.0, 3.0, 5.0);
-        let p1 = m2.pre_mul(&m1).transform_point3d(&p).unwrap();
+        let p1 = m2.pre_transform(&m1).transform_point3d(&p).unwrap();
         let p2 = m2.transform_point3d(&m1.transform_point3d(&p).unwrap()).unwrap();
         assert!(p1.approx_eq(&p2));
     }

@@ -7,7 +7,6 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#![cfg_attr(feature = "unstable", feature(fn_must_use))]
 #![cfg_attr(not(test), no_std)]
 
 //! A collection of strongly typed math tools for computer graphics with an inclination
@@ -84,7 +83,7 @@ pub use box3d::{box3d, Box3D, TypedBox3D};
 pub use translation::{TypedTranslation2D, TypedTranslation3D};
 pub use rotation::{Angle, Rotation2D, Rotation3D, TypedRotation2D, TypedRotation3D};
 pub use side_offsets::{SideOffsets2D, TypedSideOffsets2D};
-pub use size::{Size2D, TypedSize2D, size2};
+pub use size::{Size2D, TypedSize2D, TypedSize3D, size2, size3};
 pub use trig::Trig;
 
 #[macro_use]
@@ -137,3 +136,26 @@ pub type ScaleFactor<T, Src, Dst> = TypedScale<T, Src, Dst>;
 /// Temporary alias to facilitate the transition to the new naming scheme
 #[deprecated]
 pub use Angle as Radians;
+
+pub mod default {
+    use super::*;
+
+    pub type Point2D<T> = TypedPoint2D<T, UnknownUnit>;
+    pub type Point3D<T> = TypedPoint3D<T, UnknownUnit>;
+    pub type Vector2D<T> = TypedVector2D<T, UnknownUnit>;
+    pub type Vector3D<T> = TypedVector3D<T, UnknownUnit>;
+    pub type Vector4D<T> = HomogeneousVector<T, UnknownUnit>;
+    pub type Size2D<T> = TypedSize2D<T, UnknownUnit>;
+    pub type Size3D<T> = TypedSize3D<T, UnknownUnit>;
+    pub type Rect<T> = TypedRect<T, UnknownUnit>;
+    pub type Box2D<T> = TypedBox2D<T, UnknownUnit>;
+    pub type Box3D<T> = TypedBox3D<T, UnknownUnit>;
+    pub type SideOffsets2D<T> = TypedSideOffsets2D<T, UnknownUnit>;
+    pub type Tranform2D<T> = TypedTransform2D<T, UnknownUnit, UnknownUnit>;
+    pub type Tranform3D<T> = TypedTransform3D<T, UnknownUnit, UnknownUnit>;
+    pub type Rotation2D<T> = TypedRotation2D<T, UnknownUnit, UnknownUnit>;
+    pub type Rotation3D<T> = TypedRotation3D<T, UnknownUnit, UnknownUnit>;
+    pub type Translation3D<T> = TypedTranslation3D<T, UnknownUnit, UnknownUnit>;
+    pub type Scale<T> = TypedScale<T, UnknownUnit, UnknownUnit>;
+    pub type RigidTransform3D<T> = TypedRigidTransform3D<T, UnknownUnit, UnknownUnit>;
+}

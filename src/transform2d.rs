@@ -311,8 +311,8 @@ where T: Copy + Clone +
     /// applies after self's transformation.
     ///
     /// Assuming row vectors, this is equivalent to self * mat
-    #[cfg_attr(feature = "unstable", must_use)]
-    pub fn post_mul<NewDst>(&self, mat: &TypedTransform2D<T, Dst, NewDst>) -> TypedTransform2D<T, Src, NewDst> {
+    #[must_use]
+    pub fn post_transform<NewDst>(&self, mat: &TypedTransform2D<T, Dst, NewDst>) -> TypedTransform2D<T, Src, NewDst> {
         TypedTransform2D::row_major(
             self.m11 * mat.m11 + self.m12 * mat.m21,
             self.m11 * mat.m12 + self.m12 * mat.m22,
@@ -327,12 +327,34 @@ where T: Copy + Clone +
     /// applies before self's transformation.
     ///
     /// Assuming row vectors, this is equivalent to mat * self
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[inline]
+    #[must_use]
+    pub fn pre_transform<NewSrc>(&self, mat: &TypedTransform2D<T, NewSrc, Src>) -> TypedTransform2D<T, NewSrc, Dst> {
+        mat.post_transform(self)
+    }
+
+    /// Returns the multiplication of the two matrices such that mat's transformation
+    /// applies after self's transformation.
+    ///
+    /// Assuming row vectors, this is equivalent to self * mat
+    #[deprecated]
+    #[must_use]
+    pub fn post_mul<NewDst>(&self, mat: &TypedTransform2D<T, Dst, NewDst>) -> TypedTransform2D<T, Src, NewDst> {
+        self.post_transform(mat)
+    }
+
+    /// Returns the multiplication of the two matrices such that mat's transformation
+    /// applies before self's transformation.
+    ///
+    /// Assuming row vectors, this is equivalent to mat * self
+    #[deprecated]
+    #[must_use]
     pub fn pre_mul<NewSrc>(&self, mat: &TypedTransform2D<T, NewSrc, Src>) -> TypedTransform2D<T, NewSrc, Dst> {
-        mat.post_mul(self)
+        self.pre_transform(mat)
     }
 
     /// Returns a translation transform.
+    #[inline]
     pub fn create_translation(x: T, y: T) -> Self {
          let (_0, _1): (T, T) = (Zero::zero(), One::one());
          TypedTransform2D::row_major(
@@ -343,15 +365,17 @@ where T: Copy + Clone +
     }
 
     /// Applies a translation after self's transformation and returns the resulting transform.
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[inline]
+    #[must_use]
     pub fn post_translate(&self, v: TypedVector2D<T, Dst>) -> Self {
-        self.post_mul(&TypedTransform2D::create_translation(v.x, v.y))
+        self.post_transform(&TypedTransform2D::create_translation(v.x, v.y))
     }
 
     /// Applies a translation before self's transformation and returns the resulting transform.
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[inline]
+    #[must_use]
     pub fn pre_translate(&self, v: TypedVector2D<T, Src>) -> Self {
-        self.pre_mul(&TypedTransform2D::create_translation(v.x, v.y))
+        self.pre_transform(&TypedTransform2D::create_translation(v.x, v.y))
     }
 
     /// Returns a scale transform.
@@ -365,13 +389,15 @@ where T: Copy + Clone +
     }
 
     /// Applies a scale after self's transformation and returns the resulting transform.
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[inline]
+    #[must_use]
     pub fn post_scale(&self, x: T, y: T) -> Self {
-        self.post_mul(&TypedTransform2D::create_scale(x, y))
+        self.post_transform(&TypedTransform2D::create_scale(x, y))
     }
 
     /// Applies a scale before self's transformation and returns the resulting transform.
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[inline]
+    #[must_use]
     pub fn pre_scale(&self, x: T, y: T) -> Self {
         TypedTransform2D::row_major(
             self.m11 * x, self.m12,
@@ -381,6 +407,7 @@ where T: Copy + Clone +
     }
 
     /// Returns a rotation transform.
+    #[inline]
     pub fn create_rotation(theta: Angle<T>) -> Self {
         let _0 = Zero::zero();
         let cos = theta.get().cos();
@@ -393,22 +420,24 @@ where T: Copy + Clone +
     }
 
     /// Applies a rotation after self's transformation and returns the resulting transform.
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[inline]
+    #[must_use]
     pub fn post_rotate(&self, theta: Angle<T>) -> Self {
-        self.post_mul(&TypedTransform2D::create_rotation(theta))
+        self.post_transform(&TypedTransform2D::create_rotation(theta))
     }
 
     /// Applies a rotation after self's transformation and returns the resulting transform.
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[inline]
+    #[must_use]
     pub fn pre_rotate(&self, theta: Angle<T>) -> Self {
-        self.pre_mul(&TypedTransform2D::create_rotation(theta))
+        self.pre_transform(&TypedTransform2D::create_rotation(theta))
     }
 
     /// Returns the given point transformed by this transform.
     ///
     /// Assuming row vectors, this is equivalent to `p * self`
     #[inline]
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn transform_point(&self, point: &TypedPoint2D<T, Src>) -> TypedPoint2D<T, Dst> {
         TypedPoint2D::new(point.x * self.m11 + point.y * self.m21 + self.m31,
                           point.x * self.m12 + point.y * self.m22 + self.m32)
@@ -418,7 +447,7 @@ where T: Copy + Clone +
     ///
     /// Assuming row vectors, this is equivalent to `v * self`
     #[inline]
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn transform_vector(&self, vec: &TypedVector2D<T, Src>) -> TypedVector2D<T, Dst> {
         vec2(vec.x * self.m11 + vec.y * self.m21,
              vec.x * self.m12 + vec.y * self.m22)
@@ -427,7 +456,7 @@ where T: Copy + Clone +
     /// Returns a rectangle that encompasses the result of transforming the given rectangle by this
     /// transform.
     #[inline]
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn transform_rect(&self, rect: &TypedRect<T, Src>) -> TypedRect<T, Dst> {
         TypedRect::from_points(&[
             self.transform_point(&rect.origin),
@@ -443,7 +472,7 @@ where T: Copy + Clone +
     }
 
     /// Returns the inverse transform if possible.
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn inverse(&self) -> Option<TypedTransform2D<T, Dst, Src>> {
         let det = self.determinant();
 
@@ -580,7 +609,7 @@ mod test {
 
         assert_eq!(t1.transform_point(&Point2D::new(1.0, 1.0)), Point2D::new(2.0, 3.0));
 
-        assert_eq!(t1.post_mul(&t1), Mat::create_translation(2.0, 4.0));
+        assert_eq!(t1.post_transform(&t1), Mat::create_translation(2.0, 4.0));
     }
 
     #[test]
@@ -593,7 +622,7 @@ mod test {
 
         assert!(r1.transform_point(&Point2D::new(1.0, 2.0)).approx_eq(&Point2D::new(2.0, -1.0)));
 
-        assert!(r1.post_mul(&r1).approx_eq(&Mat::create_rotation(rad(FRAC_PI_2*2.0))));
+        assert!(r1.post_transform(&r1).approx_eq(&Mat::create_rotation(rad(FRAC_PI_2*2.0))));
     }
 
     #[test]
@@ -633,14 +662,14 @@ mod test {
     pub fn test_inverse_scale() {
         let m1 = Mat::create_scale(1.5, 0.3);
         let m2 = m1.inverse().unwrap();
-        assert!(m1.pre_mul(&m2).approx_eq(&Mat::identity()));
+        assert!(m1.pre_transform(&m2).approx_eq(&Mat::identity()));
     }
 
     #[test]
     pub fn test_inverse_translate() {
         let m1 = Mat::create_translation(-132.0, 0.3);
         let m2 = m1.inverse().unwrap();
-        assert!(m1.pre_mul(&m2).approx_eq(&Mat::identity()));
+        assert!(m1.pre_transform(&m2).approx_eq(&Mat::identity()));
     }
 
     #[test]
@@ -660,13 +689,13 @@ mod test {
 
         let a = Point2D::new(1.0, 1.0);
 
-        assert!(r.post_mul(&t).transform_point(&a).approx_eq(&Point2D::new(3.0, 2.0)));
-        assert!(t.post_mul(&r).transform_point(&a).approx_eq(&Point2D::new(4.0, -3.0)));
-        assert!(t.post_mul(&r).transform_point(&a).approx_eq(&r.transform_point(&t.transform_point(&a))));
+        assert!(r.post_transform(&t).transform_point(&a).approx_eq(&Point2D::new(3.0, 2.0)));
+        assert!(t.post_transform(&r).transform_point(&a).approx_eq(&Point2D::new(4.0, -3.0)));
+        assert!(t.post_transform(&r).transform_point(&a).approx_eq(&r.transform_point(&t.transform_point(&a))));
 
-        assert!(r.pre_mul(&t).transform_point(&a).approx_eq(&Point2D::new(4.0, -3.0)));
-        assert!(t.pre_mul(&r).transform_point(&a).approx_eq(&Point2D::new(3.0, 2.0)));
-        assert!(t.pre_mul(&r).transform_point(&a).approx_eq(&t.transform_point(&r.transform_point(&a))));
+        assert!(r.pre_transform(&t).transform_point(&a).approx_eq(&Point2D::new(4.0, -3.0)));
+        assert!(t.pre_transform(&r).transform_point(&a).approx_eq(&Point2D::new(3.0, 2.0)));
+        assert!(t.pre_transform(&r).transform_point(&a).approx_eq(&t.transform_point(&r.transform_point(&a))));
     }
 
     #[test]

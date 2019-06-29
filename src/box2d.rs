@@ -220,7 +220,7 @@ where
 {
     /// Inflates the box by the specified sizes on each side respectively.
     #[inline]
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn inflate(&self, width: T, height: T) -> Self {
         TypedBox2D {
             min: point2(self.min.x - width, self.min.y - height),
@@ -506,7 +506,7 @@ where
     /// avoid pixel rounding errors.
     /// Note that this is *not* rounding to nearest integer if the values are negative.
     /// They are always rounding as floor(n + 0.5).
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn round(&self) -> Self {
         TypedBox2D::new(self.min.round(), self.max.round())
     }
@@ -518,7 +518,7 @@ where
 {
     /// Return a box with faces/edges rounded to integer coordinates, such that
     /// the original box contains the resulting box.
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn round_in(&self) -> Self {
         let min = self.min.ceil();
         let max = self.max.floor();
@@ -527,7 +527,7 @@ where
 
     /// Return a box with faces/edges rounded to integer coordinates, such that
     /// the original box is contained in the resulting box.
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn round_out(&self) -> Self {
         let min = self.min.floor();
         let max = self.max.ceil();

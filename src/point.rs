@@ -332,7 +332,7 @@ impl<T: Round, U> TypedPoint2D<T, U> {
     /// This behavior is preserved for negative values (unlike the basic cast).
     /// For example `{ -0.1, -0.8 }.round() == { 0.0, -1.0 }`.
     #[inline]
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn round(&self) -> Self {
         point2(self.x.round(), self.y.round())
     }
@@ -344,7 +344,7 @@ impl<T: Ceil, U> TypedPoint2D<T, U> {
     /// This behavior is preserved for negative values (unlike the basic cast).
     /// For example `{ -0.1, -0.8 }.ceil() == { 0.0, 0.0 }`.
     #[inline]
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn ceil(&self) -> Self {
         point2(self.x.ceil(), self.y.ceil())
     }
@@ -356,7 +356,7 @@ impl<T: Floor, U> TypedPoint2D<T, U> {
     /// This behavior is preserved for negative values (unlike the basic cast).
     /// For example `{ -0.1, -0.8 }.floor() == { -1.0, -1.0 }`.
     #[inline]
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn floor(&self) -> Self {
         point2(self.x.floor(), self.y.floor())
     }
@@ -832,7 +832,7 @@ impl<T: Round, U> TypedPoint3D<T, U> {
     ///
     /// This behavior is preserved for negative values (unlike the basic cast).
     #[inline]
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn round(&self) -> Self {
         point3(self.x.round(), self.y.round(), self.z.round())
     }
@@ -843,7 +843,7 @@ impl<T: Ceil, U> TypedPoint3D<T, U> {
     ///
     /// This behavior is preserved for negative values (unlike the basic cast).
     #[inline]
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn ceil(&self) -> Self {
         point3(self.x.ceil(), self.y.ceil(), self.z.ceil())
     }
@@ -854,7 +854,7 @@ impl<T: Floor, U> TypedPoint3D<T, U> {
     ///
     /// This behavior is preserved for negative values (unlike the basic cast).
     #[inline]
-    #[cfg_attr(feature = "unstable", must_use)]
+    #[must_use]
     pub fn floor(&self) -> Self {
         point3(self.x.floor(), self.y.floor(), self.z.floor())
     }
