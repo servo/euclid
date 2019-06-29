@@ -113,30 +113,6 @@ mod box3d;
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct UnknownUnit;
 
-/// Temporary alias to facilitate the transition to the new naming scheme
-#[deprecated]
-pub type Matrix2D<T> = Transform2D<T>;
-
-/// Temporary alias to facilitate the transition to the new naming scheme
-#[deprecated]
-pub type TypedMatrix2D<T, Src, Dst> = TypedTransform2D<T, Src, Dst>;
-
-/// Temporary alias to facilitate the transition to the new naming scheme
-#[deprecated]
-pub type Matrix4D<T> = Transform3D<T>;
-
-/// Temporary alias to facilitate the transition to the new naming scheme
-#[deprecated]
-pub type TypedMatrix4D<T, Src, Dst> = TypedTransform3D<T, Src, Dst>;
-
-/// Temporary alias to facilitate the transition to the new naming scheme
-#[deprecated]
-pub type ScaleFactor<T, Src, Dst> = TypedScale<T, Src, Dst>;
-
-/// Temporary alias to facilitate the transition to the new naming scheme
-#[deprecated]
-pub use Angle as Radians;
-
 pub mod default {
     use super::*;
 
