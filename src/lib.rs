@@ -75,7 +75,7 @@ pub use transform3d::Transform3D;
 pub use point::{Point2D, Point3D, point2, point3};
 pub use vector::{Vector2D, Vector3D, vec2, vec3};
 pub use vector::{BoolVector2D, BoolVector3D, bvec2, bvec3};
-pub use homogen::HomogeneousVector;
+pub use homogen::Vector4D;
 
 pub use rect::{rect, Rect};
 pub use rigid::{RigidTransform3D};
@@ -119,7 +119,7 @@ pub mod default {
     pub type Point3D<T> = super::Point3D<T, UnknownUnit>;
     pub type Vector2D<T> = super::Vector2D<T, UnknownUnit>;
     pub type Vector3D<T> = super::Vector3D<T, UnknownUnit>;
-    pub type Vector4D<T> = super::HomogeneousVector<T, UnknownUnit>;
+    pub type Vector4D<T> = super::Vector4D<T, UnknownUnit>;
     pub type Size2D<T> = super::Size2D<T, UnknownUnit>;
     pub type Size3D<T> = super::Size3D<T, UnknownUnit>;
     pub type Rect<T> = super::Rect<T, UnknownUnit>;

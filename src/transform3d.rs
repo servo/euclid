@@ -11,7 +11,7 @@
 
 use super::{UnknownUnit, Angle};
 use approxeq::ApproxEq;
-use homogen::HomogeneousVector;
+use homogen::Vector4D;
 #[cfg(feature = "mint")]
 use mint;
 use trig::Trig;
@@ -557,7 +557,7 @@ where T: Copy + Clone +
         Transform3D::create_scale(scale.get(), scale.get(), scale.get())
     }
 
-    /// Returns the homogeneous vector corresponding to the transformed 2d point.
+    /// Returns the 4D vector corresponding to the transformed 2d point.
     ///
     /// The input point must be use the unit Src, and the returned point has the unit Dst.
     ///
@@ -565,13 +565,13 @@ where T: Copy + Clone +
     #[inline]
     pub fn transform_point2d_homogeneous(
         &self, p: &Point2D<T, Src>
-    ) -> HomogeneousVector<T, Dst> {
+    ) -> Vector4D<T, Dst> {
         let x = p.x * self.m11 + p.y * self.m21 + self.m41;
         let y = p.x * self.m12 + p.y * self.m22 + self.m42;
         let z = p.x * self.m13 + p.y * self.m23 + self.m43;
         let w = p.x * self.m14 + p.y * self.m24 + self.m44;
 
-        HomogeneousVector::new(x, y, z, w)
+        Vector4D::new(x, y, z, w)
     }
 
     /// Returns the given 2d point transformed by this transform, if the transform makes sense,
@@ -607,7 +607,7 @@ where T: Copy + Clone +
         )
     }
 
-    /// Returns the homogeneous vector corresponding to the transformed 3d point.
+    /// Returns the 4D vector corresponding to the transformed 3d point.
     ///
     /// The input point must be use the unit Src, and the returned point has the unit Dst.
     ///
@@ -615,13 +615,13 @@ where T: Copy + Clone +
     #[inline]
     pub fn transform_point3d_homogeneous(
         &self, p: &Point3D<T, Src>
-    ) -> HomogeneousVector<T, Dst> {
+    ) -> Vector4D<T, Dst> {
         let x = p.x * self.m11 + p.y * self.m21 + p.z * self.m31 + self.m41;
         let y = p.x * self.m12 + p.y * self.m22 + p.z * self.m32 + self.m42;
         let z = p.x * self.m13 + p.y * self.m23 + p.z * self.m33 + self.m43;
         let w = p.x * self.m14 + p.y * self.m24 + p.z * self.m34 + self.m44;
 
-        HomogeneousVector::new(x, y, z, w)
+        Vector4D::new(x, y, z, w)
     }
 
     /// Returns the given 3d point transformed by this transform, if the transform makes sense,
@@ -1251,11 +1251,11 @@ mod tests {
         );
         assert_eq!(
             m.transform_point2d_homogeneous(&point2(1.0, 2.0)),
-            HomogeneousVector::new(6.0, 11.0, 0.0, 19.0),
+            Vector4D::new(6.0, 11.0, 0.0, 19.0),
         );
         assert_eq!(
             m.transform_point3d_homogeneous(&point3(1.0, 2.0, 4.0)),
-            HomogeneousVector::new(8.0, 7.0, 4.0, 15.0),
+            Vector4D::new(8.0, 7.0, 4.0, 15.0),
         );
     }
 
