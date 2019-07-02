@@ -15,8 +15,8 @@ use core::marker::PhantomData;
 use core::cmp::{Eq, PartialEq};
 use core::hash::{Hash};
 use trig::Trig;
-use {TypedPoint2D, TypedPoint3D, TypedVector2D, TypedVector3D, Vector3D, point2, point3, vec3};
-use {TypedTransform2D, TypedTransform3D, UnknownUnit};
+use {Point2D, Point3D, Vector2D, Vector3D, point2, point3, vec3};
+use {Transform2D, Transform3D, UnknownUnit};
 #[cfg(feature = "serde")]
 use serde;
 
@@ -191,20 +191,17 @@ impl<T: Neg<Output = T>> Neg for Angle<T> {
 
 /// A transform that can represent rotations in 2d, represented as an angle in radians.
 #[repr(C)]
-pub struct TypedRotation2D<T, Src, Dst> {
+pub struct Rotation2D<T, Src, Dst> {
     pub angle : T,
     #[doc(hidden)]
     pub _unit: PhantomData<(Src, Dst)>,
 }
 
-/// The default 2d rotation type with no units.
-pub type Rotation2D<T> = TypedRotation2D<T, UnknownUnit, UnknownUnit>;
+impl<T: Copy, Src, Dst> Copy for Rotation2D<T, Src, Dst> {}
 
-impl<T: Copy, Src, Dst> Copy for TypedRotation2D<T, Src, Dst> {}
-
-impl<T: Clone, Src, Dst> Clone for TypedRotation2D<T, Src, Dst> {
+impl<T: Clone, Src, Dst> Clone for Rotation2D<T, Src, Dst> {
     fn clone(&self) -> Self {
-        TypedRotation2D {
+        Rotation2D {
             angle: self.angle.clone(),
             _unit: PhantomData,
         }
@@ -212,19 +209,19 @@ impl<T: Clone, Src, Dst> Clone for TypedRotation2D<T, Src, Dst> {
 }
 
 #[cfg(feature = "serde")]
-impl<'de, T, Src, Dst> serde::Deserialize<'de> for TypedRotation2D<T, Src, Dst>
+impl<'de, T, Src, Dst> serde::Deserialize<'de> for Rotation2D<T, Src, Dst>
     where T: serde::Deserialize<'de>
 {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
         where D: serde::Deserializer<'de>
     {
         let (angle,) = try!(serde::Deserialize::deserialize(deserializer));
-        Ok(TypedRotation2D { angle, _unit: PhantomData })
+        Ok(Rotation2D { angle, _unit: PhantomData })
     }
 }
 
 #[cfg(feature = "serde")]
-impl<T, Src, Dst> serde::Serialize for TypedRotation2D<T, Src, Dst>
+impl<T, Src, Dst> serde::Serialize for Rotation2D<T, Src, Dst>
     where T: serde::Serialize
 {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -234,9 +231,9 @@ impl<T, Src, Dst> serde::Serialize for TypedRotation2D<T, Src, Dst>
     }
 }
 
-impl<T, Src, Dst> Eq for TypedRotation2D<T, Src, Dst> where T: Eq {}
+impl<T, Src, Dst> Eq for Rotation2D<T, Src, Dst> where T: Eq {}
 
-impl<T, Src, Dst> PartialEq for TypedRotation2D<T, Src, Dst>
+impl<T, Src, Dst> PartialEq for Rotation2D<T, Src, Dst>
     where T: PartialEq
 {
     fn eq(&self, other: &Self) -> bool {
@@ -244,7 +241,7 @@ impl<T, Src, Dst> PartialEq for TypedRotation2D<T, Src, Dst>
     }
 }
 
-impl<T, Src, Dst> Hash for TypedRotation2D<T, Src, Dst>
+impl<T, Src, Dst> Hash for Rotation2D<T, Src, Dst>
     where T: Hash
 {
     fn hash<H: ::core::hash::Hasher>(&self, h: &mut H) {
@@ -252,11 +249,11 @@ impl<T, Src, Dst> Hash for TypedRotation2D<T, Src, Dst>
     }
 }
 
-impl<T, Src, Dst> TypedRotation2D<T, Src, Dst> {
+impl<T, Src, Dst> Rotation2D<T, Src, Dst> {
     #[inline]
     /// Creates a rotation from an angle in radians.
     pub fn new(angle: Angle<T>) -> Self {
-        TypedRotation2D {
+        Rotation2D {
             angle: angle.radians,
             _unit: PhantomData,
         }
@@ -276,7 +273,7 @@ impl<T, Src, Dst> TypedRotation2D<T, Src, Dst> {
     }
 }
 
-impl<T, Src, Dst> TypedRotation2D<T, Src, Dst>
+impl<T, Src, Dst> Rotation2D<T, Src, Dst>
 where
     T: Clone,
 {
@@ -286,7 +283,7 @@ where
     }
 }
 
-impl<T, Src, Dst> TypedRotation2D<T, Src, Dst>
+impl<T, Src, Dst> Rotation2D<T, Src, Dst>
 where
     T: Copy
         + Clone
@@ -302,31 +299,31 @@ where
 {
     /// Creates a 3d rotation (around the z axis) from this 2d rotation.
     #[inline]
-    pub fn to_3d(&self) -> TypedRotation3D<T, Src, Dst> {
-        TypedRotation3D::around_z(self.get_angle())
+    pub fn to_3d(&self) -> Rotation3D<T, Src, Dst> {
+        Rotation3D::around_z(self.get_angle())
     }
 
     /// Returns the inverse of this rotation.
     #[inline]
-    pub fn inverse(&self) -> TypedRotation2D<T, Dst, Src> {
-        TypedRotation2D::radians(-self.angle)
+    pub fn inverse(&self) -> Rotation2D<T, Dst, Src> {
+        Rotation2D::radians(-self.angle)
     }
 
     /// Returns a rotation representing the other rotation followed by this rotation.
     #[inline]
     pub fn pre_rotate<NewSrc>(
         &self,
-        other: &TypedRotation2D<T, NewSrc, Src>,
-    ) -> TypedRotation2D<T, NewSrc, Dst> {
-        TypedRotation2D::radians(self.angle + other.angle)
+        other: &Rotation2D<T, NewSrc, Src>,
+    ) -> Rotation2D<T, NewSrc, Dst> {
+        Rotation2D::radians(self.angle + other.angle)
     }
 
     /// Returns a rotation representing this rotation followed by the other rotation.
     #[inline]
     pub fn post_rotate<NewDst>(
         &self,
-        other: &TypedRotation2D<T, Dst, NewDst>,
-    ) -> TypedRotation2D<T, Src, NewDst> {
+        other: &Rotation2D<T, Dst, NewDst>,
+    ) -> Rotation2D<T, Src, NewDst> {
         other.pre_rotate(self)
     }
 
@@ -334,7 +331,7 @@ where
     ///
     /// The input point must be use the unit Src, and the returned point has the unit Dst.
     #[inline]
-    pub fn transform_point(&self, point: &TypedPoint2D<T, Src>) -> TypedPoint2D<T, Dst> {
+    pub fn transform_point(&self, point: &Point2D<T, Src>) -> Point2D<T, Dst> {
         let (sin, cos) = Float::sin_cos(self.angle);
         point2(point.x * cos - point.y * sin, point.y * cos + point.x * sin)
     }
@@ -343,12 +340,12 @@ where
     ///
     /// The input point must be use the unit Src, and the returned point has the unit Dst.
     #[inline]
-    pub fn transform_vector(&self, vector: &TypedVector2D<T, Src>) -> TypedVector2D<T, Dst> {
+    pub fn transform_vector(&self, vector: &Vector2D<T, Src>) -> Vector2D<T, Dst> {
         self.transform_point(&vector.to_point()).to_vector()
     }
 }
 
-impl<T, Src, Dst> TypedRotation2D<T, Src, Dst>
+impl<T, Src, Dst> Rotation2D<T, Src, Dst>
 where
     T: Copy
         + Clone
@@ -363,8 +360,8 @@ where
 {
     /// Returns the matrix representation of this rotation.
     #[inline]
-    pub fn to_transform(&self) -> TypedTransform2D<T, Src, Dst> {
-        TypedTransform2D::create_rotation(self.get_angle())
+    pub fn to_transform(&self) -> Transform2D<T, Src, Dst> {
+        Transform2D::create_rotation(self.get_angle())
     }
 }
 
@@ -378,7 +375,7 @@ where
 /// as follows: `x -> i`, `y -> j`, `z -> k`, `w -> r`.
 /// The memory layout of this type corresponds to the `x, y, z, w` notation
 #[repr(C)]
-pub struct TypedRotation3D<T, Src, Dst> {
+pub struct Rotation3D<T, Src, Dst> {
     /// Component multiplied by the imaginary number `i`.
     pub i: T,
     /// Component multiplied by the imaginary number `j`.
@@ -391,14 +388,11 @@ pub struct TypedRotation3D<T, Src, Dst> {
     pub _unit: PhantomData<(Src, Dst)>,
 }
 
-/// The default 3d rotation type with no units.
-pub type Rotation3D<T> = TypedRotation3D<T, UnknownUnit, UnknownUnit>;
+impl<T: Copy, Src, Dst> Copy for Rotation3D<T, Src, Dst> {}
 
-impl<T: Copy, Src, Dst> Copy for TypedRotation3D<T, Src, Dst> {}
-
-impl<T: Clone, Src, Dst> Clone for TypedRotation3D<T, Src, Dst> {
+impl<T: Clone, Src, Dst> Clone for Rotation3D<T, Src, Dst> {
     fn clone(&self) -> Self {
-        TypedRotation3D {
+        Rotation3D {
             i: self.i.clone(),
             j: self.j.clone(),
             k: self.k.clone(),
@@ -409,19 +403,19 @@ impl<T: Clone, Src, Dst> Clone for TypedRotation3D<T, Src, Dst> {
 }
 
 #[cfg(feature = "serde")]
-impl<'de, T, Src, Dst> serde::Deserialize<'de> for TypedRotation3D<T, Src, Dst>
+impl<'de, T, Src, Dst> serde::Deserialize<'de> for Rotation3D<T, Src, Dst>
     where T: serde::Deserialize<'de>
 {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
         where D: serde::Deserializer<'de>
     {
         let (i, j, k, r) = try!(serde::Deserialize::deserialize(deserializer));
-        Ok(TypedRotation3D { i, j, k, r, _unit: PhantomData })
+        Ok(Rotation3D { i, j, k, r, _unit: PhantomData })
     }
 }
 
 #[cfg(feature = "serde")]
-impl<T, Src, Dst> serde::Serialize for TypedRotation3D<T, Src, Dst>
+impl<T, Src, Dst> serde::Serialize for Rotation3D<T, Src, Dst>
     where T: serde::Serialize
 {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -431,9 +425,9 @@ impl<T, Src, Dst> serde::Serialize for TypedRotation3D<T, Src, Dst>
     }
 }
 
-impl<T, Src, Dst> Eq for TypedRotation3D<T, Src, Dst> where T: Eq {}
+impl<T, Src, Dst> Eq for Rotation3D<T, Src, Dst> where T: Eq {}
 
-impl<T, Src, Dst> PartialEq for TypedRotation3D<T, Src, Dst>
+impl<T, Src, Dst> PartialEq for Rotation3D<T, Src, Dst>
     where T: PartialEq
 {
     fn eq(&self, other: &Self) -> bool {
@@ -444,7 +438,7 @@ impl<T, Src, Dst> PartialEq for TypedRotation3D<T, Src, Dst>
     }
 }
 
-impl<T, Src, Dst> Hash for TypedRotation3D<T, Src, Dst>
+impl<T, Src, Dst> Hash for Rotation3D<T, Src, Dst>
     where T: Hash
 {
     fn hash<H: ::core::hash::Hasher>(&self, h: &mut H) {
@@ -455,7 +449,7 @@ impl<T, Src, Dst> Hash for TypedRotation3D<T, Src, Dst>
     }
 }
 
-impl<T, Src, Dst> TypedRotation3D<T, Src, Dst> {
+impl<T, Src, Dst> Rotation3D<T, Src, Dst> {
     /// Creates a rotation around from a quaternion representation.
     ///
     /// The parameters are a, b, c and r compose the quaternion `a*i + b*j + c*k + r`
@@ -465,7 +459,7 @@ impl<T, Src, Dst> TypedRotation3D<T, Src, Dst> {
     /// The resulting quaternion is not necessarily normalized. See `unit_quaternion`.
     #[inline]
     pub fn quaternion(a: T, b: T, c: T, r: T) -> Self {
-        TypedRotation3D {
+        Rotation3D {
             i: a,
             j: b,
             k: c,
@@ -475,18 +469,18 @@ impl<T, Src, Dst> TypedRotation3D<T, Src, Dst> {
     }
 }
 
-impl<T, Src, Dst> TypedRotation3D<T, Src, Dst>
+impl<T, Src, Dst> Rotation3D<T, Src, Dst>
 where
     T: Copy,
 {
     /// Returns the vector part (i, j, k) of this quaternion.
     #[inline]
-    pub fn vector_part(&self) -> Vector3D<T> {
+    pub fn vector_part(&self) -> Vector3D<T, UnknownUnit> {
         vec3(self.i, self.j, self.k)
     }
 }
 
-impl<T, Src, Dst> TypedRotation3D<T, Src, Dst>
+impl<T, Src, Dst> Rotation3D<T, Src, Dst>
 where
     T: Float,
 {
@@ -509,7 +503,7 @@ where
     }
 
     /// Creates a rotation around a given axis.
-    pub fn around_axis(axis: TypedVector3D<T, Src>, angle: Angle<T>) -> Self {
+    pub fn around_axis(axis: Vector3D<T, Src>, angle: Angle<T>) -> Self {
         let axis = axis.normalize();
         let two = T::one() + T::one();
         let (sin, cos) = Angle::sin_cos(angle / two);
@@ -564,8 +558,8 @@ where
 
     /// Returns the inverse of this rotation.
     #[inline]
-    pub fn inverse(&self) -> TypedRotation3D<T, Dst, Src> {
-        TypedRotation3D::quaternion(-self.i, -self.j, -self.k, self.r)
+    pub fn inverse(&self) -> Rotation3D<T, Dst, Src> {
+        Rotation3D::quaternion(-self.i, -self.j, -self.k, self.r)
     }
 
     /// Computes the norm of this quaternion
@@ -648,7 +642,7 @@ where
     /// Returns the given 3d point transformed by this rotation.
     ///
     /// The input point must be use the unit Src, and the returned point has the unit Dst.
-    pub fn rotate_point3d(&self, point: &TypedPoint3D<T, Src>) -> TypedPoint3D<T, Dst>
+    pub fn rotate_point3d(&self, point: &Point3D<T, Src>) -> Point3D<T, Dst>
     where
         T: ApproxEq<T>,
     {
@@ -668,7 +662,7 @@ where
     ///
     /// The input point must be use the unit Src, and the returned point has the unit Dst.
     #[inline]
-    pub fn rotate_point2d(&self, point: &TypedPoint2D<T, Src>) -> TypedPoint2D<T, Dst>
+    pub fn rotate_point2d(&self, point: &Point2D<T, Src>) -> Point2D<T, Dst>
     where
         T: ApproxEq<T>,
     {
@@ -679,7 +673,7 @@ where
     ///
     /// The input vector must be use the unit Src, and the returned point has the unit Dst.
     #[inline]
-    pub fn rotate_vector3d(&self, vector: &TypedVector3D<T, Src>) -> TypedVector3D<T, Dst>
+    pub fn rotate_vector3d(&self, vector: &Vector3D<T, Src>) -> Vector3D<T, Dst>
     where
         T: ApproxEq<T>,
     {
@@ -690,7 +684,7 @@ where
     ///
     /// The input vector must be use the unit Src, and the returned point has the unit Dst.
     #[inline]
-    pub fn rotate_vector2d(&self, vector: &TypedVector2D<T, Src>) -> TypedVector2D<T, Dst>
+    pub fn rotate_vector2d(&self, vector: &Vector2D<T, Src>) -> Vector2D<T, Dst>
     where
         T: ApproxEq<T>,
     {
@@ -699,7 +693,7 @@ where
 
     /// Returns the matrix representation of this rotation.
     #[inline]
-    pub fn to_transform(&self) -> TypedTransform3D<T, Src, Dst>
+    pub fn to_transform(&self) -> Transform3D<T, Src, Dst>
     where
         T: ApproxEq<T>,
     {
@@ -733,7 +727,7 @@ where
         let m32 = jk - ri;
         let m33 = one - (ii + jj);
 
-        TypedTransform3D::row_major(
+        Transform3D::row_major(
             m11,
             m12,
             m13,
@@ -756,13 +750,13 @@ where
     /// Returns a rotation representing the other rotation followed by this rotation.
     pub fn pre_rotate<NewSrc>(
         &self,
-        other: &TypedRotation3D<T, NewSrc, Src>,
-    ) -> TypedRotation3D<T, NewSrc, Dst>
+        other: &Rotation3D<T, NewSrc, Src>,
+    ) -> Rotation3D<T, NewSrc, Dst>
     where
         T: ApproxEq<T>,
     {
         debug_assert!(self.is_normalized());
-        TypedRotation3D::quaternion(
+        Rotation3D::quaternion(
             self.i * other.r + self.r * other.i + self.j * other.k - self.k * other.j,
             self.j * other.r + self.r * other.j + self.k * other.i - self.i * other.k,
             self.k * other.r + self.r * other.k + self.i * other.j - self.j * other.i,
@@ -774,8 +768,8 @@ where
     #[inline]
     pub fn post_rotate<NewDst>(
         &self,
-        other: &TypedRotation3D<T, Dst, NewDst>,
-    ) -> TypedRotation3D<T, Src, NewDst>
+        other: &Rotation3D<T, Dst, NewDst>,
+    ) -> Rotation3D<T, Src, NewDst>
     where
         T: ApproxEq<T>,
     {
@@ -816,7 +810,7 @@ where
     }
 }
 
-impl<T: fmt::Debug, Src, Dst> fmt::Debug for TypedRotation3D<T, Src, Dst> {
+impl<T: fmt::Debug, Src, Dst> fmt::Debug for Rotation3D<T, Src, Dst> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
@@ -826,7 +820,7 @@ impl<T: fmt::Debug, Src, Dst> fmt::Debug for TypedRotation3D<T, Src, Dst> {
     }
 }
 
-impl<T: fmt::Display, Src, Dst> fmt::Display for TypedRotation3D<T, Src, Dst> {
+impl<T: fmt::Display, Src, Dst> fmt::Display for Rotation3D<T, Src, Dst> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
@@ -836,7 +830,7 @@ impl<T: fmt::Display, Src, Dst> fmt::Display for TypedRotation3D<T, Src, Dst> {
     }
 }
 
-impl<T, Src, Dst> ApproxEq<T> for TypedRotation3D<T, Src, Dst>
+impl<T, Src, Dst> ApproxEq<T> for Rotation3D<T, Src, Dst>
 where
     T: Copy + Neg<Output = T> + ApproxEq<T>,
 {
@@ -860,6 +854,8 @@ where
 #[test]
 fn simple_rotation_2d() {
     use core::f32::consts::{FRAC_PI_2, PI};
+    use default::Rotation2D;
+
     let ri = Rotation2D::identity();
     let r90 = Rotation2D::radians(FRAC_PI_2);
     let rm90 = Rotation2D::radians(-FRAC_PI_2);
@@ -893,6 +889,8 @@ fn simple_rotation_2d() {
 #[test]
 fn simple_rotation_3d_in_2d() {
     use core::f32::consts::{FRAC_PI_2, PI};
+    use default::Rotation3D;
+
     let ri = Rotation3D::identity();
     let r90 = Rotation3D::around_z(Angle::radians(FRAC_PI_2));
     let rm90 = Rotation3D::around_z(Angle::radians(-FRAC_PI_2));
@@ -926,6 +924,8 @@ fn simple_rotation_3d_in_2d() {
 #[test]
 fn pre_post() {
     use core::f32::consts::FRAC_PI_2;
+    use default::Rotation3D;
+
     let r1 = Rotation3D::around_x(Angle::radians(FRAC_PI_2));
     let r2 = Rotation3D::around_y(Angle::radians(FRAC_PI_2));
     let r3 = Rotation3D::around_z(Angle::radians(FRAC_PI_2));
@@ -950,6 +950,8 @@ fn pre_post() {
 
 #[test]
 fn to_transform3d() {
+    use default::Rotation3D;
+
     use core::f32::consts::{FRAC_PI_2, PI};
     let rotations = [
         Rotation3D::identity(),
@@ -982,6 +984,8 @@ fn to_transform3d() {
 
 #[test]
 fn slerp() {
+    use default::Rotation3D;
+
     let q1 = Rotation3D::quaternion(1.0, 0.0, 0.0, 0.0);
     let q2 = Rotation3D::quaternion(0.0, 1.0, 0.0, 0.0);
     let q3 = Rotation3D::quaternion(0.0, 0.0, -1.0, 0.0);
@@ -1051,6 +1055,7 @@ fn slerp() {
 #[test]
 fn around_axis() {
     use core::f32::consts::{FRAC_PI_2, PI};
+    use default::Rotation3D;
 
     // Two sort of trivial cases:
     let r1 = Rotation3D::around_axis(vec3(1.0, 1.0, 0.0), Angle::radians(PI));
@@ -1076,6 +1081,7 @@ fn around_axis() {
 #[test]
 fn from_euler() {
     use core::f32::consts::FRAC_PI_2;
+    use default::Rotation3D;
 
     // First test simple separate yaw pitch and roll rotations, because it is easy to come
     // up with the corresponding quaternion.
@@ -1121,6 +1127,7 @@ fn from_euler() {
 #[test]
 fn wrap_angles() {
     use core::f32::consts::{FRAC_PI_2, PI};
+
     assert!(Angle::radians(0.0).positive().radians.approx_eq(&0.0));
     assert!(
         Angle::radians(FRAC_PI_2)

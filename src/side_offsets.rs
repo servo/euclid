@@ -10,7 +10,6 @@
 //! A group of side offsets, which correspond to top/left/bottom/right for borders, padding,
 //! and margins in CSS.
 
-use super::UnknownUnit;
 use length::Length;
 use num::Zero;
 use core::fmt;
@@ -24,7 +23,7 @@ use serde;
 /// A group of 2D side offsets, which correspond to top/left/bottom/right for borders, padding,
 /// and margins in CSS, optionally tagged with a unit.
 #[repr(C)]
-pub struct TypedSideOffsets2D<T, U> {
+pub struct SideOffsets2D<T, U> {
     pub top: T,
     pub right: T,
     pub bottom: T,
@@ -33,11 +32,11 @@ pub struct TypedSideOffsets2D<T, U> {
     pub _unit: PhantomData<U>,
 }
 
-impl<T: Copy, U> Copy for TypedSideOffsets2D<T, U> {}
+impl<T: Copy, U> Copy for SideOffsets2D<T, U> {}
 
-impl<T: Clone, U> Clone for TypedSideOffsets2D<T, U> {
+impl<T: Clone, U> Clone for SideOffsets2D<T, U> {
     fn clone(&self) -> Self {
-        TypedSideOffsets2D {
+        SideOffsets2D {
             top: self.top.clone(),
             right: self.right.clone(),
             bottom: self.bottom.clone(),
@@ -48,19 +47,19 @@ impl<T: Clone, U> Clone for TypedSideOffsets2D<T, U> {
 }
 
 #[cfg(feature = "serde")]
-impl<'de, T, U> serde::Deserialize<'de> for TypedSideOffsets2D<T, U>
+impl<'de, T, U> serde::Deserialize<'de> for SideOffsets2D<T, U>
     where T: serde::Deserialize<'de>
 {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
         where D: serde::Deserializer<'de>
     {
         let (top, right, bottom, left) = try!(serde::Deserialize::deserialize(deserializer));
-        Ok(TypedSideOffsets2D { top, right, bottom, left, _unit: PhantomData })
+        Ok(SideOffsets2D { top, right, bottom, left, _unit: PhantomData })
     }
 }
 
 #[cfg(feature = "serde")]
-impl<T, U> serde::Serialize for TypedSideOffsets2D<T, U>
+impl<T, U> serde::Serialize for SideOffsets2D<T, U>
     where T: serde::Serialize
 {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -70,9 +69,9 @@ impl<T, U> serde::Serialize for TypedSideOffsets2D<T, U>
     }
 }
 
-impl<T, U> Eq for TypedSideOffsets2D<T, U> where T: Eq {}
+impl<T, U> Eq for SideOffsets2D<T, U> where T: Eq {}
 
-impl<T, U> PartialEq for TypedSideOffsets2D<T, U>
+impl<T, U> PartialEq for SideOffsets2D<T, U>
     where T: PartialEq
 {
     fn eq(&self, other: &Self) -> bool {
@@ -83,7 +82,7 @@ impl<T, U> PartialEq for TypedSideOffsets2D<T, U>
     }
 }
 
-impl<T, U> Hash for TypedSideOffsets2D<T, U>
+impl<T, U> Hash for SideOffsets2D<T, U>
     where T: Hash
 {
     fn hash<H: ::core::hash::Hasher>(&self, h: &mut H) {
@@ -94,7 +93,7 @@ impl<T, U> Hash for TypedSideOffsets2D<T, U>
     }
 }
 
-impl<T: fmt::Debug, U> fmt::Debug for TypedSideOffsets2D<T, U> {
+impl<T: fmt::Debug, U> fmt::Debug for SideOffsets2D<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
@@ -104,9 +103,9 @@ impl<T: fmt::Debug, U> fmt::Debug for TypedSideOffsets2D<T, U> {
     }
 }
 
-impl<T: Default, U> Default for TypedSideOffsets2D<T, U> {
+impl<T: Default, U> Default for SideOffsets2D<T, U> {
     fn default() -> Self {
-        TypedSideOffsets2D {
+        SideOffsets2D {
             top: Default::default(),
             right: Default::default(),
             bottom: Default::default(),
@@ -116,13 +115,10 @@ impl<T: Default, U> Default for TypedSideOffsets2D<T, U> {
     }
 }
 
-/// The default 2D side offset type with no unit.
-pub type SideOffsets2D<T> = TypedSideOffsets2D<T, UnknownUnit>;
-
-impl<T: Copy, U> TypedSideOffsets2D<T, U> {
+impl<T: Copy, U> SideOffsets2D<T, U> {
     /// Constructor taking a scalar for each side.
     pub fn new(top: T, right: T, bottom: T, left: T) -> Self {
-        TypedSideOffsets2D {
+        SideOffsets2D {
             top,
             right,
             bottom,
@@ -138,7 +134,7 @@ impl<T: Copy, U> TypedSideOffsets2D<T, U> {
         bottom: Length<T, U>,
         left: Length<T, U>,
     ) -> Self {
-        TypedSideOffsets2D::new(top.0, right.0, bottom.0, left.0)
+        SideOffsets2D::new(top.0, right.0, bottom.0, left.0)
     }
 
     /// Access self.top as a typed Length instead of a scalar value.
@@ -163,16 +159,16 @@ impl<T: Copy, U> TypedSideOffsets2D<T, U> {
 
     /// Constructor setting the same value to all sides, taking a scalar value directly.
     pub fn new_all_same(all: T) -> Self {
-        TypedSideOffsets2D::new(all, all, all, all)
+        SideOffsets2D::new(all, all, all, all)
     }
 
     /// Constructor setting the same value to all sides, taking a typed Length.
     pub fn from_length_all_same(all: Length<T, U>) -> Self {
-        TypedSideOffsets2D::new_all_same(all.0)
+        SideOffsets2D::new_all_same(all.0)
     }
 }
 
-impl<T, U> TypedSideOffsets2D<T, U>
+impl<T, U> SideOffsets2D<T, U>
 where
     T: Add<T, Output = T> + Copy,
 {
@@ -193,13 +189,13 @@ where
     }
 }
 
-impl<T, U> Add for TypedSideOffsets2D<T, U>
+impl<T, U> Add for SideOffsets2D<T, U>
 where
     T: Copy + Add<T, Output = T>,
 {
     type Output = Self;
     fn add(self, other: Self) -> Self {
-        TypedSideOffsets2D::new(
+        SideOffsets2D::new(
             self.top + other.top,
             self.right + other.right,
             self.bottom + other.bottom,
@@ -208,9 +204,9 @@ where
     }
 }
 
-impl<T: Copy + Zero, U> TypedSideOffsets2D<T, U> {
+impl<T: Copy + Zero, U> SideOffsets2D<T, U> {
     /// Constructor, setting all sides to zero.
     pub fn zero() -> Self {
-        TypedSideOffsets2D::new(Zero::zero(), Zero::zero(), Zero::zero(), Zero::zero())
+        SideOffsets2D::new(Zero::zero(), Zero::zero(), Zero::zero(), Zero::zero())
     }
 }

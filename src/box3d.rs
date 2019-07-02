@@ -9,11 +9,11 @@
 
 use super::UnknownUnit;
 use length::Length;
-use scale::TypedScale;
+use scale::Scale;
 use num::*;
-use point::TypedPoint3D;
-use vector::TypedVector3D;
-use size::TypedSize3D;
+use point::Point3D;
+use vector::Vector3D;
+use size::Size3D;
 use approxord::{min, max};
 
 use num_traits::NumCast;
@@ -31,73 +31,70 @@ use core::ops::{Add, Div, Mul, Sub};
 #[repr(C)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(bound(serialize = "T: Serialize", deserialize = "T: Deserialize<'de>")))]
-pub struct TypedBox3D<T, U> {
-    pub min: TypedPoint3D<T, U>, 
-    pub max: TypedPoint3D<T, U>,
+pub struct Box3D<T, U> {
+    pub min: Point3D<T, U>, 
+    pub max: Point3D<T, U>,
 }
 
-/// The default box 3d type with no unit.
-pub type Box3D<T> = TypedBox3D<T, UnknownUnit>;
-
-impl<T: Hash, U> Hash for TypedBox3D<T, U> {
+impl<T: Hash, U> Hash for Box3D<T, U> {
     fn hash<H: Hasher>(&self, h: &mut H) {
         self.min.hash(h);
         self.max.hash(h);
     }
 }
 
-impl<T: Copy, U> Copy for TypedBox3D<T, U> {}
+impl<T: Copy, U> Copy for Box3D<T, U> {}
 
-impl<T: Copy, U> Clone for TypedBox3D<T, U> {
+impl<T: Copy, U> Clone for Box3D<T, U> {
     fn clone(&self) -> Self {
         *self
     }
 }
 
-impl<T: PartialEq, U> PartialEq<TypedBox3D<T, U>> for TypedBox3D<T, U> {
+impl<T: PartialEq, U> PartialEq<Box3D<T, U>> for Box3D<T, U> {
     fn eq(&self, other: &Self) -> bool {
         self.min.eq(&other.min) && self.max.eq(&other.max)
     }
 }
 
-impl<T: Eq, U> Eq for TypedBox3D<T, U> {}
+impl<T: Eq, U> Eq for Box3D<T, U> {}
 
-impl<T: fmt::Debug, U> fmt::Debug for TypedBox3D<T, U> {
+impl<T: fmt::Debug, U> fmt::Debug for Box3D<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "TypedBox3D({:?}, {:?})", self.min, self.max)
+        write!(f, "Box3D({:?}, {:?})", self.min, self.max)
     }
 }
 
-impl<T: fmt::Display, U> fmt::Display for TypedBox3D<T, U> {
+impl<T: fmt::Display, U> fmt::Display for Box3D<T, U> {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         write!(formatter, "Box3D({}, {})", self.min, self.max)
     }
 }
 
-impl<T, U> TypedBox3D<T, U> {
+impl<T, U> Box3D<T, U> {
     /// Constructor.
-    pub fn new(min: TypedPoint3D<T, U>, max: TypedPoint3D<T, U>) -> Self {
-        TypedBox3D {
+    pub fn new(min: Point3D<T, U>, max: Point3D<T, U>) -> Self {
+        Box3D {
             min,
             max,
         }
     }
 }
 
-impl<T, U> TypedBox3D<T, U>
+impl<T, U> Box3D<T, U>
 where
     T: Copy + Zero + PartialOrd,
 {
     /// Creates a Box3D of the given size, at offset zero.
     #[inline]
-    pub fn from_size(size: TypedSize3D<T, U>) -> Self {
-        let zero = TypedPoint3D::zero();
+    pub fn from_size(size: Size3D<T, U>) -> Self {
+        let zero = Point3D::zero();
         let point = size.to_vector().to_point();
-        TypedBox3D::from_points(&[zero, point])
+        Box3D::from_points(&[zero, point])
     }
 }
 
-impl<T, U> TypedBox3D<T, U>
+impl<T, U> Box3D<T, U>
 where
     T: Copy + PartialOrd,
 {
@@ -137,38 +134,38 @@ where
     }
 
     pub fn intersection(&self, other: &Self) -> Self {
-        let intersection_min = TypedPoint3D::new(
+        let intersection_min = Point3D::new(
             max(self.min.x, other.min.x),
             max(self.min.y, other.min.y),
             max(self.min.z, other.min.z),
         );
 
-        let intersection_max = TypedPoint3D::new(
+        let intersection_max = Point3D::new(
             min(self.max.x, other.max.x),
             min(self.max.y, other.max.y),
             min(self.max.z, other.max.z),
         );
 
-        TypedBox3D::new(
+        Box3D::new(
             intersection_min, 
             intersection_max,
         )
     }
 }
 
-impl<T, U> TypedBox3D<T, U>
+impl<T, U> Box3D<T, U>
 where
     T: Copy + Add<T, Output = T>,
 {
     /// Returns the same box3d, translated by a vector.
     #[inline]
     #[must_use]
-    pub fn translate(&self, by: &TypedVector3D<T, U>) -> Self {
+    pub fn translate(&self, by: &Vector3D<T, U>) -> Self {
         Self::new(self.min + *by, self.max + *by)
     }
 }
 
-impl<T, U> TypedBox3D<T, U>
+impl<T, U> Box3D<T, U>
 where
     T: Copy + PartialOrd + Zero,
 {
@@ -176,14 +173,14 @@ where
     /// in the box3d if they are on the front, left or top faces, but outside if they
     /// are on the back, right or bottom faces.
     #[inline]
-    pub fn contains(&self, other: &TypedPoint3D<T, U>) -> bool {
+    pub fn contains(&self, other: &Point3D<T, U>) -> bool {
         self.min.x <= other.x && other.x < self.max.x
             && self.min.y <= other.y && other.y < self.max.y
             && self.min.z <= other.z && other.z < self.max.z
     }
 }
 
-impl<T, U> TypedBox3D<T, U>
+impl<T, U> Box3D<T, U>
 where
     T: Copy + PartialOrd + Zero + Sub<T, Output = T>,
 {
@@ -199,13 +196,13 @@ where
     }
 }
 
-impl<T, U> TypedBox3D<T, U>
+impl<T, U> Box3D<T, U>
 where
     T: Copy + Sub<T, Output = T>,
 {
     #[inline]
-    pub fn size(&self)-> TypedSize3D<T, U> {
-        TypedSize3D::new(
+    pub fn size(&self)-> Size3D<T, U> {
+        Size3D::new(
             self.max.x - self.min.x,
             self.max.y - self.min.y,
             self.max.z - self.min.z,
@@ -213,7 +210,7 @@ where
     }
 }
 
-impl<T, U> TypedBox3D<T, U>
+impl<T, U> Box3D<T, U>
 where
     T: Copy + PartialEq + Add<T, Output = T> + Sub<T, Output = T>,
 {
@@ -221,9 +218,9 @@ where
     #[inline]
     #[must_use]
     pub fn inflate(&self, width: T, height: T, depth: T) -> Self {
-        TypedBox3D::new(
-            TypedPoint3D::new(self.min.x - width, self.min.y - height, self.min.z - depth),
-            TypedPoint3D::new(self.max.x + width, self.max.y + height, self.max.z + depth),
+        Box3D::new(
+            Point3D::new(self.min.x - width, self.min.y - height, self.min.z - depth),
+            Point3D::new(self.max.x + width, self.max.y + height, self.max.z + depth),
         )
     }
 
@@ -234,7 +231,7 @@ where
     }
 }
 
-impl<T, U> TypedBox3D<T, U>
+impl<T, U> Box3D<T, U>
 where
     T: Copy + Zero + PartialOrd,
 {
@@ -242,14 +239,14 @@ where
     pub fn from_points<I>(points: I) -> Self
     where
         I: IntoIterator,
-        I::Item: Borrow<TypedPoint3D<T, U>>,
+        I::Item: Borrow<Point3D<T, U>>,
     {
         let mut points = points.into_iter();
 
         // Need at least 2 different points for a valid box3d (ie: volume > 0).
         let (mut min_x, mut min_y, mut min_z) = match points.next() {
             Some(first) => (first.borrow().x, first.borrow().y, first.borrow().z),
-            None => return TypedBox3D::zero(),
+            None => return Box3D::zero(),
         };
         let (mut max_x, mut max_y, mut max_z) = (min_x, min_y, min_z);
 
@@ -278,7 +275,7 @@ where
                     
             match points.next() {
                 Some(second) => assign_min_max(second),
-                None => return TypedBox3D::zero(),
+                None => return Box3D::zero(),
             }
 
             for point in points {
@@ -286,11 +283,11 @@ where
             }
         }
 
-        Self::new(TypedPoint3D::new(min_x, min_y, min_z), TypedPoint3D::new(max_x, max_y, max_z))
+        Self::new(Point3D::new(min_x, min_y, min_z), Point3D::new(max_x, max_y, max_z))
     }
 }
 
-impl<T, U> TypedBox3D<T, U>
+impl<T, U> Box3D<T, U>
 where
     T: Copy + One + Add<Output = T> + Sub<Output = T> + Mul<Output = T>,
 {
@@ -306,29 +303,29 @@ where
     }
 }
 
-impl<T, U> TypedBox3D<T, U>
+impl<T, U> Box3D<T, U>
 where
     T: Copy + One + Add<Output = T> + Div<Output = T>,
 {
-    pub fn center(&self) -> TypedPoint3D<T, U> {
+    pub fn center(&self) -> Point3D<T, U> {
         let two = T::one() + T::one();
         (self.min + self.max.to_vector()) / two
     }
 }
 
-impl<T, U> TypedBox3D<T, U>
+impl<T, U> Box3D<T, U>
 where
     T: Copy + Clone + PartialOrd + Add<T, Output = T> + Sub<T, Output = T> + Zero,
 {
     #[inline]
     pub fn union(&self, other: &Self) -> Self {
-        TypedBox3D::new(
-            TypedPoint3D::new(
+        Box3D::new(
+            Point3D::new(
                 min(self.min.x, other.min.x),
                 min(self.min.y, other.min.y),
                 min(self.min.z, other.min.z),
             ),
-            TypedPoint3D::new(
+            Point3D::new(
                 max(self.max.x, other.max.x),
                 max(self.max.y, other.max.y),
                 max(self.max.z, other.max.z),
@@ -337,7 +334,7 @@ where
     }
 }
 
-impl<T, U> TypedBox3D<T, U>
+impl<T, U> Box3D<T, U>
 where
     T: Copy,
 {
@@ -346,14 +343,14 @@ where
     where
         T: Mul<S, Output = T>
     {
-        TypedBox3D::new(
-            TypedPoint3D::new(self.min.x * x, self.min.y * y, self.min.z * z),
-            TypedPoint3D::new(self.max.x * x, self.max.y * y, self.max.z * z),
+        Box3D::new(
+            Point3D::new(self.min.x * x, self.min.y * y, self.min.z * z),
+            Point3D::new(self.max.x * x, self.max.y * y, self.max.z * z),
         )
     }
 }
 
-impl<T, U> TypedBox3D<T, U>
+impl<T, U> Box3D<T, U>
 where
     T: Copy + Mul<T, Output = T> + Sub<T, Output = T>,
 {
@@ -382,17 +379,17 @@ where
     }
 }
 
-impl<T, U> TypedBox3D<T, U> 
+impl<T, U> Box3D<T, U> 
 where
     T: Copy + Zero,
 {
     /// Constructor, setting all sides to zero.
     pub fn zero() -> Self {
-        TypedBox3D::new(TypedPoint3D::zero(), TypedPoint3D::zero())
+        Box3D::new(Point3D::zero(), Point3D::zero())
     }
 }
 
-impl<T, U> TypedBox3D<T, U>
+impl<T, U> Box3D<T, U>
 where
     T: PartialEq,
 {
@@ -403,69 +400,69 @@ where
     }
 }
 
-impl<T, U> Mul<T> for TypedBox3D<T, U> 
+impl<T, U> Mul<T> for Box3D<T, U>
 where
     T: Copy + Mul<T, Output = T>,
 {
     type Output = Self;
     #[inline]
     fn mul(self, scale: T) -> Self {
-        TypedBox3D::new(self.min * scale, self.max * scale)
+        Box3D::new(self.min * scale, self.max * scale)
     }
 }
 
-impl<T, U> Div<T> for TypedBox3D<T, U> 
+impl<T, U> Div<T> for Box3D<T, U>
 where
     T: Copy + Div<T, Output = T>,
 {
     type Output = Self;
     #[inline]
     fn div(self, scale: T) -> Self {
-        TypedBox3D::new(self.min / scale, self.max / scale)
+        Box3D::new(self.min / scale, self.max / scale)
     }
 }
 
-impl<T, U1, U2> Mul<TypedScale<T, U1, U2>> for TypedBox3D<T, U1> 
+impl<T, U1, U2> Mul<Scale<T, U1, U2>> for Box3D<T, U1>
 where
     T: Copy + Mul<T, Output = T>,
 {
-    type Output = TypedBox3D<T, U2>;
+    type Output = Box3D<T, U2>;
     #[inline]
-    fn mul(self, scale: TypedScale<T, U1, U2>) -> TypedBox3D<T, U2> {
-        TypedBox3D::new(self.min * scale, self.max * scale)
+    fn mul(self, scale: Scale<T, U1, U2>) -> Box3D<T, U2> {
+        Box3D::new(self.min * scale, self.max * scale)
     }
 }
 
-impl<T, U1, U2> Div<TypedScale<T, U1, U2>> for TypedBox3D<T, U2> 
+impl<T, U1, U2> Div<Scale<T, U1, U2>> for Box3D<T, U2>
 where
     T: Copy + Div<T, Output = T>,
 {
-    type Output = TypedBox3D<T, U1>;
+    type Output = Box3D<T, U1>;
     #[inline]
-    fn div(self, scale: TypedScale<T, U1, U2>) -> TypedBox3D<T, U1> {
-        TypedBox3D::new(self.min / scale, self.max / scale)
+    fn div(self, scale: Scale<T, U1, U2>) -> Box3D<T, U1> {
+        Box3D::new(self.min / scale, self.max / scale)
     }
 }
 
-impl<T, Unit> TypedBox3D<T, Unit> 
+impl<T, Unit> Box3D<T, Unit>
 where
     T: Copy,
 {
     /// Drop the units, preserving only the numeric value.
-    pub fn to_untyped(&self) -> Box3D<T> {
-        TypedBox3D::new(self.min.to_untyped(), self.max.to_untyped())
+    pub fn to_untyped(&self) -> Box3D<T, UnknownUnit> {
+        Box3D::new(self.min.to_untyped(), self.max.to_untyped())
     }
 
     /// Tag a unitless value with units.
-    pub fn from_untyped(c: &Box3D<T>) -> TypedBox3D<T, Unit> {
-        TypedBox3D::new(
-            TypedPoint3D::from_untyped(&c.min),
-            TypedPoint3D::from_untyped(&c.max),
+    pub fn from_untyped(c: &Box3D<T, UnknownUnit>) -> Box3D<T, Unit> {
+        Box3D::new(
+            Point3D::from_untyped(&c.min),
+            Point3D::from_untyped(&c.max),
         )
     }
 }
 
-impl<T0, Unit> TypedBox3D<T0, Unit> 
+impl<T0, Unit> Box3D<T0, Unit>
 where
     T0: NumCast + Copy,
 {
@@ -474,8 +471,8 @@ where
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using round(), round_in or round_out() before casting.
-    pub fn cast<T1: NumCast + Copy>(&self) -> TypedBox3D<T1, Unit> {
-        TypedBox3D::new(
+    pub fn cast<T1: NumCast + Copy>(&self) -> Box3D<T1, Unit> {
+        Box3D::new(
             self.min.cast(),
             self.max.cast(),
         )
@@ -486,15 +483,15 @@ where
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using round(), round_in or round_out() before casting.
-    pub fn try_cast<T1: NumCast + Copy>(&self) -> Option<TypedBox3D<T1, Unit>> {
+    pub fn try_cast<T1: NumCast + Copy>(&self) -> Option<Box3D<T1, Unit>> {
         match (self.min.try_cast(), self.max.try_cast()) {
-            (Some(a), Some(b)) => Some(TypedBox3D::new(a, b)),
+            (Some(a), Some(b)) => Some(Box3D::new(a, b)),
             _ => None,
         }
     }
 }
 
-impl<T, U> TypedBox3D<T, U> 
+impl<T, U> Box3D<T, U>
 where
     T: Round,
 {
@@ -509,11 +506,11 @@ where
     /// They are always rounding as floor(n + 0.5).
     #[must_use]
     pub fn round(&self) -> Self {
-        TypedBox3D::new(self.min.round(), self.max.round())
+        Box3D::new(self.min.round(), self.max.round())
     }
 }
 
-impl<T, U> TypedBox3D<T, U> 
+impl<T, U> Box3D<T, U>
 where
     T: Floor + Ceil,
 {
@@ -521,7 +518,7 @@ where
     /// the original box3d contains the resulting box3d.
     #[must_use]
     pub fn round_in(&self) -> Self {
-        TypedBox3D {
+        Box3D {
             min: self.min.ceil(),
             max: self.max.floor(),
         }
@@ -531,7 +528,7 @@ where
     /// the original box3d is contained in the resulting box3d.
     #[must_use]
     pub fn round_out(&self) -> Self {
-        TypedBox3D {
+        Box3D {
             min: self.min.floor(),
             max: self.max.ceil(),
         }
@@ -539,14 +536,14 @@ where
 }
 
 // Convenience functions for common casts
-impl<T: NumCast + Copy, Unit> TypedBox3D<T, Unit> {
+impl<T: NumCast + Copy, Unit> Box3D<T, Unit> {
     /// Cast into an `f32` box3d.
-    pub fn to_f32(&self) -> TypedBox3D<f32, Unit> {
+    pub fn to_f32(&self) -> Box3D<f32, Unit> {
         self.cast()
     }
 
     /// Cast into an `f64` box3d.
-    pub fn to_f64(&self) -> TypedBox3D<f64, Unit> {
+    pub fn to_f64(&self) -> Box3D<f64, Unit> {
         self.cast()
     }
 
@@ -555,7 +552,7 @@ impl<T: NumCast + Copy, Unit> TypedBox3D<T, Unit> {
     /// When casting from floating point cuboids, it is worth considering whether
     /// to `round()`, `round_in()` or `round_out()` before the cast in order to
     /// obtain the desired conversion behavior.
-    pub fn to_usize(&self) -> TypedBox3D<usize, Unit> {
+    pub fn to_usize(&self) -> Box3D<usize, Unit> {
         self.cast()
     }
 
@@ -564,7 +561,7 @@ impl<T: NumCast + Copy, Unit> TypedBox3D<T, Unit> {
     /// When casting from floating point cuboids, it is worth considering whether
     /// to `round()`, `round_in()` or `round_out()` before the cast in order to
     /// obtain the desired conversion behavior.
-    pub fn to_u32(&self) -> TypedBox3D<u32, Unit> {
+    pub fn to_u32(&self) -> Box3D<u32, Unit> {
         self.cast()
     }
 
@@ -573,7 +570,7 @@ impl<T: NumCast + Copy, Unit> TypedBox3D<T, Unit> {
     /// When casting from floating point cuboids, it is worth considering whether
     /// to `round()`, `round_in()` or `round_out()` before the cast in order to
     /// obtain the desired conversion behavior.
-    pub fn to_i32(&self) -> TypedBox3D<i32, Unit> {
+    pub fn to_i32(&self) -> Box3D<i32, Unit> {
         self.cast()
     }
 
@@ -582,31 +579,29 @@ impl<T: NumCast + Copy, Unit> TypedBox3D<T, Unit> {
     /// When casting from floating point cuboids, it is worth considering whether
     /// to `round()`, `round_in()` or `round_out()` before the cast in order to
     /// obtain the desired conversion behavior.
-    pub fn to_i64(&self) -> TypedBox3D<i64, Unit> {
+    pub fn to_i64(&self) -> Box3D<i64, Unit> {
         self.cast()
     }
 }
 
-impl<T, U> From<TypedSize3D<T, U>> for TypedBox3D<T, U>
+impl<T, U> From<Size3D<T, U>> for Box3D<T, U>
 where 
     T: Copy + Zero + PartialOrd,
 {
-    fn from(b: TypedSize3D<T, U>) -> Self {
+    fn from(b: Size3D<T, U>) -> Self {
         Self::from_size(b)
     }
 }
 
-/// Shorthand for `TypedBox3D::new(TypedPoint3D::new(x1, y1, z1), TypedPoint3D::new(x2, y2, z2))`.
-pub fn box3d<T: Copy, U>(min_x: T, min_y: T, min_z: T, max_x: T, max_y: T, max_z: T) -> TypedBox3D<T, U> {
-    TypedBox3D::new(TypedPoint3D::new(min_x, min_y, min_z), TypedPoint3D::new(max_x, max_y, max_z))
+/// Shorthand for `Box3D::new(Point3D::new(x1, y1, z1), Point3D::new(x2, y2, z2))`.
+pub fn box3d<T: Copy, U>(min_x: T, min_y: T, min_z: T, max_x: T, max_y: T, max_z: T) -> Box3D<T, U> {
+    Box3D::new(Point3D::new(min_x, min_y, min_z), Point3D::new(max_x, max_y, max_z))
 }
 
 #[cfg(test)]
 mod tests {
-    use vector::vec3;
-    use size::size3;
-    use point::{point3, Point3D};
-    use super::*;
+    use {point3, size3, vec3};
+    use default::{Box3D, Point3D};
 
     #[test]
     fn test_new() {

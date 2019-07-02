@@ -12,11 +12,11 @@ use approxeq::ApproxEq;
 use length::Length;
 #[cfg(feature = "mint")]
 use mint;
-use point::{TypedPoint2D, TypedPoint3D, point2, point3};
-use size::{TypedSize2D, size2};
-use scale::TypedScale;
-use transform2d::TypedTransform2D;
-use transform3d::TypedTransform3D;
+use point::{Point2D, Point3D, point2, point3};
+use size::{Size2D, size2};
+use scale::Scale;
+use transform2d::Transform2D;
+use transform3d::Transform3D;
 use trig::Trig;
 use Angle;
 use num::*;
@@ -31,20 +31,20 @@ use serde;
 
 /// A 2d Vector tagged with a unit.
 #[repr(C)]
-pub struct TypedVector2D<T, U> {
+pub struct Vector2D<T, U> {
     pub x: T,
     pub y: T,
     #[doc(hidden)]
     pub _unit: PhantomData<U>,
 }
 
-mint_vec!(TypedVector2D[x, y] = Vector2);
+mint_vec!(Vector2D[x, y] = Vector2);
 
-impl<T: Copy, U> Copy for TypedVector2D<T, U> {}
+impl<T: Copy, U> Copy for Vector2D<T, U> {}
 
-impl<T: Clone, U> Clone for TypedVector2D<T, U> {
+impl<T: Clone, U> Clone for Vector2D<T, U> {
     fn clone(&self) -> Self {
-        TypedVector2D {
+        Vector2D {
             x: self.x.clone(),
             y: self.y.clone(),
             _unit: PhantomData,
@@ -53,19 +53,19 @@ impl<T: Clone, U> Clone for TypedVector2D<T, U> {
 }
 
 #[cfg(feature = "serde")]
-impl<'de, T, U> serde::Deserialize<'de> for TypedVector2D<T, U>
+impl<'de, T, U> serde::Deserialize<'de> for Vector2D<T, U>
     where T: serde::Deserialize<'de>
 {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
         where D: serde::Deserializer<'de>
     {
         let (x, y) = try!(serde::Deserialize::deserialize(deserializer));
-        Ok(TypedVector2D { x, y, _unit: PhantomData })
+        Ok(Vector2D { x, y, _unit: PhantomData })
     }
 }
 
 #[cfg(feature = "serde")]
-impl<T, U> serde::Serialize for TypedVector2D<T, U>
+impl<T, U> serde::Serialize for Vector2D<T, U>
     where T: serde::Serialize
 {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -75,9 +75,9 @@ impl<T, U> serde::Serialize for TypedVector2D<T, U>
     }
 }
 
-impl<T, U> Eq for TypedVector2D<T, U> where T: Eq {}
+impl<T, U> Eq for Vector2D<T, U> where T: Eq {}
 
-impl<T, U> PartialEq for TypedVector2D<T, U>
+impl<T, U> PartialEq for Vector2D<T, U>
     where T: PartialEq
 {
     fn eq(&self, other: &Self) -> bool {
@@ -85,7 +85,7 @@ impl<T, U> PartialEq for TypedVector2D<T, U>
     }
 }
 
-impl<T, U> Hash for TypedVector2D<T, U>
+impl<T, U> Hash for Vector2D<T, U>
     where T: Hash
 {
     fn hash<H: ::core::hash::Hasher>(&self, h: &mut H) {
@@ -94,48 +94,43 @@ impl<T, U> Hash for TypedVector2D<T, U>
     }
 }
 
-/// Default 2d vector type with no unit.
-///
-/// `Vector2D` provides the same methods as `TypedVector2D`.
-pub type Vector2D<T> = TypedVector2D<T, UnknownUnit>;
-
-impl<T: Copy + Zero, U> TypedVector2D<T, U> {
+impl<T: Copy + Zero, U> Vector2D<T, U> {
     /// Constructor, setting all components to zero.
     #[inline]
     pub fn zero() -> Self {
-        TypedVector2D::new(Zero::zero(), Zero::zero())
+        Vector2D::new(Zero::zero(), Zero::zero())
     }
 
     /// Convert into a 3d vector.
     #[inline]
-    pub fn to_3d(&self) -> TypedVector3D<T, U> {
+    pub fn to_3d(&self) -> Vector3D<T, U> {
         vec3(self.x, self.y, Zero::zero())
     }
 }
 
-impl<T: fmt::Debug, U> fmt::Debug for TypedVector2D<T, U> {
+impl<T: fmt::Debug, U> fmt::Debug for Vector2D<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "({:?},{:?})", self.x, self.y)
     }
 }
 
-impl<T: fmt::Display, U> fmt::Display for TypedVector2D<T, U> {
+impl<T: fmt::Display, U> fmt::Display for Vector2D<T, U> {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         write!(formatter, "({},{})", self.x, self.y)
     }
 }
 
-impl<T: Default, U> Default for TypedVector2D<T, U> {
+impl<T: Default, U> Default for Vector2D<T, U> {
     fn default() -> Self {
-        TypedVector2D::new(Default::default(), Default::default())
+        Vector2D::new(Default::default(), Default::default())
     }
 }
 
-impl<T, U> TypedVector2D<T, U> {
+impl<T, U> Vector2D<T, U> {
     /// Constructor taking scalar values directly.
     #[inline]
     pub fn new(x: T, y: T) -> Self {
-        TypedVector2D {
+        Vector2D {
             x,
             y,
             _unit: PhantomData,
@@ -143,8 +138,8 @@ impl<T, U> TypedVector2D<T, U> {
     }
 }
 
-impl<T: Copy, U> TypedVector2D<T, U> {
-    /// Constructor taking properly typed Lengths instead of scalar values.
+impl<T: Copy, U> Vector2D<T, U> {
+    /// Constructor taking properly  Lengths instead of scalar values.
     #[inline]
     pub fn from_lengths(x: Length<T, U>, y: Length<T, U>) -> Self {
         vec2(x.0, y.0)
@@ -152,7 +147,7 @@ impl<T: Copy, U> TypedVector2D<T, U> {
 
     /// Create a 3d vector from this one, using the specified z value.
     #[inline]
-    pub fn extend(&self, z: T) -> TypedVector3D<T, U> {
+    pub fn extend(&self, z: T) -> Vector3D<T, U> {
         vec3(self.x, self.y, z)
     }
 
@@ -160,8 +155,8 @@ impl<T: Copy, U> TypedVector2D<T, U> {
     ///
     /// Equivalent to adding this vector to the origin.
     #[inline]
-    pub fn to_point(&self) -> TypedPoint2D<T, U> {
-        TypedPoint2D {
+    pub fn to_point(&self) -> Point2D<T, U> {
+        Point2D {
             x: self.x,
             y: self.y,
             _unit: PhantomData,
@@ -176,7 +171,7 @@ impl<T: Copy, U> TypedVector2D<T, U> {
 
     /// Cast this vector into a size.
     #[inline]
-    pub fn to_size(&self) -> TypedSize2D<T, U> {
+    pub fn to_size(&self) -> Size2D<T, U> {
         size2(self.x, self.y)
     }
 
@@ -194,19 +189,19 @@ impl<T: Copy, U> TypedVector2D<T, U> {
 
     /// Drop the units, preserving only the numeric value.
     #[inline]
-    pub fn to_untyped(&self) -> Vector2D<T> {
+    pub fn to_untyped(&self) -> Vector2D<T, UnknownUnit> {
         vec2(self.x, self.y)
     }
 
     /// Tag a unit-less value with units.
     #[inline]
-    pub fn from_untyped(p: &Vector2D<T>) -> Self {
+    pub fn from_untyped(p: &Vector2D<T, UnknownUnit>) -> Self {
         vec2(p.x, p.y)
     }
 
     /// Cast the unit
     #[inline]
-    pub fn cast_unit<V>(&self) -> TypedVector2D<T, V> {
+    pub fn cast_unit<V>(&self) -> Vector2D<T, V> {
         vec2(self.x, self.y)
     }
 
@@ -221,7 +216,7 @@ impl<T: Copy, U> TypedVector2D<T, U> {
     }
 }
 
-impl<T, U> TypedVector2D<T, U>
+impl<T, U> Vector2D<T, U>
 where
     T: Copy
         + Clone
@@ -234,12 +229,12 @@ where
         + One
         + Zero {
     #[inline]
-    pub fn to_transform(&self) -> TypedTransform2D<T, U, U> {
-        TypedTransform2D::create_translation(self.x, self.y)
+    pub fn to_transform(&self) -> Transform2D<T, U, U> {
+        Transform2D::create_translation(self.x, self.y)
     }
 }
 
-impl<T, U> TypedVector2D<T, U>
+impl<T, U> Vector2D<T, U>
 where
     T: Trig + Copy + Sub<T, Output = T>,
 {
@@ -249,7 +244,7 @@ where
     }
 }
 
-impl<T, U> TypedVector2D<T, U>
+impl<T, U> Vector2D<T, U>
 where
     T: Copy + Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>,
 {
@@ -302,7 +297,7 @@ where
     }
 }
 
-impl<T, U> TypedVector2D<T, U>
+impl<T, U> Vector2D<T, U>
 where
     T: Copy + One + Add<Output = T> + Sub<Output = T> + Mul<Output = T>,
 {
@@ -316,28 +311,28 @@ where
     }
 }
 
-impl<T: Copy + Add<T, Output = T>, U> Add for TypedVector2D<T, U> {
+impl<T: Copy + Add<T, Output = T>, U> Add for Vector2D<T, U> {
     type Output = Self;
     fn add(self, other: Self) -> Self {
-        TypedVector2D::new(self.x + other.x, self.y + other.y)
+        Vector2D::new(self.x + other.x, self.y + other.y)
     }
 }
 
-impl<T: Copy + Add<T, Output = T>, U> AddAssign for TypedVector2D<T, U> {
+impl<T: Copy + Add<T, Output = T>, U> AddAssign for Vector2D<T, U> {
     #[inline]
     fn add_assign(&mut self, other: Self) {
         *self = *self + other
     }
 }
 
-impl<T: Copy + Sub<T, Output = T>, U> SubAssign<TypedVector2D<T, U>> for TypedVector2D<T, U> {
+impl<T: Copy + Sub<T, Output = T>, U> SubAssign<Vector2D<T, U>> for Vector2D<T, U> {
     #[inline]
     fn sub_assign(&mut self, other: Self) {
         *self = *self - other
     }
 }
 
-impl<T: Copy + Sub<T, Output = T>, U> Sub for TypedVector2D<T, U> {
+impl<T: Copy + Sub<T, Output = T>, U> Sub for Vector2D<T, U> {
     type Output = Self;
     #[inline]
     fn sub(self, other: Self) -> Self {
@@ -345,7 +340,7 @@ impl<T: Copy + Sub<T, Output = T>, U> Sub for TypedVector2D<T, U> {
     }
 }
 
-impl<T: Copy + Neg<Output = T>, U> Neg for TypedVector2D<T, U> {
+impl<T: Copy + Neg<Output = T>, U> Neg for Vector2D<T, U> {
     type Output = Self;
     #[inline]
     fn neg(self) -> Self {
@@ -353,7 +348,7 @@ impl<T: Copy + Neg<Output = T>, U> Neg for TypedVector2D<T, U> {
     }
 }
 
-impl<T: Float, U> TypedVector2D<T, U> {
+impl<T: Float, U> Vector2D<T, U> {
     #[inline]
     pub fn min(self, other: Self) -> Self {
         vec2(self.x.min(other.x), self.y.min(other.y))
@@ -370,7 +365,7 @@ impl<T: Float, U> TypedVector2D<T, U> {
     }
 }
 
-impl<T: Copy + Mul<T, Output = T>, U> Mul<T> for TypedVector2D<T, U> {
+impl<T: Copy + Mul<T, Output = T>, U> Mul<T> for Vector2D<T, U> {
     type Output = Self;
     #[inline]
     fn mul(self, scale: T) -> Self {
@@ -378,7 +373,7 @@ impl<T: Copy + Mul<T, Output = T>, U> Mul<T> for TypedVector2D<T, U> {
     }
 }
 
-impl<T: Copy + Div<T, Output = T>, U> Div<T> for TypedVector2D<T, U> {
+impl<T: Copy + Div<T, Output = T>, U> Div<T> for Vector2D<T, U> {
     type Output = Self;
     #[inline]
     fn div(self, scale: T) -> Self {
@@ -386,37 +381,37 @@ impl<T: Copy + Div<T, Output = T>, U> Div<T> for TypedVector2D<T, U> {
     }
 }
 
-impl<T: Copy + Mul<T, Output = T>, U> MulAssign<T> for TypedVector2D<T, U> {
+impl<T: Copy + Mul<T, Output = T>, U> MulAssign<T> for Vector2D<T, U> {
     #[inline]
     fn mul_assign(&mut self, scale: T) {
         *self = *self * scale
     }
 }
 
-impl<T: Copy + Div<T, Output = T>, U> DivAssign<T> for TypedVector2D<T, U> {
+impl<T: Copy + Div<T, Output = T>, U> DivAssign<T> for Vector2D<T, U> {
     #[inline]
     fn div_assign(&mut self, scale: T) {
         *self = *self / scale
     }
 }
 
-impl<T: Copy + Mul<T, Output = T>, U1, U2> Mul<TypedScale<T, U1, U2>> for TypedVector2D<T, U1> {
-    type Output = TypedVector2D<T, U2>;
+impl<T: Copy + Mul<T, Output = T>, U1, U2> Mul<Scale<T, U1, U2>> for Vector2D<T, U1> {
+    type Output = Vector2D<T, U2>;
     #[inline]
-    fn mul(self, scale: TypedScale<T, U1, U2>) -> Self::Output {
+    fn mul(self, scale: Scale<T, U1, U2>) -> Self::Output {
         vec2(self.x * scale.get(), self.y * scale.get())
     }
 }
 
-impl<T: Copy + Div<T, Output = T>, U1, U2> Div<TypedScale<T, U1, U2>> for TypedVector2D<T, U2> {
-    type Output = TypedVector2D<T, U1>;
+impl<T: Copy + Div<T, Output = T>, U1, U2> Div<Scale<T, U1, U2>> for Vector2D<T, U2> {
+    type Output = Vector2D<T, U1>;
     #[inline]
-    fn div(self, scale: TypedScale<T, U1, U2>) -> Self::Output {
+    fn div(self, scale: Scale<T, U1, U2>) -> Self::Output {
         vec2(self.x / scale.get(), self.y / scale.get())
     }
 }
 
-impl<T: Round, U> TypedVector2D<T, U> {
+impl<T: Round, U> Vector2D<T, U> {
     /// Rounds each component to the nearest integer value.
     ///
     /// This behavior is preserved for negative values (unlike the basic cast).
@@ -428,7 +423,7 @@ impl<T: Round, U> TypedVector2D<T, U> {
     }
 }
 
-impl<T: Ceil, U> TypedVector2D<T, U> {
+impl<T: Ceil, U> Vector2D<T, U> {
     /// Rounds each component to the smallest integer equal or greater than the original value.
     ///
     /// This behavior is preserved for negative values (unlike the basic cast).
@@ -440,7 +435,7 @@ impl<T: Ceil, U> TypedVector2D<T, U> {
     }
 }
 
-impl<T: Floor, U> TypedVector2D<T, U> {
+impl<T: Floor, U> Vector2D<T, U> {
     /// Rounds each component to the biggest integer equal or lower than the original value.
     ///
     /// This behavior is preserved for negative values (unlike the basic cast).
@@ -452,14 +447,14 @@ impl<T: Floor, U> TypedVector2D<T, U> {
     }
 }
 
-impl<T: NumCast + Copy, U> TypedVector2D<T, U> {
+impl<T: NumCast + Copy, U> Vector2D<T, U> {
     /// Cast from one numeric representation to another, preserving the units.
     ///
     /// When casting from floating vector to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
     #[inline]
-    pub fn cast<NewT: NumCast + Copy>(&self) -> TypedVector2D<NewT, U> {
+    pub fn cast<NewT: NumCast + Copy>(&self) -> Vector2D<NewT, U> {
         self.try_cast().unwrap()
     }
 
@@ -469,9 +464,9 @@ impl<T: NumCast + Copy, U> TypedVector2D<T, U> {
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
     #[inline]
-    pub fn try_cast<NewT: NumCast + Copy>(&self) -> Option<TypedVector2D<NewT, U>> {
+    pub fn try_cast<NewT: NumCast + Copy>(&self) -> Option<Vector2D<NewT, U>> {
         match (NumCast::from(self.x), NumCast::from(self.y)) {
-            (Some(x), Some(y)) => Some(TypedVector2D::new(x, y)),
+            (Some(x), Some(y)) => Some(Vector2D::new(x, y)),
             _ => None,
         }
     }
@@ -480,13 +475,13 @@ impl<T: NumCast + Copy, U> TypedVector2D<T, U> {
 
     /// Cast into an `f32` vector.
     #[inline]
-    pub fn to_f32(&self) -> TypedVector2D<f32, U> {
+    pub fn to_f32(&self) -> Vector2D<f32, U> {
         self.cast()
     }
 
     /// Cast into an `f64` vector.
     #[inline]
-    pub fn to_f64(&self) -> TypedVector2D<f64, U> {
+    pub fn to_f64(&self) -> Vector2D<f64, U> {
         self.cast()
     }
 
@@ -496,7 +491,7 @@ impl<T: NumCast + Copy, U> TypedVector2D<T, U> {
     /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
     /// the desired conversion behavior.
     #[inline]
-    pub fn to_usize(&self) -> TypedVector2D<usize, U> {
+    pub fn to_usize(&self) -> Vector2D<usize, U> {
         self.cast()
     }
 
@@ -506,7 +501,7 @@ impl<T: NumCast + Copy, U> TypedVector2D<T, U> {
     /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
     /// the desired conversion behavior.
     #[inline]
-    pub fn to_u32(&self) -> TypedVector2D<u32, U> {
+    pub fn to_u32(&self) -> Vector2D<u32, U> {
         self.cast()
     }
 
@@ -516,7 +511,7 @@ impl<T: NumCast + Copy, U> TypedVector2D<T, U> {
     /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
     /// the desired conversion behavior.
     #[inline]
-    pub fn to_i32(&self) -> TypedVector2D<i32, U> {
+    pub fn to_i32(&self) -> Vector2D<i32, U> {
         self.cast()
     }
 
@@ -526,12 +521,12 @@ impl<T: NumCast + Copy, U> TypedVector2D<T, U> {
     /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
     /// the desired conversion behavior.
     #[inline]
-    pub fn to_i64(&self) -> TypedVector2D<i64, U> {
+    pub fn to_i64(&self) -> Vector2D<i64, U> {
         self.cast()
     }
 }
 
-impl<T: Copy + ApproxEq<T>, U> ApproxEq<TypedVector2D<T, U>> for TypedVector2D<T, U> {
+impl<T: Copy + ApproxEq<T>, U> ApproxEq<Vector2D<T, U>> for Vector2D<T, U> {
     #[inline]
     fn approx_epsilon() -> Self {
         vec2(T::approx_epsilon(), T::approx_epsilon())
@@ -548,31 +543,31 @@ impl<T: Copy + ApproxEq<T>, U> ApproxEq<TypedVector2D<T, U>> for TypedVector2D<T
     }
 }
 
-impl<T: Copy, U> Into<[T; 2]> for TypedVector2D<T, U> {
+impl<T: Copy, U> Into<[T; 2]> for Vector2D<T, U> {
     fn into(self) -> [T; 2] {
         self.to_array()
     }
 }
 
-impl<T: Copy, U> From<[T; 2]> for TypedVector2D<T, U> {
+impl<T: Copy, U> From<[T; 2]> for Vector2D<T, U> {
     fn from(array: [T; 2]) -> Self {
         vec2(array[0], array[1])
     }
 }
 
-impl<T: Copy, U> Into<(T, T)> for TypedVector2D<T, U> {
+impl<T: Copy, U> Into<(T, T)> for Vector2D<T, U> {
     fn into(self) -> (T, T) {
         self.to_tuple()
     }
 }
 
-impl<T: Copy, U> From<(T, T)> for TypedVector2D<T, U> {
+impl<T: Copy, U> From<(T, T)> for Vector2D<T, U> {
     fn from(tuple: (T, T)) -> Self {
         vec2(tuple.0, tuple.1)
     }
 }
 
-impl<T, U> TypedVector2D<T, U>
+impl<T, U> Vector2D<T, U>
 where
     T: Signed,
 {
@@ -583,7 +578,7 @@ where
 
 /// A 3d Vector tagged with a unit.
 #[repr(C)]
-pub struct TypedVector3D<T, U> {
+pub struct Vector3D<T, U> {
     pub x: T,
     pub y: T,
     pub z: T,
@@ -591,13 +586,13 @@ pub struct TypedVector3D<T, U> {
     pub _unit: PhantomData<U>,
 }
 
-mint_vec!(TypedVector3D[x, y, z] = Vector3);
+mint_vec!(Vector3D[x, y, z] = Vector3);
 
-impl<T: Copy, U> Copy for TypedVector3D<T, U> {}
+impl<T: Copy, U> Copy for Vector3D<T, U> {}
 
-impl<T: Clone, U> Clone for TypedVector3D<T, U> {
+impl<T: Clone, U> Clone for Vector3D<T, U> {
     fn clone(&self) -> Self {
-        TypedVector3D {
+        Vector3D {
             x: self.x.clone(),
             y: self.y.clone(),
             z: self.z.clone(),
@@ -607,19 +602,19 @@ impl<T: Clone, U> Clone for TypedVector3D<T, U> {
 }
 
 #[cfg(feature = "serde")]
-impl<'de, T, U> serde::Deserialize<'de> for TypedVector3D<T, U>
+impl<'de, T, U> serde::Deserialize<'de> for Vector3D<T, U>
     where T: serde::Deserialize<'de>
 {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
         where D: serde::Deserializer<'de>
     {
         let (x, y, z) = try!(serde::Deserialize::deserialize(deserializer));
-        Ok(TypedVector3D { x, y, z, _unit: PhantomData })
+        Ok(Vector3D { x, y, z, _unit: PhantomData })
     }
 }
 
 #[cfg(feature = "serde")]
-impl<T, U> serde::Serialize for TypedVector3D<T, U>
+impl<T, U> serde::Serialize for Vector3D<T, U>
     where T: serde::Serialize
 {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -629,9 +624,9 @@ impl<T, U> serde::Serialize for TypedVector3D<T, U>
     }
 }
 
-impl<T, U> Eq for TypedVector3D<T, U> where T: Eq {}
+impl<T, U> Eq for Vector3D<T, U> where T: Eq {}
 
-impl<T, U> PartialEq for TypedVector3D<T, U>
+impl<T, U> PartialEq for Vector3D<T, U>
     where T: PartialEq
 {
     fn eq(&self, other: &Self) -> bool {
@@ -639,7 +634,7 @@ impl<T, U> PartialEq for TypedVector3D<T, U>
     }
 }
 
-impl<T, U> Hash for TypedVector3D<T, U>
+impl<T, U> Hash for Vector3D<T, U>
     where T: Hash
 {
     fn hash<H: ::core::hash::Hasher>(&self, h: &mut H) {
@@ -649,12 +644,7 @@ impl<T, U> Hash for TypedVector3D<T, U>
     }
 }
 
-/// Default 3d vector type with no unit.
-///
-/// `Vector3D` provides the same methods as `TypedVector3D`.
-pub type Vector3D<T> = TypedVector3D<T, UnknownUnit>;
-
-impl<T: Copy + Zero, U> TypedVector3D<T, U> {
+impl<T: Copy + Zero, U> Vector3D<T, U> {
     /// Constructor, setting all components to zero.
     #[inline]
     pub fn zero() -> Self {
@@ -672,29 +662,29 @@ impl<T: Copy + Zero, U> TypedVector3D<T, U> {
     }
 }
 
-impl<T: fmt::Debug, U> fmt::Debug for TypedVector3D<T, U> {
+impl<T: fmt::Debug, U> fmt::Debug for Vector3D<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "({:?},{:?},{:?})", self.x, self.y, self.z)
     }
 }
 
-impl<T: fmt::Display, U> fmt::Display for TypedVector3D<T, U> {
+impl<T: fmt::Display, U> fmt::Display for Vector3D<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "({},{},{})", self.x, self.y, self.z)
     }
 }
 
-impl<T: Default, U> Default for TypedVector3D<T, U> {
+impl<T: Default, U> Default for Vector3D<T, U> {
     fn default() -> Self {
-        TypedVector3D::new(Default::default(), Default::default(), Default::default())
+        Vector3D::new(Default::default(), Default::default(), Default::default())
     }
 }
 
-impl<T, U> TypedVector3D<T, U> {
+impl<T, U> Vector3D<T, U> {
     /// Constructor taking scalar values directly.
     #[inline]
     pub fn new(x: T, y: T, z: T) -> Self {
-        TypedVector3D {
+        Vector3D {
             x,
             y,
             z,
@@ -703,10 +693,10 @@ impl<T, U> TypedVector3D<T, U> {
     }
 }
 
-impl<T: Copy, U> TypedVector3D<T, U> {
-    /// Constructor taking properly typed Lengths instead of scalar values.
+impl<T: Copy, U> Vector3D<T, U> {
+    /// Constructor taking properly  Lengths instead of scalar values.
     #[inline]
-    pub fn from_lengths(x: Length<T, U>, y: Length<T, U>, z: Length<T, U>) -> TypedVector3D<T, U> {
+    pub fn from_lengths(x: Length<T, U>, y: Length<T, U>, z: Length<T, U>) -> Vector3D<T, U> {
         vec3(x.0, y.0, z.0)
     }
 
@@ -714,25 +704,25 @@ impl<T: Copy, U> TypedVector3D<T, U> {
     ///
     /// Equivalent to adding this vector to the origin.
     #[inline]
-    pub fn to_point(&self) -> TypedPoint3D<T, U> {
+    pub fn to_point(&self) -> Point3D<T, U> {
         point3(self.x, self.y, self.z)
     }
 
     /// Returns a 2d vector using this vector's x and y coordinates
     #[inline]
-    pub fn xy(&self) -> TypedVector2D<T, U> {
+    pub fn xy(&self) -> Vector2D<T, U> {
         vec2(self.x, self.y)
     }
 
     /// Returns a 2d vector using this vector's x and z coordinates
     #[inline]
-    pub fn xz(&self) -> TypedVector2D<T, U> {
+    pub fn xz(&self) -> Vector2D<T, U> {
         vec2(self.x, self.z)
     }
 
     /// Returns a 2d vector using this vector's x and z coordinates
     #[inline]
-    pub fn yz(&self) -> TypedVector2D<T, U> {
+    pub fn yz(&self) -> Vector2D<T, U> {
         vec2(self.y, self.z)
     }
 
@@ -766,24 +756,24 @@ impl<T: Copy, U> TypedVector3D<T, U> {
 
     /// Drop the units, preserving only the numeric value.
     #[inline]
-    pub fn to_untyped(&self) -> Vector3D<T> {
+    pub fn to_untyped(&self) -> Vector3D<T, UnknownUnit> {
         vec3(self.x, self.y, self.z)
     }
 
     /// Tag a unitless value with units.
     #[inline]
-    pub fn from_untyped(p: &Vector3D<T>) -> Self {
+    pub fn from_untyped(p: &Vector3D<T, UnknownUnit>) -> Self {
         vec3(p.x, p.y, p.z)
     }
 
     /// Convert into a 2d vector.
     #[inline]
-    pub fn to_2d(&self) -> TypedVector2D<T, U> {
+    pub fn to_2d(&self) -> Vector2D<T, U> {
         self.xy()
     }
 }
 
-impl<T, U> TypedVector3D<T, U>
+impl<T, U> Vector3D<T, U>
 where
     T: Copy
         + Clone
@@ -797,13 +787,13 @@ where
         + Zero
         + Neg<Output = T> {
     #[inline]
-    pub fn to_transform(&self) -> TypedTransform3D<T, U, U> {
-        TypedTransform3D::create_translation(self.x, self.y, self.z)
+    pub fn to_transform(&self) -> Transform3D<T, U, U> {
+        Transform3D::create_translation(self.x, self.y, self.z)
     }
 }
 
 impl<T: Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T> + Copy, U>
-    TypedVector3D<T, U> {
+    Vector3D<T, U> {
     // Dot product.
     #[inline]
     pub fn dot(self, other: Self) -> T {
@@ -857,7 +847,7 @@ impl<T: Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T> + Copy, U>
     }
 }
 
-impl<T, U> TypedVector3D<T, U>
+impl<T, U> Vector3D<T, U>
 where
     T: Copy + One + Add<Output = T> + Sub<Output = T> + Mul<Output = T>,
 {
@@ -871,7 +861,7 @@ where
     }
 }
 
-impl<T: Copy + Add<T, Output = T>, U> Add for TypedVector3D<T, U> {
+impl<T: Copy + Add<T, Output = T>, U> Add for Vector3D<T, U> {
     type Output = Self;
     #[inline]
     fn add(self, other: Self) -> Self {
@@ -879,7 +869,7 @@ impl<T: Copy + Add<T, Output = T>, U> Add for TypedVector3D<T, U> {
     }
 }
 
-impl<T: Copy + Sub<T, Output = T>, U> Sub for TypedVector3D<T, U> {
+impl<T: Copy + Sub<T, Output = T>, U> Sub for Vector3D<T, U> {
     type Output = Self;
     #[inline]
     fn sub(self, other: Self) -> Self {
@@ -887,21 +877,21 @@ impl<T: Copy + Sub<T, Output = T>, U> Sub for TypedVector3D<T, U> {
     }
 }
 
-impl<T: Copy + Add<T, Output = T>, U> AddAssign for TypedVector3D<T, U> {
+impl<T: Copy + Add<T, Output = T>, U> AddAssign for Vector3D<T, U> {
     #[inline]
     fn add_assign(&mut self, other: Self) {
         *self = *self + other
     }
 }
 
-impl<T: Copy + Sub<T, Output = T>, U> SubAssign<TypedVector3D<T, U>> for TypedVector3D<T, U> {
+impl<T: Copy + Sub<T, Output = T>, U> SubAssign<Vector3D<T, U>> for Vector3D<T, U> {
     #[inline]
     fn sub_assign(&mut self, other: Self) {
         *self = *self - other
     }
 }
 
-impl<T: Copy + Neg<Output = T>, U> Neg for TypedVector3D<T, U> {
+impl<T: Copy + Neg<Output = T>, U> Neg for Vector3D<T, U> {
     type Output = Self;
     #[inline]
     fn neg(self) -> Self {
@@ -909,7 +899,7 @@ impl<T: Copy + Neg<Output = T>, U> Neg for TypedVector3D<T, U> {
     }
 }
 
-impl<T: Copy + Mul<T, Output = T>, U> Mul<T> for TypedVector3D<T, U> {
+impl<T: Copy + Mul<T, Output = T>, U> Mul<T> for Vector3D<T, U> {
     type Output = Self;
     #[inline]
     fn mul(self, scale: T) -> Self {
@@ -917,7 +907,7 @@ impl<T: Copy + Mul<T, Output = T>, U> Mul<T> for TypedVector3D<T, U> {
     }
 }
 
-impl<T: Copy + Div<T, Output = T>, U> Div<T> for TypedVector3D<T, U> {
+impl<T: Copy + Div<T, Output = T>, U> Div<T> for Vector3D<T, U> {
     type Output = Self;
     #[inline]
     fn div(self, scale: T) -> Self {
@@ -925,21 +915,21 @@ impl<T: Copy + Div<T, Output = T>, U> Div<T> for TypedVector3D<T, U> {
     }
 }
 
-impl<T: Copy + Mul<T, Output = T>, U> MulAssign<T> for TypedVector3D<T, U> {
+impl<T: Copy + Mul<T, Output = T>, U> MulAssign<T> for Vector3D<T, U> {
     #[inline]
     fn mul_assign(&mut self, scale: T) {
         *self = *self * scale
     }
 }
 
-impl<T: Copy + Div<T, Output = T>, U> DivAssign<T> for TypedVector3D<T, U> {
+impl<T: Copy + Div<T, Output = T>, U> DivAssign<T> for Vector3D<T, U> {
     #[inline]
     fn div_assign(&mut self, scale: T) {
         *self = *self / scale
     }
 }
 
-impl<T: Float, U> TypedVector3D<T, U> {
+impl<T: Float, U> Vector3D<T, U> {
     #[inline]
     pub fn min(self, other: Self) -> Self {
         vec3(
@@ -964,23 +954,23 @@ impl<T: Float, U> TypedVector3D<T, U> {
     }
 }
 
-impl<T: Copy + Mul<T, Output = T>, U1, U2> Mul<TypedScale<T, U1, U2>> for TypedVector3D<T, U1> {
-    type Output = TypedVector3D<T, U2>;
+impl<T: Copy + Mul<T, Output = T>, U1, U2> Mul<Scale<T, U1, U2>> for Vector3D<T, U1> {
+    type Output = Vector3D<T, U2>;
     #[inline]
-    fn mul(self, scale: TypedScale<T, U1, U2>) -> Self::Output {
+    fn mul(self, scale: Scale<T, U1, U2>) -> Self::Output {
         vec3(self.x * scale.get(), self.y * scale.get(), self.z * scale.get())
     }
 }
 
-impl<T: Copy + Div<T, Output = T>, U1, U2> Div<TypedScale<T, U1, U2>> for TypedVector3D<T, U2> {
-    type Output = TypedVector3D<T, U1>;
+impl<T: Copy + Div<T, Output = T>, U1, U2> Div<Scale<T, U1, U2>> for Vector3D<T, U2> {
+    type Output = Vector3D<T, U1>;
     #[inline]
-    fn div(self, scale: TypedScale<T, U1, U2>) -> Self::Output {
+    fn div(self, scale: Scale<T, U1, U2>) -> Self::Output {
         vec3(self.x / scale.get(), self.y / scale.get(), self.z / scale.get())
     }
 }
 
-impl<T: Round, U> TypedVector3D<T, U> {
+impl<T: Round, U> Vector3D<T, U> {
     /// Rounds each component to the nearest integer value.
     ///
     /// This behavior is preserved for negative values (unlike the basic cast).
@@ -991,7 +981,7 @@ impl<T: Round, U> TypedVector3D<T, U> {
     }
 }
 
-impl<T: Ceil, U> TypedVector3D<T, U> {
+impl<T: Ceil, U> Vector3D<T, U> {
     /// Rounds each component to the smallest integer equal or greater than the original value.
     ///
     /// This behavior is preserved for negative values (unlike the basic cast).
@@ -1002,7 +992,7 @@ impl<T: Ceil, U> TypedVector3D<T, U> {
     }
 }
 
-impl<T: Floor, U> TypedVector3D<T, U> {
+impl<T: Floor, U> Vector3D<T, U> {
     /// Rounds each component to the biggest integer equal or lower than the original value.
     ///
     /// This behavior is preserved for negative values (unlike the basic cast).
@@ -1013,14 +1003,14 @@ impl<T: Floor, U> TypedVector3D<T, U> {
     }
 }
 
-impl<T: NumCast + Copy, U> TypedVector3D<T, U> {
+impl<T: NumCast + Copy, U> Vector3D<T, U> {
     /// Cast from one numeric representation to another, preserving the units.
     ///
     /// When casting from floating vector to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
     #[inline]
-    pub fn cast<NewT: NumCast + Copy>(&self) -> TypedVector3D<NewT, U> {
+    pub fn cast<NewT: NumCast + Copy>(&self) -> Vector3D<NewT, U> {
         self.try_cast().unwrap()
     }
 
@@ -1030,7 +1020,7 @@ impl<T: NumCast + Copy, U> TypedVector3D<T, U> {
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
     #[inline]
-    pub fn try_cast<NewT: NumCast + Copy>(&self) -> Option<TypedVector3D<NewT, U>> {
+    pub fn try_cast<NewT: NumCast + Copy>(&self) -> Option<Vector3D<NewT, U>> {
         match (
             NumCast::from(self.x),
             NumCast::from(self.y),
@@ -1045,13 +1035,13 @@ impl<T: NumCast + Copy, U> TypedVector3D<T, U> {
 
     /// Cast into an `f32` vector.
     #[inline]
-    pub fn to_f32(&self) -> TypedVector3D<f32, U> {
+    pub fn to_f32(&self) -> Vector3D<f32, U> {
         self.cast()
     }
 
     /// Cast into an `f64` vector.
     #[inline]
-    pub fn to_f64(&self) -> TypedVector3D<f64, U> {
+    pub fn to_f64(&self) -> Vector3D<f64, U> {
         self.cast()
     }
 
@@ -1061,7 +1051,7 @@ impl<T: NumCast + Copy, U> TypedVector3D<T, U> {
     /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
     /// the desired conversion behavior.
     #[inline]
-    pub fn to_usize(&self) -> TypedVector3D<usize, U> {
+    pub fn to_usize(&self) -> Vector3D<usize, U> {
         self.cast()
     }
 
@@ -1071,7 +1061,7 @@ impl<T: NumCast + Copy, U> TypedVector3D<T, U> {
     /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
     /// the desired conversion behavior.
     #[inline]
-    pub fn to_u32(&self) -> TypedVector3D<u32, U> {
+    pub fn to_u32(&self) -> Vector3D<u32, U> {
         self.cast()
     }
 
@@ -1081,7 +1071,7 @@ impl<T: NumCast + Copy, U> TypedVector3D<T, U> {
     /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
     /// the desired conversion behavior.
     #[inline]
-    pub fn to_i32(&self) -> TypedVector3D<i32, U> {
+    pub fn to_i32(&self) -> Vector3D<i32, U> {
         self.cast()
     }
 
@@ -1091,12 +1081,12 @@ impl<T: NumCast + Copy, U> TypedVector3D<T, U> {
     /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
     /// the desired conversion behavior.
     #[inline]
-    pub fn to_i64(&self) -> TypedVector3D<i64, U> {
+    pub fn to_i64(&self) -> Vector3D<i64, U> {
         self.cast()
     }
 }
 
-impl<T: Copy + ApproxEq<T>, U> ApproxEq<TypedVector3D<T, U>> for TypedVector3D<T, U> {
+impl<T: Copy + ApproxEq<T>, U> ApproxEq<Vector3D<T, U>> for Vector3D<T, U> {
     #[inline]
     fn approx_epsilon() -> Self {
         vec3(
@@ -1118,31 +1108,31 @@ impl<T: Copy + ApproxEq<T>, U> ApproxEq<TypedVector3D<T, U>> for TypedVector3D<T
     }
 }
 
-impl<T: Copy, U> Into<[T; 3]> for TypedVector3D<T, U> {
+impl<T: Copy, U> Into<[T; 3]> for Vector3D<T, U> {
     fn into(self) -> [T; 3] {
         self.to_array()
     }
 }
 
-impl<T: Copy, U> From<[T; 3]> for TypedVector3D<T, U> {
+impl<T: Copy, U> From<[T; 3]> for Vector3D<T, U> {
     fn from(array: [T; 3]) -> Self {
         vec3(array[0], array[1], array[2])
     }
 }
 
-impl<T: Copy, U> Into<(T, T, T)> for TypedVector3D<T, U> {
+impl<T: Copy, U> Into<(T, T, T)> for Vector3D<T, U> {
     fn into(self) -> (T, T, T) {
         self.to_tuple()
     }
 }
 
-impl<T: Copy, U> From<(T, T, T)> for TypedVector3D<T, U> {
+impl<T: Copy, U> From<(T, T, T)> for Vector3D<T, U> {
     fn from(tuple: (T, T, T)) -> Self {
         vec3(tuple.0, tuple.1, tuple.2)
     }
 }
 
-impl<T, U> TypedVector3D<T, U>
+impl<T, U> Vector3D<T, U>
 where
     T: Signed,
 {
@@ -1205,7 +1195,7 @@ impl BoolVector2D {
     }
 
     #[inline]
-    pub fn select_point<T: Copy, U>(&self, a: &TypedPoint2D<T, U>, b: &TypedPoint2D<T, U>) -> TypedPoint2D<T, U> {
+    pub fn select_point<T: Copy, U>(&self, a: &Point2D<T, U>, b: &Point2D<T, U>) -> Point2D<T, U> {
         point2(
             if self.x { a.x } else { b.x },
             if self.y { a.y } else { b.y },
@@ -1213,7 +1203,7 @@ impl BoolVector2D {
     }
 
     #[inline]
-    pub fn select_vector<T: Copy, U>(&self, a: &TypedVector2D<T, U>, b: &TypedVector2D<T, U>) -> TypedVector2D<T, U> {
+    pub fn select_vector<T: Copy, U>(&self, a: &Vector2D<T, U>, b: &Vector2D<T, U>) -> Vector2D<T, U> {
         vec2(
             if self.x { a.x } else { b.x },
             if self.y { a.y } else { b.y },
@@ -1221,7 +1211,7 @@ impl BoolVector2D {
     }
 
     #[inline]
-    pub fn select_size<T: Copy, U>(&self, a: &TypedSize2D<T, U>, b: &TypedSize2D<T, U>) -> TypedSize2D<T, U> {
+    pub fn select_size<T: Copy, U>(&self, a: &Size2D<T, U>, b: &Size2D<T, U>) -> Size2D<T, U> {
         size2(
             if self.x { a.width } else { b.width },
             if self.y { a.height } else { b.height },
@@ -1274,7 +1264,7 @@ impl BoolVector3D {
 
 
     #[inline]
-    pub fn select_point<T: Copy, U>(&self, a: &TypedPoint3D<T, U>, b: &TypedPoint3D<T, U>) -> TypedPoint3D<T, U> {
+    pub fn select_point<T: Copy, U>(&self, a: &Point3D<T, U>, b: &Point3D<T, U>) -> Point3D<T, U> {
         point3(
             if self.x { a.x } else { b.x },
             if self.y { a.y } else { b.y },
@@ -1283,7 +1273,7 @@ impl BoolVector3D {
     }
 
     #[inline]
-    pub fn select_vector<T: Copy, U>(&self, a: &TypedVector3D<T, U>, b: &TypedVector3D<T, U>) -> TypedVector3D<T, U> {
+    pub fn select_vector<T: Copy, U>(&self, a: &Vector3D<T, U>, b: &Vector3D<T, U>) -> Vector3D<T, U> {
         vec3(
             if self.x { a.x } else { b.x },
             if self.y { a.y } else { b.y },
@@ -1316,7 +1306,7 @@ impl BoolVector3D {
     }
 }
 
-impl<T: PartialOrd, U> TypedVector2D<T, U> {
+impl<T: PartialOrd, U> Vector2D<T, U> {
     pub fn greater_than(&self, other: &Self) -> BoolVector2D {
         BoolVector2D {
             x: self.x > other.x,
@@ -1333,7 +1323,7 @@ impl<T: PartialOrd, U> TypedVector2D<T, U> {
 }
 
 
-impl<T: PartialEq, U> TypedVector2D<T, U> {
+impl<T: PartialEq, U> Vector2D<T, U> {
     pub fn equal(&self, other: &Self) -> BoolVector2D {
         BoolVector2D {
             x: self.x == other.x,
@@ -1349,7 +1339,7 @@ impl<T: PartialEq, U> TypedVector2D<T, U> {
     }
 }
 
-impl<T: PartialOrd, U> TypedVector3D<T, U> {
+impl<T: PartialOrd, U> Vector3D<T, U> {
     pub fn greater_than(&self, other: &Self) -> BoolVector3D {
         BoolVector3D {
             x: self.x > other.x,
@@ -1368,7 +1358,7 @@ impl<T: PartialOrd, U> TypedVector3D<T, U> {
 }
 
 
-impl<T: PartialEq, U> TypedVector3D<T, U> {
+impl<T: PartialEq, U> Vector3D<T, U> {
     pub fn equal(&self, other: &Self) -> BoolVector3D {
         BoolVector3D {
             x: self.x == other.x,
@@ -1388,8 +1378,8 @@ impl<T: PartialEq, U> TypedVector3D<T, U> {
 
 /// Convenience constructor.
 #[inline]
-pub fn vec2<T, U>(x: T, y: T) -> TypedVector2D<T, U> {
-    TypedVector2D {
+pub fn vec2<T, U>(x: T, y: T) -> Vector2D<T, U> {
+    Vector2D {
         x,
         y,
         _unit: PhantomData,
@@ -1398,8 +1388,8 @@ pub fn vec2<T, U>(x: T, y: T) -> TypedVector2D<T, U> {
 
 /// Convenience constructor.
 #[inline]
-pub fn vec3<T, U>(x: T, y: T, z: T) -> TypedVector3D<T, U> {
-    TypedVector3D {
+pub fn vec3<T, U>(x: T, y: T, z: T) -> Vector3D<T, U> {
+    Vector3D {
         x,
         y,
         z,
@@ -1420,10 +1410,12 @@ pub fn bvec3(x: bool, y: bool, z: bool) -> BoolVector3D {
 
 #[cfg(test)]
 mod vector2d {
-    use super::{Vector2D, vec2};
+    use {default, vec2};
+    use scale::Scale;
+
     #[cfg(feature = "mint")]
     use mint;
-    type Vec2 = Vector2D<f32>;
+    type Vec2 = default::Vector2D<f32>;
 
     #[test]
     pub fn test_scalar_mul() {
@@ -1431,7 +1423,7 @@ mod vector2d {
 
         let result = p1 * 5.0;
 
-        assert_eq!(result, Vector2D::new(15.0, 25.0));
+        assert_eq!(result, Vec2::new(15.0, 25.0));
     }
 
     #[test]
@@ -1505,18 +1497,12 @@ mod vector2d {
 
         assert_eq!(v1, v2);
     }
-}
-
-#[cfg(test)]
-mod typedvector2d {
-    use super::{TypedVector2D, Vector2D, vec2};
-    use scale::TypedScale;
 
     pub enum Mm {}
     pub enum Cm {}
 
-    pub type Vector2DMm<T> = TypedVector2D<T, Mm>;
-    pub type Vector2DCm<T> = TypedVector2D<T, Cm>;
+    pub type Vector2DMm<T> = super::Vector2D<T, Mm>;
+    pub type Vector2DCm<T> = super::Vector2D<T, Cm>;
 
     #[test]
     pub fn test_add() {
@@ -1537,9 +1523,9 @@ mod typedvector2d {
     }
 
     #[test]
-    pub fn test_scalar_mul() {
+    pub fn test_tpyed_scalar_mul() {
         let p1 = Vector2DMm::new(1.0, 2.0);
-        let cm_per_mm = TypedScale::<f32, Mm, Cm>::new(0.1);
+        let cm_per_mm = Scale::<f32, Mm, Cm>::new(0.1);
 
         let result: Vector2DCm<f32> = p1 * cm_per_mm;
 
@@ -1548,7 +1534,7 @@ mod typedvector2d {
 
     #[test]
     pub fn test_swizzling() {
-        let p: Vector2D<i32> = vec2(1, 2);
+        let p: default::Vector2D<i32> = vec2(1, 2);
         assert_eq!(p.yx(), vec2(2, 1));
     }
 }
@@ -1557,10 +1543,10 @@ mod typedvector2d {
 mod vector3d {
     #[cfg(feature = "mint")]
     use mint;
-    use super::{TypedVector3D, Vector3D, vec2, vec3};
-    use scale::TypedScale;
+    use {default, vec2, vec3};
+    use scale::Scale;
 
-    type Vec3 = Vector3D<f32>;
+    type Vec3 = default::Vector3D<f32>;
 
     #[test]
     pub fn test_dot() {
@@ -1625,24 +1611,24 @@ mod vector3d {
     }
 
     #[test]
-    pub fn test_scalar_mul() {
+    pub fn test_typed_scalar_mul() {
         enum Mm {}
         enum Cm {}
 
-        let p1 = TypedVector3D::<f32, Mm>::new(1.0, 2.0, 3.0);
-        let cm_per_mm = TypedScale::<f32, Mm, Cm>::new(0.1);
+        let p1 = super::Vector3D::<f32, Mm>::new(1.0, 2.0, 3.0);
+        let cm_per_mm = Scale::<f32, Mm, Cm>::new(0.1);
 
-        let result: TypedVector3D<f32, Cm> = p1 * cm_per_mm;
+        let result: super::Vector3D<f32, Cm> = p1 * cm_per_mm;
 
         assert_eq!(result, vec3(0.1, 0.2, 0.3));
     }
 
     #[test]
     pub fn test_swizzling() {
-        let p: Vector3D<i32> = vec3(1, 2, 3);
-        assert_eq!(p.xy(), vec2(1, 2));
-        assert_eq!(p.xz(), vec2(1, 3));
-        assert_eq!(p.yz(), vec2(2, 3));
+        let p: Vec3 = vec3(1.0, 2.0, 3.0);
+        assert_eq!(p.xy(), vec2(1.0, 2.0));
+        assert_eq!(p.xz(), vec2(1.0, 3.0));
+        assert_eq!(p.yz(), vec2(2.0, 3.0));
     }
 
     #[cfg(feature = "mint")]
@@ -1658,9 +1644,10 @@ mod vector3d {
 
 #[cfg(test)]
 mod bool_vector {
+    use default;
     use super::*;
-    type Vec2 = Vector2D<f32>;
-    type Vec3 = Vector3D<f32>;
+    type Vec2 = default::Vector2D<f32>;
+    type Vec3 = default::Vector3D<f32>;
 
     #[test]
     fn test_bvec2() {
@@ -1747,5 +1734,4 @@ mod bool_vector {
             Vec3::new(1.0, 5.0, 3.0),
         );
     }
-
 }

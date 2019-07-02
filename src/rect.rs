@@ -9,13 +9,13 @@
 
 use super::UnknownUnit;
 use length::Length;
-use scale::TypedScale;
+use scale::Scale;
 use num::*;
-use box2d::TypedBox2D;
-use point::TypedPoint2D;
-use vector::TypedVector2D;
-use side_offsets::TypedSideOffsets2D;
-use size::TypedSize2D;
+use box2d::Box2D;
+use point::Point2D;
+use vector::Vector2D;
+use side_offsets::SideOffsets2D;
+use size::Size2D;
 use approxord::{min, max};
 
 use num_traits::NumCast;
@@ -31,27 +31,24 @@ use core::ops::{Add, Div, Mul, Sub, Range};
 
 /// A 2d Rectangle optionally tagged with a unit.
 #[repr(C)]
-pub struct TypedRect<T, U = UnknownUnit> {
-    pub origin: TypedPoint2D<T, U>,
-    pub size: TypedSize2D<T, U>,
+pub struct Rect<T, U = UnknownUnit> {
+    pub origin: Point2D<T, U>,
+    pub size: Size2D<T, U>,
 }
 
-/// The default rectangle type with no unit.
-pub type Rect<T> = TypedRect<T, UnknownUnit>;
-
 #[cfg(feature = "serde")]
-impl<'de, T: Copy + Deserialize<'de>, U> Deserialize<'de> for TypedRect<T, U> {
+impl<'de, T: Copy + Deserialize<'de>, U> Deserialize<'de> for Rect<T, U> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
     {
         let (origin, size) = try!(Deserialize::deserialize(deserializer));
-        Ok(TypedRect::new(origin, size))
+        Ok(Rect::new(origin, size))
     }
 }
 
 #[cfg(feature = "serde")]
-impl<T: Serialize, U> Serialize for TypedRect<T, U> {
+impl<T: Serialize, U> Serialize for Rect<T, U> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
@@ -60,71 +57,71 @@ impl<T: Serialize, U> Serialize for TypedRect<T, U> {
     }
 }
 
-impl<T: Hash, U> Hash for TypedRect<T, U> {
+impl<T: Hash, U> Hash for Rect<T, U> {
     fn hash<H: Hasher>(&self, h: &mut H) {
         self.origin.hash(h);
         self.size.hash(h);
     }
 }
 
-impl<T: Copy, U> Copy for TypedRect<T, U> {}
+impl<T: Copy, U> Copy for Rect<T, U> {}
 
-impl<T: Copy, U> Clone for TypedRect<T, U> {
+impl<T: Copy, U> Clone for Rect<T, U> {
     fn clone(&self) -> Self {
         *self
     }
 }
 
-impl<T: PartialEq, U> PartialEq<TypedRect<T, U>> for TypedRect<T, U> {
+impl<T: PartialEq, U> PartialEq<Rect<T, U>> for Rect<T, U> {
     fn eq(&self, other: &Self) -> bool {
         self.origin.eq(&other.origin) && self.size.eq(&other.size)
     }
 }
 
-impl<T: Eq, U> Eq for TypedRect<T, U> {}
+impl<T: Eq, U> Eq for Rect<T, U> {}
 
-impl<T: fmt::Debug, U> fmt::Debug for TypedRect<T, U> {
+impl<T: fmt::Debug, U> fmt::Debug for Rect<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "TypedRect({:?} at {:?})", self.size, self.origin)
+        write!(f, "Rect({:?} at {:?})", self.size, self.origin)
     }
 }
 
-impl<T: fmt::Display, U> fmt::Display for TypedRect<T, U> {
+impl<T: fmt::Display, U> fmt::Display for Rect<T, U> {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         write!(formatter, "Rect({} at {})", self.size, self.origin)
     }
 }
 
-impl<T: Default, U> Default for TypedRect<T, U> {
+impl<T: Default, U> Default for Rect<T, U> {
     fn default() -> Self {
-        TypedRect::new(Default::default(), Default::default())
+        Rect::new(Default::default(), Default::default())
     }
 }
 
-impl<T, U> TypedRect<T, U> {
+impl<T, U> Rect<T, U> {
     /// Constructor.
-    pub fn new(origin: TypedPoint2D<T, U>, size: TypedSize2D<T, U>) -> Self {
-        TypedRect {
+    pub fn new(origin: Point2D<T, U>, size: Size2D<T, U>) -> Self {
+        Rect {
             origin,
             size,
         }
     }
 }
 
-impl<T, U> TypedRect<T, U>
+impl<T, U> Rect<T, U>
 where
     T: Copy + Zero
 {
     /// Creates a rect of the given size, at offset zero.
-    pub fn from_size(size: TypedSize2D<T, U>) -> Self {
-        TypedRect {
-            origin: TypedPoint2D::zero(),
+    pub fn from_size(size: Size2D<T, U>) -> Self {
+        Rect {
+            origin: Point2D::zero(),
             size,
         }
     }
 }
 
-impl<T, U> TypedRect<T, U>
+impl<T, U> Rect<T, U>
 where
     T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output = T> + Sub<T, Output = T>,
 {
@@ -192,23 +189,23 @@ where
             return None;
         }
 
-        let upper_left = TypedPoint2D::new(
+        let upper_left = Point2D::new(
             max(self.min_x(), other.min_x()),
             max(self.min_y(), other.min_y()),
         );
         let lower_right_x = min(self.max_x(), other.max_x());
         let lower_right_y = min(self.max_y(), other.max_y());
 
-        Some(TypedRect::new(
+        Some(Rect::new(
             upper_left,
-            TypedSize2D::new(lower_right_x - upper_left.x, lower_right_y - upper_left.y),
+            Size2D::new(lower_right_x - upper_left.x, lower_right_y - upper_left.y),
         ))
     }
 
     /// Returns the same rectangle, translated by a vector.
     #[inline]
     #[must_use]
-    pub fn translate(&self, by: &TypedVector2D<T, U>) -> Self {
+    pub fn translate(&self, by: &Vector2D<T, U>) -> Self {
         Self::new(self.origin + *by, self.size)
     }
 
@@ -216,7 +213,7 @@ where
     /// in the rectangle if they are on the left or top edge, but outside if they
     /// are on the right or bottom edge.
     #[inline]
-    pub fn contains(&self, other: &TypedPoint2D<T, U>) -> bool {
+    pub fn contains(&self, other: &Point2D<T, U>) -> bool {
         self.origin.x <= other.x && other.x < self.origin.x + self.size.width
             && self.origin.y <= other.y && other.y < self.origin.y + self.size.height
     }
@@ -234,9 +231,9 @@ where
     #[inline]
     #[must_use]
     pub fn inflate(&self, width: T, height: T) -> Self {
-        TypedRect::new(
-            TypedPoint2D::new(self.origin.x - width, self.origin.y - height),
-            TypedSize2D::new(
+        Rect::new(
+            Point2D::new(self.origin.x - width, self.origin.y - height),
+            Size2D::new(
                 self.size.width + width + width,
                 self.size.height + height + height,
             ),
@@ -250,23 +247,23 @@ where
     }
 
     #[inline]
-    pub fn top_right(&self) -> TypedPoint2D<T, U> {
-        TypedPoint2D::new(self.max_x(), self.origin.y)
+    pub fn top_right(&self) -> Point2D<T, U> {
+        Point2D::new(self.max_x(), self.origin.y)
     }
 
     #[inline]
-    pub fn bottom_left(&self) -> TypedPoint2D<T, U> {
-        TypedPoint2D::new(self.origin.x, self.max_y())
+    pub fn bottom_left(&self) -> Point2D<T, U> {
+        Point2D::new(self.origin.x, self.max_y())
     }
 
     #[inline]
-    pub fn bottom_right(&self) -> TypedPoint2D<T, U> {
-        TypedPoint2D::new(self.max_x(), self.max_y())
+    pub fn bottom_right(&self) -> Point2D<T, U> {
+        Point2D::new(self.max_x(), self.max_y())
     }
 
     #[inline]
-    pub fn to_box2d(&self) -> TypedBox2D<T, U> {
-        TypedBox2D {
+    pub fn to_box2d(&self) -> Box2D<T, U> {
+        Box2D {
             min: self.origin,
             max: self.bottom_right(),
         }
@@ -274,7 +271,7 @@ where
 
     #[inline]
     #[must_use]
-    pub fn translate_by_size(&self, size: &TypedSize2D<T, U>) -> Self {
+    pub fn translate_by_size(&self, size: &Size2D<T, U>) -> Self {
         self.translate(&size.to_vector())
     }
 
@@ -282,13 +279,13 @@ where
     ///
     /// Subtracts the side offsets from all sides. The horizontal and vertical
     /// offsets must not be larger than the original side length.
-    pub fn inner_rect(&self, offsets: TypedSideOffsets2D<T, U>) -> Self {
-        let rect = TypedRect::new(
-            TypedPoint2D::new(
+    pub fn inner_rect(&self, offsets: SideOffsets2D<T, U>) -> Self {
+        let rect = Rect::new(
+            Point2D::new(
                 self.origin.x + offsets.left,
                 self.origin.y + offsets.top
             ),
-            TypedSize2D::new(
+            Size2D::new(
                 self.size.width - offsets.horizontal(),
                 self.size.height - offsets.vertical()
             )
@@ -301,13 +298,13 @@ where
     /// Calculate the size and position of an outer rectangle.
     ///
     /// Add the offsets to all sides. The expanded rectangle is returned.
-    pub fn outer_rect(&self, offsets: TypedSideOffsets2D<T, U>) -> Self {
-        TypedRect::new(
-            TypedPoint2D::new(
+    pub fn outer_rect(&self, offsets: SideOffsets2D<T, U>) -> Self {
+        Rect::new(
+            Point2D::new(
                 self.origin.x - offsets.left,
                 self.origin.y - offsets.top
             ),
-            TypedSize2D::new(
+            Size2D::new(
                 self.size.width + offsets.horizontal(),
                 self.size.height + offsets.vertical()
             )
@@ -326,13 +323,13 @@ where
     pub fn from_points<I>(points: I) -> Self
     where
         I: IntoIterator,
-        I::Item: Borrow<TypedPoint2D<T, U>>,
+        I::Item: Borrow<Point2D<T, U>>,
     {
         let mut points = points.into_iter();
 
         let (mut min_x, mut min_y) = match points.next() {
             Some(first) => (first.borrow().x, first.borrow().y),
-            None => return TypedRect::zero(),
+            None => return Rect::zero(),
         };
 
         let (mut max_x, mut max_y) = (min_x, min_y);
@@ -351,14 +348,14 @@ where
                 max_y = p.y
             }
         }
-        TypedRect::new(
-            TypedPoint2D::new(min_x, min_y),
-            TypedSize2D::new(max_x - min_x, max_y - min_y),
+        Rect::new(
+            Point2D::new(min_x, min_y),
+            Size2D::new(max_x - min_x, max_y - min_y),
         )
     }
 }
 
-impl<T, U> TypedRect<T, U>
+impl<T, U> Rect<T, U>
 where
     T: Copy + One + Add<Output = T> + Sub<Output = T> + Mul<Output = T>,
 {
@@ -374,17 +371,17 @@ where
     }
 }
 
-impl<T, U> TypedRect<T, U>
+impl<T, U> Rect<T, U>
 where
     T: Copy + One + Add<Output = T> + Div<Output = T>,
 {
-    pub fn center(&self) -> TypedPoint2D<T, U> {
+    pub fn center(&self) -> Point2D<T, U> {
         let two = T::one() + T::one();
         self.origin + self.size.to_vector() / two
     }
 }
 
-impl<T, U> TypedRect<T, U>
+impl<T, U> Rect<T, U>
 where
     T: Copy + Clone + PartialOrd + Add<T, Output = T> + Sub<T, Output = T> + Zero,
 {
@@ -397,7 +394,7 @@ where
             return *self;
         }
 
-        let upper_left = TypedPoint2D::new(
+        let upper_left = Point2D::new(
             min(self.min_x(), other.min_x()),
             min(self.min_y(), other.min_y()),
         );
@@ -405,37 +402,37 @@ where
         let lower_right_x = max(self.max_x(), other.max_x());
         let lower_right_y = max(self.max_y(), other.max_y());
 
-        TypedRect::new(
+        Rect::new(
             upper_left,
-            TypedSize2D::new(lower_right_x - upper_left.x, lower_right_y - upper_left.y),
+            Size2D::new(lower_right_x - upper_left.x, lower_right_y - upper_left.y),
         )
     }
 }
 
-impl<T, U> TypedRect<T, U> {
+impl<T, U> Rect<T, U> {
     #[inline]
     pub fn scale<S: Copy>(&self, x: S, y: S) -> Self
     where
         T: Copy + Clone + Mul<S, Output = T>,
     {
-        TypedRect::new(
-            TypedPoint2D::new(self.origin.x * x, self.origin.y * y),
-            TypedSize2D::new(self.size.width * x, self.size.height * y),
+        Rect::new(
+            Point2D::new(self.origin.x * x, self.origin.y * y),
+            Size2D::new(self.size.width * x, self.size.height * y),
         )
     }
 }
 
-impl<T: Copy + Clone + Mul<T, Output = T>, U> TypedRect<T, U> {
+impl<T: Copy + Clone + Mul<T, Output = T>, U> Rect<T, U> {
     #[inline]
     pub fn area(&self) -> T {
         self.size.area()
     }
 }
 
-impl<T: Copy + PartialEq + Zero, U> TypedRect<T, U> {
+impl<T: Copy + PartialEq + Zero, U> Rect<T, U> {
     /// Constructor, setting all sides to zero.
     pub fn zero() -> Self {
-        TypedRect::new(TypedPoint2D::origin(), TypedSize2D::zero())
+        Rect::new(Point2D::origin(), Size2D::zero())
     }
 
     /// Returns true if the size is zero, regardless of the origin's value.
@@ -444,61 +441,61 @@ impl<T: Copy + PartialEq + Zero, U> TypedRect<T, U> {
     }
 }
 
-impl<T: Copy + Mul<T, Output = T>, U> Mul<T> for TypedRect<T, U> {
+impl<T: Copy + Mul<T, Output = T>, U> Mul<T> for Rect<T, U> {
     type Output = Self;
     #[inline]
     fn mul(self, scale: T) -> Self {
-        TypedRect::new(self.origin * scale, self.size * scale)
+        Rect::new(self.origin * scale, self.size * scale)
     }
 }
 
-impl<T: Copy + Div<T, Output = T>, U> Div<T> for TypedRect<T, U> {
+impl<T: Copy + Div<T, Output = T>, U> Div<T> for Rect<T, U> {
     type Output = Self;
     #[inline]
     fn div(self, scale: T) -> Self {
-        TypedRect::new(self.origin / scale, self.size / scale)
+        Rect::new(self.origin / scale, self.size / scale)
     }
 }
 
-impl<T: Copy + Mul<T, Output = T>, U1, U2> Mul<TypedScale<T, U1, U2>> for TypedRect<T, U1> {
-    type Output = TypedRect<T, U2>;
+impl<T: Copy + Mul<T, Output = T>, U1, U2> Mul<Scale<T, U1, U2>> for Rect<T, U1> {
+    type Output = Rect<T, U2>;
     #[inline]
-    fn mul(self, scale: TypedScale<T, U1, U2>) -> TypedRect<T, U2> {
-        TypedRect::new(self.origin * scale, self.size * scale)
+    fn mul(self, scale: Scale<T, U1, U2>) -> Rect<T, U2> {
+        Rect::new(self.origin * scale, self.size * scale)
     }
 }
 
-impl<T: Copy + Div<T, Output = T>, U1, U2> Div<TypedScale<T, U1, U2>> for TypedRect<T, U2> {
-    type Output = TypedRect<T, U1>;
+impl<T: Copy + Div<T, Output = T>, U1, U2> Div<Scale<T, U1, U2>> for Rect<T, U2> {
+    type Output = Rect<T, U1>;
     #[inline]
-    fn div(self, scale: TypedScale<T, U1, U2>) -> TypedRect<T, U1> {
-        TypedRect::new(self.origin / scale, self.size / scale)
+    fn div(self, scale: Scale<T, U1, U2>) -> Rect<T, U1> {
+        Rect::new(self.origin / scale, self.size / scale)
     }
 }
 
-impl<T: Copy, Unit> TypedRect<T, Unit> {
+impl<T: Copy, Unit> Rect<T, Unit> {
     /// Drop the units, preserving only the numeric value.
-    pub fn to_untyped(&self) -> Rect<T> {
-        TypedRect::new(self.origin.to_untyped(), self.size.to_untyped())
+    pub fn to_untyped(&self) -> Rect<T, UnknownUnit> {
+        Rect::new(self.origin.to_untyped(), self.size.to_untyped())
     }
 
     /// Tag a unitless value with units.
-    pub fn from_untyped(r: &Rect<T>) -> TypedRect<T, Unit> {
-        TypedRect::new(
-            TypedPoint2D::from_untyped(&r.origin),
-            TypedSize2D::from_untyped(&r.size),
+    pub fn from_untyped(r: &Rect<T, UnknownUnit>) -> Rect<T, Unit> {
+        Rect::new(
+            Point2D::from_untyped(&r.origin),
+            Size2D::from_untyped(&r.size),
         )
     }
 }
 
-impl<T0: NumCast + Copy, Unit> TypedRect<T0, Unit> {
+impl<T0: NumCast + Copy, Unit> Rect<T0, Unit> {
     /// Cast from one numeric representation to another, preserving the units.
     ///
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using round(), round_in or round_out() before casting.
-    pub fn cast<T1: NumCast + Copy>(&self) -> TypedRect<T1, Unit> {
-        TypedRect::new(
+    pub fn cast<T1: NumCast + Copy>(&self) -> Rect<T1, Unit> {
+        Rect::new(
             self.origin.cast(),
             self.size.cast(),
         )
@@ -509,15 +506,15 @@ impl<T0: NumCast + Copy, Unit> TypedRect<T0, Unit> {
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using round(), round_in or round_out() before casting.
-    pub fn try_cast<T1: NumCast + Copy>(&self) -> Option<TypedRect<T1, Unit>> {
+    pub fn try_cast<T1: NumCast + Copy>(&self) -> Option<Rect<T1, Unit>> {
         match (self.origin.try_cast(), self.size.try_cast()) {
-            (Some(origin), Some(size)) => Some(TypedRect::new(origin, size)),
+            (Some(origin), Some(size)) => Some(Rect::new(origin, size)),
             _ => None,
         }
     }
 }
 
-impl<T: Floor + Ceil + Round + Add<T, Output = T> + Sub<T, Output = T>, U> TypedRect<T, U> {
+impl<T: Floor + Ceil + Round + Add<T, Output = T> + Sub<T, Output = T>, U> Rect<T, U> {
     /// Return a rectangle with edges rounded to integer coordinates, such that
     /// the returned rectangle has the same set of pixel centers as the original
     /// one.
@@ -531,7 +528,7 @@ impl<T: Floor + Ceil + Round + Add<T, Output = T> + Sub<T, Output = T>, U> Typed
     pub fn round(&self) -> Self {
         let origin = self.origin.round();
         let size = self.origin.add_size(&self.size).round() - origin;
-        TypedRect::new(origin, TypedSize2D::new(size.x, size.y))
+        Rect::new(origin, Size2D::new(size.x, size.y))
     }
 
     /// Return a rectangle with edges rounded to integer coordinates, such that
@@ -540,7 +537,7 @@ impl<T: Floor + Ceil + Round + Add<T, Output = T> + Sub<T, Output = T>, U> Typed
     pub fn round_in(&self) -> Self {
         let origin = self.origin.ceil();
         let size = self.origin.add_size(&self.size).floor() - origin;
-        TypedRect::new(origin, TypedSize2D::new(size.x, size.y))
+        Rect::new(origin, Size2D::new(size.x, size.y))
     }
 
     /// Return a rectangle with edges rounded to integer coordinates, such that
@@ -549,19 +546,19 @@ impl<T: Floor + Ceil + Round + Add<T, Output = T> + Sub<T, Output = T>, U> Typed
     pub fn round_out(&self) -> Self {
         let origin = self.origin.floor();
         let size = self.origin.add_size(&self.size).ceil() - origin;
-        TypedRect::new(origin, TypedSize2D::new(size.x, size.y))
+        Rect::new(origin, Size2D::new(size.x, size.y))
     }
 }
 
 // Convenience functions for common casts
-impl<T: NumCast + Copy, Unit> TypedRect<T, Unit> {
+impl<T: NumCast + Copy, Unit> Rect<T, Unit> {
     /// Cast into an `f32` rectangle.
-    pub fn to_f32(&self) -> TypedRect<f32, Unit> {
+    pub fn to_f32(&self) -> Rect<f32, Unit> {
         self.cast()
     }
 
     /// Cast into an `f64` rectangle.
-    pub fn to_f64(&self) -> TypedRect<f64, Unit> {
+    pub fn to_f64(&self) -> Rect<f64, Unit> {
         self.cast()
     }
 
@@ -570,7 +567,7 @@ impl<T: NumCast + Copy, Unit> TypedRect<T, Unit> {
     /// When casting from floating point rectangles, it is worth considering whether
     /// to `round()`, `round_in()` or `round_out()` before the cast in order to
     /// obtain the desired conversion behavior.
-    pub fn to_usize(&self) -> TypedRect<usize, Unit> {
+    pub fn to_usize(&self) -> Rect<usize, Unit> {
         self.cast()
     }
 
@@ -579,7 +576,7 @@ impl<T: NumCast + Copy, Unit> TypedRect<T, Unit> {
     /// When casting from floating point rectangles, it is worth considering whether
     /// to `round()`, `round_in()` or `round_out()` before the cast in order to
     /// obtain the desired conversion behavior.
-    pub fn to_u32(&self) -> TypedRect<u32, Unit> {
+    pub fn to_u32(&self) -> Rect<u32, Unit> {
         self.cast()
     }
 
@@ -588,7 +585,7 @@ impl<T: NumCast + Copy, Unit> TypedRect<T, Unit> {
     /// When casting from floating point rectangles, it is worth considering whether
     /// to `round()`, `round_in()` or `round_out()` before the cast in order to
     /// obtain the desired conversion behavior.
-    pub fn to_i32(&self) -> TypedRect<i32, Unit> {
+    pub fn to_i32(&self) -> Rect<i32, Unit> {
         self.cast()
     }
 
@@ -597,31 +594,29 @@ impl<T: NumCast + Copy, Unit> TypedRect<T, Unit> {
     /// When casting from floating point rectangles, it is worth considering whether
     /// to `round()`, `round_in()` or `round_out()` before the cast in order to
     /// obtain the desired conversion behavior.
-    pub fn to_i64(&self) -> TypedRect<i64, Unit> {
+    pub fn to_i64(&self) -> Rect<i64, Unit> {
         self.cast()
     }
 }
 
-impl<T, U> From<TypedSize2D<T, U>> for TypedRect<T, U>
+impl<T, U> From<Size2D<T, U>> for Rect<T, U>
 where T: Copy + Zero
 {
-    fn from(size: TypedSize2D<T, U>) -> Self {
+    fn from(size: Size2D<T, U>) -> Self {
         Self::from_size(size)
     }
 }
 
-/// Shorthand for `TypedRect::new(TypedPoint2D::new(x, y), TypedSize2D::new(w, h))`.
-pub fn rect<T: Copy, U>(x: T, y: T, w: T, h: T) -> TypedRect<T, U> {
-    TypedRect::new(TypedPoint2D::new(x, y), TypedSize2D::new(w, h))
+/// Shorthand for `Rect::new(Point2D::new(x, y), Size2D::new(w, h))`.
+pub fn rect<T: Copy, U>(x: T, y: T, w: T, h: T) -> Rect<T, U> {
+    Rect::new(Point2D::new(x, y), Size2D::new(w, h))
 }
 
 #[cfg(test)]
 mod tests {
-    use point::{Point2D, point2};
-    use vector::vec2;
+    use default::{Point2D, Rect, Size2D};
+    use {point2, vec2, rect};
     use side_offsets::SideOffsets2D;
-    use size::Size2D;
-    use super::*;
 
     #[test]
     fn test_translate() {
