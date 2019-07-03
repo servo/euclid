@@ -8,7 +8,6 @@
 // except according to those terms.
 
 use super::UnknownUnit;
-use length::Length;
 use scale::Scale;
 use num::*;
 use box2d::Box2D;
@@ -135,26 +134,6 @@ where
     }
 
     #[inline]
-    pub fn max_x_typed(&self) -> Length<T, U> {
-        Length::new(self.max_x())
-    }
-
-    #[inline]
-    pub fn min_x_typed(&self) -> Length<T, U> {
-        Length::new(self.min_x())
-    }
-
-    #[inline]
-    pub fn max_y_typed(&self) -> Length<T, U> {
-        Length::new(self.max_y())
-    }
-
-    #[inline]
-    pub fn min_y_typed(&self) -> Length<T, U> {
-        Length::new(self.min_y())
-    }
-
-    #[inline]
     pub fn x_range(&self) -> Range<T> {
         self.min_x()..self.max_x()
     }
@@ -222,12 +201,6 @@ where
     }
 
     #[inline]
-    #[must_use]
-    pub fn inflate_typed(&self, width: Length<T, U>, height: Length<T, U>) -> Self {
-        self.inflate(width.get(), height.get())
-    }
-
-    #[inline]
     pub fn top_right(&self) -> Point2D<T, U> {
         Point2D::new(self.max_x(), self.origin.y)
     }
@@ -248,12 +221,6 @@ where
             min: self.origin,
             max: self.bottom_right(),
         }
-    }
-
-    #[inline]
-    #[must_use]
-    pub fn translate_by_size(&self, size: &Size2D<T, U>) -> Self {
-        self.translate(&size.to_vector())
     }
 
     /// Calculate the size and position of an inner rectangle.
@@ -611,25 +578,6 @@ mod tests {
 
         let r = Rect::new(Point2D::new(-10, -5), Size2D::new(50, 40));
         let rr = r.translate(&vec2(0, -10));
-
-        assert!(rr.size.width == 50);
-        assert!(rr.size.height == 40);
-        assert!(rr.origin.x == -10);
-        assert!(rr.origin.y == -15);
-    }
-
-    #[test]
-    fn test_translate_by_size() {
-        let p = Rect::new(Point2D::new(0u32, 0u32), Size2D::new(50u32, 40u32));
-        let pp = p.translate_by_size(&Size2D::new(10, 15));
-
-        assert!(pp.size.width == 50);
-        assert!(pp.size.height == 40);
-        assert!(pp.origin.x == 10);
-        assert!(pp.origin.y == 15);
-
-        let r = Rect::new(Point2D::new(-10, -5), Size2D::new(50, 40));
-        let rr = r.translate_by_size(&Size2D::new(0, -10));
 
         assert!(rr.size.width == 50);
         assert!(rr.size.height == 40);

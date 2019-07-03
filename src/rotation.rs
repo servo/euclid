@@ -939,12 +939,12 @@ fn pre_post() {
     // Check that the order of transformations is correct (corresponds to what
     // we do in Transform3D).
     let p1 = r1.post_rotate(&r2).post_rotate(&r3).rotate_point3d(&p);
-    let p2 = t1.post_mul(&t2).post_mul(&t3).transform_point3d(&p);
+    let p2 = t1.post_transform(&t2).post_transform(&t3).transform_point3d(&p);
 
     assert!(p1.approx_eq(&p2.unwrap()));
 
     // Check that changing the order indeed matters.
-    let p3 = t3.post_mul(&t1).post_mul(&t2).transform_point3d(&p);
+    let p3 = t3.post_transform(&t1).post_transform(&t2).transform_point3d(&p);
     assert!(!p1.approx_eq(&p3.unwrap()));
 }
 

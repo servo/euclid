@@ -116,26 +116,6 @@ impl<T: Copy, U> SideOffsets2D<T, U> {
         SideOffsets2D::new(top.0, right.0, bottom.0, left.0)
     }
 
-    /// Access self.top as a typed Length instead of a scalar value.
-    pub fn top_typed(&self) -> Length<T, U> {
-        Length::new(self.top)
-    }
-
-    /// Access self.right as a typed Length instead of a scalar value.
-    pub fn right_typed(&self) -> Length<T, U> {
-        Length::new(self.right)
-    }
-
-    /// Access self.bottom as a typed Length instead of a scalar value.
-    pub fn bottom_typed(&self) -> Length<T, U> {
-        Length::new(self.bottom)
-    }
-
-    /// Access self.left as a typed Length instead of a scalar value.
-    pub fn left_typed(&self) -> Length<T, U> {
-        Length::new(self.left)
-    }
-
     /// Constructor setting the same value to all sides, taking a scalar value directly.
     pub fn new_all_same(all: T) -> Self {
         SideOffsets2D::new(all, all, all, all)
@@ -157,14 +137,6 @@ where
 
     pub fn vertical(&self) -> T {
         self.top + self.bottom
-    }
-
-    pub fn horizontal_typed(&self) -> Length<T, U> {
-        Length::new(self.horizontal())
-    }
-
-    pub fn vertical_typed(&self) -> Length<T, U> {
-        Length::new(self.vertical())
     }
 }
 

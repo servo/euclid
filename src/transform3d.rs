@@ -415,24 +415,6 @@ where T: Copy + Clone +
         mat.post_transform(self)
     }
 
-    /// Returns the multiplication of the two matrices such that mat's transformation
-    /// applies after self's transformation.
-    ///
-    /// Assuming row vectors, this is equivalent to self * mat
-    #[must_use]
-    pub fn post_mul<NewDst>(&self, mat: &Transform3D<T, Dst, NewDst>) -> Transform3D<T, Src, NewDst> {
-        self.post_transform(mat)
-    }
-
-    /// Returns the multiplication of the two matrices such that mat's transformation
-    /// applies before self's transformation.
-    ///
-    /// Assuming row vectors, this is equivalent to mat * self
-    #[must_use]
-    pub fn pre_mul<NewSrc>(&self, mat: &Transform3D<T, NewSrc, Src>) -> Transform3D<T, NewSrc, Dst> {
-        self.pre_transform(mat)
-    }
-
     /// Returns the inverse transform if possible.
     pub fn inverse(&self) -> Option<Transform3D<T, Dst, Src>> {
         let det = self.determinant();

@@ -8,7 +8,6 @@
 // except according to those terms.
 
 use super::UnknownUnit;
-use length::Length;
 use scale::Scale;
 use num::*;
 use point::Point3D;
@@ -222,12 +221,6 @@ where
             Point3D::new(self.min.x - width, self.min.y - height, self.min.z - depth),
             Point3D::new(self.max.x + width, self.max.y + height, self.max.z + depth),
         )
-    }
-
-    #[inline]
-    #[must_use]
-    pub fn inflate_typed(&self, width: Length<T, U>, height: Length<T, U>, depth: Length<T, U>) -> Self {
-        self.inflate(width.get(), height.get(), depth.get())
     }
 }
 

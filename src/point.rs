@@ -170,18 +170,6 @@ impl<T: Copy, U> Point2D<T, U> {
         point2(self.y, self.x)
     }
 
-    /// Returns self.x as a Length carrying the unit.
-    #[inline]
-    pub fn x_typed(&self) -> Length<T, U> {
-        Length::new(self.x)
-    }
-
-    /// Returns self.y as a Length carrying the unit.
-    #[inline]
-    pub fn y_typed(&self) -> Length<T, U> {
-        Length::new(self.y)
-    }
-
     /// Drop the units, preserving only the numeric value.
     #[inline]
     pub fn to_untyped(&self) -> Point2D<T, UnknownUnit> {
@@ -666,24 +654,6 @@ impl<T: Copy, U> Point3D<T, U> {
     #[inline]
     pub fn yz(&self) -> Point2D<T, U> {
         point2(self.y, self.z)
-    }
-
-    /// Returns self.x as a Length carrying the unit.
-    #[inline]
-    pub fn x_typed(&self) -> Length<T, U> {
-        Length::new(self.x)
-    }
-
-    /// Returns self.y as a Length carrying the unit.
-    #[inline]
-    pub fn y_typed(&self) -> Length<T, U> {
-        Length::new(self.y)
-    }
-
-    /// Returns self.z as a Length carrying the unit.
-    #[inline]
-    pub fn z_typed(&self) -> Length<T, U> {
-        Length::new(self.z)
     }
 
     #[inline]
