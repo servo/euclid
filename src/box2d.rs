@@ -159,8 +159,11 @@ where
 {
     /// Returns the same box, translated by a vector.
     #[inline]
-    pub fn translate(&self, by: &Vector2D<T, U>) -> Self {
-        Self::new(self.min + *by, self.max + *by)
+    pub fn translate(&self, by: Vector2D<T, U>) -> Self {
+        Box2D {
+            min: self.min + by,
+            max: self.max + by,
+        }
     }
 }
 
@@ -172,7 +175,7 @@ where
     /// in the box if they are on the front, left or top faces, but outside if they
     /// are on the back, right or bottom faces.
     #[inline]
-    pub fn contains(&self, p: &Point2D<T, U>) -> bool {
+    pub fn contains(&self, p: Point2D<T, U>) -> bool {
         self.min.x <= p.x && p.x < self.max.x
             && self.min.y <= p.y && p.y < self.max.y
     }
@@ -455,8 +458,8 @@ where
     /// Tag a unitless value with units.
     pub fn from_untyped(c: &Box2D<T, UnknownUnit>) -> Box2D<T, Unit> {
         Box2D::new(
-            Point2D::from_untyped(&c.min),
-            Point2D::from_untyped(&c.max),
+            Point2D::from_untyped(c.min),
+            Point2D::from_untyped(c.max),
         )
     }
 }
@@ -685,7 +688,7 @@ mod tests {
         let b = Box2D::from_size(size);
         assert_eq!(b.center(), center);
         let translation = vec2(10.0, 2.5);
-        let b = b.translate(&translation);
+        let b = b.translate(translation);
         center += translation;
         assert_eq!(b.center(), center);
         assert_eq!(b.max.x, 25.0);
@@ -757,7 +760,7 @@ mod tests {
     #[test]
     fn test_contains() {
         let b = Box2D::from_points(&[point2(-20.0, -20.0), point2(20.0, 20.0)]);
-        assert!(b.contains(&point2(-15.3, 10.5)));
+        assert!(b.contains(point2(-15.3, 10.5)));
     }
 
     #[test]

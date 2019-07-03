@@ -178,7 +178,7 @@ impl<T: Copy, U> Point2D<T, U> {
 
     /// Tag a unitless value with units.
     #[inline]
-    pub fn from_untyped(p: &Point2D<T, UnknownUnit>) -> Self {
+    pub fn from_untyped(p: Point2D<T, UnknownUnit>) -> Self {
         point2(p.x, p.y)
     }
 
@@ -674,7 +674,7 @@ impl<T: Copy, U> Point3D<T, U> {
 
     /// Tag a unitless value with units.
     #[inline]
-    pub fn from_untyped(p: &Point3D<T, UnknownUnit>) -> Self {
+    pub fn from_untyped(p: Point3D<T, UnknownUnit>) -> Self {
         point3(p.x, p.y, p.z)
     }
 
