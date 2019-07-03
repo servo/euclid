@@ -57,7 +57,7 @@ impl<T: Float + ApproxEq<T>, Src, Dst> RigidTransform3D<T, Src, Dst> {
         // It is equivalent to the translation matrix obtained by rotating the
         // translation by R
 
-        let translation = rotation.rotate_vector3d(&translation);
+        let translation = rotation.transform_vector3d(translation);
         Self {
             rotation,
             translation,
@@ -92,7 +92,7 @@ impl<T: Float + ApproxEq<T>, Src, Dst> RigidTransform3D<T, Src, Dst> {
         //
         // T' = (R^ * T * R^-1) is T rotated by R^-1
 
-        let translation = self.rotation.inverse().rotate_vector3d(&self.translation);
+        let translation = self.rotation.inverse().transform_vector3d(self.translation);
         (translation, self.rotation)
     }
 
@@ -119,7 +119,7 @@ impl<T: Float + ApproxEq<T>, Src, Dst> RigidTransform3D<T, Src, Dst> {
 
         let t_prime = other
             .rotation
-            .rotate_vector3d(&self.translation);
+            .transform_vector3d(self.translation);
         let r_prime = self.rotation.post_rotate(&other.rotation);
         let t_prime2 = t_prime + other.translation;
         RigidTransform3D {
