@@ -310,7 +310,7 @@ where
     ///
     /// The input point must be use the unit Src, and the returned point has the unit Dst.
     #[inline]
-    pub fn transform_point(&self, point: &Point2D<T, Src>) -> Point2D<T, Dst> {
+    pub fn transform_point(&self, point: Point2D<T, Src>) -> Point2D<T, Dst> {
         let (sin, cos) = Float::sin_cos(self.angle);
         point2(point.x * cos - point.y * sin, point.y * cos + point.x * sin)
     }
@@ -319,8 +319,8 @@ where
     ///
     /// The input point must be use the unit Src, and the returned point has the unit Dst.
     #[inline]
-    pub fn transform_vector(&self, vector: &Vector2D<T, Src>) -> Vector2D<T, Dst> {
-        self.transform_point(&vector.to_point()).to_vector()
+    pub fn transform_vector(&self, vector: Vector2D<T, Src>) -> Vector2D<T, Dst> {
+        self.transform_point(vector.to_point()).to_vector()
     }
 }
 
@@ -600,7 +600,7 @@ where
     /// Returns the given 3d point transformed by this rotation.
     ///
     /// The input point must be use the unit Src, and the returned point has the unit Dst.
-    pub fn rotate_point3d(&self, point: &Point3D<T, Src>) -> Point3D<T, Dst>
+    pub fn rotate_point3d(&self, point: Point3D<T, Src>) -> Point3D<T, Dst>
     where
         T: ApproxEq<T>,
     {
@@ -620,11 +620,11 @@ where
     ///
     /// The input point must be use the unit Src, and the returned point has the unit Dst.
     #[inline]
-    pub fn rotate_point2d(&self, point: &Point2D<T, Src>) -> Point2D<T, Dst>
+    pub fn rotate_point2d(&self, point: Point2D<T, Src>) -> Point2D<T, Dst>
     where
         T: ApproxEq<T>,
     {
-        self.rotate_point3d(&point.to_3d()).xy()
+        self.rotate_point3d(point.to_3d()).xy()
     }
 
     /// Returns the given 3d vector transformed by this rotation.
@@ -635,7 +635,7 @@ where
     where
         T: ApproxEq<T>,
     {
-        self.rotate_point3d(&vector.to_point()).to_vector()
+        self.rotate_point3d(vector.to_point()).to_vector()
     }
 
     /// Returns the given 2d vector transformed by this rotation then projected on the xy plane.
@@ -820,27 +820,27 @@ fn simple_rotation_2d() {
     let r180 = Rotation2D::radians(PI);
 
     assert!(
-        ri.transform_point(&point2(1.0, 2.0))
+        ri.transform_point(point2(1.0, 2.0))
             .approx_eq(&point2(1.0, 2.0))
     );
     assert!(
-        r90.transform_point(&point2(1.0, 2.0))
+        r90.transform_point(point2(1.0, 2.0))
             .approx_eq(&point2(-2.0, 1.0))
     );
     assert!(
-        rm90.transform_point(&point2(1.0, 2.0))
+        rm90.transform_point(point2(1.0, 2.0))
             .approx_eq(&point2(2.0, -1.0))
     );
     assert!(
-        r180.transform_point(&point2(1.0, 2.0))
+        r180.transform_point(point2(1.0, 2.0))
             .approx_eq(&point2(-1.0, -2.0))
     );
 
     assert!(
         r90.inverse()
             .inverse()
-            .transform_point(&point2(1.0, 2.0))
-            .approx_eq(&r90.transform_point(&point2(1.0, 2.0)))
+            .transform_point(point2(1.0, 2.0))
+            .approx_eq(&r90.transform_point(point2(1.0, 2.0)))
     );
 }
 
@@ -855,27 +855,27 @@ fn simple_rotation_3d_in_2d() {
     let r180 = Rotation3D::around_z(Angle::radians(PI));
 
     assert!(
-        ri.rotate_point2d(&point2(1.0, 2.0))
+        ri.rotate_point2d(point2(1.0, 2.0))
             .approx_eq(&point2(1.0, 2.0))
     );
     assert!(
-        r90.rotate_point2d(&point2(1.0, 2.0))
+        r90.rotate_point2d(point2(1.0, 2.0))
             .approx_eq(&point2(-2.0, 1.0))
     );
     assert!(
-        rm90.rotate_point2d(&point2(1.0, 2.0))
+        rm90.rotate_point2d(point2(1.0, 2.0))
             .approx_eq(&point2(2.0, -1.0))
     );
     assert!(
-        r180.rotate_point2d(&point2(1.0, 2.0))
+        r180.rotate_point2d(point2(1.0, 2.0))
             .approx_eq(&point2(-1.0, -2.0))
     );
 
     assert!(
         r90.inverse()
             .inverse()
-            .rotate_point2d(&point2(1.0, 2.0))
-            .approx_eq(&r90.rotate_point2d(&point2(1.0, 2.0)))
+            .rotate_point2d(point2(1.0, 2.0))
+            .approx_eq(&r90.rotate_point2d(point2(1.0, 2.0)))
     );
 }
 
@@ -896,13 +896,13 @@ fn pre_post() {
 
     // Check that the order of transformations is correct (corresponds to what
     // we do in Transform3D).
-    let p1 = r1.post_rotate(&r2).post_rotate(&r3).rotate_point3d(&p);
-    let p2 = t1.post_transform(&t2).post_transform(&t3).transform_point3d(&p);
+    let p1 = r1.post_rotate(&r2).post_rotate(&r3).rotate_point3d(p);
+    let p2 = t1.post_transform(&t2).post_transform(&t3).transform_point3d(p);
 
     assert!(p1.approx_eq(&p2.unwrap()));
 
     // Check that changing the order indeed matters.
-    let p3 = t3.post_transform(&t1).post_transform(&t2).transform_point3d(&p);
+    let p3 = t3.post_transform(&t1).post_transform(&t2).transform_point3d(p);
     assert!(!p1.approx_eq(&p3.unwrap()));
 }
 
@@ -932,7 +932,7 @@ fn to_transform3d() {
     ];
 
     for rotation in &rotations {
-        for point in &points {
+        for &point in &points {
             let p1 = rotation.rotate_point3d(point);
             let p2 = rotation.to_transform().transform_point3d(point);
             assert!(p1.approx_eq(&p2.unwrap()));
@@ -1019,17 +1019,17 @@ fn around_axis() {
     let r1 = Rotation3D::around_axis(vec3(1.0, 1.0, 0.0), Angle::radians(PI));
     let r2 = Rotation3D::around_axis(vec3(1.0, 1.0, 0.0), Angle::radians(FRAC_PI_2));
     assert!(
-        r1.rotate_point3d(&point3(1.0, 2.0, 0.0))
+        r1.rotate_point3d(point3(1.0, 2.0, 0.0))
             .approx_eq(&point3(2.0, 1.0, 0.0))
     );
     assert!(
-        r2.rotate_point3d(&point3(1.0, 0.0, 0.0))
+        r2.rotate_point3d(point3(1.0, 0.0, 0.0))
             .approx_eq(&point3(0.5, 0.5, -0.5.sqrt()))
     );
 
     // A more arbitrary test (made up with numpy):
     let r3 = Rotation3D::around_axis(vec3(0.5, 1.0, 2.0), Angle::radians(2.291288));
-    assert!(r3.rotate_point3d(&point3(1.0, 0.0, 0.0)).approx_eq(&point3(
+    assert!(r3.rotate_point3d(point3(1.0, 0.0, 0.0)).approx_eq(&point3(
         -0.58071821,
         0.81401868,
         -0.01182979
@@ -1053,20 +1053,20 @@ fn from_euler() {
     // roll
     let roll_re = Rotation3D::euler(angle, zero, zero);
     let roll_rq = Rotation3D::around_x(angle);
-    let roll_pe = roll_re.rotate_point3d(&p);
-    let roll_pq = roll_rq.rotate_point3d(&p);
+    let roll_pe = roll_re.rotate_point3d(p);
+    let roll_pq = roll_rq.rotate_point3d(p);
 
     // pitch
     let pitch_re = Rotation3D::euler(zero, angle, zero);
     let pitch_rq = Rotation3D::around_y(angle);
-    let pitch_pe = pitch_re.rotate_point3d(&p);
-    let pitch_pq = pitch_rq.rotate_point3d(&p);
+    let pitch_pe = pitch_re.rotate_point3d(p);
+    let pitch_pq = pitch_rq.rotate_point3d(p);
 
     // yaw
     let yaw_re = Rotation3D::euler(zero, zero, angle);
     let yaw_rq = Rotation3D::around_z(angle);
-    let yaw_pe = yaw_re.rotate_point3d(&p);
-    let yaw_pq = yaw_rq.rotate_point3d(&p);
+    let yaw_pe = yaw_re.rotate_point3d(p);
+    let yaw_pq = yaw_rq.rotate_point3d(p);
 
     assert!(roll_pe.approx_eq(&roll_pq));
     assert!(pitch_pe.approx_eq(&pitch_pq));
@@ -1076,8 +1076,8 @@ fn from_euler() {
     // the proper order: roll -> pitch -> yaw.
     let ypr_e = Rotation3D::euler(angle, angle, angle);
     let ypr_q = roll_rq.post_rotate(&pitch_rq).post_rotate(&yaw_rq);
-    let ypr_pe = ypr_e.rotate_point3d(&p);
-    let ypr_pq = ypr_q.rotate_point3d(&p);
+    let ypr_pe = ypr_e.rotate_point3d(p);
+    let ypr_pq = ypr_q.rotate_point3d(p);
 
     assert!(ypr_pe.approx_eq(&ypr_pq));
 }

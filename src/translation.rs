@@ -36,7 +36,7 @@ use serde;
 ///
 /// let scrolling = ScrollOffset::new(0, 100);
 /// let p1: ParentPoint = point2(0, 0);
-/// let p2: ChildPoint = scrolling.transform_point(&p1);
+/// let p2: ChildPoint = scrolling.transform_point(p1);
 /// ```
 ///
 #[repr(C)]
@@ -133,7 +133,7 @@ where
 {
     /// Translate a point and cast its unit.
     #[inline]
-    pub fn transform_point(&self, p: &Point2D<T, Src>) -> Point2D<T, Dst> {
+    pub fn transform_point(&self, p: Point2D<T, Src>) -> Point2D<T, Dst> {
         point2(p.x + self.x, p.y + self.y)
     }
 
@@ -141,14 +141,14 @@ where
     #[inline]
     pub fn transform_rect(&self, r: &Rect<T, Src>) -> Rect<T, Dst> {
         Rect {
-            origin: self.transform_point(&r.origin),
-            size: self.transform_size(&r.size),
+            origin: self.transform_point(r.origin),
+            size: self.transform_size(r.size),
         }
     }
 
     /// No-op, just cast the unit.
     #[inline]
-    pub fn transform_size(&self, s: &Size2D<T, Src>) -> Size2D<T, Dst> {
+    pub fn transform_size(&self, s: Size2D<T, Src>) -> Size2D<T, Dst> {
         Size2D::new(s.width, s.height)
     }
 
@@ -409,13 +409,13 @@ where
     pub fn transform_rect(&self, r: &Rect<T, Src>) -> Rect<T, Dst> {
         Rect {
             origin: self.transform_point2d(&r.origin),
-            size: self.transform_size(&r.size),
+            size: self.transform_size(r.size),
         }
     }
 
     /// No-op, just cast the unit.
     #[inline]
-    pub fn transform_size(&self, s: &Size2D<T, Src>) -> Size2D<T, Dst> {
+    pub fn transform_size(self, s: Size2D<T, Src>) -> Size2D<T, Dst> {
         Size2D::new(s.width, s.height)
     }
 

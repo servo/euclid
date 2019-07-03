@@ -415,7 +415,7 @@ where T: Copy + Clone +
     /// Assuming row vectors, this is equivalent to `p * self`
     #[inline]
     #[must_use]
-    pub fn transform_point(&self, point: &Point2D<T, Src>) -> Point2D<T, Dst> {
+    pub fn transform_point(&self, point: Point2D<T, Src>) -> Point2D<T, Dst> {
         Point2D::new(
             point.x * self.m11 + point.y * self.m21 + self.m31,
             point.x * self.m12 + point.y * self.m22 + self.m32
@@ -427,7 +427,7 @@ where T: Copy + Clone +
     /// Assuming row vectors, this is equivalent to `v * self`
     #[inline]
     #[must_use]
-    pub fn transform_vector(&self, vec: &Vector2D<T, Src>) -> Vector2D<T, Dst> {
+    pub fn transform_vector(&self, vec: Vector2D<T, Src>) -> Vector2D<T, Dst> {
         vec2(vec.x * self.m11 + vec.y * self.m21,
              vec.x * self.m12 + vec.y * self.m22)
     }
@@ -438,10 +438,10 @@ where T: Copy + Clone +
     #[must_use]
     pub fn transform_rect(&self, rect: &Rect<T, Src>) -> Rect<T, Dst> {
         Rect::from_points(&[
-            self.transform_point(&rect.origin),
-            self.transform_point(&rect.top_right()),
-            self.transform_point(&rect.bottom_left()),
-            self.transform_point(&rect.bottom_right()),
+            self.transform_point(rect.origin),
+            self.transform_point(rect.top_right()),
+            self.transform_point(rect.bottom_left()),
+            self.transform_point(rect.bottom_right()),
         ])
     }
 
@@ -585,7 +585,7 @@ mod test {
         assert_eq!(t1, t2);
         assert_eq!(t1, t3);
 
-        assert_eq!(t1.transform_point(&Point2D::new(1.0, 1.0)), Point2D::new(2.0, 3.0));
+        assert_eq!(t1.transform_point(Point2D::new(1.0, 1.0)), Point2D::new(2.0, 3.0));
 
         assert_eq!(t1.post_transform(&t1), Mat::create_translation(2.0, 4.0));
     }
@@ -598,7 +598,7 @@ mod test {
         assert_eq!(r1, r2);
         assert_eq!(r1, r3);
 
-        assert!(r1.transform_point(&Point2D::new(1.0, 2.0)).approx_eq(&Point2D::new(2.0, -1.0)));
+        assert!(r1.transform_point(Point2D::new(1.0, 2.0)).approx_eq(&Point2D::new(2.0, -1.0)));
 
         assert!(r1.post_transform(&r1).approx_eq(&Mat::create_rotation(rad(FRAC_PI_2*2.0))));
     }
@@ -611,7 +611,7 @@ mod test {
         assert_eq!(s1, s2);
         assert_eq!(s1, s3);
 
-        assert!(s1.transform_point(&Point2D::new(2.0, 2.0)).approx_eq(&Point2D::new(4.0, 6.0)));
+        assert!(s1.transform_point(Point2D::new(2.0, 2.0)).approx_eq(&Point2D::new(4.0, 6.0)));
     }
 
     #[test]
@@ -667,13 +667,13 @@ mod test {
 
         let a = Point2D::new(1.0, 1.0);
 
-        assert!(r.post_transform(&t).transform_point(&a).approx_eq(&Point2D::new(3.0, 2.0)));
-        assert!(t.post_transform(&r).transform_point(&a).approx_eq(&Point2D::new(4.0, -3.0)));
-        assert!(t.post_transform(&r).transform_point(&a).approx_eq(&r.transform_point(&t.transform_point(&a))));
+        assert!(r.post_transform(&t).transform_point(a).approx_eq(&Point2D::new(3.0, 2.0)));
+        assert!(t.post_transform(&r).transform_point(a).approx_eq(&Point2D::new(4.0, -3.0)));
+        assert!(t.post_transform(&r).transform_point(a).approx_eq(&r.transform_point(t.transform_point(a))));
 
-        assert!(r.pre_transform(&t).transform_point(&a).approx_eq(&Point2D::new(4.0, -3.0)));
-        assert!(t.pre_transform(&r).transform_point(&a).approx_eq(&Point2D::new(3.0, 2.0)));
-        assert!(t.pre_transform(&r).transform_point(&a).approx_eq(&t.transform_point(&r.transform_point(&a))));
+        assert!(r.pre_transform(&t).transform_point(a).approx_eq(&Point2D::new(4.0, -3.0)));
+        assert!(t.pre_transform(&r).transform_point(a).approx_eq(&Point2D::new(3.0, 2.0)));
+        assert!(t.pre_transform(&r).transform_point(a).approx_eq(&t.transform_point(r.transform_point(a))));
     }
 
     #[test]
@@ -696,7 +696,7 @@ mod test {
         // Translation does not apply to vectors.
         let m1 = Mat::create_translation(1.0, 1.0);
         let v1 = vec2(10.0, -10.0);
-        assert_eq!(v1, m1.transform_vector(&v1));
+        assert_eq!(v1, m1.transform_vector(v1));
     }
 
     #[cfg(feature = "mint")]

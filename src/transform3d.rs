@@ -546,7 +546,7 @@ where T: Copy + Clone +
     /// Assuming row vectors, this is equivalent to `p * self`
     #[inline]
     pub fn transform_point2d_homogeneous(
-        &self, p: &Point2D<T, Src>
+        &self, p: Point2D<T, Src>
     ) -> HomogeneousVector<T, Dst> {
         let x = p.x * self.m11 + p.y * self.m21 + self.m41;
         let y = p.x * self.m12 + p.y * self.m22 + self.m42;
@@ -563,7 +563,7 @@ where T: Copy + Clone +
     ///
     /// Assuming row vectors, this is equivalent to `p * self`
     #[inline]
-    pub fn transform_point2d(&self, p: &Point2D<T, Src>) -> Option<Point2D<T, Dst>> {
+    pub fn transform_point2d(&self, p: Point2D<T, Src>) -> Option<Point2D<T, Dst>> {
         //Note: could use `transform_point2d_homogeneous()` but it would waste the calculus of `z`
         let w = p.x * self.m14 + p.y * self.m24 + self.m44;
         if w > T::zero() {
@@ -582,7 +582,7 @@ where T: Copy + Clone +
     ///
     /// Assuming row vectors, this is equivalent to `v * self`
     #[inline]
-    pub fn transform_vector2d(&self, v: &Vector2D<T, Src>) -> Vector2D<T, Dst> {
+    pub fn transform_vector2d(&self, v: Vector2D<T, Src>) -> Vector2D<T, Dst> {
         vec2(
             v.x * self.m11 + v.y * self.m21,
             v.x * self.m12 + v.y * self.m22,
@@ -596,7 +596,7 @@ where T: Copy + Clone +
     /// Assuming row vectors, this is equivalent to `p * self`
     #[inline]
     pub fn transform_point3d_homogeneous(
-        &self, p: &Point3D<T, Src>
+        &self, p: Point3D<T, Src>
     ) -> HomogeneousVector<T, Dst> {
         let x = p.x * self.m11 + p.y * self.m21 + p.z * self.m31 + self.m41;
         let y = p.x * self.m12 + p.y * self.m22 + p.z * self.m32 + self.m42;
@@ -613,7 +613,7 @@ where T: Copy + Clone +
     ///
     /// Assuming row vectors, this is equivalent to `p * self`
     #[inline]
-    pub fn transform_point3d(&self, p: &Point3D<T, Src>) -> Option<Point3D<T, Dst>> {
+    pub fn transform_point3d(&self, p: Point3D<T, Src>) -> Option<Point3D<T, Dst>> {
         self.transform_point3d_homogeneous(p).to_point3d()
     }
 
@@ -623,7 +623,7 @@ where T: Copy + Clone +
     ///
     /// Assuming row vectors, this is equivalent to `v * self`
     #[inline]
-    pub fn transform_vector3d(&self, v: &Vector3D<T, Src>) -> Vector3D<T, Dst> {
+    pub fn transform_vector3d(&self, v: Vector3D<T, Src>) -> Vector3D<T, Dst> {
         vec3(
             v.x * self.m11 + v.y * self.m21 + v.z * self.m31,
             v.x * self.m12 + v.y * self.m22 + v.z * self.m32,
@@ -635,10 +635,10 @@ where T: Copy + Clone +
     /// transform, if the transform makes sense for it, or `None` otherwise.
     pub fn transform_rect(&self, rect: &Rect<T, Src>) -> Option<Rect<T, Dst>> {
         Some(Rect::from_points(&[
-            self.transform_point2d(&rect.origin)?,
-            self.transform_point2d(&rect.top_right())?,
-            self.transform_point2d(&rect.bottom_left())?,
-            self.transform_point2d(&rect.bottom_right())?,
+            self.transform_point2d(rect.origin)?,
+            self.transform_point2d(rect.top_right())?,
+            self.transform_point2d(rect.bottom_left())?,
+            self.transform_point2d(rect.bottom_right())?,
         ]))
     }
 
@@ -995,8 +995,8 @@ mod tests {
         assert_eq!(t1, t2);
         assert_eq!(t1, t3);
 
-        assert_eq!(t1.transform_point3d(&point3(1.0, 1.0, 1.0)), Some(point3(2.0, 3.0, 4.0)));
-        assert_eq!(t1.transform_point2d(&point2(1.0, 1.0)), Some(point2(2.0, 3.0)));
+        assert_eq!(t1.transform_point3d(point3(1.0, 1.0, 1.0)), Some(point3(2.0, 3.0, 4.0)));
+        assert_eq!(t1.transform_point2d(point2(1.0, 1.0)), Some(point2(2.0, 3.0)));
 
         assert_eq!(t1.post_transform(&t1), Mf32::create_translation(2.0, 4.0, 6.0));
 
@@ -1012,8 +1012,8 @@ mod tests {
         assert_eq!(r1, r2);
         assert_eq!(r1, r3);
 
-        assert!(r1.transform_point3d(&point3(1.0, 2.0, 3.0)).unwrap().approx_eq(&point3(2.0, -1.0, 3.0)));
-        assert!(r1.transform_point2d(&point2(1.0, 2.0)).unwrap().approx_eq(&point2(2.0, -1.0)));
+        assert!(r1.transform_point3d(point3(1.0, 2.0, 3.0)).unwrap().approx_eq(&point3(2.0, -1.0, 3.0)));
+        assert!(r1.transform_point2d(point2(1.0, 2.0)).unwrap().approx_eq(&point2(2.0, -1.0)));
 
         assert!(r1.post_transform(&r1).approx_eq(&Mf32::create_rotation(0.0, 0.0, 1.0, rad(FRAC_PI_2*2.0))));
 
@@ -1029,8 +1029,8 @@ mod tests {
         assert_eq!(s1, s2);
         assert_eq!(s1, s3);
 
-        assert!(s1.transform_point3d(&point3(2.0, 2.0, 2.0)).unwrap().approx_eq(&point3(4.0, 6.0, 8.0)));
-        assert!(s1.transform_point2d(&point2(2.0, 2.0)).unwrap().approx_eq(&point2(4.0, 6.0)));
+        assert!(s1.transform_point3d(point3(2.0, 2.0, 2.0)).unwrap().approx_eq(&point3(4.0, 6.0, 8.0)));
+        assert!(s1.transform_point2d(point2(2.0, 2.0)).unwrap().approx_eq(&point2(4.0, 6.0)));
 
         assert_eq!(s1.post_transform(&s1), Mf32::create_scale(4.0, 9.0, 16.0));
 
@@ -1124,10 +1124,10 @@ mod tests {
         assert!(m1.pre_transform(&m2).approx_eq(&Mf32::identity()));
 
         let p1 = point2(1000.0, 2000.0);
-        let p2 = m1.transform_point2d(&p1);
+        let p2 = m1.transform_point2d(p1);
         assert_eq!(p2, Some(point2(1100.0, 2200.0)));
 
-        let p3 = m2.transform_point2d(&p2.unwrap());
+        let p3 = m2.transform_point2d(p2.unwrap());
         assert_eq!(p3, Some(p1));
     }
 
@@ -1148,13 +1148,13 @@ mod tests {
 
         let a = point3(1.0, 1.0, 1.0);
 
-        assert!(r.post_transform(&t).transform_point3d(&a).unwrap().approx_eq(&point3(3.0, 2.0, 1.0)));
-        assert!(t.post_transform(&r).transform_point3d(&a).unwrap().approx_eq(&point3(4.0, -3.0, 1.0)));
-        assert!(t.post_transform(&r).transform_point3d(&a).unwrap().approx_eq(&r.transform_point3d(&t.transform_point3d(&a).unwrap()).unwrap()));
+        assert!(r.post_transform(&t).transform_point3d(a).unwrap().approx_eq(&point3(3.0, 2.0, 1.0)));
+        assert!(t.post_transform(&r).transform_point3d(a).unwrap().approx_eq(&point3(4.0, -3.0, 1.0)));
+        assert!(t.post_transform(&r).transform_point3d(a).unwrap().approx_eq(&r.transform_point3d(t.transform_point3d(a).unwrap()).unwrap()));
 
-        assert!(r.pre_transform(&t).transform_point3d(&a).unwrap().approx_eq(&point3(4.0, -3.0, 1.0)));
-        assert!(t.pre_transform(&r).transform_point3d(&a).unwrap().approx_eq(&point3(3.0, 2.0, 1.0)));
-        assert!(t.pre_transform(&r).transform_point3d(&a).unwrap().approx_eq(&t.transform_point3d(&r.transform_point3d(&a).unwrap()).unwrap()));
+        assert!(r.pre_transform(&t).transform_point3d(a).unwrap().approx_eq(&point3(4.0, -3.0, 1.0)));
+        assert!(t.pre_transform(&r).transform_point3d(a).unwrap().approx_eq(&point3(3.0, 2.0, 1.0)));
+        assert!(t.pre_transform(&r).transform_point3d(a).unwrap().approx_eq(&t.transform_point3d(r.transform_point3d(a).unwrap()).unwrap()));
     }
 
     #[test]
@@ -1176,8 +1176,8 @@ mod tests {
                                  -2.5, 6.0, 1.0, 1.0);
 
         let p = point3(1.0, 3.0, 5.0);
-        let p1 = m2.pre_transform(&m1).transform_point3d(&p).unwrap();
-        let p2 = m2.transform_point3d(&m1.transform_point3d(&p).unwrap()).unwrap();
+        let p1 = m2.pre_transform(&m1).transform_point3d(p).unwrap();
+        let p2 = m2.transform_point3d(m1.transform_point3d(p).unwrap()).unwrap();
         assert!(p1.approx_eq(&p2));
     }
 
@@ -1194,14 +1194,14 @@ mod tests {
         // Translation does not apply to vectors.
         let m = Mf32::create_translation(1.0, 2.0, 3.0);
         let v1 = vec3(10.0, -10.0, 3.0);
-        assert_eq!(v1, m.transform_vector3d(&v1));
+        assert_eq!(v1, m.transform_vector3d(v1));
         // While it does apply to points.
-        assert_ne!(Some(v1.to_point()), m.transform_point3d(&v1.to_point()));
+        assert_ne!(Some(v1.to_point()), m.transform_point3d(v1.to_point()));
 
         // same thing with 2d vectors/points
         let v2 = vec2(10.0, -5.0);
-        assert_eq!(v2, m.transform_vector2d(&v2));
-        assert_ne!(Some(v2.to_point()), m.transform_point2d(&v2.to_point()));
+        assert_eq!(v2, m.transform_vector2d(v2));
+        assert_ne!(Some(v2.to_point()), m.transform_point2d(v2.to_point()));
     }
 
     #[test]
@@ -1232,11 +1232,11 @@ mod tests {
             -1.0, 1.0, -1.0, 2.0,
         );
         assert_eq!(
-            m.transform_point2d_homogeneous(&point2(1.0, 2.0)),
+            m.transform_point2d_homogeneous(point2(1.0, 2.0)),
             HomogeneousVector::new(6.0, 11.0, 0.0, 19.0),
         );
         assert_eq!(
-            m.transform_point3d_homogeneous(&point3(1.0, 2.0, 4.0)),
+            m.transform_point3d_homogeneous(point3(1.0, 2.0, 4.0)),
             HomogeneousVector::new(8.0, 7.0, 4.0, 15.0),
         );
     }
@@ -1245,12 +1245,12 @@ mod tests {
     pub fn test_perspective_division() {
         let p = point2(1.0, 2.0);
         let mut m = Mf32::identity();
-        assert!(m.transform_point2d(&p).is_some());
+        assert!(m.transform_point2d(p).is_some());
         m.m44 = 0.0;
-        assert_eq!(None, m.transform_point2d(&p));
+        assert_eq!(None, m.transform_point2d(p));
         m.m44 = 1.0;
         m.m24 = -1.0;
-        assert_eq!(None, m.transform_point2d(&p));
+        assert_eq!(None, m.transform_point2d(p));
     }
 
     #[cfg(feature = "mint")]

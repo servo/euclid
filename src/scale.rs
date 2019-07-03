@@ -112,19 +112,19 @@ where
 {
     /// Returns the given point transformed by this scale.
     #[inline]
-    pub fn transform_point(&self, point: &Point2D<T, Src>) -> Point2D<T, Dst> {
+    pub fn transform_point(&self, point: Point2D<T, Src>) -> Point2D<T, Dst> {
         Point2D::new(point.x * self.get(), point.y * self.get())
     }
 
     /// Returns the given vector transformed by this scale.
     #[inline]
-    pub fn transform_vector(&self, vec: &Vector2D<T, Src>) -> Vector2D<T, Dst> {
+    pub fn transform_vector(&self, vec: Vector2D<T, Src>) -> Vector2D<T, Dst> {
         Vector2D::new(vec.x * self.get(), vec.y * self.get())
     }
 
     /// Returns the given vector transformed by this scale.
     #[inline]
-    pub fn transform_size(&self, size: &Size2D<T, Src>) -> Size2D<T, Dst> {
+    pub fn transform_size(&self, size: Size2D<T, Src>) -> Size2D<T, Dst> {
         Size2D::new(size.width * self.get(), size.height * self.get())
     }
 
@@ -132,8 +132,8 @@ where
     #[inline]
     pub fn transform_rect(&self, rect: &Rect<T, Src>) -> Rect<T, Dst> {
         Rect::new(
-            self.transform_point(&rect.origin),
-            self.transform_size(&rect.size),
+            self.transform_point(rect.origin),
+            self.transform_size(rect.size),
         )
     }
 
