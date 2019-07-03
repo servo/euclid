@@ -40,6 +40,8 @@ use serde;
 /// ```
 ///
 #[repr(C)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(bound(serialize = "T: serde::Serialize", deserialize = "T: serde::Deserialize<'de>")))]
 pub struct Translation2D<T, Src, Dst> {
     pub x: T,
     pub y: T,
@@ -56,29 +58,6 @@ impl<T: Clone, Src, Dst> Clone for Translation2D<T, Src, Dst> {
             y: self.y.clone(),
             _unit: PhantomData,
         }
-    }
-}
-
-#[cfg(feature = "serde")]
-impl<'de, T, Src, Dst> serde::Deserialize<'de> for Translation2D<T, Src, Dst>
-    where T: serde::Deserialize<'de>
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-        where D: serde::Deserializer<'de>
-    {
-        let (x, y) = try!(serde::Deserialize::deserialize(deserializer));
-        Ok(Translation2D { x, y, _unit: PhantomData })
-    }
-}
-
-#[cfg(feature = "serde")]
-impl<T, Src, Dst> serde::Serialize for Translation2D<T, Src, Dst>
-    where T: serde::Serialize
-{
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where S: serde::Serializer
-    {
-        (&self.x, &self.y).serialize(serializer)
     }
 }
 

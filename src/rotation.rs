@@ -191,6 +191,8 @@ impl<T: Neg<Output = T>> Neg for Angle<T> {
 
 /// A transform that can represent rotations in 2d, represented as an angle in radians.
 #[repr(C)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(bound(serialize = "T: serde::Serialize", deserialize = "T: serde::Deserialize<'de>")))]
 pub struct Rotation2D<T, Src, Dst> {
     pub angle : T,
     #[doc(hidden)]
@@ -205,29 +207,6 @@ impl<T: Clone, Src, Dst> Clone for Rotation2D<T, Src, Dst> {
             angle: self.angle.clone(),
             _unit: PhantomData,
         }
-    }
-}
-
-#[cfg(feature = "serde")]
-impl<'de, T, Src, Dst> serde::Deserialize<'de> for Rotation2D<T, Src, Dst>
-    where T: serde::Deserialize<'de>
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-        where D: serde::Deserializer<'de>
-    {
-        let (angle,) = try!(serde::Deserialize::deserialize(deserializer));
-        Ok(Rotation2D { angle, _unit: PhantomData })
-    }
-}
-
-#[cfg(feature = "serde")]
-impl<T, Src, Dst> serde::Serialize for Rotation2D<T, Src, Dst>
-    where T: serde::Serialize
-{
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where S: serde::Serializer
-    {
-        (&self.angle,).serialize(serializer)
     }
 }
 
@@ -375,6 +354,8 @@ where
 /// as follows: `x -> i`, `y -> j`, `z -> k`, `w -> r`.
 /// The memory layout of this type corresponds to the `x, y, z, w` notation
 #[repr(C)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(bound(serialize = "T: serde::Serialize", deserialize = "T: serde::Deserialize<'de>")))]
 pub struct Rotation3D<T, Src, Dst> {
     /// Component multiplied by the imaginary number `i`.
     pub i: T,
@@ -399,29 +380,6 @@ impl<T: Clone, Src, Dst> Clone for Rotation3D<T, Src, Dst> {
             r: self.r.clone(),
             _unit: PhantomData,
         }
-    }
-}
-
-#[cfg(feature = "serde")]
-impl<'de, T, Src, Dst> serde::Deserialize<'de> for Rotation3D<T, Src, Dst>
-    where T: serde::Deserialize<'de>
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-        where D: serde::Deserializer<'de>
-    {
-        let (i, j, k, r) = try!(serde::Deserialize::deserialize(deserializer));
-        Ok(Rotation3D { i, j, k, r, _unit: PhantomData })
-    }
-}
-
-#[cfg(feature = "serde")]
-impl<T, Src, Dst> serde::Serialize for Rotation3D<T, Src, Dst>
-    where T: serde::Serialize
-{
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where S: serde::Serializer
-    {
-        (&self.i, &self.j, &self.k, &self.r).serialize(serializer)
     }
 }
 
