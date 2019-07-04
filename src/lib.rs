@@ -103,7 +103,7 @@ pub mod default {
     pub type Point3D<T> = super::Point3D<T, UnknownUnit>;
     pub type Vector2D<T> = super::Vector2D<T, UnknownUnit>;
     pub type Vector3D<T> = super::Vector3D<T, UnknownUnit>;
-    pub type Vector4D<T> = super::HomogeneousVector<T, UnknownUnit>;
+    pub type HomogeneousVector<T> = super::HomogeneousVector<T, UnknownUnit>;
     pub type Size2D<T> = super::Size2D<T, UnknownUnit>;
     pub type Size3D<T> = super::Size3D<T, UnknownUnit>;
     pub type Rect<T> = super::Rect<T, UnknownUnit>;
