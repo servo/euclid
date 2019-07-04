@@ -403,7 +403,7 @@ where T: Copy + Clone +
         self.post_transform(&Transform2D::create_rotation(theta))
     }
 
-    /// Applies a rotation after self's transformation and returns the resulting transform.
+    /// Applies a rotation before self's transformation and returns the resulting transform.
     #[inline]
     #[must_use]
     pub fn pre_rotate(&self, theta: Angle<T>) -> Self {
