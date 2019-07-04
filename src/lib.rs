@@ -60,6 +60,7 @@ pub use point::{Point2D, Point3D, point2, point3};
 pub use vector::{Vector2D, Vector3D, vec2, vec3};
 pub use vector::{BoolVector2D, BoolVector3D, bvec2, bvec3};
 pub use homogen::HomogeneousVector;
+pub use nonempty::NonEmpty;
 
 pub use rect::{rect, Rect};
 pub use rigid::{RigidTransform3D};
@@ -92,6 +93,7 @@ mod translation;
 mod trig;
 mod vector;
 mod box3d;
+mod nonempty;
 
 /// The default unit.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]

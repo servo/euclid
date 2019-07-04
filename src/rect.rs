@@ -16,6 +16,7 @@ use vector::Vector2D;
 use side_offsets::SideOffsets2D;
 use size::Size2D;
 use approxord::{min, max};
+use nonempty::NonEmpty;
 
 use num_traits::NumCast;
 #[cfg(feature = "serde")]
@@ -32,7 +33,7 @@ use core::ops::{Add, Div, Mul, Sub, Range};
 #[repr(C)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(bound(serialize = "T: Serialize", deserialize = "T: Deserialize<'de>")))]
-pub struct Rect<T, U = UnknownUnit> {
+pub struct Rect<T, U> {
     pub origin: Point2D<T, U>,
     pub size: Size2D<T, U>,
 }
@@ -183,7 +184,7 @@ where
     /// nonempty but this rectangle is empty.
     #[inline]
     pub fn contains_rect(&self, rect: &Self) -> bool {
-        rect.is_empty()
+        rect.is_empty_or_negative()
             || (self.min_x() <= rect.min_x() && rect.max_x() <= self.max_x()
                 && self.min_y() <= rect.min_y() && rect.max_y() <= self.max_y())
     }
@@ -386,6 +387,23 @@ impl<T: Copy + PartialEq + Zero, U> Rect<T, U> {
     /// Returns true if the size is zero, regardless of the origin's value.
     pub fn is_empty(&self) -> bool {
         self.size.width == Zero::zero() || self.size.height == Zero::zero()
+    }
+}
+
+impl<T: Copy + Zero + PartialOrd, U> Rect<T, U> {
+
+    #[inline]
+    pub fn is_empty_or_negative(&self) -> bool {
+        self.size.is_empty_or_negative()
+    }
+
+    #[inline]
+    pub fn to_non_empty(&self) -> Option<NonEmpty<Self>> {
+        if self.is_empty_or_negative() {
+            return None;
+        }
+
+        Some(NonEmpty(*self))
     }
 }
 
