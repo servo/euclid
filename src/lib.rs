@@ -120,3 +120,5 @@ pub mod default {
     pub type Scale<T> = super::Scale<T, UnknownUnit, UnknownUnit>;
     pub type RigidTransform3D<T> = super::RigidTransform3D<T, UnknownUnit, UnknownUnit>;
 }
+
+pub trait YDown {}

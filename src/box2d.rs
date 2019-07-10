@@ -7,7 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::UnknownUnit;
+use super::{UnknownUnit, YDown};
 use scale::Scale;
 use num::*;
 use rect::Rect;
@@ -238,33 +238,6 @@ where
         }
     }
 }
-
-impl<T, U> Box2D<T, U>
-where
-    T: Copy + Zero + PartialOrd + Add<T, Output = T> + Sub<T, Output = T>,
-{
-    /// Calculate the size and position of an inner box.
-    ///
-    /// Subtracts the side offsets from all sides. The horizontal, vertical
-    /// and applicate offsets must not be larger than the original side length.
-    pub fn inner_box(&self, offsets: SideOffsets2D<T, U>) -> Self {
-        Box2D {
-            min: self.min + vec2(offsets.left, offsets.top),
-            max: self.max - vec2(offsets.right, offsets.bottom),
-        }
-    }
-
-    /// Calculate the b and position of an outer box.
-    ///
-    /// Add the offsets to all sides. The expanded box is returned.
-    pub fn outer_box(&self, offsets: SideOffsets2D<T, U>) -> Self {
-        Box2D {
-            min: self.min - vec2(offsets.left, offsets.top),
-            max: self.max + vec2(offsets.right, offsets.bottom),
-        }
-    }
-}
-
 
 impl<T, U> Box2D<T, U>
 where
@@ -594,6 +567,48 @@ impl<T: NumCast + Copy, Unit> Box2D<T, Unit> {
     }
 }
 
+impl<T, U> Box2D<T, U>
+where
+    T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output = T> + Sub<T, Output = T>,
+    U: YDown,
+{
+    #[inline]
+    pub fn top_left(&self) -> Point2D<T, U> {
+        self.min
+    }
+
+    #[inline]
+    pub fn top_right(&self) -> Point2D<T, U> {
+        point2(self.max.x, self.min.y)
+    }
+
+    #[inline]
+    pub fn bottom_left(&self) -> Point2D<T, U> {
+        point2(self.min.x, self.max.y)
+    }
+
+    #[inline]
+    pub fn bottom_right(&self) -> Point2D<T, U> {
+        self.max
+    }
+
+    #[inline]
+    pub fn inner_box(&self, offsets: SideOffsets2D<T, U>) -> Self {
+        Box2D {
+            min: self.min + vec2(offsets.left, offsets.top),
+            max: self.max - vec2(offsets.right, offsets.bottom),
+        }
+    }
+
+    #[inline]
+    pub fn outer_box(&self, offsets: SideOffsets2D<T, U>) -> Self {
+        Box2D {
+            min: self.min - vec2(offsets.left, offsets.top),
+            max: self.max + vec2(offsets.right, offsets.bottom),
+        }
+    }
+}
+
 impl<T, U> From<Size2D<T, U>> for Box2D<T, U>
 where
     T: Copy + Zero + PartialOrd,
@@ -673,7 +688,14 @@ mod tests {
 
     #[test]
     fn test_inner_box() {
-        let b = Box2D::from_points(&[point2(50.0, 25.0), point2(100.0, 160.0)]);
+        use YDown;
+        use box2d::Box2D;
+        // Use a custom coordinate space and opt-into Y-down semantics to have
+        // inner_rect and outer_rect methods.
+        struct LocalSpace;
+        impl YDown for LocalSpace {};
+
+        let b: Box2D<f32, LocalSpace> = Box2D::from_points(&[point2(50.0, 25.0), point2(100.0, 160.0)]);
         let b = b.inner_box(SideOffsets2D::new(10.0, 20.0, 5.0, 10.0));
         assert_eq!(b.max.x, 80.0);
         assert_eq!(b.max.y, 155.0);
@@ -683,7 +705,14 @@ mod tests {
 
     #[test]
     fn test_outer_box() {
-        let b = Box2D::from_points(&[point2(50.0, 25.0), point2(100.0, 160.0)]);
+        use YDown;
+        use box2d::Box2D;
+        // Use a custom coordinate space and opt-into Y-down semantics to have
+        // inner_rect and outer_rect methods.
+        struct LocalSpace;
+        impl YDown for LocalSpace {};
+
+        let b: Box2D<f32, LocalSpace> = Box2D::from_points(&[point2(50.0, 25.0), point2(100.0, 160.0)]);
         let b = b.outer_box(SideOffsets2D::new(10.0, 20.0, 5.0, 10.0));
         assert_eq!(b.max.x, 120.0);
         assert_eq!(b.max.y, 165.0);

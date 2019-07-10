@@ -7,11 +7,11 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::UnknownUnit;
+use super::{UnknownUnit, YDown};
 use scale::Scale;
 use num::*;
 use box2d::Box2D;
-use point::Point2D;
+use point::{Point2D, point2};
 use vector::Vector2D;
 use side_offsets::SideOffsets2D;
 use size::Size2D;
@@ -105,6 +105,68 @@ where
 impl<T, U> Rect<T, U>
 where
     T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output = T> + Sub<T, Output = T>,
+    U: YDown,
+{
+    #[inline]
+    pub fn top_left(&self) -> Point2D<T, U> {
+        self.origin
+    }
+
+    #[inline]
+    pub fn top_right(&self) -> Point2D<T, U> {
+        point2(self.max_x(), self.origin.y)
+    }
+
+    #[inline]
+    pub fn bottom_left(&self) -> Point2D<T, U> {
+        point2(self.origin.x, self.max_y())
+    }
+
+    #[inline]
+    pub fn bottom_right(&self) -> Point2D<T, U> {
+        point2(self.max_x(), self.max_y())
+    }
+
+    /// Calculate the size and position of an inner rectangle.
+    ///
+    /// Subtracts the side offsets from all sides. The horizontal and vertical
+    /// offsets must not be larger than the original side length.
+    pub fn inner_rect(&self, offsets: SideOffsets2D<T, U>) -> Self {
+        let rect = Rect::new(
+            Point2D::new(
+                self.origin.x + offsets.left,
+                self.origin.y + offsets.top
+            ),
+            Size2D::new(
+                self.size.width - offsets.horizontal(),
+                self.size.height - offsets.vertical()
+            )
+        );
+        debug_assert!(rect.size.width >= Zero::zero());
+        debug_assert!(rect.size.height >= Zero::zero());
+        rect
+    }
+
+    /// Calculate the size and position of an outer rectangle.
+    ///
+    /// Add the offsets to all sides. The expanded rectangle is returned.
+    pub fn outer_rect(&self, offsets: SideOffsets2D<T, U>) -> Self {
+        Rect::new(
+            Point2D::new(
+                self.origin.x - offsets.left,
+                self.origin.y - offsets.top
+            ),
+            Size2D::new(
+                self.size.width + offsets.horizontal(),
+                self.size.height + offsets.vertical()
+            )
+        )
+    }
+}
+
+impl<T, U> Rect<T, U>
+where
+    T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output = T> + Sub<T, Output = T>,
 {
     #[inline]
     pub fn intersects(&self, other: &Self) -> bool {
@@ -112,6 +174,16 @@ where
             && other.origin.x < self.origin.x + self.size.width
             && self.origin.y < other.origin.y + other.size.height
             && other.origin.y < self.origin.y + self.size.height
+    }
+
+    #[inline]
+    pub fn min(&self) -> Point2D<T, U> {
+        self.origin
+    }
+
+    #[inline]
+    pub fn max(&self) -> Point2D<T, U> {
+        self.origin + self.size
     }
 
     #[inline]
@@ -202,62 +274,11 @@ where
     }
 
     #[inline]
-    pub fn top_right(&self) -> Point2D<T, U> {
-        Point2D::new(self.max_x(), self.origin.y)
-    }
-
-    #[inline]
-    pub fn bottom_left(&self) -> Point2D<T, U> {
-        Point2D::new(self.origin.x, self.max_y())
-    }
-
-    #[inline]
-    pub fn bottom_right(&self) -> Point2D<T, U> {
-        Point2D::new(self.max_x(), self.max_y())
-    }
-
-    #[inline]
     pub fn to_box2d(&self) -> Box2D<T, U> {
         Box2D {
-            min: self.origin,
-            max: self.bottom_right(),
+            min: self.min(),
+            max: self.max(),
         }
-    }
-
-    /// Calculate the size and position of an inner rectangle.
-    ///
-    /// Subtracts the side offsets from all sides. The horizontal and vertical
-    /// offsets must not be larger than the original side length.
-    pub fn inner_rect(&self, offsets: SideOffsets2D<T, U>) -> Self {
-        let rect = Rect::new(
-            Point2D::new(
-                self.origin.x + offsets.left,
-                self.origin.y + offsets.top
-            ),
-            Size2D::new(
-                self.size.width - offsets.horizontal(),
-                self.size.height - offsets.vertical()
-            )
-        );
-        debug_assert!(rect.size.width >= Zero::zero());
-        debug_assert!(rect.size.height >= Zero::zero());
-        rect
-    }
-
-    /// Calculate the size and position of an outer rectangle.
-    ///
-    /// Add the offsets to all sides. The expanded rectangle is returned.
-    pub fn outer_rect(&self, offsets: SideOffsets2D<T, U>) -> Self {
-        Rect::new(
-            Point2D::new(
-                self.origin.x - offsets.left,
-                self.origin.y - offsets.top
-            ),
-            Size2D::new(
-                self.size.width + offsets.horizontal(),
-                self.size.height + offsets.vertical()
-            )
-        )
     }
 
     /// Returns the smallest rectangle defined by the top/bottom/left/right-most
@@ -583,7 +604,7 @@ pub fn rect<T: Copy, U>(x: T, y: T, w: T, h: T) -> Rect<T, U> {
 #[cfg(test)]
 mod tests {
     use default::{Point2D, Rect, Size2D};
-    use {point2, vec2, rect};
+    use {point2, vec2, rect, size2};
     use side_offsets::SideOffsets2D;
 
     #[test]
@@ -730,7 +751,14 @@ mod tests {
 
     #[test]
     fn test_inner_outer_rect() {
-        let inner_rect: Rect<i32> = Rect::new(Point2D::new(20, 40), Size2D::new(80, 100));
+        use YDown;
+        use rect::Rect;
+        // Use a custom coordinate space and opt-into Y-down semantics to have
+        // inner_rect and outer_rect methods.
+        struct LocalSpace;
+        impl YDown for LocalSpace {};
+
+        let inner_rect: rect::Rect<i32, LocalSpace> = Rect::new(point2(20, 40), size2(80, 100));
         let offsets = SideOffsets2D::new(20, 10, 10, 10);
         let outer_rect = inner_rect.outer_rect(offsets);
         assert_eq!(outer_rect.origin.x, 10);
