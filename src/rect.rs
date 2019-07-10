@@ -115,6 +115,16 @@ where
     }
 
     #[inline]
+    pub fn min(&self) -> Point2D<T, U> {
+        self.origin
+    }
+
+    #[inline]
+    pub fn max(&self) -> Point2D<T, U> {
+        self.origin + self.size
+    }
+
+    #[inline]
     pub fn max_x(&self) -> T {
         self.origin.x + self.size.width
     }
@@ -202,25 +212,10 @@ where
     }
 
     #[inline]
-    pub fn top_right(&self) -> Point2D<T, U> {
-        Point2D::new(self.max_x(), self.origin.y)
-    }
-
-    #[inline]
-    pub fn bottom_left(&self) -> Point2D<T, U> {
-        Point2D::new(self.origin.x, self.max_y())
-    }
-
-    #[inline]
-    pub fn bottom_right(&self) -> Point2D<T, U> {
-        Point2D::new(self.max_x(), self.max_y())
-    }
-
-    #[inline]
     pub fn to_box2d(&self) -> Box2D<T, U> {
         Box2D {
-            min: self.origin,
-            max: self.bottom_right(),
+            min: self.min(),
+            max: self.max(),
         }
     }
 
@@ -228,6 +223,7 @@ where
     ///
     /// Subtracts the side offsets from all sides. The horizontal and vertical
     /// offsets must not be larger than the original side length.
+    /// This method assumes y oriented downward.
     pub fn inner_rect(&self, offsets: SideOffsets2D<T, U>) -> Self {
         let rect = Rect::new(
             Point2D::new(
@@ -247,6 +243,7 @@ where
     /// Calculate the size and position of an outer rectangle.
     ///
     /// Add the offsets to all sides. The expanded rectangle is returned.
+    /// This method assumes y oriented downward.
     pub fn outer_rect(&self, offsets: SideOffsets2D<T, U>) -> Self {
         Rect::new(
             Point2D::new(
@@ -583,7 +580,7 @@ pub fn rect<T: Copy, U>(x: T, y: T, w: T, h: T) -> Rect<T, U> {
 #[cfg(test)]
 mod tests {
     use default::{Point2D, Rect, Size2D};
-    use {point2, vec2, rect};
+    use {point2, vec2, rect, size2};
     use side_offsets::SideOffsets2D;
 
     #[test]
@@ -730,7 +727,7 @@ mod tests {
 
     #[test]
     fn test_inner_outer_rect() {
-        let inner_rect: Rect<i32> = Rect::new(Point2D::new(20, 40), Size2D::new(80, 100));
+        let inner_rect = Rect::new(point2(20, 40), size2(80, 100));
         let offsets = SideOffsets2D::new(20, 10, 10, 10);
         let outer_rect = inner_rect.outer_rect(offsets);
         assert_eq!(outer_rect.origin.x, 10);
