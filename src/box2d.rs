@@ -249,8 +249,8 @@ where
     /// and applicate offsets must not be larger than the original side length.
     pub fn inner_box(&self, offsets: SideOffsets2D<T, U>) -> Self {
         Box2D {
-            min: self.min + vec2(offsets.left, offsets.top),
-            max: self.max - vec2(offsets.right, offsets.bottom),
+            min: self.min + vec2(offsets.x0, offsets.y0),
+            max: self.max - vec2(offsets.x1, offsets.y1),
         }
     }
 
@@ -259,8 +259,8 @@ where
     /// Add the offsets to all sides. The expanded box is returned.
     pub fn outer_box(&self, offsets: SideOffsets2D<T, U>) -> Self {
         Box2D {
-            min: self.min - vec2(offsets.left, offsets.top),
-            max: self.max + vec2(offsets.right, offsets.bottom),
+            min: self.min - vec2(offsets.x0, offsets.y0),
+            max: self.max + vec2(offsets.x1, offsets.y1),
         }
     }
 }

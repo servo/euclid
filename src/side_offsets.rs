@@ -1,5 +1,5 @@
-// Copyright 2013 The Servo Project Developers. See the COPYRIGHT
-// file at the top-level directory of this distribution.
+// Copyx1 2013 The Servo Project Developers. See the COPYRIGHT
+// file at the y0-level directory of this distribution.
 //
 // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 // http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,7 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-//! A group of side offsets, which correspond to top/left/bottom/right for borders, padding,
+//! A group of side offsets, which correspond to y0/x0/y1/x1 for borders, padding,
 //! and margins in CSS.
 
 use length::Length;
@@ -20,16 +20,22 @@ use core::hash::{Hash};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-/// A group of 2D side offsets, which correspond to top/left/bottom/right for borders, padding,
+/// A group of 2D side offsets, which correspond to top/right/bottom/left for borders, padding,
 /// and margins in CSS, optionally tagged with a unit.
+///
+/// When assuming that the y-axis is oriented downward:
+/// - y0 corresponds to top,
+/// - x1 corresponds to right,
+/// - y1 corresponds to bottom,
+/// - x0 corresponds to left,
 #[repr(C)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(bound(serialize = "T: Serialize", deserialize = "T: Deserialize<'de>")))]
 pub struct SideOffsets2D<T, U> {
-    pub top: T,
-    pub right: T,
-    pub bottom: T,
-    pub left: T,
+    pub y0: T,
+    pub x1: T,
+    pub y1: T,
+    pub x0: T,
     #[doc(hidden)]
     pub _unit: PhantomData<U>,
 }
@@ -39,10 +45,10 @@ impl<T: Copy, U> Copy for SideOffsets2D<T, U> {}
 impl<T: Clone, U> Clone for SideOffsets2D<T, U> {
     fn clone(&self) -> Self {
         SideOffsets2D {
-            top: self.top.clone(),
-            right: self.right.clone(),
-            bottom: self.bottom.clone(),
-            left: self.left.clone(),
+            y0: self.y0.clone(),
+            x1: self.x1.clone(),
+            y1: self.y1.clone(),
+            x0: self.x0.clone(),
             _unit: PhantomData,
         }
     }
@@ -54,10 +60,10 @@ impl<T, U> PartialEq for SideOffsets2D<T, U>
     where T: PartialEq
 {
     fn eq(&self, other: &Self) -> bool {
-        self.top == other.top &&
-            self.right == other.right &&
-            self.bottom == other.bottom &&
-            self.left == other.left
+        self.y0 == other.y0 &&
+            self.x1 == other.x1 &&
+            self.y1 == other.y1 &&
+            self.x0 == other.x0
     }
 }
 
@@ -65,10 +71,10 @@ impl<T, U> Hash for SideOffsets2D<T, U>
     where T: Hash
 {
     fn hash<H: ::core::hash::Hasher>(&self, h: &mut H) {
-        self.top.hash(h);
-        self.right.hash(h);
-        self.bottom.hash(h);
-        self.left.hash(h);
+        self.x0.hash(h);
+        self.y0.hash(h);
+        self.x1.hash(h);
+        self.y1.hash(h);
     }
 }
 
@@ -77,7 +83,7 @@ impl<T: fmt::Debug, U> fmt::Debug for SideOffsets2D<T, U> {
         write!(
             f,
             "({:?},{:?},{:?},{:?})",
-            self.top, self.right, self.bottom, self.left
+            self.y0, self.x1, self.y1, self.x0
         )
     }
 }
@@ -85,10 +91,10 @@ impl<T: fmt::Debug, U> fmt::Debug for SideOffsets2D<T, U> {
 impl<T: Default, U> Default for SideOffsets2D<T, U> {
     fn default() -> Self {
         SideOffsets2D {
-            top: Default::default(),
-            right: Default::default(),
-            bottom: Default::default(),
-            left: Default::default(),
+            x0: Default::default(),
+            y0: Default::default(),
+            x1: Default::default(),
+            y1: Default::default(),
             _unit: PhantomData,
         }
     }
@@ -96,24 +102,24 @@ impl<T: Default, U> Default for SideOffsets2D<T, U> {
 
 impl<T: Copy, U> SideOffsets2D<T, U> {
     /// Constructor taking a scalar for each side.
-    pub fn new(top: T, right: T, bottom: T, left: T) -> Self {
+    pub fn new(y0: T, x1: T, y1: T, x0: T) -> Self {
         SideOffsets2D {
-            top,
-            right,
-            bottom,
-            left,
+            y0,
+            x1,
+            y1,
+            x0,
             _unit: PhantomData,
         }
     }
 
     /// Constructor taking a typed Length for each side.
     pub fn from_lengths(
-        top: Length<T, U>,
-        right: Length<T, U>,
-        bottom: Length<T, U>,
-        left: Length<T, U>,
+        y0: Length<T, U>,
+        x1: Length<T, U>,
+        y1: Length<T, U>,
+        x0: Length<T, U>,
     ) -> Self {
-        SideOffsets2D::new(top.0, right.0, bottom.0, left.0)
+        SideOffsets2D::new(x0.0, y0.0, x1.0, y1.0)
     }
 
     /// Constructor setting the same value to all sides, taking a scalar value directly.
@@ -132,11 +138,11 @@ where
     T: Add<T, Output = T> + Copy,
 {
     pub fn horizontal(&self) -> T {
-        self.left + self.right
+        self.x0 + self.x1
     }
 
     pub fn vertical(&self) -> T {
-        self.top + self.bottom
+        self.y0 + self.y1
     }
 }
 
@@ -147,10 +153,10 @@ where
     type Output = Self;
     fn add(self, other: Self) -> Self {
         SideOffsets2D::new(
-            self.top + other.top,
-            self.right + other.right,
-            self.bottom + other.bottom,
-            self.left + other.left,
+            self.y0 + other.y0,
+            self.x1 + other.x1,
+            self.y1 + other.y1,
+            self.x0 + other.x0,
         )
     }
 }

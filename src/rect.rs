@@ -227,8 +227,8 @@ where
     pub fn inner_rect(&self, offsets: SideOffsets2D<T, U>) -> Self {
         let rect = Rect::new(
             Point2D::new(
-                self.origin.x + offsets.left,
-                self.origin.y + offsets.top
+                self.origin.x + offsets.x0,
+                self.origin.y + offsets.y0,
             ),
             Size2D::new(
                 self.size.width - offsets.horizontal(),
@@ -247,8 +247,8 @@ where
     pub fn outer_rect(&self, offsets: SideOffsets2D<T, U>) -> Self {
         Rect::new(
             Point2D::new(
-                self.origin.x - offsets.left,
-                self.origin.y - offsets.top
+                self.origin.x - offsets.x0,
+                self.origin.y - offsets.y0
             ),
             Size2D::new(
                 self.size.width + offsets.horizontal(),
