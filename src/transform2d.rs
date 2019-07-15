@@ -13,7 +13,7 @@ use super::{UnknownUnit, Angle};
 #[cfg(feature = "mint")]
 use mint;
 use num::{One, Zero};
-use point::Point2D;
+use point::{Point2D, point2};
 use vector::{Vector2D, vec2};
 use rect::Rect;
 use transform3d::Transform3D;
@@ -437,11 +437,13 @@ where T: Copy + Clone +
     #[inline]
     #[must_use]
     pub fn transform_rect(&self, rect: &Rect<T, Src>) -> Rect<T, Dst> {
+        let min = rect.min();
+        let max = rect.max();
         Rect::from_points(&[
-            self.transform_point(rect.origin),
-            self.transform_point(rect.top_right()),
-            self.transform_point(rect.bottom_left()),
-            self.transform_point(rect.bottom_right()),
+            self.transform_point(min),
+            self.transform_point(max),
+            self.transform_point(point2(max.x, min.y)),
+            self.transform_point(point2(min.x, max.y)),
         ])
     }
 
