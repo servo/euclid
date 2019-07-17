@@ -47,8 +47,6 @@ extern crate serde;
 pub extern crate mint;
 extern crate num_traits;
 #[cfg(test)]
-extern crate rand;
-#[cfg(test)]
 use std as core;
 
 pub use box2d::Box2D;
