@@ -1,6 +1,6 @@
 [package]
 name = "euclid"
-version = "0.19.10"
+version = "0.20.0"
 authors = ["The Servo Project Developers"]
 description = "Geometry primitives"
 documentation = "https://docs.rs/euclid/"
@@ -18,5 +18,4 @@ serde = { version = "1.0", features = ["serde_derive"], optional = true }
 mint = {version = "0.5.1", optional = true}
 
 [dev-dependencies]
-rand = "0.4"
 serde_test = "1.0"
