@@ -522,10 +522,20 @@ impl <T, Src, Dst> Default for Transform2D<T, Src, Dst>
 }
 
 impl<T: ApproxEq<T>, Src, Dst> Transform2D<T, Src, Dst> {
+    /// Returns true is this transform is approximately equal to the other one, using
+    /// T's default epsilon value.
     pub fn approx_eq(&self, other: &Self) -> bool {
         self.m11.approx_eq(&other.m11) && self.m12.approx_eq(&other.m12) &&
         self.m21.approx_eq(&other.m21) && self.m22.approx_eq(&other.m22) &&
         self.m31.approx_eq(&other.m31) && self.m32.approx_eq(&other.m32)
+    }
+
+    /// Returns true is this transform is approximately equal to the other one, using
+    /// a provided epsilon value.
+    pub fn approx_eq_eps(&self, other: &Self, eps: &T) -> bool {
+        self.m11.approx_eq_eps(&other.m11, eps) && self.m12.approx_eq_eps(&other.m12, eps) &&
+        self.m21.approx_eq_eps(&other.m21, eps) && self.m22.approx_eq_eps(&other.m22, eps) &&
+        self.m31.approx_eq_eps(&other.m31, eps) && self.m32.approx_eq_eps(&other.m32, eps)
     }
 }
 

@@ -323,6 +323,8 @@ where T: Copy + Clone +
         (m33 * det) < _0
     }
 
+    /// Returns true is this transform is approximately equal to the other one, using
+    /// T's default epsilon value.
     pub fn approx_eq(&self, other: &Self) -> bool
     where T : ApproxEq<T> {
         self.m11.approx_eq(&other.m11) && self.m12.approx_eq(&other.m12) &&
@@ -333,6 +335,20 @@ where T: Copy + Clone +
         self.m33.approx_eq(&other.m33) && self.m34.approx_eq(&other.m34) &&
         self.m41.approx_eq(&other.m41) && self.m42.approx_eq(&other.m42) &&
         self.m43.approx_eq(&other.m43) && self.m44.approx_eq(&other.m44)
+    }
+
+    /// Returns true is this transform is approximately equal to the other one, using
+    /// a provided epsilon value.
+    pub fn approx_eq_eps(&self, other: &Self, eps: &T) -> bool
+    where T : ApproxEq<T> {
+        self.m11.approx_eq_eps(&other.m11, eps) && self.m12.approx_eq_eps(&other.m12, eps) &&
+        self.m13.approx_eq_eps(&other.m13, eps) && self.m14.approx_eq_eps(&other.m14, eps) &&
+        self.m21.approx_eq_eps(&other.m21, eps) && self.m22.approx_eq_eps(&other.m22, eps) &&
+        self.m23.approx_eq_eps(&other.m23, eps) && self.m24.approx_eq_eps(&other.m24, eps) &&
+        self.m31.approx_eq_eps(&other.m31, eps) && self.m32.approx_eq_eps(&other.m32, eps) &&
+        self.m33.approx_eq_eps(&other.m33, eps) && self.m34.approx_eq_eps(&other.m34, eps) &&
+        self.m41.approx_eq_eps(&other.m41, eps) && self.m42.approx_eq_eps(&other.m42, eps) &&
+        self.m43.approx_eq_eps(&other.m43, eps) && self.m44.approx_eq_eps(&other.m44, eps)
     }
 
     /// Returns the same transform with a different destination unit.
