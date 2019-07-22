@@ -9,6 +9,7 @@
 
 use {Vector2D, Point2D, Vector3D, Point3D, Transform2D, Transform3D};
 use {Size2D, Rect, vec2, point2, vec3, point3};
+use UnknownUnit;
 use num::*;
 use trig::Trig;
 use core::ops::{Add, Sub, Neg, Mul, Div};
@@ -103,6 +104,26 @@ where
     #[inline]
     pub fn to_tuple(&self) -> (T, T) {
         (self.x, self.y)
+    }
+
+    /// Drop the units, preserving only the numeric value.
+    #[inline]
+    pub fn to_untyped(&self) -> Translation2D<T, UnknownUnit, UnknownUnit> {
+        Translation2D {
+            x: self.x,
+            y: self.y,
+            _unit: PhantomData,
+        }
+    }
+
+    /// Tag a unitless value with units.
+    #[inline]
+    pub fn from_untyped(t: &Translation2D<T, UnknownUnit, UnknownUnit>) -> Self {
+        Translation2D {
+            x: t.x,
+            y: t.y,
+            _unit: PhantomData,
+        }
     }
 }
 
@@ -364,6 +385,28 @@ where
     #[inline]
     pub fn to_tuple(&self) -> (T, T, T) {
         (self.x, self.y, self.z)
+    }
+
+    /// Drop the units, preserving only the numeric value.
+    #[inline]
+    pub fn to_untyped(&self) -> Translation3D<T, UnknownUnit, UnknownUnit> {
+        Translation3D {
+            x: self.x,
+            y: self.y,
+            z: self.z,
+            _unit: PhantomData,
+        }
+    }
+
+    /// Tag a unitless value with units.
+    #[inline]
+    pub fn from_untyped(t: &Translation3D<T, UnknownUnit, UnknownUnit>) -> Self {
+        Translation3D {
+            x: t.x,
+            y: t.y,
+            z: t.z,
+            _unit: PhantomData,
+        }
     }
 }
 
