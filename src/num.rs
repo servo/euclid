@@ -41,36 +41,48 @@ pub trait Ceil: Copy {
 }
 
 macro_rules! num_int {
-    ($ty:ty) => (
+    ($ty:ty) => {
         impl Round for $ty {
             #[inline]
-            fn round(self) -> $ty { self }
+            fn round(self) -> $ty {
+                self
+            }
         }
         impl Floor for $ty {
             #[inline]
-            fn floor(self) -> $ty { self }
+            fn floor(self) -> $ty {
+                self
+            }
         }
         impl Ceil for $ty {
             #[inline]
-            fn ceil(self) -> $ty { self }
+            fn ceil(self) -> $ty {
+                self
+            }
         }
-    )
+    };
 }
 macro_rules! num_float {
-    ($ty:ty) => (
+    ($ty:ty) => {
         impl Round for $ty {
             #[inline]
-            fn round(self) -> $ty { self.round() }
+            fn round(self) -> $ty {
+                num_traits::Float::round(self)
+            }
         }
         impl Floor for $ty {
             #[inline]
-            fn floor(self) -> $ty { self.floor() }
+            fn floor(self) -> $ty {
+                num_traits::Float::floor(self)
+            }
         }
         impl Ceil for $ty {
             #[inline]
-            fn ceil(self) -> $ty { self.ceil() }
+            fn ceil(self) -> $ty {
+                num_traits::Float::ceil(self)
+            }
         }
-    )
+    };
 }
 
 num_int!(i16);

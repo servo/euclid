@@ -10,11 +10,14 @@ categories = ["science"]
 license = "MIT / Apache-2.0"
 
 [features]
+default = ["std"]
 unstable = []
+std = ["num-traits/std"]
+libm = ["num-traits/libm"]
 
 [dependencies]
-num-traits = { version = "0.2" }
-serde = { version = "1.0", features = ["serde_derive"], optional = true }
+num-traits = { git = "https://github.com/rust-num/num-traits", default-features = false }
+serde = { version = "1.0", default-features = false, features = ["serde_derive"], optional = true }
 mint = {version = "0.5.1", optional = true}
 
 [dev-dependencies]
