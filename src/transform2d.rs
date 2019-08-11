@@ -300,7 +300,6 @@ where T: Copy + Clone +
          Mul<T, Output=T> +
          Div<T, Output=T> +
          Sub<T, Output=T> +
-         Trig +
          PartialOrd +
          One + Zero  {
 
@@ -381,33 +380,6 @@ where T: Copy + Clone +
             self.m21,     self.m22 * y,
             self.m31,     self.m32
         )
-    }
-
-    /// Returns a rotation transform.
-    #[inline]
-    pub fn create_rotation(theta: Angle<T>) -> Self {
-        let _0 = Zero::zero();
-        let cos = theta.get().cos();
-        let sin = theta.get().sin();
-        Transform2D::row_major(
-            cos, _0 - sin,
-            sin, cos,
-             _0, _0
-        )
-    }
-
-    /// Applies a rotation after self's transformation and returns the resulting transform.
-    #[inline]
-    #[must_use]
-    pub fn post_rotate(&self, theta: Angle<T>) -> Self {
-        self.post_transform(&Transform2D::create_rotation(theta))
-    }
-
-    /// Applies a rotation before self's transformation and returns the resulting transform.
-    #[inline]
-    #[must_use]
-    pub fn pre_rotate(&self, theta: Angle<T>) -> Self {
-        self.pre_transform(&Transform2D::create_rotation(theta))
     }
 
     /// Returns the given point transformed by this transform.
@@ -493,6 +465,43 @@ where T: Copy + Clone +
             self.m21, self.m22,
             self.m31, self.m32,
         )
+    }
+}
+
+impl<T, Src, Dst> Transform2D<T, Src, Dst>
+where T: Copy + Clone +
+         Add<T, Output=T> +
+         Mul<T, Output=T> +
+         Div<T, Output=T> +
+         Sub<T, Output=T> +
+         Trig +
+         PartialOrd +
+         One + Zero  {
+    /// Returns a rotation transform.
+    #[inline]
+    pub fn create_rotation(theta: Angle<T>) -> Self {
+        let _0 = Zero::zero();
+        let cos = theta.get().cos();
+        let sin = theta.get().sin();
+        Transform2D::row_major(
+            cos, _0 - sin,
+            sin, cos,
+            _0, _0
+        )
+    }
+
+    /// Applies a rotation after self's transformation and returns the resulting transform.
+    #[inline]
+    #[must_use]
+    pub fn post_rotate(&self, theta: Angle<T>) -> Self {
+        self.post_transform(&Transform2D::create_rotation(theta))
+    }
+
+    /// Applies a rotation before self's transformation and returns the resulting transform.
+    #[inline]
+    #[must_use]
+    pub fn pre_rotate(&self, theta: Angle<T>) -> Self {
+        self.pre_transform(&Transform2D::create_rotation(theta))
     }
 }
 
