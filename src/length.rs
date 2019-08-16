@@ -75,7 +75,7 @@ where
 }
 
 impl<T, Unit> Length<T, Unit> {
-    pub fn new(x: T) -> Self {
+    pub const fn new(x: T) -> Self {
         Length(x, PhantomData)
     }
 }

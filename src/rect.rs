@@ -81,7 +81,7 @@ impl<T: Default, U> Default for Rect<T, U> {
 
 impl<T, U> Rect<T, U> {
     /// Constructor.
-    pub fn new(origin: Point2D<T, U>, size: Size2D<T, U>) -> Self {
+    pub const fn new(origin: Point2D<T, U>, size: Size2D<T, U>) -> Self {
         Rect {
             origin,
             size,
@@ -573,7 +573,7 @@ where T: Copy + Zero
 }
 
 /// Shorthand for `Rect::new(Point2D::new(x, y), Size2D::new(w, h))`.
-pub fn rect<T: Copy, U>(x: T, y: T, w: T, h: T) -> Rect<T, U> {
+pub const fn rect<T, U>(x: T, y: T, w: T, h: T) -> Rect<T, U> {
     Rect::new(Point2D::new(x, y), Size2D::new(w, h))
 }
 

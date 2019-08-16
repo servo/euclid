@@ -94,9 +94,9 @@ impl<T: Default, U> Default for SideOffsets2D<T, U> {
     }
 }
 
-impl<T: Copy, U> SideOffsets2D<T, U> {
+impl<T, U> SideOffsets2D<T, U> {
     /// Constructor taking a scalar for each side.
-    pub fn new(top: T, right: T, bottom: T, left: T) -> Self {
+    pub const fn new(top: T, right: T, bottom: T, left: T) -> Self {
         SideOffsets2D {
             top,
             right,
@@ -105,7 +105,9 @@ impl<T: Copy, U> SideOffsets2D<T, U> {
             _unit: PhantomData,
         }
     }
+}
 
+impl<T: Copy, U> SideOffsets2D<T, U> {
     /// Constructor taking a typed Length for each side.
     pub fn from_lengths(
         top: Length<T, U>,

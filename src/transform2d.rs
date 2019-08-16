@@ -132,13 +132,13 @@ impl<T, Src, Dst> Hash for Transform2D<T, Src, Dst>
     }
 }
 
-impl<T: Copy, Src, Dst> Transform2D<T, Src, Dst> {
+impl<T, Src, Dst> Transform2D<T, Src, Dst> {
     /// Create a transform specifying its matrix elements in row-major order.
     ///
     /// Beware: This library is written with the assumption that row vectors
     /// are being used. If your matrices use column vectors (i.e. transforming a vector
     /// is `T * v`), then please use `column_major`
-    pub fn row_major(m11: T, m12: T, m21: T, m22: T, m31: T, m32: T) -> Self {
+    pub const fn row_major(m11: T, m12: T, m21: T, m22: T, m31: T, m32: T) -> Self {
         Transform2D {
             m11, m12,
             m21, m22,
@@ -152,7 +152,7 @@ impl<T: Copy, Src, Dst> Transform2D<T, Src, Dst> {
     /// Beware: This library is written with the assumption that row vectors
     /// are being used. If your matrices use column vectors (i.e. transforming a vector
     /// is `T * v`), then please use `row_major`
-    pub fn column_major(m11: T, m21: T, m31: T, m12: T, m22: T, m32: T) -> Self {
+    pub const fn column_major(m11: T, m21: T, m31: T, m12: T, m22: T, m32: T) -> Self {
         Transform2D {
             m11, m12,
             m21, m22,
@@ -160,7 +160,9 @@ impl<T: Copy, Src, Dst> Transform2D<T, Src, Dst> {
             _unit: PhantomData,
         }
     }
+}
 
+impl<T: Copy, Src, Dst> Transform2D<T, Src, Dst> {
     /// Returns an array containing this transform's terms in row-major order (the order
     /// in which the transform is actually laid out in memory).
     ///

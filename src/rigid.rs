@@ -23,16 +23,18 @@ pub struct RigidTransform3D<T, Src, Dst> {
 // i.e. a vector `v` is transformed with `v * T`, and if you want to apply `T1`
 // before `T2` you use `T1 * T2`
 
-impl<T: Float + ApproxEq<T>, Src, Dst> RigidTransform3D<T, Src, Dst> {
+impl<T, Src, Dst> RigidTransform3D<T, Src, Dst> {
     /// Construct a new rigid transformation, where the `rotation` applies first
     #[inline]
-    pub fn new(rotation: Rotation3D<T, Src, Dst>, translation: Vector3D<T, Dst>) -> Self {
+    pub const fn new(rotation: Rotation3D<T, Src, Dst>, translation: Vector3D<T, Dst>) -> Self {
         Self {
             rotation,
             translation,
         }
     }
+}
 
+impl<T: Float + ApproxEq<T>, Src, Dst> RigidTransform3D<T, Src, Dst> {
     /// Construct an identity transform
     #[inline]
     pub fn identity() -> Self {
