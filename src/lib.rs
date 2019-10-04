@@ -18,9 +18,9 @@
 //! a screen-space position by a world-space vector and this can be expressed using
 //! the generic Unit parameter.
 //!
-//! This unit system is not mandatory and all * structures have an alias
+//! This unit system is not mandatory and all structures have an alias
 //! with the default unit: `UnknownUnit`.
-//! for example ```Point2D<T>``` is equivalent to ```Point2D<T, UnknownUnit>```.
+//! for example ```default::Point2D<T>``` is equivalent to ```Point2D<T, UnknownUnit>```.
 //! Client code typically creates a set of aliases for each type and doesn't need
 //! to deal with the specifics of typed units further. For example:
 //!
@@ -98,6 +98,8 @@ mod nonempty;
 pub struct UnknownUnit;
 
 pub mod default {
+    //! A set of aliases for all types, tagged with the default unknown unit.
+
     use super::UnknownUnit;
     pub type Point2D<T> = super::Point2D<T, UnknownUnit>;
     pub type Point3D<T> = super::Point3D<T, UnknownUnit>;
