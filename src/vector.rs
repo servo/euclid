@@ -299,6 +299,20 @@ where
     }
 }
 
+impl<T, U> Vector2D<T, U>
+where
+    T: Copy + One + Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>,
+{
+    /// Returns the vector "bounced off" a surface defined by the provided normal vector.
+    ///
+    /// The normal vector should be normalized for this physical analogy to hold.
+    #[inline]
+    pub fn bounce(&self, normal: Self) -> Self {
+        let two = T::one() + T::one();
+        *self - normal * two * self.dot(normal)
+    }
+}
+
 impl<T: Copy + Add<T, Output = T>, U> Add for Vector2D<T, U> {
     type Output = Self;
     fn add(self, other: Self) -> Self {
@@ -834,6 +848,20 @@ where
     pub fn lerp(&self, other: Self, t: T) -> Self {
         let one_t = T::one() - t;
         (*self) * one_t + other * t
+    }
+}
+
+impl<T, U> Vector3D<T, U>
+where
+    T: Copy + One + Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>,
+{
+    /// Returns the vector "bounced off" a surface defined by the provided normal vector.
+    ///
+    /// The normal vector should be normalized for this physical analogy to hold.
+    #[inline]
+    pub fn bounce(&self, normal: Self) -> Self {
+        let two = T::one() + T::one();
+        *self - normal * two * self.dot(normal)
     }
 }
 
@@ -1521,6 +1549,17 @@ mod vector2d {
         let p: default::Vector2D<i32> = vec2(1, 2);
         assert_eq!(p.yx(), vec2(2, 1));
     }
+
+    #[test]
+    pub fn test_bounce() {
+        use approxeq::ApproxEq;
+        let a: Vec2 = vec2(1.0, 3.0);
+        let n1: Vec2 = vec2(0.0, -1.0);
+        let n2: Vec2 = vec2(1.0, -1.0).normalize();
+
+        assert!(a.bounce(n1).approx_eq(&vec2(1.0, -3.0)));
+        assert!(a.bounce(n2).approx_eq(&vec2(3.0, 1.0)));
+    }
 }
 
 #[cfg(test)]
@@ -1623,6 +1662,17 @@ mod vector3d {
         let v2 = Vec3::from(vm);
 
         assert_eq!(v1, v2);
+    }
+
+    #[test]
+    pub fn test_bounce() {
+        use approxeq::ApproxEq;
+        let a: Vec3 = vec3(1.0, 3.0, 2.0);
+        let n1: Vec3 = vec3(0.0, -1.0, 0.0);
+        let n2: Vec3 = vec3(0.0, 1.0, 1.0).normalize();
+
+        assert!(a.bounce(n1).approx_eq(&vec3(1.0, -3.0, 2.0)));
+        assert!(a.bounce(n2).approx_eq(&vec3(1.0, -2.0, -3.0)));
     }
 }
 
