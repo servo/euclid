@@ -302,6 +302,23 @@ where
 
 impl<T, U> Vector2D<T, U>
 where
+    T: Copy + Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>
+    + PartialOrd + Float
+{
+    /// Return this vector capped to a maximum length.
+    #[inline]
+    pub fn cap_length(&self, max_length: T) -> Self {
+        let square_length = self.square_length();
+        if square_length > max_length * max_length {
+            return self.normalize() * max_length;
+        }
+
+        *self
+    }
+}
+
+impl<T, U> Vector2D<T, U>
+where
     T: Copy + One + Add<Output = T> + Sub<Output = T> + Mul<Output = T>,
 {
     /// Linearly interpolate between this vector and another vector.
@@ -863,6 +880,23 @@ impl<T: Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T> + Copy, U>
         T: Float,
     {
         self.square_length().sqrt()
+    }
+}
+
+impl<T, U> Vector3D<T, U>
+where
+    T: Copy + Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>
+    + PartialOrd + Float
+{
+    /// Return this vector capped to a maximum length.
+    #[inline]
+    pub fn cap_length(&self, max_length: T) -> Self {
+        let square_length = self.square_length();
+        if square_length > max_length * max_length {
+            return self.normalize() * max_length;
+        }
+
+        *self
     }
 }
 
@@ -1546,6 +1580,37 @@ mod vector2d {
         assert!(up_left.angle_to(up).get().approx_eq_eps(&(0.5 * FRAC_PI_2), &0.0005));
     }
 
+    #[test]
+    pub fn test_cap_length() {
+        use approxeq::ApproxEq;
+
+        let v1: Vec2 = vec2(0.5, 0.5);
+        let v2: Vec2 = vec2(1.0, 0.0);
+        let v3: Vec2 = vec2(0.1, 0.2);
+        let v4: Vec2 = vec2(2.0, -2.0);
+        let v5: Vec2 = vec2(1.0, 2.0);
+        let v6: Vec2 = vec2(-1.0, 3.0);
+
+        assert_eq!(v1.cap_length(1.0), v1);
+        assert_eq!(v2.cap_length(1.0), v2);
+        assert_eq!(v3.cap_length(1.0), v3);
+        assert_eq!(v4.cap_length(10.0), v4);
+        assert_eq!(v5.cap_length(10.0), v5);
+        assert_eq!(v6.cap_length(10.0), v6);
+
+        let v4_clamped = v4.cap_length(1.0);
+        assert!(v4_clamped.length().approx_eq(&1.0));
+        assert!(v4_clamped.normalize().approx_eq(&v4.normalize()));
+
+        let v5_clamped = v5.cap_length(1.5);
+        assert!(v5_clamped.length().approx_eq(&1.5));
+        assert!(v5_clamped.normalize().approx_eq(&v5.normalize()));
+
+        let v6_clamped = v6.cap_length(2.5);
+        assert!(v6_clamped.length().approx_eq(&2.5));
+        assert!(v6_clamped.normalize().approx_eq(&v6.normalize()));
+    }
+
     #[cfg(feature = "mint")]
     #[test]
     pub fn test_mint() {
@@ -1735,6 +1800,37 @@ mod vector3d {
         assert!(right.angle_to(up).get().approx_eq(&FRAC_PI_2));
         assert!(up.angle_to(right).get().approx_eq(&FRAC_PI_2));
         assert!(up_left.angle_to(up).get().approx_eq_eps(&(0.5 * FRAC_PI_2), &0.0005));
+    }
+
+    #[test]
+    pub fn test_cap_length() {
+        use approxeq::ApproxEq;
+
+        let v1: Vec3 = vec3(0.5, 0.5, 0.0);
+        let v2: Vec3 = vec3(1.0, 0.0, 0.0);
+        let v3: Vec3 = vec3(0.1, 0.2, 0.3);
+        let v4: Vec3 = vec3(2.0, -2.0, 2.0);
+        let v5: Vec3 = vec3(1.0, 2.0, -3.0);
+        let v6: Vec3 = vec3(-1.0, 3.0, 2.0);
+
+        assert_eq!(v1.cap_length(1.0), v1);
+        assert_eq!(v2.cap_length(1.0), v2);
+        assert_eq!(v3.cap_length(1.0), v3);
+        assert_eq!(v4.cap_length(10.0), v4);
+        assert_eq!(v5.cap_length(10.0), v5);
+        assert_eq!(v6.cap_length(10.0), v6);
+
+        let v4_clamped = v4.cap_length(1.0);
+        assert!(v4_clamped.length().approx_eq(&1.0));
+        assert!(v4_clamped.normalize().approx_eq(&v4.normalize()));
+
+        let v5_clamped = v5.cap_length(1.5);
+        assert!(v5_clamped.length().approx_eq(&1.5));
+        assert!(v5_clamped.normalize().approx_eq(&v5.normalize()));
+
+        let v6_clamped = v6.cap_length(2.5);
+        assert!(v6_clamped.length().approx_eq(&2.5));
+        assert!(v6_clamped.normalize().approx_eq(&v6.normalize()));
     }
 }
 
