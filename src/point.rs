@@ -130,7 +130,7 @@ impl<T: Default, U> Default for Point2D<T, U> {
 impl<T, U> Point2D<T, U> {
     /// Constructor taking scalar values directly.
     #[inline]
-    pub fn new(x: T, y: T) -> Self {
+    pub const fn new(x: T, y: T) -> Self {
         Point2D {
             x,
             y,
@@ -607,10 +607,10 @@ impl<T: Copy + Default, U> Default for Point3D<T, U> {
     }
 }
 
-impl<T: Copy, U> Point3D<T, U> {
+impl<T, U> Point3D<T, U> {
     /// Constructor taking scalar values directly.
     #[inline]
-    pub fn new(x: T, y: T, z: T) -> Self {
+    pub const fn new(x: T, y: T, z: T) -> Self {
         Point3D {
             x,
             y,
@@ -618,7 +618,9 @@ impl<T: Copy, U> Point3D<T, U> {
             _unit: PhantomData,
         }
     }
+}
 
+impl<T: Copy, U> Point3D<T, U> {
     /// Constructor taking properly  Lengths instead of scalar values.
     #[inline]
     pub fn from_lengths(x: Length<T, U>, y: Length<T, U>, z: Length<T, U>) -> Self {
@@ -950,7 +952,7 @@ impl<T: Copy, U> From<(T, T, T)> for Point3D<T, U> {
 }
 
 #[inline]
-pub fn point2<T: Copy, U>(x: T, y: T) -> Point2D<T, U> {
+pub const fn point2<T, U>(x: T, y: T) -> Point2D<T, U> {
     Point2D {
         x,
         y,
@@ -959,7 +961,7 @@ pub fn point2<T: Copy, U>(x: T, y: T) -> Point2D<T, U> {
 }
 
 #[inline]
-pub fn point3<T: Copy, U>(x: T, y: T, z: T) -> Point3D<T, U> {
+pub const fn point3<T, U>(x: T, y: T, z: T) -> Point3D<T, U> {
     Point3D {
         x,
         y,

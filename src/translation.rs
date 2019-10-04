@@ -83,7 +83,7 @@ impl<T, Src, Dst> Hash for Translation2D<T, Src, Dst>
 
 impl<T, Src, Dst> Translation2D<T, Src, Dst> {
     #[inline]
-    pub fn new(x: T, y: T) -> Self {
+    pub const fn new(x: T, y: T) -> Self {
         Translation2D {
             x,
             y,
@@ -363,7 +363,7 @@ impl<T, Src, Dst> Hash for Translation3D<T, Src, Dst>
 
 impl<T, Src, Dst> Translation3D<T, Src, Dst> {
     #[inline]
-    pub fn new(x: T, y: T, z: T) -> Self {
+    pub const fn new(x: T, y: T, z: T) -> Self {
         Translation3D {
             x,
             y,

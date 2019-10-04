@@ -93,7 +93,7 @@ impl<T, U> Hash for HomogeneousVector<T, U>
 impl<T, U> HomogeneousVector<T, U> {
     /// Constructor taking scalar values directly.
     #[inline]
-    pub fn new(x: T, y: T, z: T, w: T) -> Self {
+    pub const fn new(x: T, y: T, z: T, w: T) -> Self {
         HomogeneousVector { x, y, z, w, _unit: PhantomData }
     }
 }

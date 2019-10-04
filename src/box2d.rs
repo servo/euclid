@@ -75,7 +75,7 @@ impl<T: fmt::Display, U> fmt::Display for Box2D<T, U> {
 
 impl<T, U> Box2D<T, U> {
     /// Constructor.
-    pub fn new(min: Point2D<T, U>, max: Point2D<T, U>) -> Self {
+    pub const fn new(min: Point2D<T, U>, max: Point2D<T, U>) -> Self {
         Box2D {
             min,
             max,

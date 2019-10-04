@@ -129,7 +129,7 @@ impl<T: Default, U> Default for Vector2D<T, U> {
 impl<T, U> Vector2D<T, U> {
     /// Constructor taking scalar values directly.
     #[inline]
-    pub fn new(x: T, y: T) -> Self {
+    pub const fn new(x: T, y: T) -> Self {
         Vector2D {
             x,
             y,
@@ -677,7 +677,7 @@ impl<T: Default, U> Default for Vector3D<T, U> {
 impl<T, U> Vector3D<T, U> {
     /// Constructor taking scalar values directly.
     #[inline]
-    pub fn new(x: T, y: T, z: T) -> Self {
+    pub const fn new(x: T, y: T, z: T) -> Self {
         Vector3D {
             x,
             y,

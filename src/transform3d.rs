@@ -179,7 +179,7 @@ impl<T, Src, Dst> Transform3D<T, Src, Dst> {
     /// is `T * v`), then please use `column_major`
     #[inline]
     #[cfg_attr(feature = "cargo-clippy", allow(too_many_arguments))]
-    pub fn row_major(
+    pub const fn row_major(
             m11: T, m12: T, m13: T, m14: T,
             m21: T, m22: T, m23: T, m24: T,
             m31: T, m32: T, m33: T, m34: T,
@@ -204,7 +204,7 @@ impl<T, Src, Dst> Transform3D<T, Src, Dst> {
     /// is `T * v`), then please use `row_major`
     #[inline]
     #[cfg_attr(feature = "cargo-clippy", allow(too_many_arguments))]
-    pub fn column_major(
+    pub const fn column_major(
             m11: T, m21: T, m31: T, m41: T,
             m12: T, m22: T, m32: T, m42: T,
             m13: T, m23: T, m33: T, m43: T,

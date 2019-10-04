@@ -108,7 +108,7 @@ impl<T: Default, U> Default for Size2D<T, U> {
 
 impl<T, U> Size2D<T, U> {
     /// Constructor taking scalar values.
-    pub fn new(width: T, height: T) -> Self {
+    pub const fn new(width: T, height: T) -> Self {
         Size2D {
             width,
             height,
@@ -409,7 +409,7 @@ impl<T: Float, U> Size2D<T, U> {
 
 
 /// Shorthand for `Size2D::new(w, h)`.
-pub fn size2<T, U>(w: T, h: T) -> Size2D<T, U> {
+pub const fn size2<T, U>(w: T, h: T) -> Size2D<T, U> {
     Size2D::new(w, h)
 }
 
@@ -614,7 +614,7 @@ impl<T: Default, U> Default for Size3D<T, U> {
 
 impl<T, U> Size3D<T, U> {
     /// Constructor taking scalar values.
-    pub fn new(width: T, height: T, depth: T) -> Self {
+    pub const fn new(width: T, height: T, depth: T) -> Self {
         Size3D {
             width,
             height,
@@ -918,7 +918,7 @@ impl<T: Float, U> Size3D<T, U> {
 
 
 /// Shorthand for `Size3D::new(w, h, d)`.
-pub fn size3<T, U>(w: T, h: T, d: T) -> Size3D<T, U> {
+pub const fn size3<T, U>(w: T, h: T, d: T) -> Size3D<T, U> {
     Size3D::new(w, h, d)
 }
 

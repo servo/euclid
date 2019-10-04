@@ -43,7 +43,7 @@ use {Point2D, Rect, Size2D, Vector2D};
 pub struct Scale<T, Src, Dst>(pub T, #[doc(hidden)] pub PhantomData<(Src, Dst)>);
 
 impl<T, Src, Dst> Scale<T, Src, Dst> {
-    pub fn new(x: T) -> Self {
+    pub const fn new(x: T) -> Self {
         Scale(x, PhantomData)
     }
 }
