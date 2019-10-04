@@ -226,9 +226,24 @@ impl<T, U> Vector2D<T, U>
 where
     T: Trig + Copy + Sub<T, Output = T>,
 {
-    /// Returns the angle between this vector and the x axis between -PI and PI.
+    /// Returns the signed angle between this vector and the x axis.
+    ///
+    /// The returned angle is between -PI and PI.
     pub fn angle_from_x_axis(&self) -> Angle<T> {
         Angle::radians(Trig::fast_atan2(self.y, self.x))
+    }
+}
+
+impl<T, U> Vector2D<T, U>
+where
+    T: Copy + Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>
+    + Trig + Copy + Sub<T, Output = T>,
+{
+    /// Returns the signed angle between this vector and another vector.
+    ///
+    /// The returned angle is between -PI and PI.
+    pub fn angle_to(&self, other: Self) -> Angle<T> {
+        Angle::radians(Trig::fast_atan2(self.cross(other), self.dot(other)))
     }
 }
 
@@ -777,6 +792,20 @@ where
     #[inline]
     pub fn to_transform(&self) -> Transform3D<T, U, U> {
         Transform3D::create_translation(self.x, self.y, self.z)
+    }
+}
+
+impl<T, U> Vector3D<T, U>
+where
+    T: Copy + Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>
+    + Trig + Copy + Sub<T, Output = T>
+    + Float
+{
+    /// Returns the positive angle between this vector and another vector.
+    ///
+    /// The returned angle is between 0 and PI.
+    pub fn angle_to(&self, other: Self) -> Angle<T> {
+        Angle::radians(Trig::fast_atan2(self.cross(other).length(), self.dot(other)))
     }
 }
 
@@ -1482,6 +1511,7 @@ mod vector2d {
 
         assert_eq!(result, vec2(2.0, 3.0));
     }
+
     #[test]
     pub fn test_angle_from_x_axis() {
         use core::f32::consts::FRAC_PI_2;
@@ -1494,6 +1524,22 @@ mod vector2d {
         assert!(right.angle_from_x_axis().get().approx_eq(&0.0));
         assert!(down.angle_from_x_axis().get().approx_eq(&FRAC_PI_2));
         assert!(up.angle_from_x_axis().get().approx_eq(&-FRAC_PI_2));
+    }
+
+    #[test]
+    pub fn test_angle_to() {
+        use core::f32::consts::FRAC_PI_2;
+        use approxeq::ApproxEq;
+
+        let right: Vec2 = vec2(10.0, 0.0);
+        let right2: Vec2 = vec2(1.0, 0.0);
+        let up: Vec2 = vec2(0.0, -1.0);
+        let up_left: Vec2 = vec2(-1.0, -1.0);
+
+        assert!(right.angle_to(right2).get().approx_eq(&0.0));
+        assert!(right.angle_to(up).get().approx_eq(&-FRAC_PI_2));
+        assert!(up.angle_to(right).get().approx_eq(&FRAC_PI_2));
+        assert!(up_left.angle_to(up).get().approx_eq_eps(&(0.5 * FRAC_PI_2), &0.0005));
     }
 
     #[cfg(feature = "mint")]
@@ -1669,6 +1715,22 @@ mod vector3d {
 
         assert!(a.reflect(n1).approx_eq(&vec3(1.0, -3.0, 2.0)));
         assert!(a.reflect(n2).approx_eq(&vec3(1.0, -2.0, -3.0)));
+    }
+
+    #[test]
+    pub fn test_angle_to() {
+        use core::f32::consts::FRAC_PI_2;
+        use approxeq::ApproxEq;
+
+        let right: Vec3 = vec3(10.0, 0.0, 0.0);
+        let right2: Vec3 = vec3(1.0, 0.0, 0.0);
+        let up: Vec3 = vec3(0.0, -1.0, 0.0);
+        let up_left: Vec3 = vec3(-1.0, -1.0, 0.0);
+
+        assert!(right.angle_to(right2).get().approx_eq(&0.0));
+        assert!(right.angle_to(up).get().approx_eq(&FRAC_PI_2));
+        assert!(up.angle_to(right).get().approx_eq(&FRAC_PI_2));
+        assert!(up_left.angle_to(up).get().approx_eq_eps(&(0.5 * FRAC_PI_2), &0.0005));
     }
 }
 
