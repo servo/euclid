@@ -298,6 +298,17 @@ where
     {
         self.square_length().sqrt()
     }
+
+    /// Returns this vector projected onto another one.
+    ///
+    /// Projecting onto a nil vector will cause a division by zero.
+    #[inline]
+    pub fn project_onto_vector(&self, onto: Self) -> Self
+    where
+        T: Div<T, Output = T>
+    {
+        onto * (self.dot(onto) / onto.square_length())
+    }
 }
 
 impl<T, U> Vector2D<T, U>
@@ -896,6 +907,17 @@ impl<T: Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T> + Copy, U>
         T: Float,
     {
         self.square_length().sqrt()
+    }
+
+    /// Returns this vector projected onto another one.
+    ///
+    /// Projecting onto a nil vector will cause a division by zero.
+    #[inline]
+    pub fn project_onto_vector(&self, onto: Self) -> Self
+    where
+        T: Div<T, Output = T>
+    {
+        onto * (self.dot(onto) / onto.square_length())
     }
 }
 
@@ -1643,6 +1665,22 @@ mod vector2d {
         assert!(v6_clamped.normalize().approx_eq(&v6.normalize()));
     }
 
+    #[test]
+    pub fn test_project_onto_vector() {
+        use approxeq::ApproxEq;
+
+        let v1: Vec2 = vec2(1.0, 2.0);
+        let x: Vec2 = vec2(1.0, 0.0);
+        let y: Vec2 = vec2(0.0, 1.0);
+
+        assert!(v1.project_onto_vector(x).approx_eq(&vec2(1.0, 0.0)));
+        assert!(v1.project_onto_vector(y).approx_eq(&vec2(0.0, 2.0)));
+        assert!(v1.project_onto_vector(-x).approx_eq(&vec2(1.0, 0.0)));
+        assert!(v1.project_onto_vector(x * 10.0).approx_eq(&vec2(1.0, 0.0)));
+        assert!(v1.project_onto_vector(v1 * 2.0).approx_eq(&v1));
+        assert!(v1.project_onto_vector(-v1).approx_eq(&v1));
+    }
+
     #[cfg(feature = "mint")]
     #[test]
     pub fn test_mint() {
@@ -1863,6 +1901,24 @@ mod vector3d {
         let v6_clamped = v6.with_max_length(2.5);
         assert!(v6_clamped.length().approx_eq(&2.5));
         assert!(v6_clamped.normalize().approx_eq(&v6.normalize()));
+    }
+
+    #[test]
+    pub fn test_project_onto_vector() {
+        use approxeq::ApproxEq;
+
+        let v1: Vec3 = vec3(1.0, 2.0, 3.0);
+        let x: Vec3 = vec3(1.0, 0.0, 0.0);
+        let y: Vec3 = vec3(0.0, 1.0, 0.0);
+        let z: Vec3 = vec3(0.0, 0.0, 1.0);
+
+        assert!(v1.project_onto_vector(x).approx_eq(&vec3(1.0, 0.0, 0.0)));
+        assert!(v1.project_onto_vector(y).approx_eq(&vec3(0.0, 2.0, 0.0)));
+        assert!(v1.project_onto_vector(z).approx_eq(&vec3(0.0, 0.0, 3.0)));
+        assert!(v1.project_onto_vector(-x).approx_eq(&vec3(1.0, 0.0, 0.0)));
+        assert!(v1.project_onto_vector(x * 10.0).approx_eq(&vec3(1.0, 0.0, 0.0)));
+        assert!(v1.project_onto_vector(v1 * 2.0).approx_eq(&v1));
+        assert!(v1.project_onto_vector(-v1).approx_eq(&v1));
     }
 }
 
