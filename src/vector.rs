@@ -226,9 +226,24 @@ impl<T, U> Vector2D<T, U>
 where
     T: Trig + Copy + Sub<T, Output = T>,
 {
-    /// Returns the angle between this vector and the x axis between -PI and PI.
+    /// Returns the signed angle between this vector and the x axis.
+    ///
+    /// The returned angle is between -PI and PI.
     pub fn angle_from_x_axis(&self) -> Angle<T> {
         Angle::radians(Trig::fast_atan2(self.y, self.x))
+    }
+}
+
+impl<T, U> Vector2D<T, U>
+where
+    T: Copy + Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>
+    + Trig + Copy + Sub<T, Output = T>,
+{
+    /// Returns the signed angle between this vector and another vector.
+    ///
+    /// The returned angle is between -PI and PI.
+    pub fn angle_to(&self, other: Self) -> Angle<T> {
+        Angle::radians(Trig::fast_atan2(self.cross(other), self.dot(other)))
     }
 }
 
@@ -283,6 +298,52 @@ where
     {
         self.square_length().sqrt()
     }
+
+    /// Returns this vector projected onto another one.
+    ///
+    /// Projecting onto a nil vector will cause a division by zero.
+    #[inline]
+    pub fn project_onto_vector(&self, onto: Self) -> Self
+    where
+        T: Div<T, Output = T>
+    {
+        onto * (self.dot(onto) / onto.square_length())
+    }
+}
+
+impl<T, U> Vector2D<T, U>
+where
+    T: Copy + Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>
+    + PartialOrd + Float
+{
+    /// Return this vector capped to a maximum length.
+    #[inline]
+    pub fn with_max_length(&self, max_length: T) -> Self {
+        let square_length = self.square_length();
+        if square_length > max_length * max_length {
+            return (*self) * (max_length / square_length.sqrt());
+        }
+
+        *self
+    }
+
+    /// Return this vector with a minimum length applied.
+    #[inline]
+    pub fn with_min_length(&self, min_length: T) -> Self {
+        let square_length = self.square_length();
+        if square_length < min_length * min_length {
+            return (*self) * (min_length / square_length.sqrt());
+        }
+
+        *self
+    }
+
+    /// Return this vector with minimum and maximum lengths applied.
+    #[inline]
+    pub fn clamp_length(&self, min: T, max: T) -> Self {
+        debug_assert!(min <= max);
+        self.with_min_length(min).with_max_length(max)
+    }
 }
 
 impl<T, U> Vector2D<T, U>
@@ -296,6 +357,18 @@ where
     pub fn lerp(&self, other: Self, t: T) -> Self {
         let one_t = T::one() - t;
         (*self) * one_t + other * t
+    }
+}
+
+impl<T, U> Vector2D<T, U>
+where
+    T: Copy + One + Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>,
+{
+    /// Returns a reflection vector using an incident ray and a surface normal.
+    #[inline]
+    pub fn reflect(&self, normal: Self) -> Self {
+        let two = T::one() + T::one();
+        *self - normal * two * self.dot(normal)
     }
 }
 
@@ -768,6 +841,20 @@ where
     }
 }
 
+impl<T, U> Vector3D<T, U>
+where
+    T: Copy + Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>
+    + Trig + Copy + Sub<T, Output = T>
+    + Float
+{
+    /// Returns the positive angle between this vector and another vector.
+    ///
+    /// The returned angle is between 0 and PI.
+    pub fn angle_to(&self, other: Self) -> Angle<T> {
+        Angle::radians(Trig::fast_atan2(self.cross(other).length(), self.dot(other)))
+    }
+}
+
 impl<T: Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T> + Copy, U>
     Vector3D<T, U> {
     // Dot product.
@@ -821,6 +908,52 @@ impl<T: Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T> + Copy, U>
     {
         self.square_length().sqrt()
     }
+
+    /// Returns this vector projected onto another one.
+    ///
+    /// Projecting onto a nil vector will cause a division by zero.
+    #[inline]
+    pub fn project_onto_vector(&self, onto: Self) -> Self
+    where
+        T: Div<T, Output = T>
+    {
+        onto * (self.dot(onto) / onto.square_length())
+    }
+}
+
+impl<T, U> Vector3D<T, U>
+where
+    T: Copy + Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>
+    + PartialOrd + Float
+{
+    /// Return this vector capped to a maximum length.
+    #[inline]
+    pub fn with_max_length(&self, max_length: T) -> Self {
+        let square_length = self.square_length();
+        if square_length > max_length * max_length {
+            return (*self) * (max_length / square_length.sqrt());
+        }
+
+        *self
+    }
+
+    /// Return this vector with a minimum length applied.
+    #[inline]
+    pub fn with_min_length(&self, min_length: T) -> Self {
+        let square_length = self.square_length();
+        if square_length < min_length * min_length {
+            return (*self) * (min_length / square_length.sqrt());
+        }
+
+        *self
+    }
+
+    /// Return this vector with minimum and maximum lengths applied.
+    #[inline]
+    pub fn clamp_length(&self, min: T, max: T) -> Self {
+        debug_assert!(min <= max);
+        self.with_min_length(min).with_max_length(max)
+    }
 }
 
 impl<T, U> Vector3D<T, U>
@@ -834,6 +967,18 @@ where
     pub fn lerp(&self, other: Self, t: T) -> Self {
         let one_t = T::one() - t;
         (*self) * one_t + other * t
+    }
+}
+
+impl<T, U> Vector3D<T, U>
+where
+    T: Copy + One + Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>,
+{
+    /// Returns a reflection vector using an incident ray and a surface normal.
+    #[inline]
+    pub fn reflect(&self, normal: Self) -> Self {
+        let two = T::one() + T::one();
+        *self - normal * two * self.dot(normal)
     }
 }
 
@@ -1458,6 +1603,7 @@ mod vector2d {
 
         assert_eq!(result, vec2(2.0, 3.0));
     }
+
     #[test]
     pub fn test_angle_from_x_axis() {
         use core::f32::consts::FRAC_PI_2;
@@ -1470,6 +1616,69 @@ mod vector2d {
         assert!(right.angle_from_x_axis().get().approx_eq(&0.0));
         assert!(down.angle_from_x_axis().get().approx_eq(&FRAC_PI_2));
         assert!(up.angle_from_x_axis().get().approx_eq(&-FRAC_PI_2));
+    }
+
+    #[test]
+    pub fn test_angle_to() {
+        use core::f32::consts::FRAC_PI_2;
+        use approxeq::ApproxEq;
+
+        let right: Vec2 = vec2(10.0, 0.0);
+        let right2: Vec2 = vec2(1.0, 0.0);
+        let up: Vec2 = vec2(0.0, -1.0);
+        let up_left: Vec2 = vec2(-1.0, -1.0);
+
+        assert!(right.angle_to(right2).get().approx_eq(&0.0));
+        assert!(right.angle_to(up).get().approx_eq(&-FRAC_PI_2));
+        assert!(up.angle_to(right).get().approx_eq(&FRAC_PI_2));
+        assert!(up_left.angle_to(up).get().approx_eq_eps(&(0.5 * FRAC_PI_2), &0.0005));
+    }
+
+    #[test]
+    pub fn test_with_max_length() {
+        use approxeq::ApproxEq;
+
+        let v1: Vec2 = vec2(0.5, 0.5);
+        let v2: Vec2 = vec2(1.0, 0.0);
+        let v3: Vec2 = vec2(0.1, 0.2);
+        let v4: Vec2 = vec2(2.0, -2.0);
+        let v5: Vec2 = vec2(1.0, 2.0);
+        let v6: Vec2 = vec2(-1.0, 3.0);
+
+        assert_eq!(v1.with_max_length(1.0), v1);
+        assert_eq!(v2.with_max_length(1.0), v2);
+        assert_eq!(v3.with_max_length(1.0), v3);
+        assert_eq!(v4.with_max_length(10.0), v4);
+        assert_eq!(v5.with_max_length(10.0), v5);
+        assert_eq!(v6.with_max_length(10.0), v6);
+
+        let v4_clamped = v4.with_max_length(1.0);
+        assert!(v4_clamped.length().approx_eq(&1.0));
+        assert!(v4_clamped.normalize().approx_eq(&v4.normalize()));
+
+        let v5_clamped = v5.with_max_length(1.5);
+        assert!(v5_clamped.length().approx_eq(&1.5));
+        assert!(v5_clamped.normalize().approx_eq(&v5.normalize()));
+
+        let v6_clamped = v6.with_max_length(2.5);
+        assert!(v6_clamped.length().approx_eq(&2.5));
+        assert!(v6_clamped.normalize().approx_eq(&v6.normalize()));
+    }
+
+    #[test]
+    pub fn test_project_onto_vector() {
+        use approxeq::ApproxEq;
+
+        let v1: Vec2 = vec2(1.0, 2.0);
+        let x: Vec2 = vec2(1.0, 0.0);
+        let y: Vec2 = vec2(0.0, 1.0);
+
+        assert!(v1.project_onto_vector(x).approx_eq(&vec2(1.0, 0.0)));
+        assert!(v1.project_onto_vector(y).approx_eq(&vec2(0.0, 2.0)));
+        assert!(v1.project_onto_vector(-x).approx_eq(&vec2(1.0, 0.0)));
+        assert!(v1.project_onto_vector(x * 10.0).approx_eq(&vec2(1.0, 0.0)));
+        assert!(v1.project_onto_vector(v1 * 2.0).approx_eq(&v1));
+        assert!(v1.project_onto_vector(-v1).approx_eq(&v1));
     }
 
     #[cfg(feature = "mint")]
@@ -1520,6 +1729,17 @@ mod vector2d {
     pub fn test_swizzling() {
         let p: default::Vector2D<i32> = vec2(1, 2);
         assert_eq!(p.yx(), vec2(2, 1));
+    }
+
+    #[test]
+    pub fn test_reflect() {
+        use approxeq::ApproxEq;
+        let a: Vec2 = vec2(1.0, 3.0);
+        let n1: Vec2 = vec2(0.0, -1.0);
+        let n2: Vec2 = vec2(1.0, -1.0).normalize();
+
+        assert!(a.reflect(n1).approx_eq(&vec2(1.0, -3.0)));
+        assert!(a.reflect(n2).approx_eq(&vec2(3.0, 1.0)));
     }
 }
 
@@ -1623,6 +1843,82 @@ mod vector3d {
         let v2 = Vec3::from(vm);
 
         assert_eq!(v1, v2);
+    }
+
+    #[test]
+    pub fn test_reflect() {
+        use approxeq::ApproxEq;
+        let a: Vec3 = vec3(1.0, 3.0, 2.0);
+        let n1: Vec3 = vec3(0.0, -1.0, 0.0);
+        let n2: Vec3 = vec3(0.0, 1.0, 1.0).normalize();
+
+        assert!(a.reflect(n1).approx_eq(&vec3(1.0, -3.0, 2.0)));
+        assert!(a.reflect(n2).approx_eq(&vec3(1.0, -2.0, -3.0)));
+    }
+
+    #[test]
+    pub fn test_angle_to() {
+        use core::f32::consts::FRAC_PI_2;
+        use approxeq::ApproxEq;
+
+        let right: Vec3 = vec3(10.0, 0.0, 0.0);
+        let right2: Vec3 = vec3(1.0, 0.0, 0.0);
+        let up: Vec3 = vec3(0.0, -1.0, 0.0);
+        let up_left: Vec3 = vec3(-1.0, -1.0, 0.0);
+
+        assert!(right.angle_to(right2).get().approx_eq(&0.0));
+        assert!(right.angle_to(up).get().approx_eq(&FRAC_PI_2));
+        assert!(up.angle_to(right).get().approx_eq(&FRAC_PI_2));
+        assert!(up_left.angle_to(up).get().approx_eq_eps(&(0.5 * FRAC_PI_2), &0.0005));
+    }
+
+    #[test]
+    pub fn test_with_max_length() {
+        use approxeq::ApproxEq;
+
+        let v1: Vec3 = vec3(0.5, 0.5, 0.0);
+        let v2: Vec3 = vec3(1.0, 0.0, 0.0);
+        let v3: Vec3 = vec3(0.1, 0.2, 0.3);
+        let v4: Vec3 = vec3(2.0, -2.0, 2.0);
+        let v5: Vec3 = vec3(1.0, 2.0, -3.0);
+        let v6: Vec3 = vec3(-1.0, 3.0, 2.0);
+
+        assert_eq!(v1.with_max_length(1.0), v1);
+        assert_eq!(v2.with_max_length(1.0), v2);
+        assert_eq!(v3.with_max_length(1.0), v3);
+        assert_eq!(v4.with_max_length(10.0), v4);
+        assert_eq!(v5.with_max_length(10.0), v5);
+        assert_eq!(v6.with_max_length(10.0), v6);
+
+        let v4_clamped = v4.with_max_length(1.0);
+        assert!(v4_clamped.length().approx_eq(&1.0));
+        assert!(v4_clamped.normalize().approx_eq(&v4.normalize()));
+
+        let v5_clamped = v5.with_max_length(1.5);
+        assert!(v5_clamped.length().approx_eq(&1.5));
+        assert!(v5_clamped.normalize().approx_eq(&v5.normalize()));
+
+        let v6_clamped = v6.with_max_length(2.5);
+        assert!(v6_clamped.length().approx_eq(&2.5));
+        assert!(v6_clamped.normalize().approx_eq(&v6.normalize()));
+    }
+
+    #[test]
+    pub fn test_project_onto_vector() {
+        use approxeq::ApproxEq;
+
+        let v1: Vec3 = vec3(1.0, 2.0, 3.0);
+        let x: Vec3 = vec3(1.0, 0.0, 0.0);
+        let y: Vec3 = vec3(0.0, 1.0, 0.0);
+        let z: Vec3 = vec3(0.0, 0.0, 1.0);
+
+        assert!(v1.project_onto_vector(x).approx_eq(&vec3(1.0, 0.0, 0.0)));
+        assert!(v1.project_onto_vector(y).approx_eq(&vec3(0.0, 2.0, 0.0)));
+        assert!(v1.project_onto_vector(z).approx_eq(&vec3(0.0, 0.0, 3.0)));
+        assert!(v1.project_onto_vector(-x).approx_eq(&vec3(1.0, 0.0, 0.0)));
+        assert!(v1.project_onto_vector(x * 10.0).approx_eq(&vec3(1.0, 0.0, 0.0)));
+        assert!(v1.project_onto_vector(v1 * 2.0).approx_eq(&v1));
+        assert!(v1.project_onto_vector(-v1).approx_eq(&v1));
     }
 }
 
