@@ -545,6 +545,15 @@ impl<T: NumCast + Copy, Unit> Rect<T, Unit> {
         self.cast()
     }
 
+    /// Cast into an `u64` rectangle, truncating decimals if any.
+    ///
+    /// When casting from floating point rectangles, it is worth considering whether
+    /// to `round()`, `round_in()` or `round_out()` before the cast in order to
+    /// obtain the desired conversion behavior.
+    pub fn to_u64(&self) -> Rect<u64, Unit> {
+        self.cast()
+    }
+
     /// Cast into an `i32` rectangle, truncating decimals if any.
     ///
     /// When casting from floating point rectangles, it is worth considering whether
