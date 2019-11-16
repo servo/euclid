@@ -265,6 +265,11 @@ impl<T: Copy, U> Size2D<T, U> {
     pub fn from_untyped(p: Size2D<T, UnknownUnit>) -> Self {
         Size2D::new(p.width, p.height)
     }
+
+    /// Cast the unit
+    pub fn cast_unit<V>(&self) -> Size2D<T, V> {
+        Size2D::new(self.width, self.height)
+    }
 }
 
 impl<T: NumCast + Copy, Unit> Size2D<T, Unit> {
@@ -776,6 +781,11 @@ impl<T: Copy, U> Size3D<T, U> {
     /// Tag a unitless value with units.
     pub fn from_untyped(p: Size3D<T, UnknownUnit>) -> Self {
         Size3D::new(p.width, p.height, p.depth)
+    }
+
+    /// Cast the unit
+    pub fn cast_unit<V>(&self) -> Size3D<T, V> {
+        Size3D::new(self.width, self.height, self.depth)
     }
 }
 

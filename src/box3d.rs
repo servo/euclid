@@ -470,6 +470,11 @@ where
             max: Point3D::from_untyped(c.max),
         }
     }
+
+    /// Cast the unit
+    pub fn cast_unit<V>(&self) -> Box3D<T, V> {
+        Box3D::new(self.min.cast_unit(), self.max.cast_unit())
+    }
 }
 
 impl<T0, Unit> Box3D<T0, Unit>

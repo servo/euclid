@@ -815,6 +815,11 @@ impl<T: Copy, U> Vector3D<T, U> {
         vec3(p.x, p.y, p.z)
     }
 
+    /// Cast the unit
+    pub fn cast_unit<V>(&self) -> Vector3D<T, V> {
+        vec3(self.x, self.y, self.z)
+    }
+
     /// Convert into a 2d vector.
     #[inline]
     pub fn to_2d(&self) -> Vector2D<T, U> {

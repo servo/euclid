@@ -472,6 +472,11 @@ where
             Point2D::from_untyped(c.max),
         )
     }
+
+    /// Cast the unit
+    pub fn cast_unit<V>(&self) -> Box2D<T, V> {
+        Box2D::new(self.min.cast_unit(), self.max.cast_unit())
+    }
 }
 
 impl<T0, Unit> Box2D<T0, Unit>
