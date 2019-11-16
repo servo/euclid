@@ -182,6 +182,11 @@ impl<T: Copy, U> Point2D<T, U> {
         point2(p.x, p.y)
     }
 
+    /// Cast the unit
+    pub fn cast_unit<V>(&self) -> Point2D<T, V> {
+        point2(self.x, self.y)
+    }
+
     #[inline]
     pub fn to_array(&self) -> [T; 2] {
         [self.x, self.y]
@@ -678,6 +683,11 @@ impl<T: Copy, U> Point3D<T, U> {
     #[inline]
     pub fn from_untyped(p: Point3D<T, UnknownUnit>) -> Self {
         point3(p.x, p.y, p.z)
+    }
+
+    /// Cast the unit
+    pub fn cast_unit<V>(&self) -> Point3D<T, V> {
+        point3(self.x, self.y, self.z)
     }
 
     /// Convert into a 2d point.

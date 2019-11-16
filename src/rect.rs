@@ -451,6 +451,11 @@ impl<T: Copy, Unit> Rect<T, Unit> {
             Size2D::from_untyped(r.size),
         )
     }
+
+    /// Cast the unit
+    pub fn cast_unit<V>(&self) -> Rect<T, V> {
+        Rect::new(self.origin.cast_unit(), self.size.cast_unit())
+    }
 }
 
 impl<T0: NumCast + Copy, Unit> Rect<T0, Unit> {

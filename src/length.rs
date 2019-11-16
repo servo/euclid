@@ -84,6 +84,11 @@ impl<Unit, T: Clone> Length<T, Unit> {
     pub fn get(&self) -> T {
         self.0.clone()
     }
+
+    /// Cast the unit
+    pub fn cast_unit<V>(&self) -> Length<T, V> {
+        Length::new(self.0.clone())
+    }
 }
 
 impl<T: fmt::Debug + Clone, U> fmt::Debug for Length<T, U> {
