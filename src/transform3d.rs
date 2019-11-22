@@ -734,9 +734,9 @@ where T: Copy + Clone +
     #[must_use]
     pub fn pre_scale(&self, x: T, y: T, z: T) -> Self {
         Transform3D::row_major(
-            self.m11 * x, self.m12,     self.m13,     self.m14,
-            self.m21    , self.m22 * y, self.m23,     self.m24,
-            self.m31    , self.m32,     self.m33 * z, self.m34,
+            self.m11 * x, self.m12 * x, self.m13 * x, self.m14 * x,
+            self.m21 * y, self.m22 * y, self.m23 * y, self.m24 * y,
+            self.m31 * z, self.m32 * z, self.m33 * z, self.m34 * z,
             self.m41    , self.m42,     self.m43,     self.m44
         )
     }
@@ -1055,6 +1055,16 @@ mod tests {
         assert!(!s1.is_2d());
         assert_eq!(Mf32::create_scale(2.0, 3.0, 0.0).to_2d(), Transform2D::create_scale(2.0, 3.0));
     }
+
+
+    #[test]
+    pub fn test_pre_post_scale() {
+        let m = Mf32::create_rotation(0.0, 0.0, 1.0, rad(FRAC_PI_2)).post_translate(vec3(6.0, 7.0, 8.0));
+        let s = Mf32::create_scale(2.0, 3.0, 4.0);
+        assert_eq!(m.post_transform(&s), m.post_scale(2.0, 3.0, 4.0));
+        assert_eq!(m.pre_transform(&s), m.pre_scale(2.0, 3.0, 4.0));
+    }
+
 
     #[test]
     pub fn test_ortho() {

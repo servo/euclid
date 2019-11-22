@@ -378,8 +378,8 @@ where T: Copy + Clone +
     #[must_use]
     pub fn pre_scale(&self, x: T, y: T) -> Self {
         Transform2D::row_major(
-            self.m11 * x, self.m12,
-            self.m21,     self.m22 * y,
+            self.m11 * x, self.m12 * x,
+            self.m21 * y, self.m22 * y,
             self.m31,     self.m32
         )
     }
@@ -635,6 +635,15 @@ mod test {
         assert_eq!(s1, s3);
 
         assert!(s1.transform_point(Point2D::new(2.0, 2.0)).approx_eq(&Point2D::new(4.0, 6.0)));
+    }
+
+
+    #[test]
+    pub fn test_pre_post_scale() {
+        let m = Mat::create_rotation(rad(FRAC_PI_2)).post_translate(vec2(6.0, 7.0));
+        let s = Mat::create_scale(2.0, 3.0);
+        assert_eq!(m.post_transform(&s), m.post_scale(2.0, 3.0));
+        assert_eq!(m.pre_transform(&s), m.pre_scale(2.0, 3.0));
     }
 
     #[test]
