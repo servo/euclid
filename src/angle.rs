@@ -12,6 +12,7 @@ use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, Sub, S
 use core::cmp::{Eq, PartialEq};
 use core::hash::{Hash};
 use trig::Trig;
+use Vector2D;
 #[cfg(feature = "serde")]
 use serde;
 
@@ -184,6 +185,15 @@ impl<T: Neg<Output = T>> Neg for Angle<T> {
     }
 }
 
+impl<T, U> From<Vector2D<T, U>> for Angle<T>
+where
+    T: Trig,
+{
+    fn from(vec: Vector2D<T, U>) -> Self {
+        Angle::radians(Trig::fast_atan2(vec.y, vec.x))
+    }
+}
+
 #[test]
 fn wrap_angles() {
     use approxeq::ApproxEq;
@@ -241,4 +251,26 @@ fn wrap_angles() {
     assert!(Angle::radians(-2.0 * PI).signed().radians.approx_eq(&0.0));
     assert!(Angle::radians(-PI).signed().radians.approx_eq(&PI));
     assert!(Angle::radians(PI).signed().radians.approx_eq(&PI));
+}
+
+#[test]
+fn test_from_vector() {
+    use {default, vec2};
+    use approxeq::ApproxEq;
+    use core::f32::consts::FRAC_PI_2;
+
+    type Vec2 = default::Vector2D<f32>;
+
+    let down: Vec2 = vec2(0.0, 3.0);
+    let right: Vec2 = vec2(2.0, 0.0);
+    let down_right: Vec2 = vec2(10.0, 10.0);
+
+    assert!(Angle::from(down).positive().radians.approx_eq(&FRAC_PI_2));
+    assert!(Angle::from(right).positive().radians.approx_eq(&0.0));
+    assert!(
+        Angle::from(down_right)
+            .positive()
+            .radians
+            .approx_eq_eps(&(0.5 * FRAC_PI_2), &0.0005)
+    );
 }
