@@ -431,6 +431,12 @@ where T: Copy + Clone +
         mat.post_transform(self)
     }
 
+    /// Returns whether it is possible to compute the inverse transform.
+    #[inline]
+    pub fn is_invertible(&self) -> bool {
+        self.determinant() != Zero::zero()
+    }
+
     /// Returns the inverse transform if possible.
     pub fn inverse(&self) -> Option<Transform3D<T, Dst, Src>> {
         let det = self.determinant();
