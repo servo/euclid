@@ -9,6 +9,7 @@ rust:
 env:
   - FEATURES=""
   - FEATURES="--features serde"
+  - FEATURES="--no-default-features --features libm"
 
 matrix:
   include:

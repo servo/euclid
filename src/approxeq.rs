@@ -15,20 +15,22 @@ pub trait ApproxEq<Eps> {
 }
 
 macro_rules! approx_eq {
-    ($ty:ty, $eps:expr) => (
+    ($ty:ty, $eps:expr) => {
         impl ApproxEq<$ty> for $ty {
             #[inline]
-            fn approx_epsilon() -> $ty { $eps }
+            fn approx_epsilon() -> $ty {
+                $eps
+            }
             #[inline]
             fn approx_eq(&self, other: &$ty) -> bool {
                 self.approx_eq_eps(other, &$eps)
             }
             #[inline]
             fn approx_eq_eps(&self, other: &$ty, approx_epsilon: &$ty) -> bool {
-                (*self - *other).abs() < *approx_epsilon
+                num_traits::Float::abs(*self - *other) < *approx_epsilon
             }
         }
-    )
+    };
 }
 
 approx_eq!(f32, 1.0e-6);
