@@ -426,6 +426,12 @@ where T: Copy + Clone +
         self.m11 * self.m22 - self.m12 * self.m21
     }
 
+    /// Returns whether it is possible to compute the inverse transform.
+    #[inline]
+    pub fn is_invertible(&self) -> bool {
+        self.determinant() != Zero::zero()
+    }
+
     /// Returns the inverse transform if possible.
     #[must_use]
     pub fn inverse(&self) -> Option<Transform2D<T, Dst, Src>> {
