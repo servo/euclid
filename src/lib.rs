@@ -49,6 +49,7 @@ extern crate num_traits;
 #[cfg(test)]
 use std as core;
 
+pub use angle::Angle;
 pub use box2d::Box2D;
 pub use length::Length;
 pub use scale::Scale;
@@ -64,7 +65,7 @@ pub use rect::{rect, Rect};
 pub use rigid::{RigidTransform3D};
 pub use box3d::{box3d, Box3D};
 pub use translation::{Translation2D, Translation3D};
-pub use rotation::{Angle, Rotation2D, Rotation3D};
+pub use rotation::{Rotation2D, Rotation3D};
 pub use side_offsets::SideOffsets2D;
 pub use size::{Size2D, Size3D, size2, size3};
 pub use trig::Trig;
@@ -72,6 +73,7 @@ pub use trig::Trig;
 #[macro_use]
 mod macros;
 
+mod angle;
 pub mod approxeq;
 pub mod approxord;
 mod box2d;
