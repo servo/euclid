@@ -145,6 +145,16 @@ where
     }
 
     #[inline]
+    pub fn width(&self) -> T {
+        self.size.width
+    }
+
+    #[inline]
+    pub fn height(&self) -> T {
+        self.size.height
+    }
+
+    #[inline]
     pub fn x_range(&self) -> Range<T> {
         self.min_x()..self.max_x()
     }
@@ -764,6 +774,13 @@ mod tests {
         assert!(r.min_y() == -5);
         assert!(r.max_x() == 40);
         assert!(r.min_x() == -10);
+    }
+
+    #[test]
+    fn test_width_height() {
+        let r = Rect::new(Point2D::new(-10, -5), Size2D::new(50, 40));
+        assert!(r.width() == 50);
+        assert!(r.height() == 40);
     }
 
     #[test]

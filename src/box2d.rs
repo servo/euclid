@@ -216,6 +216,16 @@ where
     }
 
     #[inline]
+    pub fn width(&self) -> T {
+        self.max.x - self.min.x
+    }
+
+    #[inline]
+    pub fn height(&self) -> T {
+        self.max.y - self.min.y
+    }
+
+    #[inline]
     pub fn to_rect(&self) -> Rect<T, U> {
         Rect {
             origin: self.min,
@@ -620,6 +630,13 @@ mod tests {
         let b = Box2D::new(point2(-10.0, -10.0), point2(10.0, 10.0));
         assert_eq!(b.size().width, 20.0);
         assert_eq!(b.size().height, 20.0);
+    }
+
+    #[test]
+    fn test_width_height() {
+        let b = Box2D::new(point2(-10.0, -10.0), point2(10.0, 10.0));
+        assert!(b.width() == 20.0);
+        assert!(b.height() == 20.0);
     }
 
     #[test]

@@ -219,6 +219,21 @@ where
             self.max.z - self.min.z,
         )
     }
+
+    #[inline]
+    pub fn width(&self) -> T {
+        self.max.x - self.min.x
+    }
+
+    #[inline]
+    pub fn height(&self) -> T {
+        self.max.y - self.min.y
+    }
+
+    #[inline]
+    pub fn depth(&self) -> T {
+        self.max.z - self.min.z
+    }
 }
 
 impl<T, U> Box3D<T, U>
@@ -635,6 +650,14 @@ mod tests {
         assert!(b.size().width == 20.0);
         assert!(b.size().height == 20.0);
         assert!(b.size().depth == 20.0);
+    }
+
+    #[test]
+    fn test_width_height_depth() {
+        let b = Box3D::new(point3(-10.0, -10.0, -10.0), point3(10.0, 10.0, 10.0));
+        assert!(b.width() == 20.0);
+        assert!(b.height() == 20.0);
+        assert!(b.depth() == 20.0);
     }
 
     #[test]
