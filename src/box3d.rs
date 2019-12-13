@@ -10,7 +10,7 @@
 use super::UnknownUnit;
 use scale::Scale;
 use num::*;
-use point::Point3D;
+use point::{Point3D, point3};
 use vector::Vector3D;
 use size::Size3D;
 use approxord::{min, max};
@@ -263,47 +263,38 @@ where
     {
         let mut points = points.into_iter();
 
-        // Need at least 2 different points for a valid box3d (ie: volume > 0).
         let (mut min_x, mut min_y, mut min_z) = match points.next() {
             Some(first) => (first.borrow().x, first.borrow().y, first.borrow().z),
             None => return Box3D::zero(),
         };
         let (mut max_x, mut max_y, mut max_z) = (min_x, min_y, min_z);
 
-        {
-            let mut assign_min_max = |point: I::Item| {
-                let p = point.borrow();
-                if p.x < min_x {
-                    min_x = p.x
-                }
-                if p.x > max_x {
-                    max_x = p.x
-                }
-                if p.y < min_y {
-                    min_y = p.y
-                }
-                if p.y > max_y {
-                    max_y = p.y
-                }
-                if p.z < min_z {
-                    min_z = p.z
-                }
-                if p.z > max_z {
-                    max_z = p.z
-                }
-            };
-                    
-            match points.next() {
-                Some(second) => assign_min_max(second),
-                None => return Box3D::zero(),
+        for point in points {
+            let p = point.borrow();
+            if p.x < min_x {
+                min_x = p.x
             }
-
-            for point in points {
-                assign_min_max(point);
+            if p.x > max_x {
+                max_x = p.x
+            }
+            if p.y < min_y {
+                min_y = p.y
+            }
+            if p.y > max_y {
+                max_y = p.y
+            }
+            if p.z < min_z {
+                min_z = p.z
+            }
+            if p.z > max_z {
+                max_z = p.z
             }
         }
 
-        Self::new(Point3D::new(min_x, min_y, min_z), Point3D::new(max_x, max_y, max_z))
+        Box3D {
+            min: point3(min_x, min_y, min_z),
+            max: point3(max_x, max_y, max_z),
+        }
     }
 }
 
