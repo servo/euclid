@@ -240,17 +240,19 @@ impl<T: Copy + Div<T, Output = T>, U1, U2> Div<Scale<T, U1, U2>> for Size2D<T, U
 }
 
 impl<T: Copy, U> Size2D<T, U> {
-    /// Returns self.width as a Length carrying the unit.
+    /// Return this size as an array of two elements.
     #[inline]
     pub fn to_array(&self) -> [T; 2] {
         [self.width, self.height]
     }
 
+    /// Return this size as a tuple of two elements.
     #[inline]
     pub fn to_tuple(&self) -> (T, T) {
         (self.width, self.height)
     }
 
+    /// Return this size as a vector.
     #[inline]
     pub fn to_vector(&self) -> Vector2D<T, U> {
         vec2(self.width, self.height)
@@ -762,12 +764,19 @@ impl<T: Copy + Div<T, Output = T>, U1, U2> Div<Scale<T, U1, U2>> for Size3D<T, U
 }
 
 impl<T: Copy, U> Size3D<T, U> {
-    /// Returns self.width as a Length carrying the unit.
+    /// Return this size as an array of two elements.
     #[inline]
     pub fn to_array(&self) -> [T; 3] {
         [self.width, self.height, self.depth]
     }
 
+    /// Return this size as an array of two elements.
+    #[inline]
+    pub fn to_tuple(&self) -> (T, T, T) {
+        (self.width, self.height, self.depth)
+    }
+
+    /// Return this size as a vector
     #[inline]
     pub fn to_vector(&self) -> Vector3D<T, U> {
         vec3(self.width, self.height, self.depth)
