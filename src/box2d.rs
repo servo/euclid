@@ -288,37 +288,25 @@ where
     {
         let mut points = points.into_iter();
 
-        // Need at least 2 different points for a valid box (ie: volume > 0).
         let (mut min_x, mut min_y) = match points.next() {
             Some(first) => (first.borrow().x, first.borrow().y),
             None => return Box2D::zero(),
         };
+
         let (mut max_x, mut max_y) = (min_x, min_y);
-
-        {
-            let mut assign_min_max = |point: I::Item| {
-                let p = point.borrow();
-                if p.x < min_x {
-                    min_x = p.x
-                }
-                if p.x > max_x {
-                    max_x = p.x
-                }
-                if p.y < min_y {
-                    min_y = p.y
-                }
-                if p.y > max_y {
-                    max_y = p.y
-                }
-            };
-
-            match points.next() {
-                Some(second) => assign_min_max(second),
-                None => return Box2D::zero(),
+        for point in points {
+            let p = point.borrow();
+            if p.x < min_x {
+                min_x = p.x
             }
-
-            for point in points {
-                assign_min_max(point);
+            if p.x > max_x {
+                max_x = p.x
+            }
+            if p.y < min_y {
+                min_y = p.y
+            }
+            if p.y > max_y {
+                max_y = p.y
             }
         }
 
