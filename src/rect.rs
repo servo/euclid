@@ -104,7 +104,7 @@ where
 
 impl<T, U> Rect<T, U>
 where
-    T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output = T> + Sub<T, Output = T>,
+    T: Copy + Clone + PartialOrd + PartialEq + Add<T, Output = T> + Sub<T, Output = T>,
 {
     #[inline]
     pub fn intersects(&self, other: &Self) -> bool {
@@ -199,16 +199,6 @@ where
             && self.origin.y <= other.y && other.y < self.origin.y + self.size.height
     }
 
-    /// Returns true if this rectangle contains the interior of rect. Always
-    /// returns true if rect is empty, and always returns false if rect is
-    /// nonempty but this rectangle is empty.
-    #[inline]
-    pub fn contains_rect(&self, rect: &Self) -> bool {
-        rect.is_empty_or_negative()
-            || (self.min_x() <= rect.min_x() && rect.max_x() <= self.max_x()
-                && self.min_y() <= rect.min_y() && rect.max_y() <= self.max_y())
-    }
-
     #[inline]
     #[must_use]
     pub fn inflate(&self, width: T, height: T) -> Self {
@@ -227,6 +217,21 @@ where
             min: self.min(),
             max: self.max(),
         }
+    }
+}
+
+impl<T, U> Rect<T, U>
+where
+    T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output = T> + Sub<T, Output = T>,
+{
+    /// Returns true if this rectangle contains the interior of rect. Always
+    /// returns true if rect is empty, and always returns false if rect is
+    /// nonempty but this rectangle is empty.
+    #[inline]
+    pub fn contains_rect(&self, rect: &Self) -> bool {
+        rect.is_empty_or_negative()
+            || (self.min_x() <= rect.min_x() && rect.max_x() <= self.max_x()
+                && self.min_y() <= rect.min_y() && rect.max_y() <= self.max_y())
     }
 
     /// Calculate the size and position of an inner rectangle.
