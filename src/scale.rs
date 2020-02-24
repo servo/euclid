@@ -151,7 +151,7 @@ where
 }
 
 // FIXME: Switch to `derive(PartialEq, Clone)` after this Rust issue is fixed:
-// https://github.com/mozilla/rust/issues/7671
+// https://github.com/rust-lang/rust/issues/26925
 
 impl<T: PartialEq, Src, Dst> PartialEq for Scale<T, Src, Dst> {
     fn eq(&self, other: &Scale<T, Src, Dst>) -> bool {
