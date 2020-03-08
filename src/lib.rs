@@ -103,6 +103,7 @@ pub mod default {
     //! A set of aliases for all types, tagged with the default unknown unit.
 
     use super::UnknownUnit;
+    pub type Length<T> = super::Length<T, UnknownUnit>;
     pub type Point2D<T> = super::Point2D<T, UnknownUnit>;
     pub type Point3D<T> = super::Point3D<T, UnknownUnit>;
     pub type Vector2D<T> = super::Vector2D<T, UnknownUnit>;
