@@ -90,12 +90,24 @@ impl<T, Src, Dst> Translation2D<T, Src, Dst> {
             _unit: PhantomData,
         }
     }
+
+    /// No-op, just cast the unit.
+    #[inline]
+    pub fn transform_size(&self, s: Size2D<T, Src>) -> Size2D<T, Dst> {
+        Size2D::new(s.width, s.height)
+    }
 }
 
 impl<T, Src, Dst> Translation2D<T, Src, Dst>
 where
     T : Copy
 {
+    /// Cast into a 2D vector.
+    #[inline]
+    pub fn to_vector(&self) -> Vector2D<T, Src> {
+        vec2(self.x, self.y)
+    }
+
     /// Cast into an array with x and y.
     #[inline]
     pub fn to_array(&self) -> [T; 2] {
@@ -167,17 +179,6 @@ where
             origin: self.transform_point(r.origin),
             size: self.transform_size(r.size),
         }
-    }
-
-    /// No-op, just cast the unit.
-    #[inline]
-    pub fn transform_size(&self, s: Size2D<T, Src>) -> Size2D<T, Dst> {
-        Size2D::new(s.width, s.height)
-    }
-
-    /// Cast into a 2D vector.
-    pub fn to_vector(&self) -> Vector2D<T, Src> {
-        vec2(self.x, self.y)
     }
 }
 
@@ -373,12 +374,23 @@ impl<T, Src, Dst> Translation3D<T, Src, Dst> {
             _unit: PhantomData,
         }
     }
+
+    /// No-op, just cast the unit.
+    #[inline]
+    pub fn transform_size(self, s: Size2D<T, Src>) -> Size2D<T, Dst> {
+        Size2D::new(s.width, s.height)
+    }
 }
 
 impl<T, Src, Dst> Translation3D<T, Src, Dst>
 where
     T: Copy
 {
+    /// Cast into a 3D vector.
+    pub fn to_vector(&self) -> Vector3D<T, Src> {
+        vec3(self.x, self.y, self.z)
+    }
+
     /// Cast into an array with x, y and z.
     #[inline]
     pub fn to_array(&self) -> [T; 3] {
@@ -458,17 +470,6 @@ where
             origin: self.transform_point2d(&r.origin),
             size: self.transform_size(r.size),
         }
-    }
-
-    /// No-op, just cast the unit.
-    #[inline]
-    pub fn transform_size(self, s: Size2D<T, Src>) -> Size2D<T, Dst> {
-        Size2D::new(s.width, s.height)
-    }
-
-    /// Cast into a 3D vector.
-    pub fn to_vector(&self) -> Vector3D<T, Src> {
-        vec3(self.x, self.y, self.z)
     }
 }
 
