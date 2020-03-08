@@ -961,6 +961,7 @@ impl<T: Copy, U> From<(T, T, T)> for Point3D<T, U> {
     }
 }
 
+/// Shorthand for `Point2D::new(x, y)`.
 #[inline]
 pub const fn point2<T, U>(x: T, y: T) -> Point2D<T, U> {
     Point2D {
@@ -970,6 +971,7 @@ pub const fn point2<T, U>(x: T, y: T) -> Point2D<T, U> {
     }
 }
 
+/// Shorthand for `Point3D::new(x, y)`.
 #[inline]
 pub const fn point3<T, U>(x: T, y: T, z: T) -> Point3D<T, U> {
     Point3D {

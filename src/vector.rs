@@ -1543,11 +1543,13 @@ pub fn vec3<T, U>(x: T, y: T, z: T) -> Vector3D<T, U> {
     }
 }
 
+/// Shorthand for `BoolVector2D { x, y }`.
 #[inline]
 pub fn bvec2(x: bool, y: bool) -> BoolVector2D {
     BoolVector2D { x, y }
 }
 
+/// Shorthand for `BoolVector3D { x, y, z }`.
 #[inline]
 pub fn bvec3(x: bool, y: bool, z: bool) -> BoolVector3D {
     BoolVector3D { x, y, z }
