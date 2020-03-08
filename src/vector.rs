@@ -217,7 +217,9 @@ where
         + Trig
         + PartialOrd
         + One
-        + Zero {
+        + Zero
+{
+    /// Creates translation by this vector in vector units
     #[inline]
     pub fn to_transform(&self) -> Transform2D<T, U, U> {
         Transform2D::create_translation(self.x, self.y)
@@ -288,11 +290,13 @@ where
         }
     }
 
+    /// Returns length square.
     #[inline]
     pub fn square_length(&self) -> T {
         self.x * self.x + self.y * self.y
     }
 
+    /// Returns the vector length.
     #[inline]
     pub fn length(&self) -> T
     where
@@ -352,9 +356,11 @@ impl<T, U> Vector2D<T, U>
 where
     T: Copy + One + Add<Output = T> + Sub<Output = T> + Mul<Output = T>,
 {
-    /// Linearly interpolate between this vector and another vector.
+    /// Linearly interpolate each component between this vector and another vector.
     ///
     /// `t` is expected to be between zero and one.
+    ///
+    /// When `t` is `One::one()`, returned value equals to `other`, otherwise equals to `self`.
     #[inline]
     pub fn lerp(&self, other: Self, t: T) -> Self {
         let one_t = T::one() - t;
@@ -412,16 +418,21 @@ impl<T: Copy + Neg<Output = T>, U> Neg for Vector2D<T, U> {
 }
 
 impl<T: Float, U> Vector2D<T, U> {
+    /// Returns the vector each component of which are minimum of this vector and another.
     #[inline]
     pub fn min(self, other: Self) -> Self {
         vec2(self.x.min(other.x), self.y.min(other.y))
     }
 
+    /// Returns the vector each component of which are maximum of this vector and another.
     #[inline]
     pub fn max(self, other: Self) -> Self {
         vec2(self.x.max(other.x), self.y.max(other.y))
     }
 
+    /// Returns the vector each component of which is clamped by corresponding components of `start` and `end`.
+    ///
+    /// Shortcut for `self.max(start).min(end)`.
     #[inline]
     pub fn clamp(&self, start: Self, end: Self) -> Self {
         self.max(start).min(end)
@@ -640,6 +651,11 @@ impl<T, U> Vector2D<T, U>
 where
     T: Signed,
 {
+    /// Computes the vector with absolute values of each component.
+    ///
+    /// For `f32` and `f64`, `NaN` will be returned for component if the component is `NaN`.
+    ///
+    /// For signed integers, `::MIN` will be returned for component if the component is `::MIN`.
     pub fn abs(&self) -> Self {
         vec2(self.x.abs(), self.y.abs())
     }
@@ -843,7 +859,9 @@ where
         + PartialOrd
         + One
         + Zero
-        + Neg<Output = T> {
+        + Neg<Output = T>
+{
+    /// Creates translation by this vector in vector units
     #[inline]
     pub fn to_transform(&self) -> Transform3D<T, U, U> {
         Transform3D::create_translation(self.x, self.y, self.z)
@@ -866,13 +884,13 @@ where
 
 impl<T: Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T> + Copy, U>
     Vector3D<T, U> {
-    // Dot product.
+    /// Dot product.
     #[inline]
     pub fn dot(self, other: Self) -> T {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
 
-    // Cross product.
+    /// Cross product.
     #[inline]
     pub fn cross(self, other: Self) -> Self {
         vec3(
@@ -905,11 +923,13 @@ impl<T: Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T> + Copy, U>
         }
     }
 
+    /// Returns length square.
     #[inline]
     pub fn square_length(&self) -> T {
         self.x * self.x + self.y * self.y + self.z * self.z
     }
 
+    /// Returns the vector length.
     #[inline]
     pub fn length(&self) -> T
     where
@@ -969,9 +989,11 @@ impl<T, U> Vector3D<T, U>
 where
     T: Copy + One + Add<Output = T> + Sub<Output = T> + Mul<Output = T>,
 {
-    /// Linearly interpolate between this vector and another vector.
+    /// Linearly interpolate each component between this vector and another vector.
     ///
     /// `t` is expected to be between zero and one.
+    ///
+    /// When `t` is `One::one()`, returned value equals to `other`, otherwise equals to `self`.
     #[inline]
     pub fn lerp(&self, other: Self, t: T) -> Self {
         let one_t = T::one() - t;
@@ -1060,6 +1082,7 @@ impl<T: Copy + Div<T, Output = T>, U> DivAssign<T> for Vector3D<T, U> {
 }
 
 impl<T: Float, U> Vector3D<T, U> {
+    /// Returns the vector each component of which are minimum of this vector and another.
     #[inline]
     pub fn min(self, other: Self) -> Self {
         vec3(
@@ -1069,6 +1092,7 @@ impl<T: Float, U> Vector3D<T, U> {
         )
     }
 
+    /// Returns the vector each component of which are maximum of this vector and another.
     #[inline]
     pub fn max(self, other: Self) -> Self {
         vec3(
@@ -1078,6 +1102,9 @@ impl<T: Float, U> Vector3D<T, U> {
         )
     }
 
+    /// Returns the vector each component of which is clamped by corresponding components of `start` and `end`.
+    ///
+    /// Shortcut for `self.max(start).min(end)`.
     #[inline]
     pub fn clamp(&self, start: Self, end: Self) -> Self {
         self.max(start).min(end)
@@ -1266,17 +1293,30 @@ impl<T, U> Vector3D<T, U>
 where
     T: Signed,
 {
+    /// Computes the vector with absolute values of each component.
+    ///
+    /// For `f32` and `f64`, `NaN` will be returned for component if the component is `NaN`.
+    ///
+    /// For signed integers, `::MIN` will be returned for component if the component is `::MIN`.
     pub fn abs(&self) -> Self {
         vec3(self.x.abs(), self.y.abs(), self.z.abs())
     }
 }
 
+/// Result of boolean operations on [`Size2D`] or [`Vector2D`].
+///
+/// [`Size2D`]: struct.Size2D.html
+/// [`Vector2D`]: struct.Vector2D.html
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct BoolVector2D {
     pub x: bool,
     pub y: bool,
 }
 
+/// Result of boolean operations on [`Size3D`] or [`Vector3D`].
+///
+/// [`Size3D`]: struct.Size3D.html
+/// [`Vector3D`]: struct.Vector3D.html
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct BoolVector3D {
     pub x: bool,
@@ -1285,21 +1325,25 @@ pub struct BoolVector3D {
 }
 
 impl BoolVector2D {
+    /// Returns `true` if all components are `true` and `false` otherwise.
     #[inline]
     pub fn all(&self) -> bool {
         self.x && self.y
     }
 
+    /// Returns `true` if any component are `true` and `false` otherwise.
     #[inline]
     pub fn any(&self) -> bool {
         self.x || self.y
     }
 
+    /// Returns `true` if all components are `false` and `false` otherwise. Negation of `any()`.
     #[inline]
     pub fn none(&self) -> bool {
         !self.any()
     }
 
+    /// Returns new vector with by-component AND operation applied.
     #[inline]
     pub fn and(&self, other: Self) -> Self {
         BoolVector2D {
@@ -1308,6 +1352,7 @@ impl BoolVector2D {
         }
     }
 
+    /// Returns new vector with by-component OR operation applied.
     #[inline]
     pub fn or(&self, other: Self) -> Self {
         BoolVector2D {
@@ -1316,6 +1361,7 @@ impl BoolVector2D {
         }
     }
 
+    /// Returns new vector with results of negation operaton on each component.
     #[inline]
     pub fn not(&self) -> Self {
         BoolVector2D {
@@ -1324,6 +1370,8 @@ impl BoolVector2D {
         }
     }
 
+    /// Returns point, each component of which or from `a`, or from `b` depending on truly value
+    /// of corresponding vector component. `true` selects value from `a` and `false` from `b`.
     #[inline]
     pub fn select_point<T: Copy, U>(&self, a: Point2D<T, U>, b: Point2D<T, U>) -> Point2D<T, U> {
         point2(
@@ -1332,6 +1380,8 @@ impl BoolVector2D {
         )
     }
 
+    /// Returns vector, each component of which or from `a`, or from `b` depending on truly value
+    /// of corresponding vector component. `true` selects value from `a` and `false` from `b`.
     #[inline]
     pub fn select_vector<T: Copy, U>(&self, a: Vector2D<T, U>, b: Vector2D<T, U>) -> Vector2D<T, U> {
         vec2(
@@ -1340,6 +1390,8 @@ impl BoolVector2D {
         )
     }
 
+    /// Returns size, each component of which or from `a`, or from `b` depending on truly value
+    /// of corresponding vector component. `true` selects value from `a` and `false` from `b`.
     #[inline]
     pub fn select_size<T: Copy, U>(&self, a: Size2D<T, U>, b: Size2D<T, U>) -> Size2D<T, U> {
         size2(
@@ -1350,21 +1402,25 @@ impl BoolVector2D {
 }
 
 impl BoolVector3D {
+    /// Returns `true` if all components are `true` and `false` otherwise.
     #[inline]
     pub fn all(&self) -> bool {
         self.x && self.y && self.z
     }
 
+    /// Returns `true` if any component are `true` and `false` otherwise.
     #[inline]
     pub fn any(&self) -> bool {
         self.x || self.y || self.z
     }
 
+    /// Returns `true` if all components are `false` and `false` otherwise. Negation of `any()`.
     #[inline]
     pub fn none(&self) -> bool {
         !self.any()
     }
 
+    /// Returns new vector with by-component AND operation applied.
     #[inline]
     pub fn and(&self, other: Self) -> Self {
         BoolVector3D {
@@ -1374,6 +1430,7 @@ impl BoolVector3D {
         }
     }
 
+    /// Returns new vector with by-component OR operation applied.
     #[inline]
     pub fn or(&self, other: Self) -> Self {
         BoolVector3D {
@@ -1383,6 +1440,7 @@ impl BoolVector3D {
         }
     }
 
+    /// Returns new vector with results of negation operaton on each component.
     #[inline]
     pub fn not(&self) -> Self {
         BoolVector3D {
@@ -1393,6 +1451,8 @@ impl BoolVector3D {
     }
 
 
+    /// Returns point, each component of which or from `a`, or from `b` depending on truly value
+    /// of corresponding vector component. `true` selects value from `a` and `false` from `b`.
     #[inline]
     pub fn select_point<T: Copy, U>(&self, a: Point3D<T, U>, b: Point3D<T, U>) -> Point3D<T, U> {
         point3(
@@ -1402,6 +1462,8 @@ impl BoolVector3D {
         )
     }
 
+    /// Returns vector, each component of which or from `a`, or from `b` depending on truly value
+    /// of corresponding vector component. `true` selects value from `a` and `false` from `b`.
     #[inline]
     pub fn select_vector<T: Copy, U>(&self, a: Vector3D<T, U>, b: Vector3D<T, U>) -> Vector3D<T, U> {
         vec3(
@@ -1449,6 +1511,7 @@ impl BoolVector3D {
 }
 
 impl<T: PartialOrd, U> Vector2D<T, U> {
+    /// Returns vector with results of "greater than" operaton on each component.
     #[inline]
     pub fn greater_than(&self, other: Self) -> BoolVector2D {
         BoolVector2D {
@@ -1457,6 +1520,7 @@ impl<T: PartialOrd, U> Vector2D<T, U> {
         }
     }
 
+    /// Returns vector with results of "lower than" operaton on each component.
     #[inline]
     pub fn lower_than(&self, other: Self) -> BoolVector2D {
         BoolVector2D {
@@ -1468,6 +1532,7 @@ impl<T: PartialOrd, U> Vector2D<T, U> {
 
 
 impl<T: PartialEq, U> Vector2D<T, U> {
+    /// Returns vector with results of "equal" operaton on each component.
     #[inline]
     pub fn equal(&self, other: Self) -> BoolVector2D {
         BoolVector2D {
@@ -1476,6 +1541,7 @@ impl<T: PartialEq, U> Vector2D<T, U> {
         }
     }
 
+    /// Returns vector with results of "not equal" operaton on each component.
     #[inline]
     pub fn not_equal(&self, other: Self) -> BoolVector2D {
         BoolVector2D {
@@ -1486,6 +1552,7 @@ impl<T: PartialEq, U> Vector2D<T, U> {
 }
 
 impl<T: PartialOrd, U> Vector3D<T, U> {
+    /// Returns vector with results of "greater than" operaton on each component.
     #[inline]
     pub fn greater_than(&self, other: Self) -> BoolVector3D {
         BoolVector3D {
@@ -1495,6 +1562,7 @@ impl<T: PartialOrd, U> Vector3D<T, U> {
         }
     }
 
+    /// Returns vector with results of "lower than" operaton on each component.
     #[inline]
     pub fn lower_than(&self, other: Self) -> BoolVector3D {
         BoolVector3D {
@@ -1507,6 +1575,7 @@ impl<T: PartialOrd, U> Vector3D<T, U> {
 
 
 impl<T: PartialEq, U> Vector3D<T, U> {
+    /// Returns vector with results of "equal" operaton on each component.
     #[inline]
     pub fn equal(&self, other: Self) -> BoolVector3D {
         BoolVector3D {
@@ -1516,6 +1585,7 @@ impl<T: PartialEq, U> Vector3D<T, U> {
         }
     }
 
+    /// Returns vector with results of "not equal" operaton on each component.
     #[inline]
     pub fn not_equal(&self, other: Self) -> BoolVector3D {
         BoolVector3D {
