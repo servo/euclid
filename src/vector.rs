@@ -193,11 +193,13 @@ impl<T: Copy, U> Vector2D<T, U> {
         vec2(self.x, self.y)
     }
 
+    /// Cast into an array with x and y.
     #[inline]
     pub fn to_array(&self) -> [T; 2] {
         [self.x, self.y]
     }
 
+    /// Cast into a tuple with x and y.
     #[inline]
     pub fn to_tuple(&self) -> (T, T) {
         (self.x, self.y)
@@ -793,11 +795,13 @@ impl<T: Copy, U> Vector3D<T, U> {
         vec2(self.y, self.z)
     }
 
+    /// Cast into an array with x, y and z.
     #[inline]
     pub fn to_array(&self) -> [T; 3] {
         [self.x, self.y, self.z]
     }
 
+    /// Cast into a tuple with x, y and z.
     #[inline]
     pub fn to_tuple(&self) -> (T, T, T) {
         (self.x, self.y, self.z)
