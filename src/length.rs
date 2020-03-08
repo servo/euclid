@@ -103,6 +103,13 @@ impl<T: fmt::Display + Clone, U> fmt::Display for Length<T, U> {
     }
 }
 
+impl<T: Default, U> Default for Length<T, U> {
+    #[inline]
+    fn default() -> Self {
+        Length::new(Default::default())
+    }
+}
+
 // length + length
 impl<U, T: Clone + Add<T, Output = T>> Add for Length<T, U> {
     type Output = Length<T, U>;
