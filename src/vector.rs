@@ -209,7 +209,6 @@ impl<T: Copy, U> Vector2D<T, U> {
 impl<T, U> Vector2D<T, U>
 where
     T: Copy
-        + Clone
         + Add<T, Output = T>
         + Mul<T, Output = T>
         + Div<T, Output = T>
@@ -850,7 +849,6 @@ impl<T: Copy, U> Vector3D<T, U> {
 impl<T, U> Vector3D<T, U>
 where
     T: Copy
-        + Clone
         + Add<T, Output = T>
         + Mul<T, Output = T>
         + Div<T, Output = T>

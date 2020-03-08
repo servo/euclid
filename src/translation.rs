@@ -225,7 +225,6 @@ where
 impl<T, Src, Dst> Translation2D<T, Src, Dst>
 where
     T: Copy
-        + Clone
         + Add<T, Output = T>
         + Mul<T, Output = T>
         + Div<T, Output = T>
@@ -263,7 +262,6 @@ where
 impl<T, Src, Dst> Into<Transform2D<T, Src, Dst>> for Translation2D<T, Src, Dst>
 where
     T: Copy
-        + Clone
         + Add<T, Output = T>
         + Mul<T, Output = T>
         + Div<T, Output = T>
@@ -517,7 +515,7 @@ where
 
 impl<T, Src, Dst> Translation3D<T, Src, Dst>
 where
-    T: Copy + Clone +
+    T: Copy +
         Add<T, Output=T> +
         Sub<T, Output=T> +
         Mul<T, Output=T> +
@@ -554,7 +552,7 @@ where
 
 impl<T, Src, Dst> Into<Transform3D<T, Src, Dst>> for Translation3D<T, Src, Dst>
 where
-    T: Copy + Clone +
+    T: Copy +
         Add<T, Output=T> +
         Sub<T, Output=T> +
         Mul<T, Output=T> +

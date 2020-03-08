@@ -221,7 +221,7 @@ impl<T, Src, Dst> Transform3D<T, Src, Dst> {
 }
 
 impl <T, Src, Dst> Transform3D<T, Src, Dst>
-where T: Copy + Clone +
+where T: Copy +
          PartialEq +
          One + Zero {
     #[inline]
@@ -245,7 +245,7 @@ where T: Copy + Clone +
 }
 
 impl <T, Src, Dst> Transform3D<T, Src, Dst>
-where T: Copy + Clone +
+where T: Copy +
          Add<T, Output=T> +
          Sub<T, Output=T> +
          Mul<T, Output=T> +

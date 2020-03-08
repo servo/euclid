@@ -32,7 +32,7 @@ use core::ops::{Add, Div, Mul, Sub};
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(bound(serialize = "T: Serialize", deserialize = "T: Deserialize<'de>")))]
 pub struct Box3D<T, U> {
-    pub min: Point3D<T, U>, 
+    pub min: Point3D<T, U>,
     pub max: Point3D<T, U>,
 }
 
@@ -155,7 +155,7 @@ where
         );
 
         Box3D::new(
-            intersection_min, 
+            intersection_min,
             intersection_max,
         )
     }
@@ -326,7 +326,7 @@ where
 
 impl<T, U> Box3D<T, U>
 where
-    T: Copy + Clone + PartialOrd + Add<T, Output = T> + Sub<T, Output = T> + Zero,
+    T: Copy + PartialOrd + Add<T, Output = T> + Sub<T, Output = T> + Zero,
 {
     #[inline]
     pub fn union(&self, other: &Self) -> Self {
@@ -390,7 +390,7 @@ where
     }
 }
 
-impl<T, U> Box3D<T, U> 
+impl<T, U> Box3D<T, U>
 where
     T: Copy + Zero,
 {
@@ -606,7 +606,7 @@ impl<T: NumCast + Copy, Unit> Box3D<T, Unit> {
 }
 
 impl<T, U> From<Size3D<T, U>> for Box3D<T, U>
-where 
+where
     T: Copy + Zero + PartialOrd,
 {
     fn from(b: Size3D<T, U>) -> Self {
@@ -789,7 +789,7 @@ mod tests {
         let b1 = Box3D::from_points(&[point3(-15.0, -20.0, -20.0), point3(10.0, 20.0, 20.0)]);
         let b2 = Box3D::from_points(&[point3(-10.0, 20.0, 20.0), point3(15.0, -20.0, -20.0)]);
         assert!(b1.try_intersection(&b2).is_some());
-    
+
         let b1 = Box3D::from_points(&[point3(-15.0, -20.0, -20.0), point3(-10.0, 20.0, 20.0)]);
         let b2 = Box3D::from_points(&[point3(10.0, 20.0, 20.0), point3(15.0, -20.0, -20.0)]);
         assert!(b1.try_intersection(&b2).is_none());

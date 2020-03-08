@@ -119,12 +119,9 @@ impl<T, U> Size2D<T, U> {
             _unit: PhantomData,
         }
     }
-}
-
-impl<T: Clone, U> Size2D<T, U> {
     /// Constructor taking scalar strongly typed lengths.
     pub fn from_lengths(width: Length<T, U>, height: Length<T, U>) -> Self {
-        Size2D::new(width.get(), height.get())
+        Size2D::new(width.0, height.0)
     }
 }
 
@@ -169,7 +166,7 @@ impl<T: Copy + Sub<T, Output = T>, U> Sub for Size2D<T, U> {
     }
 }
 
-impl<T: Copy + Clone + Mul<T>, U> Size2D<T, U> {
+impl<T: Copy + Mul<T>, U> Size2D<T, U> {
     /// Returns result of multiplication of both components
     pub fn area(&self) -> T::Output {
         self.width * self.height
@@ -669,10 +666,10 @@ impl<T, U> Size3D<T, U> {
     }
 }
 
-impl<T: Clone, U> Size3D<T, U> {
+impl<T, U> Size3D<T, U> {
     /// Constructor taking scalar strongly typed lengths.
     pub fn from_lengths(width: Length<T, U>, height: Length<T, U>, depth: Length<T, U>) -> Self {
-        Size3D::new(width.get(), height.get(), depth.get())
+        Size3D::new(width.0, height.0, depth.0)
     }
 }
 
@@ -717,7 +714,7 @@ impl<T: Copy + Sub<T, Output = T>, U> Sub for Size3D<T, U> {
     }
 }
 
-impl<T: Copy + Clone + Mul<T, Output=T>, U> Size3D<T, U> {
+impl<T: Copy + Mul<T, Output=T>, U> Size3D<T, U> {
     /// Returns result of multiplication of all components
     pub fn volume(&self) -> T {
         self.width * self.height * self.depth

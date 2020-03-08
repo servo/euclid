@@ -104,7 +104,7 @@ where
 
 impl<T, U> Rect<T, U>
 where
-    T: Copy + Clone + PartialOrd + PartialEq + Add<T, Output = T> + Sub<T, Output = T>,
+    T: Copy + PartialOrd + PartialEq + Add<T, Output = T> + Sub<T, Output = T>,
 {
     #[inline]
     pub fn intersects(&self, other: &Self) -> bool {
@@ -222,7 +222,7 @@ where
 
 impl<T, U> Rect<T, U>
 where
-    T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output = T> + Sub<T, Output = T>,
+    T: Copy + Zero + PartialOrd + PartialEq + Add<T, Output = T> + Sub<T, Output = T>,
 {
     /// Returns true if this rectangle contains the interior of rect. Always
     /// returns true if rect is empty, and always returns false if rect is
@@ -344,7 +344,7 @@ where
 
 impl<T, U> Rect<T, U>
 where
-    T: Copy + Clone + PartialOrd + Add<T, Output = T> + Sub<T, Output = T> + Zero,
+    T: Copy + PartialOrd + Add<T, Output = T> + Sub<T, Output = T> + Zero,
 {
     #[inline]
     pub fn union(&self, other: &Self) -> Self {
@@ -374,7 +374,7 @@ impl<T, U> Rect<T, U> {
     #[inline]
     pub fn scale<S: Copy>(&self, x: S, y: S) -> Self
     where
-        T: Copy + Clone + Mul<S, Output = T>,
+        T: Copy + Mul<S, Output = T>,
     {
         Rect::new(
             Point2D::new(self.origin.x * x, self.origin.y * y),
@@ -383,7 +383,7 @@ impl<T, U> Rect<T, U> {
     }
 }
 
-impl<T: Copy + Clone + Mul<T, Output = T>, U> Rect<T, U> {
+impl<T: Copy + Mul<T, Output = T>, U> Rect<T, U> {
     #[inline]
     pub fn area(&self) -> T {
         self.size.area()

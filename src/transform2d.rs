@@ -297,7 +297,7 @@ where T: Copy +
 }
 
 impl<T, Src, Dst> Transform2D<T, Src, Dst>
-where T: Copy + Clone +
+where T: Copy +
          Add<T, Output=T> +
          Mul<T, Output=T> +
          Div<T, Output=T> +
@@ -477,7 +477,7 @@ where T: Copy + Clone +
 }
 
 impl<T, Src, Dst> Transform2D<T, Src, Dst>
-where T: Copy + Clone +
+where T: Copy +
          Add<T, Output=T> +
          Mul<T, Output=T> +
          Div<T, Output=T> +
@@ -514,7 +514,7 @@ where T: Copy + Clone +
 }
 
 impl <T, Src, Dst> Transform2D<T, Src, Dst>
-where T: Copy + Clone +
+where T: Copy +
          Add<T, Output=T> +
          Sub<T, Output=T> +
          Mul<T, Output=T> +

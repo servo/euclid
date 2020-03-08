@@ -27,7 +27,7 @@ impl<T> NonEmpty<T> {
 
 impl<T, U> NonEmpty<Rect<T, U>>
 where
-    T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output = T> + Sub<T, Output = T>,
+    T: Copy + Zero + PartialOrd + PartialEq + Add<T, Output = T> + Sub<T, Output = T>,
 {
     #[inline]
     pub fn union(&self, other: &NonEmpty<Rect<T, U>>) -> NonEmpty<Rect<T, U>> {
