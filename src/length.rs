@@ -18,6 +18,7 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use core::cmp::Ordering;
 use core::ops::{Add, Div, Mul, Neg, Sub};
 use core::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
+use core::hash::{Hash, Hasher};
 use core::marker::PhantomData;
 use core::fmt;
 
@@ -107,6 +108,14 @@ impl<T: Default, U> Default for Length<T, U> {
     #[inline]
     fn default() -> Self {
         Length::new(Default::default())
+    }
+}
+
+impl<T, U> Hash for Length<T, U>
+    where T: Hash
+{
+    fn hash<H: Hasher>(&self, h: &mut H) {
+        self.0.hash(h);
     }
 }
 
