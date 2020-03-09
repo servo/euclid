@@ -93,6 +93,11 @@ impl<T, U> Rect<T, U>
 where
     T: Zero
 {
+    /// Constructor, setting all sides to zero.
+    pub fn zero() -> Self {
+        Rect::new(Point2D::origin(), Size2D::zero())
+    }
+
     /// Creates a rect of the given size, at offset zero.
     pub fn from_size(size: Size2D<T, U>) -> Self {
         Rect {
@@ -390,25 +395,22 @@ impl<T: Copy + Mul<T, Output = T>, U> Rect<T, U> {
     }
 }
 
-impl<T: Copy + PartialEq + Zero, U> Rect<T, U> {
-    /// Constructor, setting all sides to zero.
-    pub fn zero() -> Self {
-        Rect::new(Point2D::origin(), Size2D::zero())
-    }
-
+impl<T: Zero + PartialEq, U> Rect<T, U> {
     /// Returns true if the size is zero, regardless of the origin's value.
     pub fn is_empty(&self) -> bool {
         self.size.width == Zero::zero() || self.size.height == Zero::zero()
     }
 }
 
-impl<T: Copy + Zero + PartialOrd, U> Rect<T, U> {
+impl<T: Zero + PartialOrd, U> Rect<T, U> {
 
     #[inline]
     pub fn is_empty_or_negative(&self) -> bool {
         self.size.is_empty_or_negative()
     }
+}
 
+impl<T: Copy + Zero + PartialOrd, U> Rect<T, U> {
     #[inline]
     pub fn to_non_empty(&self) -> Option<NonEmpty<Self>> {
         if self.is_empty_or_negative() {

@@ -94,13 +94,15 @@ impl<T, U> Hash for Vector2D<T, U>
     }
 }
 
-impl<T: Copy + Zero, U> Vector2D<T, U> {
+impl<T: Zero, U> Vector2D<T, U> {
     /// Constructor, setting all components to zero.
     #[inline]
     pub fn zero() -> Self {
         Vector2D::new(Zero::zero(), Zero::zero())
     }
+}
 
+impl<T: Copy + Zero, U> Vector2D<T, U> {
     /// Convert into a 3d vector.
     #[inline]
     pub fn to_3d(&self) -> Vector3D<T, U> {
@@ -252,20 +254,30 @@ where
 
 impl<T, U> Vector2D<T, U>
 where
-    T: Copy + Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>,
+    T: Mul<T, Output = T> + Add<T, Output = T>,
 {
     /// Dot product.
     #[inline]
     pub fn dot(self, other: Self) -> T {
         self.x * other.x + self.y * other.y
     }
+}
 
+impl<T, U> Vector2D<T, U>
+where
+    T: Mul<T, Output = T> + Sub<T, Output = T>,
+{
     /// Returns the norm of the cross product [self.x, self.y, 0] x [other.x, other.y, 0]..
     #[inline]
     pub fn cross(self, other: Self) -> T {
         self.x * other.y - self.y * other.x
     }
+}
 
+impl<T, U> Vector2D<T, U>
+where
+    T: Copy + Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>,
+{
     #[inline]
     pub fn normalize(self) -> Self
     where
@@ -728,13 +740,15 @@ impl<T, U> Hash for Vector3D<T, U>
     }
 }
 
-impl<T: Copy + Zero, U> Vector3D<T, U> {
+impl<T: Zero, U> Vector3D<T, U> {
     /// Constructor, setting all components to zero.
     #[inline]
     pub fn zero() -> Self {
         vec3(Zero::zero(), Zero::zero(), Zero::zero())
     }
+}
 
+impl<T: Copy + Zero, U> Vector3D<T, U> {
     #[inline]
     pub fn to_array_4d(&self) -> [T; 4] {
         [self.x, self.y, self.z, Zero::zero()]
@@ -880,14 +894,21 @@ where
     }
 }
 
-impl<T: Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T> + Copy, U>
-    Vector3D<T, U> {
+impl<T, U> Vector3D<T, U>
+where
+    T: Mul<T, Output = T> + Add<T, Output = T>
+{
     /// Dot product.
     #[inline]
     pub fn dot(self, other: Self) -> T {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
+}
 
+impl<T, U> Vector3D<T, U>
+where
+    T: Copy + Mul<T, Output = T> + Sub<T, Output = T>
+{
     /// Cross product.
     #[inline]
     pub fn cross(self, other: Self) -> Self {
@@ -897,7 +918,12 @@ impl<T: Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T> + Copy, U>
             self.x * other.y - self.y * other.x,
         )
     }
+}
 
+impl<T, U> Vector3D<T, U>
+where
+    T: Copy + Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>
+{
     #[inline]
     pub fn normalize(self) -> Self
     where
@@ -950,7 +976,7 @@ impl<T: Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T> + Copy, U>
 
 impl<T, U> Vector3D<T, U>
 where
-    T: Copy + Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>
+    T: Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>
     + PartialOrd + Float
 {
     /// Return this vector capped to a maximum length.
@@ -997,12 +1023,7 @@ where
         let one_t = T::one() - t;
         (*self) * one_t + other * t
     }
-}
 
-impl<T, U> Vector3D<T, U>
-where
-    T: Copy + One + Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>,
-{
     /// Returns a reflection vector using an incident ray and a surface normal.
     #[inline]
     pub fn reflect(&self, normal: Self) -> Self {
