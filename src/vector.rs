@@ -13,7 +13,7 @@ use length::Length;
 #[cfg(feature = "mint")]
 use mint;
 use point::{Point2D, Point3D, point2, point3};
-use size::{Size2D, size2};
+use size::{Size2D, Size3D, size2, size3};
 use scale::Scale;
 use transform2d::Transform2D;
 use transform3d::Transform3D;
@@ -1404,6 +1404,18 @@ impl BoolVector3D {
             if self.x { a.x } else { b.x },
             if self.y { a.y } else { b.y },
             if self.z { a.z } else { b.z },
+        )
+    }
+
+    /// Returns size, each component of which or from `a`, or from `b` depending on truly value
+    /// of corresponding vector component. `true` selects value from `a` and `false` from `b`.
+    #[inline]
+    #[must_use]
+    pub fn select_size<T: Copy, U>(&self, a: Size3D<T, U>, b: Size3D<T, U>) -> Size3D<T, U> {
+        size3(
+            if self.x { a.width } else { b.width },
+            if self.y { a.height } else { b.height },
+            if self.z { a.depth } else { b.depth },
         )
     }
 
