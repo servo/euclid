@@ -280,13 +280,17 @@ impl <T, Src, Dst> Default for Translation2D<T, Src, Dst>
     }
 }
 
-impl<T, Src, Dst> fmt::Debug for Translation2D<T, Src, Dst>
-where T: Copy + fmt::Debug {
+impl<T: fmt::Debug, Src, Dst> fmt::Debug for Translation2D<T, Src, Dst> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        self.to_array().fmt(f)
+        write!(f, "Translation({:?},{:?})", self.x, self.y)
     }
 }
 
+impl<T: fmt::Display, Src, Dst> fmt::Display for Translation2D<T, Src, Dst> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "({},{})", self.x, self.y)
+    }
+}
 
 
 /// A 3d transformation from a space to another that can only express translations.
@@ -567,10 +571,15 @@ impl <T, Src, Dst> Default for Translation3D<T, Src, Dst>
     }
 }
 
-impl<T, Src, Dst> fmt::Debug for Translation3D<T, Src, Dst>
-where T: Copy + fmt::Debug {
+impl<T: fmt::Debug, Src, Dst> fmt::Debug for Translation3D<T, Src, Dst> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        self.to_array().fmt(f)
+        write!(f, "Translation({:?},{:?},{:?})", self.x, self.y, self.z)
+    }
+}
+
+impl<T: fmt::Display, Src, Dst> fmt::Display for Translation3D<T, Src, Dst> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "({},{},{})", self.x, self.y, self.z)
     }
 }
 
