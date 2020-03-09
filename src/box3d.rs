@@ -45,9 +45,9 @@ impl<T: Hash, U> Hash for Box3D<T, U> {
 
 impl<T: Copy, U> Copy for Box3D<T, U> {}
 
-impl<T: Copy, U> Clone for Box3D<T, U> {
+impl<T: Clone, U> Clone for Box3D<T, U> {
     fn clone(&self) -> Self {
-        *self
+        Self::new(self.min.clone(), self.max.clone())
     }
 }
 
@@ -73,6 +73,7 @@ impl<T: fmt::Display, U> fmt::Display for Box3D<T, U> {
 
 impl<T, U> Box3D<T, U> {
     /// Constructor.
+    #[inline]
     pub const fn new(min: Point3D<T, U>, max: Point3D<T, U>) -> Self {
         Box3D {
             min,

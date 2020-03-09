@@ -47,9 +47,9 @@ impl<T: Hash, U> Hash for Rect<T, U> {
 
 impl<T: Copy, U> Copy for Rect<T, U> {}
 
-impl<T: Copy, U> Clone for Rect<T, U> {
+impl<T: Clone, U> Clone for Rect<T, U> {
     fn clone(&self) -> Self {
-        *self
+        Self::new(self.origin.clone(), self.size.clone())
     }
 }
 
@@ -81,6 +81,7 @@ impl<T: Default, U> Default for Rect<T, U> {
 
 impl<T, U> Rect<T, U> {
     /// Constructor.
+    #[inline]
     pub const fn new(origin: Point2D<T, U>, size: Size2D<T, U>) -> Self {
         Rect {
             origin,

@@ -47,9 +47,9 @@ impl<T: Hash, U> Hash for Box2D<T, U> {
 
 impl<T: Copy, U> Copy for Box2D<T, U> {}
 
-impl<T: Copy, U> Clone for Box2D<T, U> {
+impl<T: Clone, U> Clone for Box2D<T, U> {
     fn clone(&self) -> Self {
-        *self
+        Self::new(self.min.clone(), self.max.clone())
     }
 }
 
@@ -75,6 +75,7 @@ impl<T: fmt::Display, U> fmt::Display for Box2D<T, U> {
 
 impl<T, U> Box2D<T, U> {
     /// Constructor.
+    #[inline]
     pub const fn new(min: Point2D<T, U>, max: Point2D<T, U>) -> Self {
         Box2D {
             min,
