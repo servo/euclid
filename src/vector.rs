@@ -616,21 +616,21 @@ impl<T: Copy + ApproxEq<T>, U> ApproxEq<Vector2D<T, U>> for Vector2D<T, U> {
     }
 }
 
-impl<T: Copy, U> Into<[T; 2]> for Vector2D<T, U> {
+impl<T, U> Into<[T; 2]> for Vector2D<T, U> {
     fn into(self) -> [T; 2] {
-        self.to_array()
+        [self.x, self.y]
     }
 }
 
-impl<T: Copy, U> From<[T; 2]> for Vector2D<T, U> {
-    fn from(array: [T; 2]) -> Self {
-        vec2(array[0], array[1])
+impl<T, U> From<[T; 2]> for Vector2D<T, U> {
+    fn from([x, y]: [T; 2]) -> Self {
+        vec2(x, y)
     }
 }
 
-impl<T: Copy, U> Into<(T, T)> for Vector2D<T, U> {
+impl<T, U> Into<(T, T)> for Vector2D<T, U> {
     fn into(self) -> (T, T) {
-        self.to_tuple()
+        (self.x, self.y)
     }
 }
 
@@ -640,9 +640,9 @@ impl<T: Copy, U> From<(T, T)> for Vector2D<T, U> {
     }
 }
 
-impl<T: Copy, U> From<Size2D<T, U>> for Vector2D<T, U> {
+impl<T, U> From<Size2D<T, U>> for Vector2D<T, U> {
     fn from(size: Size2D<T, U>) -> Self {
-        size.to_vector()
+        vec2(size.width, size.height)
     }
 }
 
@@ -1263,21 +1263,21 @@ impl<T: Copy + ApproxEq<T>, U> ApproxEq<Vector3D<T, U>> for Vector3D<T, U> {
     }
 }
 
-impl<T: Copy, U> Into<[T; 3]> for Vector3D<T, U> {
+impl<T, U> Into<[T; 3]> for Vector3D<T, U> {
     fn into(self) -> [T; 3] {
-        self.to_array()
+        [self.x, self.y, self.z]
     }
 }
 
-impl<T: Copy, U> From<[T; 3]> for Vector3D<T, U> {
-    fn from(array: [T; 3]) -> Self {
-        vec3(array[0], array[1], array[2])
+impl<T, U> From<[T; 3]> for Vector3D<T, U> {
+    fn from([x, y, z]: [T; 3]) -> Self {
+        vec3(x, y, z)
     }
 }
 
-impl<T: Copy, U> Into<(T, T, T)> for Vector3D<T, U> {
+impl<T, U> Into<(T, T, T)> for Vector3D<T, U> {
     fn into(self) -> (T, T, T) {
-        self.to_tuple()
+        (self.x, self.y, self.z)
     }
 }
 

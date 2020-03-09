@@ -463,21 +463,21 @@ impl<T: Copy + ApproxEq<T>, U> ApproxEq<Point2D<T, U>> for Point2D<T, U> {
     }
 }
 
-impl<T: Copy, U> Into<[T; 2]> for Point2D<T, U> {
+impl<T, U> Into<[T; 2]> for Point2D<T, U> {
     fn into(self) -> [T; 2] {
-        self.to_array()
+        [self.x, self.y]
     }
 }
 
-impl<T: Copy, U> From<[T; 2]> for Point2D<T, U> {
-    fn from(array: [T; 2]) -> Self {
-        point2(array[0], array[1])
+impl<T, U> From<[T; 2]> for Point2D<T, U> {
+    fn from([x, y]: [T; 2]) -> Self {
+        point2(x, y)
     }
 }
 
-impl<T: Copy, U> Into<(T, T)> for Point2D<T, U> {
+impl<T, U> Into<(T, T)> for Point2D<T, U> {
     fn into(self) -> (T, T) {
-        self.to_tuple()
+        (self.x, self.y)
     }
 }
 
@@ -943,21 +943,21 @@ impl<T: Copy + ApproxEq<T>, U> ApproxEq<Point3D<T, U>> for Point3D<T, U> {
     }
 }
 
-impl<T: Copy, U> Into<[T; 3]> for Point3D<T, U> {
+impl<T, U> Into<[T; 3]> for Point3D<T, U> {
     fn into(self) -> [T; 3] {
-        self.to_array()
+        [self.x, self.y, self.z]
     }
 }
 
-impl<T: Copy, U> From<[T; 3]> for Point3D<T, U> {
-    fn from(array: [T; 3]) -> Self {
-        point3(array[0], array[1], array[2])
+impl<T, U> From<[T; 3]> for Point3D<T, U> {
+    fn from([x, y, z]: [T; 3]) -> Self {
+        point3(x, y, z)
     }
 }
 
-impl<T: Copy, U> Into<(T, T, T)> for Point3D<T, U> {
+impl<T, U> Into<(T, T, T)> for Point3D<T, U> {
     fn into(self) -> (T, T, T) {
-        self.to_tuple()
+        (self.x, self.y, self.z)
     }
 }
 

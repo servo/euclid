@@ -143,12 +143,11 @@ where
 
 impl<T, Src, Dst> Translation2D<T, Src, Dst>
 where
-    T : Copy + Zero
+    T: Zero
 {
     #[inline]
     pub fn identity() -> Self {
-        let _0 = T::zero();
-        Translation2D::new(_0, _0)
+        Translation2D::new(T::zero(), T::zero())
     }
 }
 
@@ -158,7 +157,8 @@ where
 {
     #[inline]
     pub fn is_identity(&self) -> bool {
-        self.x == T::zero() && self.y == T::zero()
+        let _0 = T::zero();
+        self.x == _0 && self.y == _0
     }
 }
 
@@ -426,12 +426,11 @@ where
 
 impl<T, Src, Dst> Translation3D<T, Src, Dst>
 where
-    T: Copy + Zero
+    T: Zero
 {
     #[inline]
     pub fn identity() -> Self {
-        let _0 = T::zero();
-        Translation3D::new(_0, _0, _0)
+        Translation3D::new(T::zero(), T::zero(), T::zero())
     }
 }
 
@@ -441,7 +440,8 @@ where
 {
     #[inline]
     pub fn is_identity(&self) -> bool {
-        self.x == T::zero() && self.y == T::zero() && self.z == T::zero()
+        let _0 = T::zero();
+        self.x == _0 && self.y == _0 && self.z == _0
     }
 }
 

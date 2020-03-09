@@ -483,21 +483,21 @@ impl<T, U> From<Vector2D<T, U>> for Size2D<T, U> {
     }
 }
 
-impl<T: Copy, U> Into<[T; 2]> for Size2D<T, U> {
+impl<T, U> Into<[T; 2]> for Size2D<T, U> {
     fn into(self) -> [T; 2] {
-        self.to_array()
+        [self.width, self.height]
     }
 }
 
-impl<T: Copy, U> From<[T; 2]> for Size2D<T, U> {
-    fn from(array: [T; 2]) -> Self {
-        size2(array[0], array[1])
+impl<T, U> From<[T; 2]> for Size2D<T, U> {
+    fn from([w, h]: [T; 2]) -> Self {
+        size2(w, h)
     }
 }
 
-impl<T: Copy, U> Into<(T, T)> for Size2D<T, U> {
+impl<T, U> Into<(T, T)> for Size2D<T, U> {
     fn into(self) -> (T, T) {
-        self.to_tuple()
+        (self.width, self.height)
     }
 }
 
