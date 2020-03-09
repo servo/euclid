@@ -123,6 +123,12 @@ impl<T, U> Size2D<T, U> {
     pub fn from_lengths(width: Length<T, U>, height: Length<T, U>) -> Self {
         Size2D::new(width.0, height.0)
     }
+
+    /// Tag a unitless value with units.
+    #[inline]
+    pub fn from_untyped(p: Size2D<T, UnknownUnit>) -> Self {
+        Size2D::new(p.width, p.height)
+    }
 }
 
 impl<T: Round, U> Size2D<T, U> {
@@ -269,11 +275,6 @@ impl<T: Copy, U> Size2D<T, U> {
     /// Drop the units, preserving only the numeric value.
     pub fn to_untyped(&self) -> Size2D<T, UnknownUnit> {
         Size2D::new(self.width, self.height)
-    }
-
-    /// Tag a unitless value with units.
-    pub fn from_untyped(p: Size2D<T, UnknownUnit>) -> Self {
-        Size2D::new(p.width, p.height)
     }
 
     /// Cast the unit

@@ -96,7 +96,7 @@ where
 
 impl<T, U> Box3D<T, U>
 where
-    T: Copy + PartialOrd,
+    T: PartialOrd,
 {
     /// Returns true if the box has a negative volume.
     ///
@@ -114,15 +114,6 @@ where
     }
 
     #[inline]
-    pub fn to_non_empty(&self) -> Option<NonEmpty<Self>> {
-        if self.is_empty_or_negative() {
-            return None;
-        }
-
-        Some(NonEmpty(*self))
-    }
-
-    #[inline]
     pub fn intersects(&self, other: &Self) -> bool {
         self.min.x < other.max.x
             && self.max.x > other.min.x
@@ -130,6 +121,41 @@ where
             && self.max.y > other.min.y
             && self.min.z < other.max.z
             && self.max.z > other.min.z
+    }
+
+    /// Returns `true` if this box3d contains the point. Points are considered
+    /// in the box3d if they are on the front, left or top faces, but outside if they
+    /// are on the back, right or bottom faces.
+    #[inline]
+    pub fn contains(&self, other: Point3D<T, U>) -> bool {
+        self.min.x <= other.x && other.x < self.max.x
+            && self.min.y <= other.y && other.y < self.max.y
+            && self.min.z <= other.z && other.z < self.max.z
+    }
+
+    /// Returns `true` if this box3d contains the interior of the other box3d. Always
+    /// returns `true` if other is empty, and always returns `false` if other is
+    /// nonempty but this box3d is empty.
+    #[inline]
+    pub fn contains_box(&self, other: &Self) -> bool {
+        other.is_empty_or_negative()
+            || (self.min.x <= other.min.x && other.max.x <= self.max.x
+                && self.min.y <= other.min.y && other.max.y <= self.max.y
+                && self.min.z <= other.min.z && other.max.z <= self.max.z)
+    }
+}
+
+impl<T, U> Box3D<T, U>
+where
+    T: Copy + PartialOrd,
+{
+    #[inline]
+    pub fn to_non_empty(&self) -> Option<NonEmpty<Self>> {
+        if self.is_empty_or_negative() {
+            return None;
+        }
+
+        Some(NonEmpty(*self))
     }
 
     #[inline]
@@ -173,37 +199,6 @@ where
             min: self.min + by,
             max: self.max + by,
         }
-    }
-}
-
-impl<T, U> Box3D<T, U>
-where
-    T: Copy + PartialOrd + Zero,
-{
-    /// Returns true if this box3d contains the point. Points are considered
-    /// in the box3d if they are on the front, left or top faces, but outside if they
-    /// are on the back, right or bottom faces.
-    #[inline]
-    pub fn contains(&self, other: Point3D<T, U>) -> bool {
-        self.min.x <= other.x && other.x < self.max.x
-            && self.min.y <= other.y && other.y < self.max.y
-            && self.min.z <= other.z && other.z < self.max.z
-    }
-}
-
-impl<T, U> Box3D<T, U>
-where
-    T: Copy + PartialOrd + Zero + Sub<T, Output = T>,
-{
-    /// Returns true if this box3d contains the interior of the other box3d. Always
-    /// returns true if other is empty, and always returns false if other is
-    /// nonempty but this box3d is empty.
-    #[inline]
-    pub fn contains_box(&self, other: &Self) -> bool {
-        other.is_empty_or_negative()
-            || (self.min.x <= other.min.x && other.max.x <= self.max.x
-                && self.min.y <= other.min.y && other.max.y <= self.max.y
-                && self.min.z <= other.min.z && other.max.z <= self.max.z)
     }
 }
 

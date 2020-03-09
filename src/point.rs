@@ -90,7 +90,7 @@ impl<T, U> Hash for Point2D<T, U>
 
 mint_vec!(Point2D[x, y] = Point2);
 
-impl<T: Copy + Zero, U> Point2D<T, U> {
+impl<T: Zero, U> Point2D<T, U> {
     /// Constructor, setting all components to zero.
     #[inline]
     pub fn origin() -> Self {
@@ -101,7 +101,9 @@ impl<T: Copy + Zero, U> Point2D<T, U> {
     pub fn zero() -> Self {
         Self::origin()
     }
+}
 
+impl<T: Copy + Zero, U> Point2D<T, U> {
     /// Convert into a 3d point.
     #[inline]
     pub fn to_3d(&self) -> Point3D<T, U> {
@@ -137,15 +139,21 @@ impl<T, U> Point2D<T, U> {
             _unit: PhantomData,
         }
     }
-}
 
-impl<T: Copy, U> Point2D<T, U> {
-    /// Constructor taking properly  Lengths instead of scalar values.
+    /// Constructor taking properly Lengths instead of scalar values.
     #[inline]
     pub fn from_lengths(x: Length<T, U>, y: Length<T, U>) -> Self {
         point2(x.0, y.0)
     }
 
+    /// Tag a unitless value with units.
+    #[inline]
+    pub fn from_untyped(p: Point2D<T, UnknownUnit>) -> Self {
+        point2(p.x, p.y)
+    }
+}
+
+impl<T: Copy, U> Point2D<T, U> {
     /// Create a 3d point from this one, using the specified z value.
     #[inline]
     pub fn extend(&self, z: T) -> Point3D<T, U> {
@@ -174,12 +182,6 @@ impl<T: Copy, U> Point2D<T, U> {
     #[inline]
     pub fn to_untyped(&self) -> Point2D<T, UnknownUnit> {
         point2(self.x, self.y)
-    }
-
-    /// Tag a unitless value with units.
-    #[inline]
-    pub fn from_untyped(p: Point2D<T, UnknownUnit>) -> Self {
-        point2(p.x, p.y)
     }
 
     /// Cast the unit
@@ -553,7 +555,7 @@ impl<T, U> Hash for Point3D<T, U>
     }
 }
 
-impl<T: Copy + Zero, U> Point3D<T, U> {
+impl<T: Zero, U> Point3D<T, U> {
     /// Constructor, setting all components to zero.
     #[inline]
     pub fn origin() -> Self {
@@ -625,15 +627,21 @@ impl<T, U> Point3D<T, U> {
             _unit: PhantomData,
         }
     }
-}
 
-impl<T: Copy, U> Point3D<T, U> {
-    /// Constructor taking properly  Lengths instead of scalar values.
+    /// Constructor taking properly Lengths instead of scalar values.
     #[inline]
     pub fn from_lengths(x: Length<T, U>, y: Length<T, U>, z: Length<T, U>) -> Self {
         point3(x.0, y.0, z.0)
     }
 
+    /// Tag a unitless value with units.
+    #[inline]
+    pub fn from_untyped(p: Point3D<T, UnknownUnit>) -> Self {
+        point3(p.x, p.y, p.z)
+    }
+}
+
+impl<T: Copy, U> Point3D<T, U> {
     /// Cast this point into a vector.
     ///
     /// Equivalent to subtracting the origin to this point.
@@ -681,12 +689,6 @@ impl<T: Copy, U> Point3D<T, U> {
     #[inline]
     pub fn to_untyped(&self) -> Point3D<T, UnknownUnit> {
         point3(self.x, self.y, self.z)
-    }
-
-    /// Tag a unitless value with units.
-    #[inline]
-    pub fn from_untyped(p: Point3D<T, UnknownUnit>) -> Self {
-        point3(p.x, p.y, p.z)
     }
 
     /// Cast the unit

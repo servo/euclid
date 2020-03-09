@@ -136,15 +136,21 @@ impl<T, U> Vector2D<T, U> {
             _unit: PhantomData,
         }
     }
-}
 
-impl<T: Copy, U> Vector2D<T, U> {
     /// Constructor taking properly  Lengths instead of scalar values.
     #[inline]
     pub fn from_lengths(x: Length<T, U>, y: Length<T, U>) -> Self {
         vec2(x.0, y.0)
     }
 
+    /// Tag a unit-less value with units.
+    #[inline]
+    pub fn from_untyped(p: Vector2D<T, UnknownUnit>) -> Self {
+        vec2(p.x, p.y)
+    }
+}
+
+impl<T: Copy, U> Vector2D<T, U> {
     /// Create a 3d vector from this one, using the specified z value.
     #[inline]
     pub fn extend(&self, z: T) -> Vector3D<T, U> {
@@ -179,12 +185,6 @@ impl<T: Copy, U> Vector2D<T, U> {
     #[inline]
     pub fn to_untyped(&self) -> Vector2D<T, UnknownUnit> {
         vec2(self.x, self.y)
-    }
-
-    /// Tag a unit-less value with units.
-    #[inline]
-    pub fn from_untyped(p: Vector2D<T, UnknownUnit>) -> Self {
-        vec2(p.x, p.y)
     }
 
     /// Cast the unit
@@ -775,15 +775,21 @@ impl<T, U> Vector3D<T, U> {
             _unit: PhantomData,
         }
     }
-}
 
-impl<T: Copy, U> Vector3D<T, U> {
     /// Constructor taking properly  Lengths instead of scalar values.
     #[inline]
     pub fn from_lengths(x: Length<T, U>, y: Length<T, U>, z: Length<T, U>) -> Vector3D<T, U> {
         vec3(x.0, y.0, z.0)
     }
 
+    /// Tag a unitless value with units.
+    #[inline]
+    pub fn from_untyped(p: Vector3D<T, UnknownUnit>) -> Self {
+        vec3(p.x, p.y, p.z)
+    }
+}
+
+impl<T: Copy, U> Vector3D<T, U> {
     /// Cast this vector into a point.
     ///
     /// Equivalent to adding this vector to the origin.
@@ -826,12 +832,6 @@ impl<T: Copy, U> Vector3D<T, U> {
     #[inline]
     pub fn to_untyped(&self) -> Vector3D<T, UnknownUnit> {
         vec3(self.x, self.y, self.z)
-    }
-
-    /// Tag a unitless value with units.
-    #[inline]
-    pub fn from_untyped(p: Vector3D<T, UnknownUnit>) -> Self {
-        vec3(p.x, p.y, p.z)
     }
 
     /// Cast the unit

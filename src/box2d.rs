@@ -98,7 +98,7 @@ where
 
 impl<T, U> Box2D<T, U>
 where
-    T: Copy + PartialOrd,
+    T: PartialOrd,
 {
     /// Returns true if the box has a negative area.
     ///
@@ -115,16 +115,7 @@ where
         self.max.x <= self.min.x || self.max.y <= self.min.y
     }
 
-    #[inline]
-    pub fn to_non_empty(&self) -> Option<NonEmpty<Self>> {
-        if self.is_empty_or_negative() {
-            return None;
-        }
-
-        Some(NonEmpty(*self))
-    }
-
-    /// Returns true if the two boxes intersect.
+    /// Returns `true` if the two boxes intersect.
     #[inline]
     pub fn intersects(&self, other: &Self) -> bool {
         self.min.x < other.max.x
@@ -133,6 +124,38 @@ where
             && self.max.y > other.min.y
     }
 
+    /// Returns `true` if this box contains the point. Points are considered
+    /// in the box if they are on the front, left or top faces, but outside if they
+    /// are on the back, right or bottom faces.
+    #[inline]
+    pub fn contains(&self, p: Point2D<T, U>) -> bool {
+        self.min.x <= p.x && p.x < self.max.x
+            && self.min.y <= p.y && p.y < self.max.y
+    }
+
+    /// Returns `true` if this box contains the interior of the other box. Always
+    /// returns `true` if other is empty, and always returns `false` if other is
+    /// nonempty but this box is empty.
+    #[inline]
+    pub fn contains_box(&self, other: &Self) -> bool {
+        other.is_empty_or_negative()
+            || (self.min.x <= other.min.x && other.max.x <= self.max.x
+                && self.min.y <= other.min.y && other.max.y <= self.max.y)
+    }
+}
+
+impl<T, U> Box2D<T, U>
+where
+    T: Copy + PartialOrd,
+{
+    #[inline]
+    pub fn to_non_empty(&self) -> Option<NonEmpty<Self>> {
+        if self.is_empty_or_negative() {
+            return None;
+        }
+
+        Some(NonEmpty(*self))
+    }
     /// Computes the intersection of two boxes.
     ///
     /// The result is a negative box if the boxes do not intersect.
@@ -174,35 +197,6 @@ where
             min: self.min + by,
             max: self.max + by,
         }
-    }
-}
-
-impl<T, U> Box2D<T, U>
-where
-    T: Copy + PartialOrd + Zero,
-{
-    /// Returns true if this box contains the point. Points are considered
-    /// in the box if they are on the front, left or top faces, but outside if they
-    /// are on the back, right or bottom faces.
-    #[inline]
-    pub fn contains(&self, p: Point2D<T, U>) -> bool {
-        self.min.x <= p.x && p.x < self.max.x
-            && self.min.y <= p.y && p.y < self.max.y
-    }
-}
-
-impl<T, U> Box2D<T, U>
-where
-    T: Copy + PartialOrd + Zero + Sub<T, Output = T>,
-{
-    /// Returns true if this box contains the interior of the other box. Always
-    /// returns true if other is empty, and always returns false if other is
-    /// nonempty but this box is empty.
-    #[inline]
-    pub fn contains_box(&self, other: &Self) -> bool {
-        other.is_empty_or_negative()
-            || (self.min.x <= other.min.x && other.max.x <= self.max.x
-                && self.min.y <= other.min.y && other.max.y <= self.max.y)
     }
 }
 
