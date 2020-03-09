@@ -387,7 +387,7 @@ where
 
 impl<T, U> Box3D<T, U>
 where
-    T: Copy + Zero,
+    T: Zero,
 {
     /// Constructor, setting all sides to zero.
     pub fn zero() -> Self {
@@ -487,7 +487,7 @@ where
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using round(), round_in or round_out() before casting.
-    pub fn cast<T1: NumCast + Copy>(&self) -> Box3D<T1, Unit> {
+    pub fn cast<T1: NumCast>(&self) -> Box3D<T1, Unit> {
         Box3D::new(
             self.min.cast(),
             self.max.cast(),
@@ -499,7 +499,7 @@ where
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using round(), round_in or round_out() before casting.
-    pub fn try_cast<T1: NumCast + Copy>(&self) -> Option<Box3D<T1, Unit>> {
+    pub fn try_cast<T1: NumCast>(&self) -> Option<Box3D<T1, Unit>> {
         match (self.min.try_cast(), self.max.try_cast()) {
             (Some(a), Some(b)) => Some(Box3D::new(a, b)),
             _ => None,

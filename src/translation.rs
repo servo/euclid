@@ -196,7 +196,7 @@ where
 impl<T, Src, Dst1, Dst2> Add<Translation2D<T, Dst1, Dst2>>
 for Translation2D<T, Src, Dst1>
 where
-    T: Copy + Add<T, Output = T>
+    T: Add<T, Output = T>
 {
     type Output = Translation2D<T, Src, Dst2>;
     fn add(self, other: Translation2D<T, Dst1, Dst2>) -> Translation2D<T, Src, Dst2> {
@@ -211,7 +211,7 @@ impl<T, Src, Dst1, Dst2>
     Sub<Translation2D<T, Dst1, Dst2>>
     for Translation2D<T, Src, Dst2>
 where
-    T: Copy + Sub<T, Output = T>
+    T: Sub<T, Output = T>
 {
     type Output = Translation2D<T, Src, Dst1>;
     fn sub(self, other: Translation2D<T, Dst1, Dst2>) -> Translation2D<T, Src, Dst1> {
@@ -242,8 +242,6 @@ where
 }
 
 impl<T, Src, Dst> From<Vector2D<T, Src>> for Translation2D<T, Src, Dst>
-where
-    T: Copy
 {
     fn from(v: Vector2D<T, Src>) -> Self {
         Translation2D::new(v.x, v.y)
@@ -251,8 +249,6 @@ where
 }
 
 impl<T, Src, Dst> Into<Vector2D<T, Src>> for Translation2D<T, Src, Dst>
-where
-    T: Copy
 {
     fn into(self) -> Vector2D<T, Src> {
         vec2(self.x, self.y)
@@ -277,7 +273,7 @@ where
 }
 
 impl <T, Src, Dst> Default for Translation2D<T, Src, Dst>
-    where T: Copy + Zero
+    where T: Zero
 {
     fn default() -> Self {
         Self::identity()
@@ -485,7 +481,7 @@ where
 impl<T, Src, Dst1, Dst2> Add<Translation3D<T, Dst1, Dst2>>
 for Translation3D<T, Src, Dst1>
 where
-    T: Copy + Add<T, Output = T>
+    T: Add<T, Output = T>
 {
     type Output = Translation3D<T, Src, Dst2>;
     fn add(self, other: Translation3D<T, Dst1, Dst2>) -> Translation3D<T, Src, Dst2> {
@@ -501,7 +497,7 @@ impl<T, Src, Dst1, Dst2>
     Sub<Translation3D<T, Dst1, Dst2>>
     for Translation3D<T, Src, Dst2>
 where
-    T: Copy + Sub<T, Output = T>
+    T: Sub<T, Output = T>
 {
     type Output = Translation3D<T, Src, Dst1>;
     fn sub(self, other: Translation3D<T, Dst1, Dst2>) -> Translation3D<T, Src, Dst1> {
@@ -533,8 +529,6 @@ where
 }
 
 impl<T, Src, Dst> From<Vector3D<T, Src>> for Translation3D<T, Src, Dst>
-where
-    T: Copy
 {
     fn from(v: Vector3D<T, Src>) -> Self {
         Translation3D::new(v.x, v.y, v.z)
@@ -542,8 +536,6 @@ where
 }
 
 impl<T, Src, Dst> Into<Vector3D<T, Src>> for Translation3D<T, Src, Dst>
-where
-    T: Copy
 {
     fn into(self) -> Vector3D<T, Src> {
         vec3(self.x, self.y, self.z)
@@ -568,7 +560,7 @@ where
 }
 
 impl <T, Src, Dst> Default for Translation3D<T, Src, Dst>
-    where T: Copy + Zero
+    where T: Zero
 {
     fn default() -> Self {
         Self::identity()

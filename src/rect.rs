@@ -91,7 +91,7 @@ impl<T, U> Rect<T, U> {
 
 impl<T, U> Rect<T, U>
 where
-    T: Copy + Zero
+    T: Zero
 {
     /// Creates a rect of the given size, at offset zero.
     pub fn from_size(size: Size2D<T, U>) -> Self {
@@ -479,7 +479,7 @@ impl<T0: NumCast + Copy, Unit> Rect<T0, Unit> {
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using round(), round_in or round_out() before casting.
-    pub fn cast<T1: NumCast + Copy>(&self) -> Rect<T1, Unit> {
+    pub fn cast<T1: NumCast>(&self) -> Rect<T1, Unit> {
         Rect::new(
             self.origin.cast(),
             self.size.cast(),
@@ -491,7 +491,7 @@ impl<T0: NumCast + Copy, Unit> Rect<T0, Unit> {
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using round(), round_in or round_out() before casting.
-    pub fn try_cast<T1: NumCast + Copy>(&self) -> Option<Rect<T1, Unit>> {
+    pub fn try_cast<T1: NumCast>(&self) -> Option<Rect<T1, Unit>> {
         match (self.origin.try_cast(), self.size.try_cast()) {
             (Some(origin), Some(size)) => Some(Rect::new(origin, size)),
             _ => None,
@@ -594,7 +594,7 @@ impl<T: NumCast + Copy, Unit> Rect<T, Unit> {
 }
 
 impl<T, U> From<Size2D<T, U>> for Rect<T, U>
-where T: Copy + Zero
+where T: Zero
 {
     fn from(size: Size2D<T, U>) -> Self {
         Self::from_size(size)

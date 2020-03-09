@@ -144,7 +144,7 @@ where
 
 impl<T, U> Add for SideOffsets2D<T, U>
 where
-    T: Copy + Add<T, Output = T>,
+    T: Add<T, Output = T>,
 {
     type Output = Self;
     fn add(self, other: Self) -> Self {
@@ -157,7 +157,7 @@ where
     }
 }
 
-impl<T: Copy + Zero, U> SideOffsets2D<T, U> {
+impl<T: Zero, U> SideOffsets2D<T, U> {
     /// Constructor, setting all sides to zero.
     pub fn zero() -> Self {
         SideOffsets2D::new(Zero::zero(), Zero::zero(), Zero::zero(), Zero::zero())

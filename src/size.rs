@@ -158,14 +158,14 @@ impl<T: Floor, U> Size2D<T, U> {
     }
 }
 
-impl<T: Copy + Add<T, Output = T>, U> Add for Size2D<T, U> {
+impl<T: Add<T, Output = T>, U> Add for Size2D<T, U> {
     type Output = Self;
     fn add(self, other: Self) -> Self {
         Size2D::new(self.width + other.width, self.height + other.height)
     }
 }
 
-impl<T: Copy + Sub<T, Output = T>, U> Sub for Size2D<T, U> {
+impl<T: Sub<T, Output = T>, U> Sub for Size2D<T, U> {
     type Output = Self;
     fn sub(self, other: Self) -> Self {
         Size2D::new(self.width - other.width, self.height - other.height)
@@ -289,7 +289,7 @@ impl<T: NumCast + Copy, Unit> Size2D<T, Unit> {
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
-    pub fn cast<NewT: NumCast + Copy>(&self) -> Size2D<NewT, Unit> {
+    pub fn cast<NewT: NumCast>(&self) -> Size2D<NewT, Unit> {
         self.try_cast().unwrap()
     }
 
@@ -298,7 +298,7 @@ impl<T: NumCast + Copy, Unit> Size2D<T, Unit> {
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
-    pub fn try_cast<NewT: NumCast + Copy>(&self) -> Option<Size2D<NewT, Unit>> {
+    pub fn try_cast<NewT: NumCast>(&self) -> Option<Size2D<NewT, Unit>> {
         match (NumCast::from(self.width), NumCast::from(self.height)) {
             (Some(w), Some(h)) => Some(Size2D::new(w, h)),
             _ => None,
@@ -501,7 +501,7 @@ impl<T, U> Into<(T, T)> for Size2D<T, U> {
     }
 }
 
-impl<T: Copy, U> From<(T, T)> for Size2D<T, U> {
+impl<T, U> From<(T, T)> for Size2D<T, U> {
     fn from(tuple: (T, T)) -> Self {
         size2(tuple.0, tuple.1)
     }
@@ -701,14 +701,14 @@ impl<T: Floor, U> Size3D<T, U> {
     }
 }
 
-impl<T: Copy + Add<T, Output = T>, U> Add for Size3D<T, U> {
+impl<T: Add<T, Output = T>, U> Add for Size3D<T, U> {
     type Output = Self;
     fn add(self, other: Self) -> Self {
         Size3D::new(self.width + other.width, self.height + other.height, self.depth + other.depth)
     }
 }
 
-impl<T: Copy + Sub<T, Output = T>, U> Sub for Size3D<T, U> {
+impl<T: Sub<T, Output = T>, U> Sub for Size3D<T, U> {
     type Output = Self;
     fn sub(self, other: Self) -> Self {
         Size3D::new(self.width - other.width, self.height - other.height, self.depth - other.depth)

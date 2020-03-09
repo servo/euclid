@@ -240,7 +240,7 @@ where
 impl<T, U> Vector2D<T, U>
 where
     T: Copy + Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>
-    + Trig + Copy + Sub<T, Output = T>,
+    + Trig,
 {
     /// Returns the signed angle between this vector and another vector.
     ///
@@ -379,7 +379,7 @@ where
     }
 }
 
-impl<T: Copy + Add<T, Output = T>, U> Add for Vector2D<T, U> {
+impl<T: Add<T, Output = T>, U> Add for Vector2D<T, U> {
     type Output = Self;
     fn add(self, other: Self) -> Self {
         Vector2D::new(self.x + other.x, self.y + other.y)
@@ -400,7 +400,7 @@ impl<T: Copy + Sub<T, Output = T>, U> SubAssign<Vector2D<T, U>> for Vector2D<T, 
     }
 }
 
-impl<T: Copy + Sub<T, Output = T>, U> Sub for Vector2D<T, U> {
+impl<T: Sub<T, Output = T>, U> Sub for Vector2D<T, U> {
     type Output = Self;
     #[inline]
     fn sub(self, other: Self) -> Self {
@@ -408,7 +408,7 @@ impl<T: Copy + Sub<T, Output = T>, U> Sub for Vector2D<T, U> {
     }
 }
 
-impl<T: Copy + Neg<Output = T>, U> Neg for Vector2D<T, U> {
+impl<T: Neg<Output = T>, U> Neg for Vector2D<T, U> {
     type Output = Self;
     #[inline]
     fn neg(self) -> Self {
@@ -527,7 +527,7 @@ impl<T: NumCast + Copy, U> Vector2D<T, U> {
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
     #[inline]
-    pub fn cast<NewT: NumCast + Copy>(&self) -> Vector2D<NewT, U> {
+    pub fn cast<NewT: NumCast>(&self) -> Vector2D<NewT, U> {
         self.try_cast().unwrap()
     }
 
@@ -537,7 +537,7 @@ impl<T: NumCast + Copy, U> Vector2D<T, U> {
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
     #[inline]
-    pub fn try_cast<NewT: NumCast + Copy>(&self) -> Option<Vector2D<NewT, U>> {
+    pub fn try_cast<NewT: NumCast>(&self) -> Option<Vector2D<NewT, U>> {
         match (NumCast::from(self.x), NumCast::from(self.y)) {
             (Some(x), Some(y)) => Some(Vector2D::new(x, y)),
             _ => None,
@@ -599,7 +599,7 @@ impl<T: NumCast + Copy, U> Vector2D<T, U> {
     }
 }
 
-impl<T: Copy + ApproxEq<T>, U> ApproxEq<Vector2D<T, U>> for Vector2D<T, U> {
+impl<T: ApproxEq<T>, U> ApproxEq<Vector2D<T, U>> for Vector2D<T, U> {
     #[inline]
     fn approx_epsilon() -> Self {
         vec2(T::approx_epsilon(), T::approx_epsilon())
@@ -634,7 +634,7 @@ impl<T, U> Into<(T, T)> for Vector2D<T, U> {
     }
 }
 
-impl<T: Copy, U> From<(T, T)> for Vector2D<T, U> {
+impl<T, U> From<(T, T)> for Vector2D<T, U> {
     fn from(tuple: (T, T)) -> Self {
         vec2(tuple.0, tuple.1)
     }
@@ -869,7 +869,7 @@ where
 impl<T, U> Vector3D<T, U>
 where
     T: Copy + Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>
-    + Trig + Copy + Sub<T, Output = T>
+    + Trig
     + Float
 {
     /// Returns the positive angle between this vector and another vector.
@@ -1011,7 +1011,7 @@ where
     }
 }
 
-impl<T: Copy + Add<T, Output = T>, U> Add for Vector3D<T, U> {
+impl<T: Add<T, Output = T>, U> Add for Vector3D<T, U> {
     type Output = Self;
     #[inline]
     fn add(self, other: Self) -> Self {
@@ -1019,7 +1019,7 @@ impl<T: Copy + Add<T, Output = T>, U> Add for Vector3D<T, U> {
     }
 }
 
-impl<T: Copy + Sub<T, Output = T>, U> Sub for Vector3D<T, U> {
+impl<T: Sub<T, Output = T>, U> Sub for Vector3D<T, U> {
     type Output = Self;
     #[inline]
     fn sub(self, other: Self) -> Self {
@@ -1041,7 +1041,7 @@ impl<T: Copy + Sub<T, Output = T>, U> SubAssign<Vector3D<T, U>> for Vector3D<T, 
     }
 }
 
-impl<T: Copy + Neg<Output = T>, U> Neg for Vector3D<T, U> {
+impl<T: Neg<Output = T>, U> Neg for Vector3D<T, U> {
     type Output = Self;
     #[inline]
     fn neg(self) -> Self {
@@ -1165,7 +1165,7 @@ impl<T: NumCast + Copy, U> Vector3D<T, U> {
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
     #[inline]
-    pub fn cast<NewT: NumCast + Copy>(&self) -> Vector3D<NewT, U> {
+    pub fn cast<NewT: NumCast>(&self) -> Vector3D<NewT, U> {
         self.try_cast().unwrap()
     }
 
@@ -1175,7 +1175,7 @@ impl<T: NumCast + Copy, U> Vector3D<T, U> {
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
     #[inline]
-    pub fn try_cast<NewT: NumCast + Copy>(&self) -> Option<Vector3D<NewT, U>> {
+    pub fn try_cast<NewT: NumCast>(&self) -> Option<Vector3D<NewT, U>> {
         match (
             NumCast::from(self.x),
             NumCast::from(self.y),
@@ -1241,7 +1241,7 @@ impl<T: NumCast + Copy, U> Vector3D<T, U> {
     }
 }
 
-impl<T: Copy + ApproxEq<T>, U> ApproxEq<Vector3D<T, U>> for Vector3D<T, U> {
+impl<T: ApproxEq<T>, U> ApproxEq<Vector3D<T, U>> for Vector3D<T, U> {
     #[inline]
     fn approx_epsilon() -> Self {
         vec3(
@@ -1281,7 +1281,7 @@ impl<T, U> Into<(T, T, T)> for Vector3D<T, U> {
     }
 }
 
-impl<T: Copy, U> From<(T, T, T)> for Vector3D<T, U> {
+impl<T, U> From<(T, T, T)> for Vector3D<T, U> {
     fn from(tuple: (T, T, T)) -> Self {
         vec3(tuple.0, tuple.1, tuple.2)
     }
@@ -1371,7 +1371,7 @@ impl BoolVector2D {
     /// Returns point, each component of which or from `a`, or from `b` depending on truly value
     /// of corresponding vector component. `true` selects value from `a` and `false` from `b`.
     #[inline]
-    pub fn select_point<T: Copy, U>(&self, a: Point2D<T, U>, b: Point2D<T, U>) -> Point2D<T, U> {
+    pub fn select_point<T, U>(&self, a: Point2D<T, U>, b: Point2D<T, U>) -> Point2D<T, U> {
         point2(
             if self.x { a.x } else { b.x },
             if self.y { a.y } else { b.y },
@@ -1381,7 +1381,7 @@ impl BoolVector2D {
     /// Returns vector, each component of which or from `a`, or from `b` depending on truly value
     /// of corresponding vector component. `true` selects value from `a` and `false` from `b`.
     #[inline]
-    pub fn select_vector<T: Copy, U>(&self, a: Vector2D<T, U>, b: Vector2D<T, U>) -> Vector2D<T, U> {
+    pub fn select_vector<T, U>(&self, a: Vector2D<T, U>, b: Vector2D<T, U>) -> Vector2D<T, U> {
         vec2(
             if self.x { a.x } else { b.x },
             if self.y { a.y } else { b.y },
@@ -1391,7 +1391,7 @@ impl BoolVector2D {
     /// Returns size, each component of which or from `a`, or from `b` depending on truly value
     /// of corresponding vector component. `true` selects value from `a` and `false` from `b`.
     #[inline]
-    pub fn select_size<T: Copy, U>(&self, a: Size2D<T, U>, b: Size2D<T, U>) -> Size2D<T, U> {
+    pub fn select_size<T, U>(&self, a: Size2D<T, U>, b: Size2D<T, U>) -> Size2D<T, U> {
         size2(
             if self.x { a.width } else { b.width },
             if self.y { a.height } else { b.height },
@@ -1452,7 +1452,7 @@ impl BoolVector3D {
     /// Returns point, each component of which or from `a`, or from `b` depending on truly value
     /// of corresponding vector component. `true` selects value from `a` and `false` from `b`.
     #[inline]
-    pub fn select_point<T: Copy, U>(&self, a: Point3D<T, U>, b: Point3D<T, U>) -> Point3D<T, U> {
+    pub fn select_point<T, U>(&self, a: Point3D<T, U>, b: Point3D<T, U>) -> Point3D<T, U> {
         point3(
             if self.x { a.x } else { b.x },
             if self.y { a.y } else { b.y },
@@ -1463,7 +1463,7 @@ impl BoolVector3D {
     /// Returns vector, each component of which or from `a`, or from `b` depending on truly value
     /// of corresponding vector component. `true` selects value from `a` and `false` from `b`.
     #[inline]
-    pub fn select_vector<T: Copy, U>(&self, a: Vector3D<T, U>, b: Vector3D<T, U>) -> Vector3D<T, U> {
+    pub fn select_vector<T, U>(&self, a: Vector3D<T, U>, b: Vector3D<T, U>) -> Vector3D<T, U> {
         vec3(
             if self.x { a.x } else { b.x },
             if self.y { a.y } else { b.y },
@@ -1475,7 +1475,7 @@ impl BoolVector3D {
     /// of corresponding vector component. `true` selects value from `a` and `false` from `b`.
     #[inline]
     #[must_use]
-    pub fn select_size<T: Copy, U>(&self, a: Size3D<T, U>, b: Size3D<T, U>) -> Size3D<T, U> {
+    pub fn select_size<T, U>(&self, a: Size3D<T, U>, b: Size3D<T, U>) -> Size3D<T, U> {
         size3(
             if self.x { a.width } else { b.width },
             if self.y { a.height } else { b.height },

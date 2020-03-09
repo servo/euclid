@@ -170,11 +170,11 @@ impl<Src, Dst, T: Div<T, Output = T>> Div<Length<T, Src>> for Length<T, Dst> {
 }
 
 // length * scalar
-impl<T: Copy + Mul<T, Output = T>, U> Mul<T> for Length<T, U> {
+impl<T: Mul<T, Output = T>, U> Mul<T> for Length<T, U> {
     type Output = Self;
     #[inline]
     fn mul(self, scale: T) -> Self {
-        Length::new(self.get() * scale)
+        Length::new(self.0 * scale)
     }
 }
 
@@ -187,11 +187,11 @@ impl<T: Copy + Mul<T, Output = T>, U> MulAssign<T> for Length<T, U> {
 }
 
 // length / scalar
-impl<T: Copy + Div<T, Output = T>, U> Div<T> for Length<T, U> {
+impl<T: Div<T, Output = T>, U> Div<T> for Length<T, U> {
     type Output = Self;
     #[inline]
     fn div(self, scale: T) -> Self {
-        Length::new(self.get() / scale)
+        Length::new(self.0 / scale)
     }
 }
 
