@@ -28,7 +28,9 @@ use serde;
 /// A 2d size tagged with a unit.
 #[repr(C)]
 pub struct Size2D<T, U> {
+    /// The extent of the element in the `U` units along the `x` axis (usually horizontal).
     pub width: T,
+    /// The extent of the element in the `U` units along the `y` axis (usually vertical).
     pub height: T,
     #[doc(hidden)]
     pub _unit: PhantomData<U>,
@@ -50,6 +52,7 @@ impl<T: Clone, U> Clone for Size2D<T, U> {
 impl<'de, T, U> serde::Deserialize<'de> for Size2D<T, U>
     where T: serde::Deserialize<'de>
 {
+    /// Deserializes 2d size from tuple of width and height.
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
         where D: serde::Deserializer<'de>
     {
@@ -62,6 +65,7 @@ impl<'de, T, U> serde::Deserialize<'de> for Size2D<T, U>
 impl<T, U> serde::Serialize for Size2D<T, U>
     where T: serde::Serialize
 {
+    /// Serializes 2d size to tuple of width and height.
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
         where S: serde::Serializer
     {
@@ -166,6 +170,7 @@ impl<T: Copy + Sub<T, Output = T>, U> Sub for Size2D<T, U> {
 }
 
 impl<T: Copy + Clone + Mul<T>, U> Size2D<T, U> {
+    /// Returns result of multiplication of both components
     pub fn area(&self) -> T::Output {
         self.width * self.height
     }
@@ -175,9 +180,11 @@ impl<T, U> Size2D<T, U>
 where
     T: Copy + One + Add<Output = T> + Sub<Output = T> + Mul<Output = T>,
 {
-    /// Linearly interpolate between this size and another size.
+    /// Linearly interpolate each component between this size and another size.
     ///
     /// `t` is expected to be between zero and one.
+    ///
+    /// When `t` is `One::one()`, returned value equals to `other`, otherwise equals to `self`.
     #[inline]
     pub fn lerp(&self, other: Self, t: T) -> Self {
         let one_t = T::one() - t;
@@ -189,6 +196,7 @@ where
 }
 
 impl<T: Zero + PartialOrd, U> Size2D<T, U> {
+    /// Returns `true` if any component of size is zero or negative.
     pub fn is_empty_or_negative(&self) -> bool {
         let zero = T::zero();
         self.width <= zero || self.height <= zero
@@ -196,6 +204,9 @@ impl<T: Zero + PartialOrd, U> Size2D<T, U> {
 }
 
 impl<T: Zero, U> Size2D<T, U> {
+    /// The same as [`Zero::zero()`] but avalible without importing trait.
+    ///
+    /// [`Zero::zero()`]: ./num/trait.Zero.html#tymethod.zero
     pub fn zero() -> Self {
         Size2D::new(Zero::zero(), Zero::zero())
     }
@@ -240,19 +251,19 @@ impl<T: Copy + Div<T, Output = T>, U1, U2> Div<Scale<T, U1, U2>> for Size2D<T, U
 }
 
 impl<T: Copy, U> Size2D<T, U> {
-    /// Return this size as an array of two elements.
+    /// Return this size as an array of two elements (width, then height).
     #[inline]
     pub fn to_array(&self) -> [T; 2] {
         [self.width, self.height]
     }
 
-    /// Return this size as a tuple of two elements.
+    /// Return this size as a tuple of two elements (width, then height).
     #[inline]
     pub fn to_tuple(&self) -> (T, T) {
         (self.width, self.height)
     }
 
-    /// Return this size as a vector.
+    /// Return this size as a vector with width and height.
     #[inline]
     pub fn to_vector(&self) -> Vector2D<T, U> {
         vec2(self.width, self.height)
@@ -358,16 +369,23 @@ impl<T, U> Size2D<T, U>
 where
     T: Signed,
 {
+    /// Computes the absolute value of each component.
+    ///
+    /// For `f32` and `f64`, `NaN` will be returned for component if the component is `NaN`.
+    ///
+    /// For signed integers, `::MIN` will be returned for component if the component is `::MIN`.
     pub fn abs(&self) -> Self {
         size2(self.width.abs(), self.height.abs())
     }
 
+    /// Returns `true` if both components is positive and `false` any component is zero or negative.
     pub fn is_positive(&self) -> bool {
         self.width.is_positive() && self.height.is_positive()
     }
 }
 
 impl<T: PartialOrd, U> Size2D<T, U> {
+    /// Returns vector with results of "greater then" operaton on each component.
     pub fn greater_than(&self, other: Self) -> BoolVector2D {
         BoolVector2D {
             x: self.width > other.width,
@@ -375,6 +393,7 @@ impl<T: PartialOrd, U> Size2D<T, U> {
         }
     }
 
+    /// Returns vector with results of "lower then" operaton on each component.
     pub fn lower_than(&self, other: Self) -> BoolVector2D {
         BoolVector2D {
             x: self.width < other.width,
@@ -385,6 +404,7 @@ impl<T: PartialOrd, U> Size2D<T, U> {
 
 
 impl<T: PartialEq, U> Size2D<T, U> {
+    /// Returns vector with results of "equal" operaton on each component.
     pub fn equal(&self, other: Self) -> BoolVector2D {
         BoolVector2D {
             x: self.width == other.width,
@@ -392,6 +412,7 @@ impl<T: PartialEq, U> Size2D<T, U> {
         }
     }
 
+    /// Returns vector with results of "not equal" operaton on each component.
     pub fn not_equal(&self, other: Self) -> BoolVector2D {
         BoolVector2D {
             x: self.width != other.width,
@@ -401,6 +422,7 @@ impl<T: PartialEq, U> Size2D<T, U> {
 }
 
 impl<T: Float, U> Size2D<T, U> {
+    /// Returns the size each component of which are minimum of this size and another.
     #[inline]
     pub fn min(self, other: Self) -> Self {
         size2(
@@ -409,6 +431,7 @@ impl<T: Float, U> Size2D<T, U> {
         )
     }
 
+    /// Returns the size each component of which are maximum of this size and another.
     #[inline]
     pub fn max(self, other: Self) -> Self {
         size2(
@@ -417,6 +440,9 @@ impl<T: Float, U> Size2D<T, U> {
         )
     }
 
+    /// Returns the size each component of which clamped by corresponding components of `start` and `end`.
+    ///
+    /// Shortcut for `self.max(start).min(end)`.
     #[inline]
     pub fn clamp(&self, start: Self, end: Self) -> Self {
         self.max(start).min(end)
@@ -547,8 +573,11 @@ mod size2d {
 /// A 3d size tagged with a unit.
 #[repr(C)]
 pub struct Size3D<T, U> {
+    /// The extent of the element in the `U` units along the `x` axis.
     pub width: T,
+    /// The extent of the element in the `U` units along the `y` axis.
     pub height: T,
+    /// The extent of the element in the `U` units along the `z` axis.
     pub depth: T,
     #[doc(hidden)]
     pub _unit: PhantomData<U>,
@@ -689,6 +718,7 @@ impl<T: Copy + Sub<T, Output = T>, U> Sub for Size3D<T, U> {
 }
 
 impl<T: Copy + Clone + Mul<T, Output=T>, U> Size3D<T, U> {
+    /// Returns result of multiplication of all components
     pub fn volume(&self) -> T {
         self.width * self.height * self.depth
     }
@@ -713,6 +743,7 @@ where
 }
 
 impl<T: Zero + PartialOrd, U> Size3D<T, U> {
+    /// Returns `true` if any component of size is zero or negative.
     pub fn is_empty_or_negative(&self) -> bool {
         let zero = T::zero();
         self.width <= zero || self.height <= zero || self.depth <= zero
@@ -720,6 +751,9 @@ impl<T: Zero + PartialOrd, U> Size3D<T, U> {
 }
 
 impl<T: Zero, U> Size3D<T, U> {
+    /// The same as [`Zero::zero()`] but avalible without importing trait.
+    ///
+    /// [`Zero::zero()`]: ./num/trait.Zero.html#tymethod.zero
     pub fn zero() -> Self {
         Size3D::new(Zero::zero(), Zero::zero(), Zero::zero())
     }
@@ -764,19 +798,19 @@ impl<T: Copy + Div<T, Output = T>, U1, U2> Div<Scale<T, U1, U2>> for Size3D<T, U
 }
 
 impl<T: Copy, U> Size3D<T, U> {
-    /// Return this size as an array of two elements.
+    /// Return this size as an array of three elements (width, then height, then depth).
     #[inline]
     pub fn to_array(&self) -> [T; 3] {
         [self.width, self.height, self.depth]
     }
 
-    /// Return this size as an array of two elements.
+    /// Return this size as an array of three elements (width, then height, then depth).
     #[inline]
     pub fn to_tuple(&self) -> (T, T, T) {
         (self.width, self.height, self.depth)
     }
 
-    /// Return this size as a vector
+    /// Return this size as a vector with width, height and depth.
     #[inline]
     pub fn to_vector(&self) -> Vector3D<T, U> {
         vec3(self.width, self.height, self.depth)
@@ -873,16 +907,23 @@ impl<T, U> Size3D<T, U>
 where
     T: Signed,
 {
+    /// Computes the absolute value of each component.
+    ///
+    /// For `f32` and `f64`, `NaN` will be returned for component if the component is `NaN`.
+    ///
+    /// For signed integers, `::MIN` will be returned for component if the component is `::MIN`.
     pub fn abs(&self) -> Self {
         size3(self.width.abs(), self.height.abs(), self.depth.abs())
     }
 
+    /// Returns `true` if all components is positive and `false` any component is zero or negative.
     pub fn is_positive(&self) -> bool {
         self.width.is_positive() && self.height.is_positive() && self.depth.is_positive()
     }
 }
 
 impl<T: PartialOrd, U> Size3D<T, U> {
+    /// Returns vector with results of "greater than" operaton on each component.
     pub fn greater_than(&self, other: Self) -> BoolVector3D {
         BoolVector3D {
             x: self.width > other.width,
@@ -891,6 +932,7 @@ impl<T: PartialOrd, U> Size3D<T, U> {
         }
     }
 
+    /// Returns vector with results of "lower than" operaton on each component.
     pub fn lower_than(&self, other: Self) -> BoolVector3D {
         BoolVector3D {
             x: self.width < other.width,
@@ -902,6 +944,7 @@ impl<T: PartialOrd, U> Size3D<T, U> {
 
 
 impl<T: PartialEq, U> Size3D<T, U> {
+    /// Returns vector with results of "equal" operaton on each component.
     pub fn equal(&self, other: Self) -> BoolVector3D {
         BoolVector3D {
             x: self.width == other.width,
@@ -910,6 +953,7 @@ impl<T: PartialEq, U> Size3D<T, U> {
         }
     }
 
+    /// Returns vector with results of "not equal" operaton on each component.
     pub fn not_equal(&self, other: Self) -> BoolVector3D {
         BoolVector3D {
             x: self.width != other.width,
@@ -920,6 +964,7 @@ impl<T: PartialEq, U> Size3D<T, U> {
 }
 
 impl<T: Float, U> Size3D<T, U> {
+    /// Returns the size each component of which are minimum of this size and another.
     #[inline]
     pub fn min(self, other: Self) -> Self {
         size3(
@@ -929,6 +974,7 @@ impl<T: Float, U> Size3D<T, U> {
         )
     }
 
+    /// Returns the size each component of which are maximum of this size and another.
     #[inline]
     pub fn max(self, other: Self) -> Self {
         size3(
@@ -938,6 +984,9 @@ impl<T: Float, U> Size3D<T, U> {
         )
     }
 
+    /// Returns the size each component of which clamped by corresponding components of `start` and `end`.
+    ///
+    /// Shortcut for `self.max(start).min(end)`.
     #[inline]
     pub fn clamp(&self, start: Self, end: Self) -> Self {
         self.max(start).min(end)

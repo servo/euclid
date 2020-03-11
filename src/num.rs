@@ -30,13 +30,25 @@ impl<T: num_traits::One> One for T {
     }
 }
 
+/// Defines the nearest integer value to the original value.
 pub trait Round: Copy {
+    /// Rounds to the nearest integer value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
     fn round(self) -> Self;
 }
+/// Defines the biggest integer equal or lower than the original value.
 pub trait Floor: Copy {
+    /// Rounds to the biggest integer equal or lower than the original value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
     fn floor(self) -> Self;
 }
+/// Defines the smallest integer equal or greater than the original value.
 pub trait Ceil: Copy {
+    /// Rounds to the smallest integer equal or greater than the original value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
     fn ceil(self) -> Self;
 }
 

@@ -187,11 +187,13 @@ impl<T: Copy, U> Point2D<T, U> {
         point2(self.x, self.y)
     }
 
+    /// Cast into an array with x and y.
     #[inline]
     pub fn to_array(&self) -> [T; 2] {
         [self.x, self.y]
     }
 
+    /// Cast into a tuple with x and y.
     #[inline]
     pub fn to_tuple(&self) -> (T, T) {
         (self.x, self.y)
@@ -663,11 +665,13 @@ impl<T: Copy, U> Point3D<T, U> {
         point2(self.y, self.z)
     }
 
+    /// Cast into an array with x, y and z.
     #[inline]
     pub fn to_array(&self) -> [T; 3] {
         [self.x, self.y, self.z]
     }
 
+    /// Cast into a tuple with x, y and z.
     #[inline]
     pub fn to_tuple(&self) -> (T, T, T) {
         (self.x, self.y, self.z)
@@ -961,6 +965,7 @@ impl<T: Copy, U> From<(T, T, T)> for Point3D<T, U> {
     }
 }
 
+/// Shorthand for `Point2D::new(x, y)`.
 #[inline]
 pub const fn point2<T, U>(x: T, y: T) -> Point2D<T, U> {
     Point2D {
@@ -970,6 +975,7 @@ pub const fn point2<T, U>(x: T, y: T) -> Point2D<T, U> {
     }
 }
 
+/// Shorthand for `Point3D::new(x, y)`.
 #[inline]
 pub const fn point3<T, U>(x: T, y: T, z: T) -> Point3D<T, U> {
     Point3D {
