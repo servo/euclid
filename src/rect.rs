@@ -674,6 +674,22 @@ mod tests {
     }
 
     #[test]
+    fn test_intersection_overflow() {
+        // test some scenarios where the intersection can overflow but
+        // the min_x() and max_x() don't. Gecko currently fails these cases
+        let p = Rect::new(Point2D::new(-2147483648, -2147483648), Size2D::new(0, 0));
+        let q = Rect::new(Point2D::new(2136893440, 2136893440), Size2D::new(279552, 279552));
+        let r = Rect::new(Point2D::new(-2147483648, -2147483648), Size2D::new(1, 1));
+
+        assert!(p.is_empty());
+        let pq = p.intersection(&q);
+        assert!(pq.is_none());
+
+        let qr = q.intersection(&r);
+        assert!(qr.is_none());
+    }
+
+    #[test]
     fn test_contains() {
         let r = Rect::new(Point2D::new(-20, 15), Size2D::new(100, 200));
 
