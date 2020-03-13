@@ -95,11 +95,13 @@ where
     T: Zero
 {
     /// Constructor, setting all sides to zero.
+    #[inline]
     pub fn zero() -> Self {
         Rect::new(Point2D::origin(), Size2D::zero())
     }
 
     /// Creates a rect of the given size, at offset zero.
+    #[inline]
     pub fn from_size(size: Size2D<T, U>) -> Self {
         Rect {
             origin: Point2D::zero(),
@@ -110,7 +112,7 @@ where
 
 impl<T, U> Rect<T, U>
 where
-    T: Copy + PartialOrd + PartialEq + Add<T, Output = T> + Sub<T, Output = T>,
+    T: Copy + PartialOrd + Add<T, Output = T> + Sub<T, Output = T>,
 {
     #[inline]
     pub fn intersects(&self, other: &Self) -> bool {
@@ -228,7 +230,7 @@ where
 
 impl<T, U> Rect<T, U>
 where
-    T: Copy + Zero + PartialOrd + PartialEq + Add<T, Output = T> + Sub<T, Output = T>,
+    T: Copy + Zero + PartialOrd + Add<T, Output = T> + Sub<T, Output = T>,
 {
     /// Returns true if this rectangle contains the interior of rect. Always
     /// returns true if rect is empty, and always returns false if rect is
