@@ -38,6 +38,7 @@
 //! All euclid types are marked `#[repr(C)]` in order to facilitate exposing them to
 //! foreign function interfaces (provided the underlying scalar type is also `repr(C)`).
 //!
+#![deny(unconditional_recursion)]
 
 #[cfg(feature = "serde")]
 #[macro_use]

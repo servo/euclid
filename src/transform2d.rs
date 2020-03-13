@@ -160,6 +160,31 @@ impl<T, Src, Dst> Transform2D<T, Src, Dst> {
             _unit: PhantomData,
         }
     }
+
+
+    /// Returns true is this transform is approximately equal to the other one, using
+    /// T's default epsilon value.
+    ///
+    /// The same as [`ApproxEq::approx_eq()`] but available without importing trait.
+    ///
+    /// [`ApproxEq::approx_eq()`]: ./approxeq/trait.ApproxEq.html#method.approx_eq
+    #[inline]
+    pub fn approx_eq(&self, other: &Self) -> bool
+    where T : ApproxEq<T> {
+        <Self as ApproxEq<T>>::approx_eq(&self, &other)
+    }
+
+    /// Returns true is this transform is approximately equal to the other one, using
+    /// a provided epsilon value.
+    ///
+    /// The same as [`ApproxEq::approx_eq_eps()`] but available without importing trait.
+    ///
+    /// [`ApproxEq::approx_eq_eps()`]: ./approxeq/trait.ApproxEq.html#method.approx_eq_eps
+    #[inline]
+    pub fn approx_eq_eps(&self, other: &Self, eps: &T) -> bool
+    where T : ApproxEq<T> {
+        <Self as ApproxEq<T>>::approx_eq_eps(&self, &other, &eps)
+    }
 }
 
 impl<T: Copy, Src, Dst> Transform2D<T, Src, Dst> {
@@ -546,18 +571,13 @@ impl <T, Src, Dst> Default for Transform2D<T, Src, Dst>
     }
 }
 
-impl<T: ApproxEq<T>, Src, Dst> Transform2D<T, Src, Dst> {
-    /// Returns true is this transform is approximately equal to the other one, using
-    /// T's default epsilon value.
-    pub fn approx_eq(&self, other: &Self) -> bool {
-        self.m11.approx_eq(&other.m11) && self.m12.approx_eq(&other.m12) &&
-        self.m21.approx_eq(&other.m21) && self.m22.approx_eq(&other.m22) &&
-        self.m31.approx_eq(&other.m31) && self.m32.approx_eq(&other.m32)
-    }
+impl<T: ApproxEq<T>, Src, Dst> ApproxEq<T> for Transform2D<T, Src, Dst> {
+    #[inline]
+    fn approx_epsilon() -> T { T::approx_epsilon() }
 
     /// Returns true is this transform is approximately equal to the other one, using
     /// a provided epsilon value.
-    pub fn approx_eq_eps(&self, other: &Self, eps: &T) -> bool {
+    fn approx_eq_eps(&self, other: &Self, eps: &T) -> bool {
         self.m11.approx_eq_eps(&other.m11, eps) && self.m12.approx_eq_eps(&other.m12, eps) &&
         self.m21.approx_eq_eps(&other.m21, eps) && self.m22.approx_eq_eps(&other.m22, eps) &&
         self.m31.approx_eq_eps(&other.m31, eps) && self.m32.approx_eq_eps(&other.m32, eps)

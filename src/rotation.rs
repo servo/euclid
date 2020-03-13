@@ -667,10 +667,6 @@ where
         T::approx_epsilon()
     }
 
-    fn approx_eq(&self, other: &Self) -> bool {
-        self.approx_eq_eps(other, &Self::approx_epsilon())
-    }
-
     fn approx_eq_eps(&self, other: &Self, eps: &T) -> bool {
         (self.i.approx_eq_eps(&other.i, eps) && self.j.approx_eq_eps(&other.j, eps)
             && self.k.approx_eq_eps(&other.k, eps) && self.r.approx_eq_eps(&other.r, eps))

@@ -9,9 +9,18 @@
 
 /// Trait for testing approximate equality
 pub trait ApproxEq<Eps> {
+    /// Default epsilon value
     fn approx_epsilon() -> Eps;
-    fn approx_eq(&self, other: &Self) -> bool;
+
+    /// Returns `true` is this object is approximately equal to the other one, using
+    /// a provided epsilon value.
     fn approx_eq_eps(&self, other: &Self, approx_epsilon: &Eps) -> bool;
+
+    /// Returns `true` is this object is approximately equal to the other one, using
+    /// the `approx_epsilon()` epsilon value.
+    fn approx_eq(&self, other: &Self) -> bool {
+        self.approx_eq_eps(other, &Self::approx_epsilon())
+    }
 }
 
 macro_rules! approx_eq {
@@ -20,10 +29,6 @@ macro_rules! approx_eq {
             #[inline]
             fn approx_epsilon() -> $ty {
                 $eps
-            }
-            #[inline]
-            fn approx_eq(&self, other: &$ty) -> bool {
-                self.approx_eq_eps(other, &$eps)
             }
             #[inline]
             fn approx_eq_eps(&self, other: &$ty, approx_epsilon: &$ty) -> bool {
