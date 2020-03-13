@@ -252,12 +252,12 @@ impl<T: Copy, Src, Dst> Transform2D<T, Src, Dst> {
 
 impl<T0: NumCast + Copy, Src, Dst> Transform2D<T0, Src, Dst> {
     /// Cast from one numeric representation to another, preserving the units.
-    pub fn cast<T1: NumCast + Copy>(&self) -> Transform2D<T1, Src, Dst> {
+    pub fn cast<T1: NumCast>(&self) -> Transform2D<T1, Src, Dst> {
         self.try_cast().unwrap()
     }
 
     /// Fallible cast from one numeric representation to another, preserving the units.
-    pub fn try_cast<T1: NumCast + Copy>(&self) -> Option<Transform2D<T1, Src, Dst>> {
+    pub fn try_cast<T1: NumCast>(&self) -> Option<Transform2D<T1, Src, Dst>> {
         match (NumCast::from(self.m11), NumCast::from(self.m12),
                NumCast::from(self.m21), NumCast::from(self.m22),
                NumCast::from(self.m31), NumCast::from(self.m32)) {
@@ -297,7 +297,7 @@ where T: Copy +
 }
 
 impl<T, Src, Dst> Transform2D<T, Src, Dst>
-where T: Copy + Clone +
+where T: Copy +
          Add<T, Output=T> +
          Mul<T, Output=T> +
          Div<T, Output=T> +
@@ -477,7 +477,7 @@ where T: Copy + Clone +
 }
 
 impl<T, Src, Dst> Transform2D<T, Src, Dst>
-where T: Copy + Clone +
+where T: Copy +
          Add<T, Output=T> +
          Mul<T, Output=T> +
          Div<T, Output=T> +
@@ -514,7 +514,7 @@ where T: Copy + Clone +
 }
 
 impl <T, Src, Dst> Transform2D<T, Src, Dst>
-where T: Copy + Clone +
+where T: Copy +
          Add<T, Output=T> +
          Sub<T, Output=T> +
          Mul<T, Output=T> +
@@ -556,7 +556,7 @@ impl<T: ApproxEq<T>, Src, Dst> Transform2D<T, Src, Dst> {
     }
 }
 
-impl<T: Copy + fmt::Debug, Src, Dst> fmt::Debug for Transform2D<T, Src, Dst>
+impl<T, Src, Dst> fmt::Debug for Transform2D<T, Src, Dst>
 where T: Copy + fmt::Debug +
          PartialEq +
          One + Zero {

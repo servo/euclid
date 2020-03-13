@@ -105,9 +105,7 @@ impl<T, U> SideOffsets2D<T, U> {
             _unit: PhantomData,
         }
     }
-}
 
-impl<T: Copy, U> SideOffsets2D<T, U> {
     /// Constructor taking a typed Length for each side.
     pub fn from_lengths(
         top: Length<T, U>,
@@ -117,7 +115,9 @@ impl<T: Copy, U> SideOffsets2D<T, U> {
     ) -> Self {
         SideOffsets2D::new(top.0, right.0, bottom.0, left.0)
     }
+}
 
+impl<T: Copy, U> SideOffsets2D<T, U> {
     /// Constructor setting the same value to all sides, taking a scalar value directly.
     pub fn new_all_same(all: T) -> Self {
         SideOffsets2D::new(all, all, all, all)
@@ -144,7 +144,7 @@ where
 
 impl<T, U> Add for SideOffsets2D<T, U>
 where
-    T: Copy + Add<T, Output = T>,
+    T: Add<T, Output = T>,
 {
     type Output = Self;
     fn add(self, other: Self) -> Self {
@@ -157,7 +157,7 @@ where
     }
 }
 
-impl<T: Copy + Zero, U> SideOffsets2D<T, U> {
+impl<T: Zero, U> SideOffsets2D<T, U> {
     /// Constructor, setting all sides to zero.
     pub fn zero() -> Self {
         SideOffsets2D::new(Zero::zero(), Zero::zero(), Zero::zero(), Zero::zero())

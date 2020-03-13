@@ -119,12 +119,15 @@ impl<T, U> Size2D<T, U> {
             _unit: PhantomData,
         }
     }
-}
-
-impl<T: Clone, U> Size2D<T, U> {
     /// Constructor taking scalar strongly typed lengths.
     pub fn from_lengths(width: Length<T, U>, height: Length<T, U>) -> Self {
-        Size2D::new(width.get(), height.get())
+        Size2D::new(width.0, height.0)
+    }
+
+    /// Tag a unitless value with units.
+    #[inline]
+    pub fn from_untyped(p: Size2D<T, UnknownUnit>) -> Self {
+        Size2D::new(p.width, p.height)
     }
 }
 
@@ -155,21 +158,21 @@ impl<T: Floor, U> Size2D<T, U> {
     }
 }
 
-impl<T: Copy + Add<T, Output = T>, U> Add for Size2D<T, U> {
+impl<T: Add<T, Output = T>, U> Add for Size2D<T, U> {
     type Output = Self;
     fn add(self, other: Self) -> Self {
         Size2D::new(self.width + other.width, self.height + other.height)
     }
 }
 
-impl<T: Copy + Sub<T, Output = T>, U> Sub for Size2D<T, U> {
+impl<T: Sub<T, Output = T>, U> Sub for Size2D<T, U> {
     type Output = Self;
     fn sub(self, other: Self) -> Self {
         Size2D::new(self.width - other.width, self.height - other.height)
     }
 }
 
-impl<T: Copy + Clone + Mul<T>, U> Size2D<T, U> {
+impl<T: Copy + Mul<T>, U> Size2D<T, U> {
     /// Returns result of multiplication of both components
     pub fn area(&self) -> T::Output {
         self.width * self.height
@@ -274,11 +277,6 @@ impl<T: Copy, U> Size2D<T, U> {
         Size2D::new(self.width, self.height)
     }
 
-    /// Tag a unitless value with units.
-    pub fn from_untyped(p: Size2D<T, UnknownUnit>) -> Self {
-        Size2D::new(p.width, p.height)
-    }
-
     /// Cast the unit
     pub fn cast_unit<V>(&self) -> Size2D<T, V> {
         Size2D::new(self.width, self.height)
@@ -291,7 +289,7 @@ impl<T: NumCast + Copy, Unit> Size2D<T, Unit> {
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
-    pub fn cast<NewT: NumCast + Copy>(&self) -> Size2D<NewT, Unit> {
+    pub fn cast<NewT: NumCast>(&self) -> Size2D<NewT, Unit> {
         self.try_cast().unwrap()
     }
 
@@ -300,7 +298,7 @@ impl<T: NumCast + Copy, Unit> Size2D<T, Unit> {
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
-    pub fn try_cast<NewT: NumCast + Copy>(&self) -> Option<Size2D<NewT, Unit>> {
+    pub fn try_cast<NewT: NumCast>(&self) -> Option<Size2D<NewT, Unit>> {
         match (NumCast::from(self.width), NumCast::from(self.height)) {
             (Some(w), Some(h)) => Some(Size2D::new(w, h)),
             _ => None,
@@ -485,25 +483,25 @@ impl<T, U> From<Vector2D<T, U>> for Size2D<T, U> {
     }
 }
 
-impl<T: Copy, U> Into<[T; 2]> for Size2D<T, U> {
+impl<T, U> Into<[T; 2]> for Size2D<T, U> {
     fn into(self) -> [T; 2] {
-        self.to_array()
+        [self.width, self.height]
     }
 }
 
-impl<T: Copy, U> From<[T; 2]> for Size2D<T, U> {
-    fn from(array: [T; 2]) -> Self {
-        size2(array[0], array[1])
+impl<T, U> From<[T; 2]> for Size2D<T, U> {
+    fn from([w, h]: [T; 2]) -> Self {
+        size2(w, h)
     }
 }
 
-impl<T: Copy, U> Into<(T, T)> for Size2D<T, U> {
+impl<T, U> Into<(T, T)> for Size2D<T, U> {
     fn into(self) -> (T, T) {
-        self.to_tuple()
+        (self.width, self.height)
     }
 }
 
-impl<T: Copy, U> From<(T, T)> for Size2D<T, U> {
+impl<T, U> From<(T, T)> for Size2D<T, U> {
     fn from(tuple: (T, T)) -> Self {
         size2(tuple.0, tuple.1)
     }
@@ -669,10 +667,10 @@ impl<T, U> Size3D<T, U> {
     }
 }
 
-impl<T: Clone, U> Size3D<T, U> {
+impl<T, U> Size3D<T, U> {
     /// Constructor taking scalar strongly typed lengths.
     pub fn from_lengths(width: Length<T, U>, height: Length<T, U>, depth: Length<T, U>) -> Self {
-        Size3D::new(width.get(), height.get(), depth.get())
+        Size3D::new(width.0, height.0, depth.0)
     }
 }
 
@@ -703,21 +701,21 @@ impl<T: Floor, U> Size3D<T, U> {
     }
 }
 
-impl<T: Copy + Add<T, Output = T>, U> Add for Size3D<T, U> {
+impl<T: Add<T, Output = T>, U> Add for Size3D<T, U> {
     type Output = Self;
     fn add(self, other: Self) -> Self {
         Size3D::new(self.width + other.width, self.height + other.height, self.depth + other.depth)
     }
 }
 
-impl<T: Copy + Sub<T, Output = T>, U> Sub for Size3D<T, U> {
+impl<T: Sub<T, Output = T>, U> Sub for Size3D<T, U> {
     type Output = Self;
     fn sub(self, other: Self) -> Self {
         Size3D::new(self.width - other.width, self.height - other.height, self.depth - other.depth)
     }
 }
 
-impl<T: Copy + Clone + Mul<T, Output=T>, U> Size3D<T, U> {
+impl<T: Copy + Mul<T, Output=T>, U> Size3D<T, U> {
     /// Returns result of multiplication of all components
     pub fn volume(&self) -> T {
         self.width * self.height * self.depth

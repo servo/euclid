@@ -92,15 +92,15 @@ impl<Unit, T: Clone> Length<T, Unit> {
     }
 }
 
-impl<T: fmt::Debug + Clone, U> fmt::Debug for Length<T, U> {
+impl<T: fmt::Debug, U> fmt::Debug for Length<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        self.get().fmt(f)
+        self.0.fmt(f)
     }
 }
 
-impl<T: fmt::Display + Clone, U> fmt::Display for Length<T, U> {
+impl<T: fmt::Display, U> fmt::Display for Length<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        self.get().fmt(f)
+        self.0.fmt(f)
     }
 }
 
@@ -120,61 +120,61 @@ impl<T, U> Hash for Length<T, U>
 }
 
 // length + length
-impl<U, T: Clone + Add<T, Output = T>> Add for Length<T, U> {
+impl<U, T: Add<T, Output = T>> Add for Length<T, U> {
     type Output = Length<T, U>;
     fn add(self, other: Length<T, U>) -> Length<T, U> {
-        Length::new(self.get() + other.get())
+        Length::new(self.0 + other.0)
     }
 }
 
 // length += length
-impl<U, T: Clone + AddAssign<T>> AddAssign for Length<T, U> {
+impl<U, T: AddAssign<T>> AddAssign for Length<T, U> {
     fn add_assign(&mut self, other: Length<T, U>) {
-        self.0 += other.get();
+        self.0 += other.0;
     }
 }
 
 // length - length
-impl<U, T: Clone + Sub<T, Output = T>> Sub<Length<T, U>> for Length<T, U> {
+impl<U, T: Sub<T, Output = T>> Sub<Length<T, U>> for Length<T, U> {
     type Output = Length<T, U>;
     fn sub(self, other: Length<T, U>) -> <Self as Sub>::Output {
-        Length::new(self.get() - other.get())
+        Length::new(self.0 - other.0)
     }
 }
 
 // length -= length
-impl<U, T: Clone + SubAssign<T>> SubAssign for Length<T, U> {
+impl<U, T: SubAssign<T>> SubAssign for Length<T, U> {
     fn sub_assign(&mut self, other: Length<T, U>) {
-        self.0 -= other.get();
+        self.0 -= other.0;
     }
 }
 
 // Saturating length + length and length - length.
-impl<U, T: Clone + Saturating> Saturating for Length<T, U> {
+impl<U, T: Saturating> Saturating for Length<T, U> {
     fn saturating_add(self, other: Length<T, U>) -> Length<T, U> {
-        Length::new(self.get().saturating_add(other.get()))
+        Length::new(self.0.saturating_add(other.0))
     }
 
     fn saturating_sub(self, other: Length<T, U>) -> Length<T, U> {
-        Length::new(self.get().saturating_sub(other.get()))
+        Length::new(self.0.saturating_sub(other.0))
     }
 }
 
 // length / length
-impl<Src, Dst, T: Clone + Div<T, Output = T>> Div<Length<T, Src>> for Length<T, Dst> {
+impl<Src, Dst, T: Div<T, Output = T>> Div<Length<T, Src>> for Length<T, Dst> {
     type Output = Scale<T, Src, Dst>;
     #[inline]
     fn div(self, other: Length<T, Src>) -> Scale<T, Src, Dst> {
-        Scale::new(self.get() / other.get())
+        Scale::new(self.0 / other.0)
     }
 }
 
 // length * scalar
-impl<T: Copy + Mul<T, Output = T>, U> Mul<T> for Length<T, U> {
+impl<T: Mul<T, Output = T>, U> Mul<T> for Length<T, U> {
     type Output = Self;
     #[inline]
     fn mul(self, scale: T) -> Self {
-        Length::new(self.get() * scale)
+        Length::new(self.0 * scale)
     }
 }
 
@@ -187,11 +187,11 @@ impl<T: Copy + Mul<T, Output = T>, U> MulAssign<T> for Length<T, U> {
 }
 
 // length / scalar
-impl<T: Copy + Div<T, Output = T>, U> Div<T> for Length<T, U> {
+impl<T: Div<T, Output = T>, U> Div<T> for Length<T, U> {
     type Output = Self;
     #[inline]
     fn div(self, scale: T) -> Self {
-        Length::new(self.get() / scale)
+        Length::new(self.0 / scale)
     }
 }
 
@@ -204,61 +204,61 @@ impl<T: Copy + Div<T, Output = T>, U> DivAssign<T> for Length<T, U> {
 }
 
 // length * scaleFactor
-impl<Src, Dst, T: Clone + Mul<T, Output = T>> Mul<Scale<T, Src, Dst>> for Length<T, Src> {
+impl<Src, Dst, T: Mul<T, Output = T>> Mul<Scale<T, Src, Dst>> for Length<T, Src> {
     type Output = Length<T, Dst>;
     #[inline]
     fn mul(self, scale: Scale<T, Src, Dst>) -> Length<T, Dst> {
-        Length::new(self.get() * scale.get())
+        Length::new(self.0 * scale.0)
     }
 }
 
 // length / scaleFactor
-impl<Src, Dst, T: Clone + Div<T, Output = T>> Div<Scale<T, Src, Dst>> for Length<T, Dst> {
+impl<Src, Dst, T: Div<T, Output = T>> Div<Scale<T, Src, Dst>> for Length<T, Dst> {
     type Output = Length<T, Src>;
     #[inline]
     fn div(self, scale: Scale<T, Src, Dst>) -> Length<T, Src> {
-        Length::new(self.get() / scale.get())
+        Length::new(self.0 / scale.0)
     }
 }
 
 // -length
-impl<U, T: Clone + Neg<Output = T>> Neg for Length<T, U> {
+impl<U, T: Neg<Output = T>> Neg for Length<T, U> {
     type Output = Length<T, U>;
     #[inline]
     fn neg(self) -> Length<T, U> {
-        Length::new(-self.get())
+        Length::new(-self.0)
     }
 }
 
 impl<Unit, T0: NumCast + Clone> Length<T0, Unit> {
     /// Cast from one numeric representation to another, preserving the units.
-    pub fn cast<T1: NumCast + Clone>(&self) -> Length<T1, Unit> {
+    pub fn cast<T1: NumCast>(&self) -> Length<T1, Unit> {
         self.try_cast().unwrap()
     }
 
     /// Fallible cast from one numeric representation to another, preserving the units.
-    pub fn try_cast<T1: NumCast + Clone>(&self) -> Option<Length<T1, Unit>> {
+    pub fn try_cast<T1: NumCast>(&self) -> Option<Length<T1, Unit>> {
         NumCast::from(self.get()).map(Length::new)
     }
 }
 
-impl<Unit, T: Clone + PartialEq> PartialEq for Length<T, Unit> {
+impl<Unit, T: PartialEq> PartialEq for Length<T, Unit> {
     fn eq(&self, other: &Self) -> bool {
-        self.get().eq(&other.get())
+        self.0.eq(&other.0)
     }
 }
 
-impl<Unit, T: Clone + PartialOrd> PartialOrd for Length<T, Unit> {
+impl<Unit, T: PartialOrd> PartialOrd for Length<T, Unit> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        self.get().partial_cmp(&other.get())
+        self.0.partial_cmp(&other.0)
     }
 }
 
-impl<Unit, T: Clone + Eq> Eq for Length<T, Unit> {}
+impl<Unit, T: Eq> Eq for Length<T, Unit> {}
 
-impl<Unit, T: Clone + Ord> Ord for Length<T, Unit> {
+impl<Unit, T: Ord> Ord for Length<T, Unit> {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.get().cmp(&other.get())
+        self.0.cmp(&other.0)
     }
 }
 

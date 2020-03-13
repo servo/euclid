@@ -115,33 +115,33 @@ where
     }
 }
 
-impl<T: Clone + Add<T, Output = T>> Add for Angle<T> {
+impl<T: Add<T, Output = T>> Add for Angle<T> {
     type Output = Angle<T>;
     fn add(self, other: Angle<T>) -> Angle<T> {
         Angle::radians(self.radians + other.radians)
     }
 }
 
-impl<T: Clone + AddAssign<T>> AddAssign for Angle<T> {
+impl<T: AddAssign<T>> AddAssign for Angle<T> {
     fn add_assign(&mut self, other: Angle<T>) {
         self.radians += other.radians;
     }
 }
 
-impl<T: Clone + Sub<T, Output = T>> Sub<Angle<T>> for Angle<T> {
+impl<T: Sub<T, Output = T>> Sub<Angle<T>> for Angle<T> {
     type Output = Angle<T>;
     fn sub(self, other: Angle<T>) -> <Self as Sub>::Output {
         Angle::radians(self.radians - other.radians)
     }
 }
 
-impl<T: Clone + SubAssign<T>> SubAssign for Angle<T> {
+impl<T: SubAssign<T>> SubAssign for Angle<T> {
     fn sub_assign(&mut self, other: Angle<T>) {
         self.radians -= other.radians;
     }
 }
 
-impl<T: Clone + Div<T, Output = T>> Div<Angle<T>> for Angle<T> {
+impl<T: Div<T, Output = T>> Div<Angle<T>> for Angle<T> {
     type Output = T;
     #[inline]
     fn div(self, other: Angle<T>) -> T {
@@ -149,7 +149,7 @@ impl<T: Clone + Div<T, Output = T>> Div<Angle<T>> for Angle<T> {
     }
 }
 
-impl<T: Clone + Div<T, Output = T>> Div<T> for Angle<T> {
+impl<T: Div<T, Output = T>> Div<T> for Angle<T> {
     type Output = Angle<T>;
     #[inline]
     fn div(self, factor: T) -> Angle<T> {
@@ -157,13 +157,13 @@ impl<T: Clone + Div<T, Output = T>> Div<T> for Angle<T> {
     }
 }
 
-impl<T: Clone + DivAssign<T>> DivAssign<T> for Angle<T> {
+impl<T: DivAssign<T>> DivAssign<T> for Angle<T> {
     fn div_assign(&mut self, factor: T) {
         self.radians /= factor;
     }
 }
 
-impl<T: Clone + Mul<T, Output = T>> Mul<T> for Angle<T> {
+impl<T: Mul<T, Output = T>> Mul<T> for Angle<T> {
     type Output = Angle<T>;
     #[inline]
     fn mul(self, factor: T) -> Angle<T> {
@@ -171,7 +171,7 @@ impl<T: Clone + Mul<T, Output = T>> Mul<T> for Angle<T> {
     }
 }
 
-impl<T: Clone + MulAssign<T>> MulAssign<T> for Angle<T> {
+impl<T: MulAssign<T>> MulAssign<T> for Angle<T> {
     fn mul_assign(&mut self, factor: T) {
         self.radians *= factor;
     }

@@ -95,9 +95,7 @@ where
 
 impl<T, Src, Dst> Rotation2D<T, Src, Dst>
 where
-    T: Copy
-        + Clone
-        + Add<T, Output = T>
+    T:    Add<T, Output = T>
         + Sub<T, Output = T>
         + Mul<T, Output = T>
         + Div<T, Output = T>
@@ -176,7 +174,6 @@ where
 impl<T, Src, Dst> Rotation2D<T, Src, Dst>
 where
     T: Copy
-        + Clone
         + Add<T, Output = T>
         + Mul<T, Output = T>
         + Div<T, Output = T>

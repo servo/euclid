@@ -94,13 +94,15 @@ impl<T, U> Hash for Vector2D<T, U>
     }
 }
 
-impl<T: Copy + Zero, U> Vector2D<T, U> {
+impl<T: Zero, U> Vector2D<T, U> {
     /// Constructor, setting all components to zero.
     #[inline]
     pub fn zero() -> Self {
         Vector2D::new(Zero::zero(), Zero::zero())
     }
+}
 
+impl<T: Copy + Zero, U> Vector2D<T, U> {
     /// Convert into a 3d vector.
     #[inline]
     pub fn to_3d(&self) -> Vector3D<T, U> {
@@ -136,15 +138,21 @@ impl<T, U> Vector2D<T, U> {
             _unit: PhantomData,
         }
     }
-}
 
-impl<T: Copy, U> Vector2D<T, U> {
     /// Constructor taking properly  Lengths instead of scalar values.
     #[inline]
     pub fn from_lengths(x: Length<T, U>, y: Length<T, U>) -> Self {
         vec2(x.0, y.0)
     }
 
+    /// Tag a unit-less value with units.
+    #[inline]
+    pub fn from_untyped(p: Vector2D<T, UnknownUnit>) -> Self {
+        vec2(p.x, p.y)
+    }
+}
+
+impl<T: Copy, U> Vector2D<T, U> {
     /// Create a 3d vector from this one, using the specified z value.
     #[inline]
     pub fn extend(&self, z: T) -> Vector3D<T, U> {
@@ -181,12 +189,6 @@ impl<T: Copy, U> Vector2D<T, U> {
         vec2(self.x, self.y)
     }
 
-    /// Tag a unit-less value with units.
-    #[inline]
-    pub fn from_untyped(p: Vector2D<T, UnknownUnit>) -> Self {
-        vec2(p.x, p.y)
-    }
-
     /// Cast the unit
     #[inline]
     pub fn cast_unit<V>(&self) -> Vector2D<T, V> {
@@ -209,7 +211,6 @@ impl<T: Copy, U> Vector2D<T, U> {
 impl<T, U> Vector2D<T, U>
 where
     T: Copy
-        + Clone
         + Add<T, Output = T>
         + Mul<T, Output = T>
         + Div<T, Output = T>
@@ -241,7 +242,7 @@ where
 impl<T, U> Vector2D<T, U>
 where
     T: Copy + Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>
-    + Trig + Copy + Sub<T, Output = T>,
+    + Trig,
 {
     /// Returns the signed angle between this vector and another vector.
     ///
@@ -253,20 +254,30 @@ where
 
 impl<T, U> Vector2D<T, U>
 where
-    T: Copy + Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>,
+    T: Mul<T, Output = T> + Add<T, Output = T>,
 {
     /// Dot product.
     #[inline]
     pub fn dot(self, other: Self) -> T {
         self.x * other.x + self.y * other.y
     }
+}
 
+impl<T, U> Vector2D<T, U>
+where
+    T: Mul<T, Output = T> + Sub<T, Output = T>,
+{
     /// Returns the norm of the cross product [self.x, self.y, 0] x [other.x, other.y, 0]..
     #[inline]
     pub fn cross(self, other: Self) -> T {
         self.x * other.y - self.y * other.x
     }
+}
 
+impl<T, U> Vector2D<T, U>
+where
+    T: Copy + Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>,
+{
     #[inline]
     pub fn normalize(self) -> Self
     where
@@ -380,7 +391,7 @@ where
     }
 }
 
-impl<T: Copy + Add<T, Output = T>, U> Add for Vector2D<T, U> {
+impl<T: Add<T, Output = T>, U> Add for Vector2D<T, U> {
     type Output = Self;
     fn add(self, other: Self) -> Self {
         Vector2D::new(self.x + other.x, self.y + other.y)
@@ -401,7 +412,7 @@ impl<T: Copy + Sub<T, Output = T>, U> SubAssign<Vector2D<T, U>> for Vector2D<T, 
     }
 }
 
-impl<T: Copy + Sub<T, Output = T>, U> Sub for Vector2D<T, U> {
+impl<T: Sub<T, Output = T>, U> Sub for Vector2D<T, U> {
     type Output = Self;
     #[inline]
     fn sub(self, other: Self) -> Self {
@@ -409,7 +420,7 @@ impl<T: Copy + Sub<T, Output = T>, U> Sub for Vector2D<T, U> {
     }
 }
 
-impl<T: Copy + Neg<Output = T>, U> Neg for Vector2D<T, U> {
+impl<T: Neg<Output = T>, U> Neg for Vector2D<T, U> {
     type Output = Self;
     #[inline]
     fn neg(self) -> Self {
@@ -528,7 +539,7 @@ impl<T: NumCast + Copy, U> Vector2D<T, U> {
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
     #[inline]
-    pub fn cast<NewT: NumCast + Copy>(&self) -> Vector2D<NewT, U> {
+    pub fn cast<NewT: NumCast>(&self) -> Vector2D<NewT, U> {
         self.try_cast().unwrap()
     }
 
@@ -538,7 +549,7 @@ impl<T: NumCast + Copy, U> Vector2D<T, U> {
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
     #[inline]
-    pub fn try_cast<NewT: NumCast + Copy>(&self) -> Option<Vector2D<NewT, U>> {
+    pub fn try_cast<NewT: NumCast>(&self) -> Option<Vector2D<NewT, U>> {
         match (NumCast::from(self.x), NumCast::from(self.y)) {
             (Some(x), Some(y)) => Some(Vector2D::new(x, y)),
             _ => None,
@@ -600,7 +611,7 @@ impl<T: NumCast + Copy, U> Vector2D<T, U> {
     }
 }
 
-impl<T: Copy + ApproxEq<T>, U> ApproxEq<Vector2D<T, U>> for Vector2D<T, U> {
+impl<T: ApproxEq<T>, U> ApproxEq<Vector2D<T, U>> for Vector2D<T, U> {
     #[inline]
     fn approx_epsilon() -> Self {
         vec2(T::approx_epsilon(), T::approx_epsilon())
@@ -617,33 +628,33 @@ impl<T: Copy + ApproxEq<T>, U> ApproxEq<Vector2D<T, U>> for Vector2D<T, U> {
     }
 }
 
-impl<T: Copy, U> Into<[T; 2]> for Vector2D<T, U> {
+impl<T, U> Into<[T; 2]> for Vector2D<T, U> {
     fn into(self) -> [T; 2] {
-        self.to_array()
+        [self.x, self.y]
     }
 }
 
-impl<T: Copy, U> From<[T; 2]> for Vector2D<T, U> {
-    fn from(array: [T; 2]) -> Self {
-        vec2(array[0], array[1])
+impl<T, U> From<[T; 2]> for Vector2D<T, U> {
+    fn from([x, y]: [T; 2]) -> Self {
+        vec2(x, y)
     }
 }
 
-impl<T: Copy, U> Into<(T, T)> for Vector2D<T, U> {
+impl<T, U> Into<(T, T)> for Vector2D<T, U> {
     fn into(self) -> (T, T) {
-        self.to_tuple()
+        (self.x, self.y)
     }
 }
 
-impl<T: Copy, U> From<(T, T)> for Vector2D<T, U> {
+impl<T, U> From<(T, T)> for Vector2D<T, U> {
     fn from(tuple: (T, T)) -> Self {
         vec2(tuple.0, tuple.1)
     }
 }
 
-impl<T: Copy, U> From<Size2D<T, U>> for Vector2D<T, U> {
+impl<T, U> From<Size2D<T, U>> for Vector2D<T, U> {
     fn from(size: Size2D<T, U>) -> Self {
-        size.to_vector()
+        vec2(size.width, size.height)
     }
 }
 
@@ -729,13 +740,15 @@ impl<T, U> Hash for Vector3D<T, U>
     }
 }
 
-impl<T: Copy + Zero, U> Vector3D<T, U> {
+impl<T: Zero, U> Vector3D<T, U> {
     /// Constructor, setting all components to zero.
     #[inline]
     pub fn zero() -> Self {
         vec3(Zero::zero(), Zero::zero(), Zero::zero())
     }
+}
 
+impl<T: Copy + Zero, U> Vector3D<T, U> {
     #[inline]
     pub fn to_array_4d(&self) -> [T; 4] {
         [self.x, self.y, self.z, Zero::zero()]
@@ -776,15 +789,21 @@ impl<T, U> Vector3D<T, U> {
             _unit: PhantomData,
         }
     }
-}
 
-impl<T: Copy, U> Vector3D<T, U> {
     /// Constructor taking properly  Lengths instead of scalar values.
     #[inline]
     pub fn from_lengths(x: Length<T, U>, y: Length<T, U>, z: Length<T, U>) -> Vector3D<T, U> {
         vec3(x.0, y.0, z.0)
     }
 
+    /// Tag a unitless value with units.
+    #[inline]
+    pub fn from_untyped(p: Vector3D<T, UnknownUnit>) -> Self {
+        vec3(p.x, p.y, p.z)
+    }
+}
+
+impl<T: Copy, U> Vector3D<T, U> {
     /// Cast this vector into a point.
     ///
     /// Equivalent to adding this vector to the origin.
@@ -829,12 +848,6 @@ impl<T: Copy, U> Vector3D<T, U> {
         vec3(self.x, self.y, self.z)
     }
 
-    /// Tag a unitless value with units.
-    #[inline]
-    pub fn from_untyped(p: Vector3D<T, UnknownUnit>) -> Self {
-        vec3(p.x, p.y, p.z)
-    }
-
     /// Cast the unit
     pub fn cast_unit<V>(&self) -> Vector3D<T, V> {
         vec3(self.x, self.y, self.z)
@@ -850,7 +863,6 @@ impl<T: Copy, U> Vector3D<T, U> {
 impl<T, U> Vector3D<T, U>
 where
     T: Copy
-        + Clone
         + Add<T, Output = T>
         + Mul<T, Output = T>
         + Div<T, Output = T>
@@ -871,7 +883,7 @@ where
 impl<T, U> Vector3D<T, U>
 where
     T: Copy + Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>
-    + Trig + Copy + Sub<T, Output = T>
+    + Trig
     + Float
 {
     /// Returns the positive angle between this vector and another vector.
@@ -882,14 +894,21 @@ where
     }
 }
 
-impl<T: Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T> + Copy, U>
-    Vector3D<T, U> {
+impl<T, U> Vector3D<T, U>
+where
+    T: Mul<T, Output = T> + Add<T, Output = T>
+{
     /// Dot product.
     #[inline]
     pub fn dot(self, other: Self) -> T {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
+}
 
+impl<T, U> Vector3D<T, U>
+where
+    T: Copy + Mul<T, Output = T> + Sub<T, Output = T>
+{
     /// Cross product.
     #[inline]
     pub fn cross(self, other: Self) -> Self {
@@ -899,7 +918,12 @@ impl<T: Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T> + Copy, U>
             self.x * other.y - self.y * other.x,
         )
     }
+}
 
+impl<T, U> Vector3D<T, U>
+where
+    T: Copy + Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>
+{
     #[inline]
     pub fn normalize(self) -> Self
     where
@@ -952,7 +976,7 @@ impl<T: Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T> + Copy, U>
 
 impl<T, U> Vector3D<T, U>
 where
-    T: Copy + Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>
+    T: Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>
     + PartialOrd + Float
 {
     /// Return this vector capped to a maximum length.
@@ -999,12 +1023,7 @@ where
         let one_t = T::one() - t;
         (*self) * one_t + other * t
     }
-}
 
-impl<T, U> Vector3D<T, U>
-where
-    T: Copy + One + Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>,
-{
     /// Returns a reflection vector using an incident ray and a surface normal.
     #[inline]
     pub fn reflect(&self, normal: Self) -> Self {
@@ -1013,7 +1032,7 @@ where
     }
 }
 
-impl<T: Copy + Add<T, Output = T>, U> Add for Vector3D<T, U> {
+impl<T: Add<T, Output = T>, U> Add for Vector3D<T, U> {
     type Output = Self;
     #[inline]
     fn add(self, other: Self) -> Self {
@@ -1021,7 +1040,7 @@ impl<T: Copy + Add<T, Output = T>, U> Add for Vector3D<T, U> {
     }
 }
 
-impl<T: Copy + Sub<T, Output = T>, U> Sub for Vector3D<T, U> {
+impl<T: Sub<T, Output = T>, U> Sub for Vector3D<T, U> {
     type Output = Self;
     #[inline]
     fn sub(self, other: Self) -> Self {
@@ -1043,7 +1062,7 @@ impl<T: Copy + Sub<T, Output = T>, U> SubAssign<Vector3D<T, U>> for Vector3D<T, 
     }
 }
 
-impl<T: Copy + Neg<Output = T>, U> Neg for Vector3D<T, U> {
+impl<T: Neg<Output = T>, U> Neg for Vector3D<T, U> {
     type Output = Self;
     #[inline]
     fn neg(self) -> Self {
@@ -1167,7 +1186,7 @@ impl<T: NumCast + Copy, U> Vector3D<T, U> {
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
     #[inline]
-    pub fn cast<NewT: NumCast + Copy>(&self) -> Vector3D<NewT, U> {
+    pub fn cast<NewT: NumCast>(&self) -> Vector3D<NewT, U> {
         self.try_cast().unwrap()
     }
 
@@ -1177,7 +1196,7 @@ impl<T: NumCast + Copy, U> Vector3D<T, U> {
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
     #[inline]
-    pub fn try_cast<NewT: NumCast + Copy>(&self) -> Option<Vector3D<NewT, U>> {
+    pub fn try_cast<NewT: NumCast>(&self) -> Option<Vector3D<NewT, U>> {
         match (
             NumCast::from(self.x),
             NumCast::from(self.y),
@@ -1243,7 +1262,7 @@ impl<T: NumCast + Copy, U> Vector3D<T, U> {
     }
 }
 
-impl<T: Copy + ApproxEq<T>, U> ApproxEq<Vector3D<T, U>> for Vector3D<T, U> {
+impl<T: ApproxEq<T>, U> ApproxEq<Vector3D<T, U>> for Vector3D<T, U> {
     #[inline]
     fn approx_epsilon() -> Self {
         vec3(
@@ -1265,25 +1284,25 @@ impl<T: Copy + ApproxEq<T>, U> ApproxEq<Vector3D<T, U>> for Vector3D<T, U> {
     }
 }
 
-impl<T: Copy, U> Into<[T; 3]> for Vector3D<T, U> {
+impl<T, U> Into<[T; 3]> for Vector3D<T, U> {
     fn into(self) -> [T; 3] {
-        self.to_array()
+        [self.x, self.y, self.z]
     }
 }
 
-impl<T: Copy, U> From<[T; 3]> for Vector3D<T, U> {
-    fn from(array: [T; 3]) -> Self {
-        vec3(array[0], array[1], array[2])
+impl<T, U> From<[T; 3]> for Vector3D<T, U> {
+    fn from([x, y, z]: [T; 3]) -> Self {
+        vec3(x, y, z)
     }
 }
 
-impl<T: Copy, U> Into<(T, T, T)> for Vector3D<T, U> {
+impl<T, U> Into<(T, T, T)> for Vector3D<T, U> {
     fn into(self) -> (T, T, T) {
-        self.to_tuple()
+        (self.x, self.y, self.z)
     }
 }
 
-impl<T: Copy, U> From<(T, T, T)> for Vector3D<T, U> {
+impl<T, U> From<(T, T, T)> for Vector3D<T, U> {
     fn from(tuple: (T, T, T)) -> Self {
         vec3(tuple.0, tuple.1, tuple.2)
     }
@@ -1373,7 +1392,7 @@ impl BoolVector2D {
     /// Returns point, each component of which or from `a`, or from `b` depending on truly value
     /// of corresponding vector component. `true` selects value from `a` and `false` from `b`.
     #[inline]
-    pub fn select_point<T: Copy, U>(&self, a: Point2D<T, U>, b: Point2D<T, U>) -> Point2D<T, U> {
+    pub fn select_point<T, U>(&self, a: Point2D<T, U>, b: Point2D<T, U>) -> Point2D<T, U> {
         point2(
             if self.x { a.x } else { b.x },
             if self.y { a.y } else { b.y },
@@ -1383,7 +1402,7 @@ impl BoolVector2D {
     /// Returns vector, each component of which or from `a`, or from `b` depending on truly value
     /// of corresponding vector component. `true` selects value from `a` and `false` from `b`.
     #[inline]
-    pub fn select_vector<T: Copy, U>(&self, a: Vector2D<T, U>, b: Vector2D<T, U>) -> Vector2D<T, U> {
+    pub fn select_vector<T, U>(&self, a: Vector2D<T, U>, b: Vector2D<T, U>) -> Vector2D<T, U> {
         vec2(
             if self.x { a.x } else { b.x },
             if self.y { a.y } else { b.y },
@@ -1393,7 +1412,7 @@ impl BoolVector2D {
     /// Returns size, each component of which or from `a`, or from `b` depending on truly value
     /// of corresponding vector component. `true` selects value from `a` and `false` from `b`.
     #[inline]
-    pub fn select_size<T: Copy, U>(&self, a: Size2D<T, U>, b: Size2D<T, U>) -> Size2D<T, U> {
+    pub fn select_size<T, U>(&self, a: Size2D<T, U>, b: Size2D<T, U>) -> Size2D<T, U> {
         size2(
             if self.x { a.width } else { b.width },
             if self.y { a.height } else { b.height },
@@ -1454,7 +1473,7 @@ impl BoolVector3D {
     /// Returns point, each component of which or from `a`, or from `b` depending on truly value
     /// of corresponding vector component. `true` selects value from `a` and `false` from `b`.
     #[inline]
-    pub fn select_point<T: Copy, U>(&self, a: Point3D<T, U>, b: Point3D<T, U>) -> Point3D<T, U> {
+    pub fn select_point<T, U>(&self, a: Point3D<T, U>, b: Point3D<T, U>) -> Point3D<T, U> {
         point3(
             if self.x { a.x } else { b.x },
             if self.y { a.y } else { b.y },
@@ -1465,7 +1484,7 @@ impl BoolVector3D {
     /// Returns vector, each component of which or from `a`, or from `b` depending on truly value
     /// of corresponding vector component. `true` selects value from `a` and `false` from `b`.
     #[inline]
-    pub fn select_vector<T: Copy, U>(&self, a: Vector3D<T, U>, b: Vector3D<T, U>) -> Vector3D<T, U> {
+    pub fn select_vector<T, U>(&self, a: Vector3D<T, U>, b: Vector3D<T, U>) -> Vector3D<T, U> {
         vec3(
             if self.x { a.x } else { b.x },
             if self.y { a.y } else { b.y },
@@ -1477,7 +1496,7 @@ impl BoolVector3D {
     /// of corresponding vector component. `true` selects value from `a` and `false` from `b`.
     #[inline]
     #[must_use]
-    pub fn select_size<T: Copy, U>(&self, a: Size3D<T, U>, b: Size3D<T, U>) -> Size3D<T, U> {
+    pub fn select_size<T, U>(&self, a: Size3D<T, U>, b: Size3D<T, U>) -> Size3D<T, U> {
         size3(
             if self.x { a.width } else { b.width },
             if self.y { a.height } else { b.height },

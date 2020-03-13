@@ -90,7 +90,7 @@ impl<T, U> Hash for Point2D<T, U>
 
 mint_vec!(Point2D[x, y] = Point2);
 
-impl<T: Copy + Zero, U> Point2D<T, U> {
+impl<T: Zero, U> Point2D<T, U> {
     /// Constructor, setting all components to zero.
     #[inline]
     pub fn origin() -> Self {
@@ -101,7 +101,9 @@ impl<T: Copy + Zero, U> Point2D<T, U> {
     pub fn zero() -> Self {
         Self::origin()
     }
+}
 
+impl<T: Copy + Zero, U> Point2D<T, U> {
     /// Convert into a 3d point.
     #[inline]
     pub fn to_3d(&self) -> Point3D<T, U> {
@@ -137,15 +139,21 @@ impl<T, U> Point2D<T, U> {
             _unit: PhantomData,
         }
     }
-}
 
-impl<T: Copy, U> Point2D<T, U> {
-    /// Constructor taking properly  Lengths instead of scalar values.
+    /// Constructor taking properly Lengths instead of scalar values.
     #[inline]
     pub fn from_lengths(x: Length<T, U>, y: Length<T, U>) -> Self {
         point2(x.0, y.0)
     }
 
+    /// Tag a unitless value with units.
+    #[inline]
+    pub fn from_untyped(p: Point2D<T, UnknownUnit>) -> Self {
+        point2(p.x, p.y)
+    }
+}
+
+impl<T: Copy, U> Point2D<T, U> {
     /// Create a 3d point from this one, using the specified z value.
     #[inline]
     pub fn extend(&self, z: T) -> Point3D<T, U> {
@@ -176,12 +184,6 @@ impl<T: Copy, U> Point2D<T, U> {
         point2(self.x, self.y)
     }
 
-    /// Tag a unitless value with units.
-    #[inline]
-    pub fn from_untyped(p: Point2D<T, UnknownUnit>) -> Self {
-        point2(p.x, p.y)
-    }
-
     /// Cast the unit
     pub fn cast_unit<V>(&self) -> Point2D<T, V> {
         point2(self.x, self.y)
@@ -207,7 +209,7 @@ impl<T: Copy + Add<T, Output = T>, U> Point2D<T, U> {
     }
 }
 
-impl<T: Copy + Add<T, Output = T>, U> Add<Size2D<T, U>> for Point2D<T, U> {
+impl<T: Add<T, Output = T>, U> Add<Size2D<T, U>> for Point2D<T, U> {
     type Output = Self;
     #[inline]
     fn add(self, other: Size2D<T, U>) -> Self {
@@ -229,7 +231,7 @@ impl<T: Copy + Sub<T, Output = T>, U> SubAssign<Vector2D<T, U>> for Point2D<T, U
     }
 }
 
-impl<T: Copy + Add<T, Output = T>, U> Add<Vector2D<T, U>> for Point2D<T, U> {
+impl<T: Add<T, Output = T>, U> Add<Vector2D<T, U>> for Point2D<T, U> {
     type Output = Self;
     #[inline]
     fn add(self, other: Vector2D<T, U>) -> Self {
@@ -237,7 +239,7 @@ impl<T: Copy + Add<T, Output = T>, U> Add<Vector2D<T, U>> for Point2D<T, U> {
     }
 }
 
-impl<T: Copy + Sub<T, Output = T>, U> Sub for Point2D<T, U> {
+impl<T: Sub<T, Output = T>, U> Sub for Point2D<T, U> {
     type Output = Vector2D<T, U>;
     #[inline]
     fn sub(self, other: Self) -> Vector2D<T, U> {
@@ -245,7 +247,7 @@ impl<T: Copy + Sub<T, Output = T>, U> Sub for Point2D<T, U> {
     }
 }
 
-impl<T: Copy + Sub<T, Output = T>, U> Sub<Vector2D<T, U>> for Point2D<T, U> {
+impl<T: Sub<T, Output = T>, U> Sub<Vector2D<T, U>> for Point2D<T, U> {
     type Output = Self;
     #[inline]
     fn sub(self, other: Vector2D<T, U>) -> Self {
@@ -359,7 +361,7 @@ impl<T: NumCast + Copy, U> Point2D<T, U> {
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
     #[inline]
-    pub fn cast<NewT: NumCast + Copy>(&self) -> Point2D<NewT, U> {
+    pub fn cast<NewT: NumCast>(&self) -> Point2D<NewT, U> {
         self.try_cast().unwrap()
     }
 
@@ -368,7 +370,7 @@ impl<T: NumCast + Copy, U> Point2D<T, U> {
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
-    pub fn try_cast<NewT: NumCast + Copy>(&self) -> Option<Point2D<NewT, U>> {
+    pub fn try_cast<NewT: NumCast>(&self) -> Option<Point2D<NewT, U>> {
         match (NumCast::from(self.x), NumCast::from(self.y)) {
             (Some(x), Some(y)) => Some(point2(x, y)),
             _ => None,
@@ -444,7 +446,7 @@ where
     }
 }
 
-impl<T: Copy + ApproxEq<T>, U> ApproxEq<Point2D<T, U>> for Point2D<T, U> {
+impl<T: ApproxEq<T>, U> ApproxEq<Point2D<T, U>> for Point2D<T, U> {
     #[inline]
     fn approx_epsilon() -> Self {
         point2(T::approx_epsilon(), T::approx_epsilon())
@@ -461,25 +463,25 @@ impl<T: Copy + ApproxEq<T>, U> ApproxEq<Point2D<T, U>> for Point2D<T, U> {
     }
 }
 
-impl<T: Copy, U> Into<[T; 2]> for Point2D<T, U> {
+impl<T, U> Into<[T; 2]> for Point2D<T, U> {
     fn into(self) -> [T; 2] {
-        self.to_array()
+        [self.x, self.y]
     }
 }
 
-impl<T: Copy, U> From<[T; 2]> for Point2D<T, U> {
-    fn from(array: [T; 2]) -> Self {
-        point2(array[0], array[1])
+impl<T, U> From<[T; 2]> for Point2D<T, U> {
+    fn from([x, y]: [T; 2]) -> Self {
+        point2(x, y)
     }
 }
 
-impl<T: Copy, U> Into<(T, T)> for Point2D<T, U> {
+impl<T, U> Into<(T, T)> for Point2D<T, U> {
     fn into(self) -> (T, T) {
-        self.to_tuple()
+        (self.x, self.y)
     }
 }
 
-impl<T: Copy, U> From<(T, T)> for Point2D<T, U> {
+impl<T, U> From<(T, T)> for Point2D<T, U> {
     fn from(tuple: (T, T)) -> Self {
         point2(tuple.0, tuple.1)
     }
@@ -553,7 +555,7 @@ impl<T, U> Hash for Point3D<T, U>
     }
 }
 
-impl<T: Copy + Zero, U> Point3D<T, U> {
+impl<T: Zero, U> Point3D<T, U> {
     /// Constructor, setting all components to zero.
     #[inline]
     pub fn origin() -> Self {
@@ -608,7 +610,7 @@ impl<T: fmt::Display, U> fmt::Display for Point3D<T, U> {
     }
 }
 
-impl<T: Copy + Default, U> Default for Point3D<T, U> {
+impl<T: Default, U> Default for Point3D<T, U> {
     fn default() -> Self {
         Point3D::new(Default::default(), Default::default(), Default::default())
     }
@@ -625,15 +627,21 @@ impl<T, U> Point3D<T, U> {
             _unit: PhantomData,
         }
     }
-}
 
-impl<T: Copy, U> Point3D<T, U> {
-    /// Constructor taking properly  Lengths instead of scalar values.
+    /// Constructor taking properly Lengths instead of scalar values.
     #[inline]
     pub fn from_lengths(x: Length<T, U>, y: Length<T, U>, z: Length<T, U>) -> Self {
         point3(x.0, y.0, z.0)
     }
 
+    /// Tag a unitless value with units.
+    #[inline]
+    pub fn from_untyped(p: Point3D<T, UnknownUnit>) -> Self {
+        point3(p.x, p.y, p.z)
+    }
+}
+
+impl<T: Copy, U> Point3D<T, U> {
     /// Cast this point into a vector.
     ///
     /// Equivalent to subtracting the origin to this point.
@@ -683,12 +691,6 @@ impl<T: Copy, U> Point3D<T, U> {
         point3(self.x, self.y, self.z)
     }
 
-    /// Tag a unitless value with units.
-    #[inline]
-    pub fn from_untyped(p: Point3D<T, UnknownUnit>) -> Self {
-        point3(p.x, p.y, p.z)
-    }
-
     /// Cast the unit
     pub fn cast_unit<V>(&self) -> Point3D<T, V> {
         point3(self.x, self.y, self.z)
@@ -722,7 +724,7 @@ impl<T: Copy + Sub<T, Output = T>, U> SubAssign<Vector3D<T, U>> for Point3D<T, U
     }
 }
 
-impl<T: Copy + Add<T, Output = T>, U> Add<Vector3D<T, U>> for Point3D<T, U> {
+impl<T: Add<T, Output = T>, U> Add<Vector3D<T, U>> for Point3D<T, U> {
     type Output = Self;
     #[inline]
     fn add(self, other: Vector3D<T, U>) -> Self {
@@ -730,7 +732,7 @@ impl<T: Copy + Add<T, Output = T>, U> Add<Vector3D<T, U>> for Point3D<T, U> {
     }
 }
 
-impl<T: Copy + Sub<T, Output = T>, U> Sub for Point3D<T, U> {
+impl<T: Sub<T, Output = T>, U> Sub for Point3D<T, U> {
     type Output = Vector3D<T, U>;
     #[inline]
     fn sub(self, other: Self) -> Vector3D<T, U> {
@@ -738,7 +740,7 @@ impl<T: Copy + Sub<T, Output = T>, U> Sub for Point3D<T, U> {
     }
 }
 
-impl<T: Copy + Sub<T, Output = T>, U> Sub<Vector3D<T, U>> for Point3D<T, U> {
+impl<T: Sub<T, Output = T>, U> Sub<Vector3D<T, U>> for Point3D<T, U> {
     type Output = Self;
     #[inline]
     fn sub(self, other: Vector3D<T, U>) -> Self {
@@ -843,7 +845,7 @@ impl<T: NumCast + Copy, U> Point3D<T, U> {
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
     #[inline]
-    pub fn cast<NewT: NumCast + Copy>(&self) -> Point3D<NewT, U> {
+    pub fn cast<NewT: NumCast>(&self) -> Point3D<NewT, U> {
         self.try_cast().unwrap()
     }
 
@@ -853,7 +855,7 @@ impl<T: NumCast + Copy, U> Point3D<T, U> {
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
     #[inline]
-    pub fn try_cast<NewT: NumCast + Copy>(&self) -> Option<Point3D<NewT, U>> {
+    pub fn try_cast<NewT: NumCast>(&self) -> Option<Point3D<NewT, U>> {
         match (
             NumCast::from(self.x),
             NumCast::from(self.y),
@@ -919,7 +921,7 @@ impl<T: NumCast + Copy, U> Point3D<T, U> {
     }
 }
 
-impl<T: Copy + ApproxEq<T>, U> ApproxEq<Point3D<T, U>> for Point3D<T, U> {
+impl<T: ApproxEq<T>, U> ApproxEq<Point3D<T, U>> for Point3D<T, U> {
     #[inline]
     fn approx_epsilon() -> Self {
         point3(
@@ -941,25 +943,25 @@ impl<T: Copy + ApproxEq<T>, U> ApproxEq<Point3D<T, U>> for Point3D<T, U> {
     }
 }
 
-impl<T: Copy, U> Into<[T; 3]> for Point3D<T, U> {
+impl<T, U> Into<[T; 3]> for Point3D<T, U> {
     fn into(self) -> [T; 3] {
-        self.to_array()
+        [self.x, self.y, self.z]
     }
 }
 
-impl<T: Copy, U> From<[T; 3]> for Point3D<T, U> {
-    fn from(array: [T; 3]) -> Self {
-        point3(array[0], array[1], array[2])
+impl<T, U> From<[T; 3]> for Point3D<T, U> {
+    fn from([x, y, z]: [T; 3]) -> Self {
+        point3(x, y, z)
     }
 }
 
-impl<T: Copy, U> Into<(T, T, T)> for Point3D<T, U> {
+impl<T, U> Into<(T, T, T)> for Point3D<T, U> {
     fn into(self) -> (T, T, T) {
-        self.to_tuple()
+        (self.x, self.y, self.z)
     }
 }
 
-impl<T: Copy, U> From<(T, T, T)> for Point3D<T, U> {
+impl<T, U> From<(T, T, T)> for Point3D<T, U> {
     fn from(tuple: (T, T, T)) -> Self {
         point3(tuple.0, tuple.1, tuple.2)
     }

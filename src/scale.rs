@@ -68,47 +68,47 @@ impl<T: Clone + One + Div<T, Output = T>, Src, Dst> Scale<T, Src, Dst> {
 }
 
 // scale0 * scale1
-impl<T: Clone + Mul<T, Output = T>, A, B, C> Mul<Scale<T, B, C>> for Scale<T, A, B> {
+impl<T: Mul<T, Output = T>, A, B, C> Mul<Scale<T, B, C>> for Scale<T, A, B> {
     type Output = Scale<T, A, C>;
     #[inline]
     fn mul(self, other: Scale<T, B, C>) -> Scale<T, A, C> {
-        Scale::new(self.get() * other.get())
+        Scale::new(self.0 * other.0)
     }
 }
 
 // scale0 + scale1
-impl<T: Clone + Add<T, Output = T>, Src, Dst> Add for Scale<T, Src, Dst> {
+impl<T: Add<T, Output = T>, Src, Dst> Add for Scale<T, Src, Dst> {
     type Output = Scale<T, Src, Dst>;
     #[inline]
     fn add(self, other: Scale<T, Src, Dst>) -> Scale<T, Src, Dst> {
-        Scale::new(self.get() + other.get())
+        Scale::new(self.0 + other.0)
     }
 }
 
 // scale0 - scale1
-impl<T: Clone + Sub<T, Output = T>, Src, Dst> Sub for Scale<T, Src, Dst> {
+impl<T: Sub<T, Output = T>, Src, Dst> Sub for Scale<T, Src, Dst> {
     type Output = Scale<T, Src, Dst>;
     #[inline]
     fn sub(self, other: Scale<T, Src, Dst>) -> Scale<T, Src, Dst> {
-        Scale::new(self.get() - other.get())
+        Scale::new(self.0 - other.0)
     }
 }
 
 impl<T: NumCast + Clone, Src, Dst0> Scale<T, Src, Dst0> {
     /// Cast from one numeric representation to another, preserving the units.
-    pub fn cast<T1: NumCast + Clone>(&self) -> Scale<T1, Src, Dst0> {
+    pub fn cast<T1: NumCast>(&self) -> Scale<T1, Src, Dst0> {
         self.try_cast().unwrap()
     }
 
     /// Fallible cast from one numeric representation to another, preserving the units.
-    pub fn try_cast<T1: NumCast + Clone>(&self) -> Option<Scale<T1, Src, Dst0>> {
+    pub fn try_cast<T1: NumCast>(&self) -> Option<Scale<T1, Src, Dst0>> {
         NumCast::from(self.get()).map(Scale::new)
     }
 }
 
 impl<T, Src, Dst> Scale<T, Src, Dst>
 where
-    T: Copy + Clone + Mul<T, Output = T> + Neg<Output = T> + PartialEq + One,
+    T: Copy + Mul<T, Output = T> + Neg<Output = T> + PartialEq + One,
 {
     /// Returns the given point transformed by this scale.
     #[inline]
@@ -146,7 +146,7 @@ where
     /// Returns true if this scale has no effect.
     #[inline]
     pub fn is_identity(&self) -> bool {
-        self.get() == T::one()
+        self.0 == T::one()
     }
 }
 

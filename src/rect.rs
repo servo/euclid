@@ -47,9 +47,9 @@ impl<T: Hash, U> Hash for Rect<T, U> {
 
 impl<T: Copy, U> Copy for Rect<T, U> {}
 
-impl<T: Copy, U> Clone for Rect<T, U> {
+impl<T: Clone, U> Clone for Rect<T, U> {
     fn clone(&self) -> Self {
-        *self
+        Self::new(self.origin.clone(), self.size.clone())
     }
 }
 
@@ -81,6 +81,7 @@ impl<T: Default, U> Default for Rect<T, U> {
 
 impl<T, U> Rect<T, U> {
     /// Constructor.
+    #[inline]
     pub const fn new(origin: Point2D<T, U>, size: Size2D<T, U>) -> Self {
         Rect {
             origin,
@@ -91,8 +92,13 @@ impl<T, U> Rect<T, U> {
 
 impl<T, U> Rect<T, U>
 where
-    T: Copy + Zero
+    T: Zero
 {
+    /// Constructor, setting all sides to zero.
+    pub fn zero() -> Self {
+        Rect::new(Point2D::origin(), Size2D::zero())
+    }
+
     /// Creates a rect of the given size, at offset zero.
     pub fn from_size(size: Size2D<T, U>) -> Self {
         Rect {
@@ -104,7 +110,7 @@ where
 
 impl<T, U> Rect<T, U>
 where
-    T: Copy + Clone + PartialOrd + PartialEq + Add<T, Output = T> + Sub<T, Output = T>,
+    T: Copy + PartialOrd + PartialEq + Add<T, Output = T> + Sub<T, Output = T>,
 {
     #[inline]
     pub fn intersects(&self, other: &Self) -> bool {
@@ -222,7 +228,7 @@ where
 
 impl<T, U> Rect<T, U>
 where
-    T: Copy + Clone + Zero + PartialOrd + PartialEq + Add<T, Output = T> + Sub<T, Output = T>,
+    T: Copy + Zero + PartialOrd + PartialEq + Add<T, Output = T> + Sub<T, Output = T>,
 {
     /// Returns true if this rectangle contains the interior of rect. Always
     /// returns true if rect is empty, and always returns false if rect is
@@ -344,7 +350,7 @@ where
 
 impl<T, U> Rect<T, U>
 where
-    T: Copy + Clone + PartialOrd + Add<T, Output = T> + Sub<T, Output = T> + Zero,
+    T: Copy + PartialOrd + Add<T, Output = T> + Sub<T, Output = T> + Zero,
 {
     #[inline]
     pub fn union(&self, other: &Self) -> Self {
@@ -374,7 +380,7 @@ impl<T, U> Rect<T, U> {
     #[inline]
     pub fn scale<S: Copy>(&self, x: S, y: S) -> Self
     where
-        T: Copy + Clone + Mul<S, Output = T>,
+        T: Copy + Mul<S, Output = T>,
     {
         Rect::new(
             Point2D::new(self.origin.x * x, self.origin.y * y),
@@ -383,32 +389,29 @@ impl<T, U> Rect<T, U> {
     }
 }
 
-impl<T: Copy + Clone + Mul<T, Output = T>, U> Rect<T, U> {
+impl<T: Copy + Mul<T, Output = T>, U> Rect<T, U> {
     #[inline]
     pub fn area(&self) -> T {
         self.size.area()
     }
 }
 
-impl<T: Copy + PartialEq + Zero, U> Rect<T, U> {
-    /// Constructor, setting all sides to zero.
-    pub fn zero() -> Self {
-        Rect::new(Point2D::origin(), Size2D::zero())
-    }
-
+impl<T: Zero + PartialEq, U> Rect<T, U> {
     /// Returns true if the size is zero, regardless of the origin's value.
     pub fn is_empty(&self) -> bool {
         self.size.width == Zero::zero() || self.size.height == Zero::zero()
     }
 }
 
-impl<T: Copy + Zero + PartialOrd, U> Rect<T, U> {
+impl<T: Zero + PartialOrd, U> Rect<T, U> {
 
     #[inline]
     pub fn is_empty_or_negative(&self) -> bool {
         self.size.is_empty_or_negative()
     }
+}
 
+impl<T: Copy + Zero + PartialOrd, U> Rect<T, U> {
     #[inline]
     pub fn to_non_empty(&self) -> Option<NonEmpty<Self>> {
         if self.is_empty_or_negative() {
@@ -479,7 +482,7 @@ impl<T0: NumCast + Copy, Unit> Rect<T0, Unit> {
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using round(), round_in or round_out() before casting.
-    pub fn cast<T1: NumCast + Copy>(&self) -> Rect<T1, Unit> {
+    pub fn cast<T1: NumCast>(&self) -> Rect<T1, Unit> {
         Rect::new(
             self.origin.cast(),
             self.size.cast(),
@@ -491,7 +494,7 @@ impl<T0: NumCast + Copy, Unit> Rect<T0, Unit> {
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using round(), round_in or round_out() before casting.
-    pub fn try_cast<T1: NumCast + Copy>(&self) -> Option<Rect<T1, Unit>> {
+    pub fn try_cast<T1: NumCast>(&self) -> Option<Rect<T1, Unit>> {
         match (self.origin.try_cast(), self.size.try_cast()) {
             (Some(origin), Some(size)) => Some(Rect::new(origin, size)),
             _ => None,
@@ -594,7 +597,7 @@ impl<T: NumCast + Copy, Unit> Rect<T, Unit> {
 }
 
 impl<T, U> From<Size2D<T, U>> for Rect<T, U>
-where T: Copy + Zero
+where T: Zero
 {
     fn from(size: Size2D<T, U>) -> Self {
         Self::from_size(size)

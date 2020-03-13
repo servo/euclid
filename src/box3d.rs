@@ -32,7 +32,7 @@ use core::ops::{Add, Div, Mul, Sub};
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(bound(serialize = "T: Serialize", deserialize = "T: Deserialize<'de>")))]
 pub struct Box3D<T, U> {
-    pub min: Point3D<T, U>, 
+    pub min: Point3D<T, U>,
     pub max: Point3D<T, U>,
 }
 
@@ -45,9 +45,9 @@ impl<T: Hash, U> Hash for Box3D<T, U> {
 
 impl<T: Copy, U> Copy for Box3D<T, U> {}
 
-impl<T: Copy, U> Clone for Box3D<T, U> {
+impl<T: Clone, U> Clone for Box3D<T, U> {
     fn clone(&self) -> Self {
-        *self
+        Self::new(self.min.clone(), self.max.clone())
     }
 }
 
@@ -73,6 +73,7 @@ impl<T: fmt::Display, U> fmt::Display for Box3D<T, U> {
 
 impl<T, U> Box3D<T, U> {
     /// Constructor.
+    #[inline]
     pub const fn new(min: Point3D<T, U>, max: Point3D<T, U>) -> Self {
         Box3D {
             min,
@@ -96,7 +97,7 @@ where
 
 impl<T, U> Box3D<T, U>
 where
-    T: Copy + PartialOrd,
+    T: PartialOrd,
 {
     /// Returns true if the box has a negative volume.
     ///
@@ -114,15 +115,6 @@ where
     }
 
     #[inline]
-    pub fn to_non_empty(&self) -> Option<NonEmpty<Self>> {
-        if self.is_empty_or_negative() {
-            return None;
-        }
-
-        Some(NonEmpty(*self))
-    }
-
-    #[inline]
     pub fn intersects(&self, other: &Self) -> bool {
         self.min.x < other.max.x
             && self.max.x > other.min.x
@@ -130,6 +122,41 @@ where
             && self.max.y > other.min.y
             && self.min.z < other.max.z
             && self.max.z > other.min.z
+    }
+
+    /// Returns `true` if this box3d contains the point. Points are considered
+    /// in the box3d if they are on the front, left or top faces, but outside if they
+    /// are on the back, right or bottom faces.
+    #[inline]
+    pub fn contains(&self, other: Point3D<T, U>) -> bool {
+        self.min.x <= other.x && other.x < self.max.x
+            && self.min.y <= other.y && other.y < self.max.y
+            && self.min.z <= other.z && other.z < self.max.z
+    }
+
+    /// Returns `true` if this box3d contains the interior of the other box3d. Always
+    /// returns `true` if other is empty, and always returns `false` if other is
+    /// nonempty but this box3d is empty.
+    #[inline]
+    pub fn contains_box(&self, other: &Self) -> bool {
+        other.is_empty_or_negative()
+            || (self.min.x <= other.min.x && other.max.x <= self.max.x
+                && self.min.y <= other.min.y && other.max.y <= self.max.y
+                && self.min.z <= other.min.z && other.max.z <= self.max.z)
+    }
+}
+
+impl<T, U> Box3D<T, U>
+where
+    T: Copy + PartialOrd,
+{
+    #[inline]
+    pub fn to_non_empty(&self) -> Option<NonEmpty<Self>> {
+        if self.is_empty_or_negative() {
+            return None;
+        }
+
+        Some(NonEmpty(*self))
     }
 
     #[inline]
@@ -155,7 +182,7 @@ where
         );
 
         Box3D::new(
-            intersection_min, 
+            intersection_min,
             intersection_max,
         )
     }
@@ -173,37 +200,6 @@ where
             min: self.min + by,
             max: self.max + by,
         }
-    }
-}
-
-impl<T, U> Box3D<T, U>
-where
-    T: Copy + PartialOrd + Zero,
-{
-    /// Returns true if this box3d contains the point. Points are considered
-    /// in the box3d if they are on the front, left or top faces, but outside if they
-    /// are on the back, right or bottom faces.
-    #[inline]
-    pub fn contains(&self, other: Point3D<T, U>) -> bool {
-        self.min.x <= other.x && other.x < self.max.x
-            && self.min.y <= other.y && other.y < self.max.y
-            && self.min.z <= other.z && other.z < self.max.z
-    }
-}
-
-impl<T, U> Box3D<T, U>
-where
-    T: Copy + PartialOrd + Zero + Sub<T, Output = T>,
-{
-    /// Returns true if this box3d contains the interior of the other box3d. Always
-    /// returns true if other is empty, and always returns false if other is
-    /// nonempty but this box3d is empty.
-    #[inline]
-    pub fn contains_box(&self, other: &Self) -> bool {
-        other.is_empty_or_negative()
-            || (self.min.x <= other.min.x && other.max.x <= self.max.x
-                && self.min.y <= other.min.y && other.max.y <= self.max.y
-                && self.min.z <= other.min.z && other.max.z <= self.max.z)
     }
 }
 
@@ -326,7 +322,7 @@ where
 
 impl<T, U> Box3D<T, U>
 where
-    T: Copy + Clone + PartialOrd + Add<T, Output = T> + Sub<T, Output = T> + Zero,
+    T: Copy + PartialOrd + Add<T, Output = T> + Sub<T, Output = T> + Zero,
 {
     #[inline]
     pub fn union(&self, other: &Self) -> Self {
@@ -390,9 +386,9 @@ where
     }
 }
 
-impl<T, U> Box3D<T, U> 
+impl<T, U> Box3D<T, U>
 where
-    T: Copy + Zero,
+    T: Zero,
 {
     /// Constructor, setting all sides to zero.
     pub fn zero() -> Self {
@@ -492,7 +488,7 @@ where
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using round(), round_in or round_out() before casting.
-    pub fn cast<T1: NumCast + Copy>(&self) -> Box3D<T1, Unit> {
+    pub fn cast<T1: NumCast>(&self) -> Box3D<T1, Unit> {
         Box3D::new(
             self.min.cast(),
             self.max.cast(),
@@ -504,7 +500,7 @@ where
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using round(), round_in or round_out() before casting.
-    pub fn try_cast<T1: NumCast + Copy>(&self) -> Option<Box3D<T1, Unit>> {
+    pub fn try_cast<T1: NumCast>(&self) -> Option<Box3D<T1, Unit>> {
         match (self.min.try_cast(), self.max.try_cast()) {
             (Some(a), Some(b)) => Some(Box3D::new(a, b)),
             _ => None,
@@ -606,7 +602,7 @@ impl<T: NumCast + Copy, Unit> Box3D<T, Unit> {
 }
 
 impl<T, U> From<Size3D<T, U>> for Box3D<T, U>
-where 
+where
     T: Copy + Zero + PartialOrd,
 {
     fn from(b: Size3D<T, U>) -> Self {
@@ -789,7 +785,7 @@ mod tests {
         let b1 = Box3D::from_points(&[point3(-15.0, -20.0, -20.0), point3(10.0, 20.0, 20.0)]);
         let b2 = Box3D::from_points(&[point3(-10.0, 20.0, 20.0), point3(15.0, -20.0, -20.0)]);
         assert!(b1.try_intersection(&b2).is_some());
-    
+
         let b1 = Box3D::from_points(&[point3(-15.0, -20.0, -20.0), point3(-10.0, 20.0, 20.0)]);
         let b2 = Box3D::from_points(&[point3(10.0, 20.0, 20.0), point3(15.0, -20.0, -20.0)]);
         assert!(b1.try_intersection(&b2).is_none());
