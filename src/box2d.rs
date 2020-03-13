@@ -258,7 +258,7 @@ where
 
 impl<T, U> Box2D<T, U>
 where
-    T: Copy + PartialEq + Add<T, Output = T> + Sub<T, Output = T>,
+    T: Copy + Add<T, Output = T> + Sub<T, Output = T>,
 {
     /// Inflates the box by the specified sizes on each side respectively.
     #[inline]
@@ -269,12 +269,7 @@ where
             max: point2(self.max.x + width, self.max.y + height),
         }
     }
-}
 
-impl<T, U> Box2D<T, U>
-where
-    T: Copy + Zero + PartialOrd + Add<T, Output = T> + Sub<T, Output = T>,
-{
     /// Calculate the size and position of an inner box.
     ///
     /// Subtracts the side offsets from all sides. The horizontal, vertical

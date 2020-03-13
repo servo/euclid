@@ -241,7 +241,7 @@ where
 
 impl<T, U> Box3D<T, U>
 where
-    T: Copy + PartialEq + Add<T, Output = T> + Sub<T, Output = T>,
+    T: Copy + Add<T, Output = T> + Sub<T, Output = T>,
 {
     /// Inflates the box by the specified sizes on each side respectively.
     #[inline]
@@ -327,7 +327,7 @@ where
 
 impl<T, U> Box3D<T, U>
 where
-    T: Copy + PartialOrd + Add<T, Output = T> + Sub<T, Output = T> + Zero,
+    T: Copy + PartialOrd,
 {
     #[inline]
     pub fn union(&self, other: &Self) -> Self {

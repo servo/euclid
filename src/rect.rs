@@ -120,7 +120,7 @@ where
 
 impl<T, U> Rect<T, U>
 where
-    T: Copy + PartialOrd + Add<T, Output = T> + Sub<T, Output = T>,
+    T: Copy + PartialOrd + Add<T, Output = T>,
 {
     #[inline]
     pub fn intersects(&self, other: &Self) -> bool {
@@ -129,7 +129,12 @@ where
             && self.origin.y < other.origin.y + other.size.height
             && other.origin.y < self.origin.y + self.size.height
     }
+}
 
+impl<T, U> Rect<T, U>
+where
+    T: Copy + Add<T, Output = T>,
+{
     #[inline]
     pub fn min(&self) -> Point2D<T, U> {
         self.origin
@@ -179,7 +184,12 @@ where
     pub fn y_range(&self) -> Range<T> {
         self.min_y()..self.max_y()
     }
+}
 
+impl<T, U> Rect<T, U>
+where
+    T: Copy + PartialOrd + Add<T, Output = T> + Sub<T, Output = T>,
+{
     #[inline]
     pub fn intersection(&self, other: &Self) -> Option<Self> {
         if !self.intersects(other) {
@@ -214,7 +224,12 @@ where
         self.origin.x <= other.x && other.x < self.origin.x + self.size.width
             && self.origin.y <= other.y && other.y < self.origin.y + self.size.height
     }
+}
 
+impl<T, U> Rect<T, U>
+where
+    T: Copy + Add<T, Output = T> + Sub<T, Output = T>,
+{
     #[inline]
     #[must_use]
     pub fn inflate(&self, width: T, height: T) -> Self {
@@ -238,7 +253,7 @@ where
 
 impl<T, U> Rect<T, U>
 where
-    T: Copy + Zero + PartialOrd + Add<T, Output = T> + Sub<T, Output = T>,
+    T: Copy + Zero + PartialOrd + Add<T, Output = T>,
 {
     /// Returns true if this rectangle contains the interior of rect. Always
     /// returns true if rect is empty, and always returns false if rect is
@@ -249,7 +264,12 @@ where
             || (self.min_x() <= rect.min_x() && rect.max_x() <= self.max_x()
                 && self.min_y() <= rect.min_y() && rect.max_y() <= self.max_y())
     }
+}
 
+impl<T, U> Rect<T, U>
+where
+    T: Copy + Zero + PartialOrd + Add<T, Output = T> + Sub<T, Output = T>,
+{
     /// Calculate the size and position of an inner rectangle.
     ///
     /// Subtracts the side offsets from all sides. The horizontal and vertical
@@ -270,7 +290,12 @@ where
         debug_assert!(rect.size.height >= Zero::zero());
         rect
     }
+}
 
+impl<T, U> Rect<T, U>
+where
+    T: Copy + Add<T, Output = T> + Sub<T, Output = T>,
+{
     /// Calculate the size and position of an outer rectangle.
     ///
     /// Add the offsets to all sides. The expanded rectangle is returned.
@@ -287,7 +312,12 @@ where
             )
         )
     }
+}
 
+impl<T, U> Rect<T, U>
+where
+    T: Copy + Zero + PartialOrd + Sub<T, Output = T>,
+{
     /// Returns the smallest rectangle defined by the top/bottom/left/right-most
     /// points provided as parameter.
     ///
