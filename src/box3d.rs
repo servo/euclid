@@ -474,6 +474,7 @@ where
     }
 
     /// Cast the unit
+    #[inline]
     pub fn cast_unit<V>(&self) -> Box3D<T, V> {
         Box3D::new(self.min.cast_unit(), self.max.cast_unit())
     }
@@ -488,6 +489,7 @@ where
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using round(), round_in or round_out() before casting.
+    #[inline]
     pub fn cast<T1: NumCast>(&self) -> Box3D<T1, Unit> {
         Box3D::new(
             self.min.cast(),
@@ -555,11 +557,13 @@ where
 // Convenience functions for common casts
 impl<T: NumCast + Copy, Unit> Box3D<T, Unit> {
     /// Cast into an `f32` box3d.
+    #[inline]
     pub fn to_f32(&self) -> Box3D<f32, Unit> {
         self.cast()
     }
 
     /// Cast into an `f64` box3d.
+    #[inline]
     pub fn to_f64(&self) -> Box3D<f64, Unit> {
         self.cast()
     }
@@ -569,6 +573,7 @@ impl<T: NumCast + Copy, Unit> Box3D<T, Unit> {
     /// When casting from floating point cuboids, it is worth considering whether
     /// to `round()`, `round_in()` or `round_out()` before the cast in order to
     /// obtain the desired conversion behavior.
+    #[inline]
     pub fn to_usize(&self) -> Box3D<usize, Unit> {
         self.cast()
     }
@@ -578,6 +583,7 @@ impl<T: NumCast + Copy, Unit> Box3D<T, Unit> {
     /// When casting from floating point cuboids, it is worth considering whether
     /// to `round()`, `round_in()` or `round_out()` before the cast in order to
     /// obtain the desired conversion behavior.
+    #[inline]
     pub fn to_u32(&self) -> Box3D<u32, Unit> {
         self.cast()
     }
@@ -587,6 +593,7 @@ impl<T: NumCast + Copy, Unit> Box3D<T, Unit> {
     /// When casting from floating point cuboids, it is worth considering whether
     /// to `round()`, `round_in()` or `round_out()` before the cast in order to
     /// obtain the desired conversion behavior.
+    #[inline]
     pub fn to_i32(&self) -> Box3D<i32, Unit> {
         self.cast()
     }
@@ -596,6 +603,7 @@ impl<T: NumCast + Copy, Unit> Box3D<T, Unit> {
     /// When casting from floating point cuboids, it is worth considering whether
     /// to `round()`, `round_in()` or `round_out()` before the cast in order to
     /// obtain the desired conversion behavior.
+    #[inline]
     pub fn to_i64(&self) -> Box3D<i64, Unit> {
         self.cast()
     }

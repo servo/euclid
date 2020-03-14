@@ -43,12 +43,14 @@ use {Point2D, Rect, Size2D, Vector2D};
 pub struct Scale<T, Src, Dst>(pub T, #[doc(hidden)] pub PhantomData<(Src, Dst)>);
 
 impl<T, Src, Dst> Scale<T, Src, Dst> {
+    #[inline]
     pub const fn new(x: T) -> Self {
         Scale(x, PhantomData)
     }
 }
 
 impl<T: Clone, Src, Dst> Scale<T, Src, Dst> {
+    #[inline]
     pub fn get(&self) -> T {
         self.0.clone()
     }
@@ -96,6 +98,7 @@ impl<T: Sub<T, Output = T>, Src, Dst> Sub for Scale<T, Src, Dst> {
 
 impl<T: NumCast + Clone, Src, Dst0> Scale<T, Src, Dst0> {
     /// Cast from one numeric representation to another, preserving the units.
+    #[inline]
     pub fn cast<T1: NumCast>(&self) -> Scale<T1, Src, Dst0> {
         self.try_cast().unwrap()
     }

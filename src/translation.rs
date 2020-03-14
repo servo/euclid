@@ -385,6 +385,7 @@ where
     T: Copy
 {
     /// Cast into a 3D vector.
+    #[inline]
     pub fn to_vector(&self) -> Vector3D<T, Src> {
         vec3(self.x, self.y, self.z)
     }

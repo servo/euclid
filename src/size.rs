@@ -113,6 +113,7 @@ impl<T: Default, U> Default for Size2D<T, U> {
 
 impl<T, U> Size2D<T, U> {
     /// Constructor taking scalar values.
+    #[inline]
     pub const fn new(width: T, height: T) -> Self {
         Size2D {
             width,
@@ -121,6 +122,7 @@ impl<T, U> Size2D<T, U> {
         }
     }
     /// Constructor taking scalar strongly typed lengths.
+    #[inline]
     pub fn from_lengths(width: Length<T, U>, height: Length<T, U>) -> Self {
         Size2D::new(width.0, height.0)
     }
@@ -136,6 +138,7 @@ impl<T: Round, U> Size2D<T, U> {
     /// Rounds each component to the nearest integer value.
     ///
     /// This behavior is preserved for negative values (unlike the basic cast).
+    #[inline]
     pub fn round(&self) -> Self {
         Size2D::new(self.width.round(), self.height.round())
     }
@@ -145,6 +148,7 @@ impl<T: Ceil, U> Size2D<T, U> {
     /// Rounds each component to the smallest integer equal or greater than the original value.
     ///
     /// This behavior is preserved for negative values (unlike the basic cast).
+    #[inline]
     pub fn ceil(&self) -> Self {
         Size2D::new(self.width.ceil(), self.height.ceil())
     }
@@ -154,6 +158,7 @@ impl<T: Floor, U> Size2D<T, U> {
     /// Rounds each component to the biggest integer equal or lower than the original value.
     ///
     /// This behavior is preserved for negative values (unlike the basic cast).
+    #[inline]
     pub fn floor(&self) -> Self {
         Size2D::new(self.width.floor(), self.height.floor())
     }
@@ -211,12 +216,14 @@ impl<T: Zero, U> Size2D<T, U> {
     /// The same as [`Zero::zero()`] but available without importing trait.
     ///
     /// [`Zero::zero()`]: ./num/trait.Zero.html#tymethod.zero
+    #[inline]
     pub fn zero() -> Self {
         Size2D::new(Zero::zero(), Zero::zero())
     }
 }
 
 impl<T: Zero, U> Zero for Size2D<T, U> {
+    #[inline]
     fn zero() -> Self {
         Size2D::new(Zero::zero(), Zero::zero())
     }
@@ -274,11 +281,13 @@ impl<T: Copy, U> Size2D<T, U> {
     }
 
     /// Drop the units, preserving only the numeric value.
+    #[inline]
     pub fn to_untyped(&self) -> Size2D<T, UnknownUnit> {
         Size2D::new(self.width, self.height)
     }
 
     /// Cast the unit
+    #[inline]
     pub fn cast_unit<V>(&self) -> Size2D<T, V> {
         Size2D::new(self.width, self.height)
     }
@@ -290,6 +299,7 @@ impl<T: NumCast + Copy, Unit> Size2D<T, Unit> {
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
+    #[inline]
     pub fn cast<NewT: NumCast>(&self) -> Size2D<NewT, Unit> {
         self.try_cast().unwrap()
     }
@@ -309,11 +319,13 @@ impl<T: NumCast + Copy, Unit> Size2D<T, Unit> {
     // Convenience functions for common casts
 
     /// Cast into an `f32` size.
+    #[inline]
     pub fn to_f32(&self) -> Size2D<f32, Unit> {
         self.cast()
     }
 
     /// Cast into an `f64` size.
+    #[inline]
     pub fn to_f64(&self) -> Size2D<f64, Unit> {
         self.cast()
     }
@@ -323,6 +335,7 @@ impl<T: NumCast + Copy, Unit> Size2D<T, Unit> {
     /// When casting from floating point sizes, it is worth considering whether
     /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
     /// the desired conversion behavior.
+    #[inline]
     pub fn to_usize(&self) -> Size2D<usize, Unit> {
         self.cast()
     }
@@ -332,6 +345,7 @@ impl<T: NumCast + Copy, Unit> Size2D<T, Unit> {
     /// When casting from floating point sizes, it is worth considering whether
     /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
     /// the desired conversion behavior.
+    #[inline]
     pub fn to_u32(&self) -> Size2D<u32, Unit> {
         self.cast()
     }
@@ -341,6 +355,7 @@ impl<T: NumCast + Copy, Unit> Size2D<T, Unit> {
     /// When casting from floating point sizes, it is worth considering whether
     /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
     /// the desired conversion behavior.
+    #[inline]
     pub fn to_u64(&self) -> Size2D<u64, Unit> {
         self.cast()
     }
@@ -350,6 +365,7 @@ impl<T: NumCast + Copy, Unit> Size2D<T, Unit> {
     /// When casting from floating point sizes, it is worth considering whether
     /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
     /// the desired conversion behavior.
+    #[inline]
     pub fn to_i32(&self) -> Size2D<i32, Unit> {
         self.cast()
     }
@@ -359,6 +375,7 @@ impl<T: NumCast + Copy, Unit> Size2D<T, Unit> {
     /// When casting from floating point sizes, it is worth considering whether
     /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
     /// the desired conversion behavior.
+    #[inline]
     pub fn to_i64(&self) -> Size2D<i64, Unit> {
         self.cast()
     }
@@ -454,12 +471,14 @@ impl<T: PartialOrd, U> Size2D<T, U> {
 
 
 /// Shorthand for `Size2D::new(w, h)`.
+#[inline]
 pub const fn size2<T, U>(w: T, h: T) -> Size2D<T, U> {
     Size2D::new(w, h)
 }
 
 #[cfg(feature = "mint")]
 impl<T, U> From<mint::Vector2<T>> for Size2D<T, U> {
+    #[inline]
     fn from(v: mint::Vector2<T>) -> Self {
         Size2D {
             width: v.x,
@@ -470,6 +489,7 @@ impl<T, U> From<mint::Vector2<T>> for Size2D<T, U> {
 }
 #[cfg(feature = "mint")]
 impl<T, U> Into<mint::Vector2<T>> for Size2D<T, U> {
+    #[inline]
     fn into(self) -> mint::Vector2<T> {
         mint::Vector2 {
             x: self.width,
@@ -479,6 +499,7 @@ impl<T, U> Into<mint::Vector2<T>> for Size2D<T, U> {
 }
 
 impl<T, U> From<Vector2D<T, U>> for Size2D<T, U> {
+    #[inline]
     fn from(v: Vector2D<T, U>) -> Self {
         Size2D {
             width: v.x,
@@ -489,24 +510,28 @@ impl<T, U> From<Vector2D<T, U>> for Size2D<T, U> {
 }
 
 impl<T, U> Into<[T; 2]> for Size2D<T, U> {
+    #[inline]
     fn into(self) -> [T; 2] {
         [self.width, self.height]
     }
 }
 
 impl<T, U> From<[T; 2]> for Size2D<T, U> {
+    #[inline]
     fn from([w, h]: [T; 2]) -> Self {
         size2(w, h)
     }
 }
 
 impl<T, U> Into<(T, T)> for Size2D<T, U> {
+    #[inline]
     fn into(self) -> (T, T) {
         (self.width, self.height)
     }
 }
 
 impl<T, U> From<(T, T)> for Size2D<T, U> {
+    #[inline]
     fn from(tuple: (T, T)) -> Self {
         size2(tuple.0, tuple.1)
     }
@@ -662,6 +687,7 @@ impl<T: Default, U> Default for Size3D<T, U> {
 
 impl<T, U> Size3D<T, U> {
     /// Constructor taking scalar values.
+    #[inline]
     pub const fn new(width: T, height: T, depth: T) -> Self {
         Size3D {
             width,
@@ -674,6 +700,7 @@ impl<T, U> Size3D<T, U> {
 
 impl<T, U> Size3D<T, U> {
     /// Constructor taking scalar strongly typed lengths.
+    #[inline]
     pub fn from_lengths(width: Length<T, U>, height: Length<T, U>, depth: Length<T, U>) -> Self {
         Size3D::new(width.0, height.0, depth.0)
     }
@@ -683,6 +710,7 @@ impl<T: Round, U> Size3D<T, U> {
     /// Rounds each component to the nearest integer value.
     ///
     /// This behavior is preserved for negative values (unlike the basic cast).
+    #[inline]
     pub fn round(&self) -> Self {
         Size3D::new(self.width.round(), self.height.round(), self.depth.round())
     }
@@ -692,6 +720,7 @@ impl<T: Ceil, U> Size3D<T, U> {
     /// Rounds each component to the smallest integer equal or greater than the original value.
     ///
     /// This behavior is preserved for negative values (unlike the basic cast).
+    #[inline]
     pub fn ceil(&self) -> Self {
         Size3D::new(self.width.ceil(), self.height.ceil(), self.depth.ceil())
     }
@@ -701,6 +730,7 @@ impl<T: Floor, U> Size3D<T, U> {
     /// Rounds each component to the biggest integer equal or lower than the original value.
     ///
     /// This behavior is preserved for negative values (unlike the basic cast).
+    #[inline]
     pub fn floor(&self) -> Self {
         Size3D::new(self.width.floor(), self.height.floor(), self.depth.floor())
     }
@@ -708,6 +738,7 @@ impl<T: Floor, U> Size3D<T, U> {
 
 impl<T: Add<T, Output = T>, U> Add for Size3D<T, U> {
     type Output = Self;
+    #[inline]
     fn add(self, other: Self) -> Self {
         Size3D::new(self.width + other.width, self.height + other.height, self.depth + other.depth)
     }
@@ -715,6 +746,7 @@ impl<T: Add<T, Output = T>, U> Add for Size3D<T, U> {
 
 impl<T: Sub<T, Output = T>, U> Sub for Size3D<T, U> {
     type Output = Self;
+    #[inline]
     fn sub(self, other: Self) -> Self {
         Size3D::new(self.width - other.width, self.height - other.height, self.depth - other.depth)
     }
@@ -757,12 +789,14 @@ impl<T: Zero, U> Size3D<T, U> {
     /// The same as [`Zero::zero()`] but available without importing trait.
     ///
     /// [`Zero::zero()`]: ./num/trait.Zero.html#tymethod.zero
+    #[inline]
     pub fn zero() -> Self {
         Size3D::new(Zero::zero(), Zero::zero(), Zero::zero())
     }
 }
 
 impl<T: Zero, U> Zero for Size3D<T, U> {
+    #[inline]
     fn zero() -> Self {
         Size3D::new(Zero::zero(), Zero::zero(), Zero::zero())
     }
@@ -820,16 +854,19 @@ impl<T: Copy, U> Size3D<T, U> {
     }
 
     /// Drop the units, preserving only the numeric value.
+    #[inline]
     pub fn to_untyped(&self) -> Size3D<T, UnknownUnit> {
         Size3D::new(self.width, self.height, self.depth)
     }
 
     /// Tag a unitless value with units.
+    #[inline]
     pub fn from_untyped(p: Size3D<T, UnknownUnit>) -> Self {
         Size3D::new(p.width, p.height, p.depth)
     }
 
     /// Cast the unit
+    #[inline]
     pub fn cast_unit<V>(&self) -> Size3D<T, V> {
         Size3D::new(self.width, self.height, self.depth)
     }
@@ -841,6 +878,7 @@ impl<T: NumCast + Copy, Unit> Size3D<T, Unit> {
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
+    #[inline]
     pub fn cast<NewT: NumCast + Copy>(&self) -> Size3D<NewT, Unit> {
         self.try_cast().unwrap()
     }
@@ -860,11 +898,13 @@ impl<T: NumCast + Copy, Unit> Size3D<T, Unit> {
     // Convenience functions for common casts
 
     /// Cast into an `f32` size.
+    #[inline]
     pub fn to_f32(&self) -> Size3D<f32, Unit> {
         self.cast()
     }
 
     /// Cast into an `f64` size.
+    #[inline]
     pub fn to_f64(&self) -> Size3D<f64, Unit> {
         self.cast()
     }
@@ -874,6 +914,7 @@ impl<T: NumCast + Copy, Unit> Size3D<T, Unit> {
     /// When casting from floating point sizes, it is worth considering whether
     /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
     /// the desired conversion behavior.
+    #[inline]
     pub fn to_usize(&self) -> Size3D<usize, Unit> {
         self.cast()
     }
@@ -883,6 +924,7 @@ impl<T: NumCast + Copy, Unit> Size3D<T, Unit> {
     /// When casting from floating point sizes, it is worth considering whether
     /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
     /// the desired conversion behavior.
+    #[inline]
     pub fn to_u32(&self) -> Size3D<u32, Unit> {
         self.cast()
     }
@@ -892,6 +934,7 @@ impl<T: NumCast + Copy, Unit> Size3D<T, Unit> {
     /// When casting from floating point sizes, it is worth considering whether
     /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
     /// the desired conversion behavior.
+    #[inline]
     pub fn to_i32(&self) -> Size3D<i32, Unit> {
         self.cast()
     }
@@ -901,6 +944,7 @@ impl<T: NumCast + Copy, Unit> Size3D<T, Unit> {
     /// When casting from floating point sizes, it is worth considering whether
     /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
     /// the desired conversion behavior.
+    #[inline]
     pub fn to_i64(&self) -> Size3D<i64, Unit> {
         self.cast()
     }
@@ -1002,12 +1046,14 @@ impl<T: PartialOrd, U> Size3D<T, U> {
 
 
 /// Shorthand for `Size3D::new(w, h, d)`.
+#[inline]
 pub const fn size3<T, U>(w: T, h: T, d: T) -> Size3D<T, U> {
     Size3D::new(w, h, d)
 }
 
 #[cfg(feature = "mint")]
 impl<T, U> From<mint::Vector3<T>> for Size3D<T, U> {
+    #[inline]
     fn from(v: mint::Vector3<T>) -> Self {
         Size3D {
             width: v.x,
@@ -1019,6 +1065,7 @@ impl<T, U> From<mint::Vector3<T>> for Size3D<T, U> {
 }
 #[cfg(feature = "mint")]
 impl<T, U> Into<mint::Vector3<T>> for Size3D<T, U> {
+    #[inline]
     fn into(self) -> mint::Vector3<T> {
         mint::Vector3 {
             x: self.width,

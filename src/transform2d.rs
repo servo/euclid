@@ -169,6 +169,7 @@ impl<T: Copy, Src, Dst> Transform2D<T, Src, Dst> {
     /// Beware: This library is written with the assumption that row vectors
     /// are being used. If your matrices use column vectors (i.e. transforming a vector
     /// is `T * v`), then please use `to_column_major_array`
+    #[inline]
     pub fn to_row_major_array(&self) -> [T; 6] {
         [
             self.m11, self.m12,
@@ -182,6 +183,7 @@ impl<T: Copy, Src, Dst> Transform2D<T, Src, Dst> {
     /// Beware: This library is written with the assumption that row vectors
     /// are being used. If your matrices use column vectors (i.e. transforming a vector
     /// is `T * v`), then please use `to_row_major_array`
+    #[inline]
     pub fn to_column_major_array(&self) -> [T; 6] {
         [
             self.m11, self.m21, self.m31,
@@ -197,6 +199,7 @@ impl<T: Copy, Src, Dst> Transform2D<T, Src, Dst> {
     /// Beware: This library is written with the assumption that row vectors
     /// are being used. If your matrices use column vectors (i.e. transforming a vector
     /// is `T * v`), this will return column major arrays.
+    #[inline]
     pub fn to_row_arrays(&self) -> [[T; 2]; 3] {
         [
             [self.m11, self.m12],
@@ -210,6 +213,7 @@ impl<T: Copy, Src, Dst> Transform2D<T, Src, Dst> {
     /// Beware: This library is written with the assumption that row vectors
     /// are being used. If your matrices use column vectors (i.e. transforming a vector
     /// is `T * v`), please provide a column major array.
+    #[inline]
     pub fn from_row_major_array(array: [T; 6]) -> Self {
         Self::row_major(
             array[0], array[1],
@@ -223,6 +227,7 @@ impl<T: Copy, Src, Dst> Transform2D<T, Src, Dst> {
     /// Beware: This library is written with the assumption that row vectors
     /// are being used. If your matrices use column vectors (i.e. transforming a vector
     /// is `T * v`), please provide a column major array.
+    #[inline]
     pub fn from_row_arrays(array: [[T; 2]; 3]) -> Self {
         Self::row_major(
             array[0][0], array[0][1],
@@ -232,6 +237,7 @@ impl<T: Copy, Src, Dst> Transform2D<T, Src, Dst> {
     }
 
     /// Drop the units, preserving only the numeric value.
+    #[inline]
     pub fn to_untyped(&self) -> Transform2D<T, UnknownUnit, UnknownUnit> {
         Transform2D::row_major(
             self.m11, self.m12,
@@ -241,6 +247,7 @@ impl<T: Copy, Src, Dst> Transform2D<T, Src, Dst> {
     }
 
     /// Tag a unitless value with units.
+    #[inline]
     pub fn from_untyped(p: &Transform2D<T, UnknownUnit, UnknownUnit>) -> Self {
         Transform2D::row_major(
             p.m11, p.m12,
@@ -252,6 +259,7 @@ impl<T: Copy, Src, Dst> Transform2D<T, Src, Dst> {
 
 impl<T0: NumCast + Copy, Src, Dst> Transform2D<T0, Src, Dst> {
     /// Cast from one numeric representation to another, preserving the units.
+    #[inline]
     pub fn cast<T1: NumCast>(&self) -> Transform2D<T1, Src, Dst> {
         self.try_cast().unwrap()
     }

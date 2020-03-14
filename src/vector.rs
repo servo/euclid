@@ -553,7 +553,6 @@ impl<T: NumCast + Copy, U> Vector2D<T, U> {
     /// When casting from floating vector to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
-    #[inline]
     pub fn try_cast<NewT: NumCast>(&self) -> Option<Vector2D<NewT, U>> {
         match (NumCast::from(self.x), NumCast::from(self.y)) {
             (Some(x), Some(y)) => Some(Vector2D::new(x, y)),
@@ -854,6 +853,7 @@ impl<T: Copy, U> Vector3D<T, U> {
     }
 
     /// Cast the unit
+    #[inline]
     pub fn cast_unit<V>(&self) -> Vector3D<T, V> {
         vec3(self.x, self.y, self.z)
     }
@@ -1204,7 +1204,6 @@ impl<T: NumCast + Copy, U> Vector3D<T, U> {
     /// When casting from floating vector to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
-    #[inline]
     pub fn try_cast<NewT: NumCast>(&self) -> Option<Vector3D<NewT, U>> {
         match (
             NumCast::from(self.x),

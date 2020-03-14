@@ -835,6 +835,7 @@ impl<T: Copy, Src, Dst> Transform3D<T, Src, Dst> {
     /// Beware: This library is written with the assumption that row vectors
     /// are being used. If your matrices use column vectors (i.e. transforming a vector
     /// is `T * v`), then please use `to_column_major_array`
+    #[inline]
     pub fn to_row_major_array(&self) -> [T; 16] {
         [
             self.m11, self.m12, self.m13, self.m14,
@@ -849,6 +850,7 @@ impl<T: Copy, Src, Dst> Transform3D<T, Src, Dst> {
     /// Beware: This library is written with the assumption that row vectors
     /// are being used. If your matrices use column vectors (i.e. transforming a vector
     /// is `T * v`), then please use `to_row_major_array`
+    #[inline]
     pub fn to_column_major_array(&self) -> [T; 16] {
         [
             self.m11, self.m21, self.m31, self.m41,
@@ -866,6 +868,7 @@ impl<T: Copy, Src, Dst> Transform3D<T, Src, Dst> {
     /// Beware: This library is written with the assumption that row vectors
     /// are being used. If your matrices use column vectors (i.e. transforming a vector
     /// is `T * v`), then please use `to_column_arrays`
+    #[inline]
     pub fn to_row_arrays(&self) -> [[T; 4]; 4] {
         [
             [self.m11, self.m12, self.m13, self.m14],
@@ -883,6 +886,7 @@ impl<T: Copy, Src, Dst> Transform3D<T, Src, Dst> {
     /// Beware: This library is written with the assumption that row vectors
     /// are being used. If your matrices use column vectors (i.e. transforming a vector
     /// is `T * v`), then please use `to_row_arrays`
+    #[inline]
     pub fn to_column_arrays(&self) -> [[T; 4]; 4] {
         [
             [self.m11, self.m21, self.m31, self.m41],
@@ -897,6 +901,7 @@ impl<T: Copy, Src, Dst> Transform3D<T, Src, Dst> {
     /// Beware: This library is written with the assumption that row vectors
     /// are being used. If your matrices use column vectors (i.e. transforming a vector
     /// is `T * v`), please provide column-major data to this function.
+    #[inline]
     pub fn from_array(array: [T; 16]) -> Self {
         Self::row_major(
             array[0],  array[1],  array[2],  array[3],
@@ -911,6 +916,7 @@ impl<T: Copy, Src, Dst> Transform3D<T, Src, Dst> {
     /// Beware: This library is written with the assumption that row vectors
     /// are being used. If your matrices use column vectors (i.e. transforming a vector
     /// is `T * v`), please provide column-major data to tis function.
+    #[inline]
     pub fn from_row_arrays(array: [[T; 4]; 4]) -> Self {
         Self::row_major(
             array[0][0], array[0][1], array[0][2], array[0][3],
@@ -923,6 +929,7 @@ impl<T: Copy, Src, Dst> Transform3D<T, Src, Dst> {
 
 impl<T0: NumCast + Copy, Src, Dst> Transform3D<T0, Src, Dst> {
     /// Cast from one numeric representation to another, preserving the units.
+    #[inline]
     pub fn cast<T1: NumCast>(&self) -> Transform3D<T1, Src, Dst> {
         self.try_cast().unwrap()
     }

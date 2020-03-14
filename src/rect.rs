@@ -473,6 +473,7 @@ impl<T: Copy, Unit> Rect<T, Unit> {
     }
 
     /// Cast the unit
+    #[inline]
     pub fn cast_unit<V>(&self) -> Rect<T, V> {
         Rect::new(self.origin.cast_unit(), self.size.cast_unit())
     }
@@ -484,6 +485,7 @@ impl<T0: NumCast + Copy, Unit> Rect<T0, Unit> {
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using round(), round_in or round_out() before casting.
+    #[inline]
     pub fn cast<T1: NumCast>(&self) -> Rect<T1, Unit> {
         Rect::new(
             self.origin.cast(),
@@ -543,11 +545,13 @@ impl<T: Floor + Ceil + Round + Add<T, Output = T> + Sub<T, Output = T>, U> Rect<
 // Convenience functions for common casts
 impl<T: NumCast + Copy, Unit> Rect<T, Unit> {
     /// Cast into an `f32` rectangle.
+    #[inline]
     pub fn to_f32(&self) -> Rect<f32, Unit> {
         self.cast()
     }
 
     /// Cast into an `f64` rectangle.
+    #[inline]
     pub fn to_f64(&self) -> Rect<f64, Unit> {
         self.cast()
     }
@@ -557,6 +561,7 @@ impl<T: NumCast + Copy, Unit> Rect<T, Unit> {
     /// When casting from floating point rectangles, it is worth considering whether
     /// to `round()`, `round_in()` or `round_out()` before the cast in order to
     /// obtain the desired conversion behavior.
+    #[inline]
     pub fn to_usize(&self) -> Rect<usize, Unit> {
         self.cast()
     }
@@ -566,6 +571,7 @@ impl<T: NumCast + Copy, Unit> Rect<T, Unit> {
     /// When casting from floating point rectangles, it is worth considering whether
     /// to `round()`, `round_in()` or `round_out()` before the cast in order to
     /// obtain the desired conversion behavior.
+    #[inline]
     pub fn to_u32(&self) -> Rect<u32, Unit> {
         self.cast()
     }
@@ -575,6 +581,7 @@ impl<T: NumCast + Copy, Unit> Rect<T, Unit> {
     /// When casting from floating point rectangles, it is worth considering whether
     /// to `round()`, `round_in()` or `round_out()` before the cast in order to
     /// obtain the desired conversion behavior.
+    #[inline]
     pub fn to_u64(&self) -> Rect<u64, Unit> {
         self.cast()
     }
@@ -584,6 +591,7 @@ impl<T: NumCast + Copy, Unit> Rect<T, Unit> {
     /// When casting from floating point rectangles, it is worth considering whether
     /// to `round()`, `round_in()` or `round_out()` before the cast in order to
     /// obtain the desired conversion behavior.
+    #[inline]
     pub fn to_i32(&self) -> Rect<i32, Unit> {
         self.cast()
     }
@@ -593,6 +601,7 @@ impl<T: NumCast + Copy, Unit> Rect<T, Unit> {
     /// When casting from floating point rectangles, it is worth considering whether
     /// to `round()`, `round_in()` or `round_out()` before the cast in order to
     /// obtain the desired conversion behavior.
+    #[inline]
     pub fn to_i64(&self) -> Rect<i64, Unit> {
         self.cast()
     }

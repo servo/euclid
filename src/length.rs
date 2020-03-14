@@ -76,6 +76,7 @@ where
 }
 
 impl<T, Unit> Length<T, Unit> {
+    #[inline]
     pub const fn new(x: T) -> Self {
         Length(x, PhantomData)
     }
@@ -87,6 +88,7 @@ impl<Unit, T: Clone> Length<T, Unit> {
     }
 
     /// Cast the unit
+    #[inline]
     pub fn cast_unit<V>(&self) -> Length<T, V> {
         Length::new(self.0.clone())
     }
@@ -232,6 +234,7 @@ impl<U, T: Neg<Output = T>> Neg for Length<T, U> {
 
 impl<Unit, T0: NumCast + Clone> Length<T0, Unit> {
     /// Cast from one numeric representation to another, preserving the units.
+    #[inline]
     pub fn cast<T1: NumCast>(&self) -> Length<T1, Unit> {
         self.try_cast().unwrap()
     }
@@ -263,6 +266,7 @@ impl<Unit, T: Ord> Ord for Length<T, Unit> {
 }
 
 impl<Unit, T: Zero> Zero for Length<T, Unit> {
+    #[inline]
     fn zero() -> Self {
         Length::new(Zero::zero())
     }
