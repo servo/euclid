@@ -165,10 +165,7 @@ impl<T: NumCast + Clone, Src, Dst> Scale<T, Src, Dst> {
     }
 }
 
-impl<T, Src, Dst> Scale<T, Src, Dst>
-where
-    T: Copy + Mul<T, Output = T> + Neg<Output = T> + PartialEq + One,
-{
+impl<T, Src, Dst> Scale<T, Src, Dst> {
     /// Returns the given point transformed by this scale.
     ///
     /// # Example
@@ -183,7 +180,9 @@ where
     /// assert_eq!(to_mm.transform_point(point2(42, -42)), point2(420, -420));
     /// ```
     #[inline]
-    pub fn transform_point(&self, point: Point2D<T, Src>) -> Point2D<T, Dst> {
+    pub fn transform_point(&self, point: Point2D<T, Src>) -> Point2D<T::Output, Dst>
+        where T: Clone + Mul
+    {
         Point2D::new(point.x * self.get(), point.y * self.get())
     }
 
@@ -201,7 +200,9 @@ where
     /// assert_eq!(to_mm.transform_vector(vec2(42, -42)), vec2(420, -420));
     /// ```
     #[inline]
-    pub fn transform_vector(&self, vec: Vector2D<T, Src>) -> Vector2D<T, Dst> {
+    pub fn transform_vector(&self, vec: Vector2D<T, Src>) -> Vector2D<T::Output, Dst>
+        where T: Clone + Mul
+    {
         Vector2D::new(vec.x * self.get(), vec.y * self.get())
     }
 
@@ -219,7 +220,9 @@ where
     /// assert_eq!(to_mm.transform_size(size2(42, -42)), size2(420, -420));
     /// ```
     #[inline]
-    pub fn transform_size(&self, size: Size2D<T, Src>) -> Size2D<T, Dst> {
+    pub fn transform_size(&self, size: Size2D<T, Src>) -> Size2D<T::Output, Dst>
+        where T: Clone + Mul
+    {
         Size2D::new(size.width * self.get(), size.height * self.get())
     }
 
@@ -237,7 +240,9 @@ where
     /// assert_eq!(to_mm.transform_rect(&rect(1, 2, 42, -42)), rect(10, 20, 420, -420));
     /// ```
     #[inline]
-    pub fn transform_rect(&self, rect: &Rect<T, Src>) -> Rect<T, Dst> {
+    pub fn transform_rect(&self, rect: &Rect<T, Src>) -> Rect<T::Output, Dst>
+        where T: Copy + Mul
+    {
         Rect::new(
             self.transform_point(rect.origin),
             self.transform_size(rect.size),
@@ -246,7 +251,9 @@ where
 
     /// Returns the inverse of this scale.
     #[inline]
-    pub fn inverse(&self) -> Scale<T, Dst, Src> {
+    pub fn inverse(&self) -> Scale<T::Output, Dst, Src>
+        where T: Clone + Neg
+    {
         Scale::new(-self.get())
     }
 
@@ -267,7 +274,9 @@ where
     /// assert_eq!(mm_per_mm.is_identity(), true);
     /// ```
     #[inline]
-    pub fn is_identity(&self) -> bool {
+    pub fn is_identity(&self) -> bool
+        where T: PartialEq + One
+    {
         self.0 == T::one()
     }
 }
