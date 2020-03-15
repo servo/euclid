@@ -257,15 +257,15 @@ impl<T: Copy, Src, Dst> Transform2D<T, Src, Dst> {
     }
 }
 
-impl<T0: NumCast + Copy, Src, Dst> Transform2D<T0, Src, Dst> {
+impl<T: NumCast + Copy, Src, Dst> Transform2D<T, Src, Dst> {
     /// Cast from one numeric representation to another, preserving the units.
     #[inline]
-    pub fn cast<T1: NumCast>(&self) -> Transform2D<T1, Src, Dst> {
+    pub fn cast<NewT: NumCast>(&self) -> Transform2D<NewT, Src, Dst> {
         self.try_cast().unwrap()
     }
 
     /// Fallible cast from one numeric representation to another, preserving the units.
-    pub fn try_cast<T1: NumCast>(&self) -> Option<Transform2D<T1, Src, Dst>> {
+    pub fn try_cast<NewT: NumCast>(&self) -> Option<Transform2D<NewT, Src, Dst>> {
         match (NumCast::from(self.m11), NumCast::from(self.m12),
                NumCast::from(self.m21), NumCast::from(self.m22),
                NumCast::from(self.m31), NumCast::from(self.m32)) {

@@ -96,15 +96,15 @@ impl<T: Sub<T, Output = T>, Src, Dst> Sub for Scale<T, Src, Dst> {
     }
 }
 
-impl<T: NumCast + Clone, Src, Dst0> Scale<T, Src, Dst0> {
+impl<T: NumCast + Clone, Src, Dst> Scale<T, Src, Dst> {
     /// Cast from one numeric representation to another, preserving the units.
     #[inline]
-    pub fn cast<T1: NumCast>(&self) -> Scale<T1, Src, Dst0> {
+    pub fn cast<NewT: NumCast>(&self) -> Scale<NewT, Src, Dst> {
         self.try_cast().unwrap()
     }
 
     /// Fallible cast from one numeric representation to another, preserving the units.
-    pub fn try_cast<T1: NumCast>(&self) -> Option<Scale<T1, Src, Dst0>> {
+    pub fn try_cast<NewT: NumCast>(&self) -> Option<Scale<T1, Src, Dst>> {
         NumCast::from(self.get()).map(Scale::new)
     }
 }

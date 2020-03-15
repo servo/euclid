@@ -456,7 +456,7 @@ impl<T: Copy + Div<T, Output = T>, U1, U2> Div<Scale<T, U1, U2>> for Rect<T, U2>
     }
 }
 
-impl<T: Copy, Unit> Rect<T, Unit> {
+impl<T: Copy, U> Rect<T, U> {
     /// Drop the units, preserving only the numeric value.
     #[inline]
     pub fn to_untyped(&self) -> Rect<T, UnknownUnit> {
@@ -465,7 +465,7 @@ impl<T: Copy, Unit> Rect<T, Unit> {
 
     /// Tag a unitless value with units.
     #[inline]
-    pub fn from_untyped(r: &Rect<T, UnknownUnit>) -> Rect<T, Unit> {
+    pub fn from_untyped(r: &Rect<T, UnknownUnit>) -> Rect<T, U> {
         Rect::new(
             Point2D::from_untyped(r.origin),
             Size2D::from_untyped(r.size),
@@ -479,14 +479,14 @@ impl<T: Copy, Unit> Rect<T, Unit> {
     }
 }
 
-impl<T0: NumCast + Copy, Unit> Rect<T0, Unit> {
+impl<T: NumCast + Copy, U> Rect<T, U> {
     /// Cast from one numeric representation to another, preserving the units.
     ///
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using round(), round_in or round_out() before casting.
     #[inline]
-    pub fn cast<T1: NumCast>(&self) -> Rect<T1, Unit> {
+    pub fn cast<NewT: NumCast>(&self) -> Rect<NewT, U> {
         Rect::new(
             self.origin.cast(),
             self.size.cast(),
@@ -498,7 +498,7 @@ impl<T0: NumCast + Copy, Unit> Rect<T0, Unit> {
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using round(), round_in or round_out() before casting.
-    pub fn try_cast<T1: NumCast>(&self) -> Option<Rect<T1, Unit>> {
+    pub fn try_cast<NewT: NumCast>(&self) -> Option<Rect<NewT, U>> {
         match (self.origin.try_cast(), self.size.try_cast()) {
             (Some(origin), Some(size)) => Some(Rect::new(origin, size)),
             _ => None,
@@ -543,16 +543,16 @@ impl<T: Floor + Ceil + Round + Add<T, Output = T> + Sub<T, Output = T>, U> Rect<
 }
 
 // Convenience functions for common casts
-impl<T: NumCast + Copy, Unit> Rect<T, Unit> {
+impl<T: NumCast + Copy, U> Rect<T, U> {
     /// Cast into an `f32` rectangle.
     #[inline]
-    pub fn to_f32(&self) -> Rect<f32, Unit> {
+    pub fn to_f32(&self) -> Rect<f32, U> {
         self.cast()
     }
 
     /// Cast into an `f64` rectangle.
     #[inline]
-    pub fn to_f64(&self) -> Rect<f64, Unit> {
+    pub fn to_f64(&self) -> Rect<f64, U> {
         self.cast()
     }
 
@@ -562,7 +562,7 @@ impl<T: NumCast + Copy, Unit> Rect<T, Unit> {
     /// to `round()`, `round_in()` or `round_out()` before the cast in order to
     /// obtain the desired conversion behavior.
     #[inline]
-    pub fn to_usize(&self) -> Rect<usize, Unit> {
+    pub fn to_usize(&self) -> Rect<usize, U> {
         self.cast()
     }
 
@@ -572,7 +572,7 @@ impl<T: NumCast + Copy, Unit> Rect<T, Unit> {
     /// to `round()`, `round_in()` or `round_out()` before the cast in order to
     /// obtain the desired conversion behavior.
     #[inline]
-    pub fn to_u32(&self) -> Rect<u32, Unit> {
+    pub fn to_u32(&self) -> Rect<u32, U> {
         self.cast()
     }
 
@@ -582,7 +582,7 @@ impl<T: NumCast + Copy, Unit> Rect<T, Unit> {
     /// to `round()`, `round_in()` or `round_out()` before the cast in order to
     /// obtain the desired conversion behavior.
     #[inline]
-    pub fn to_u64(&self) -> Rect<u64, Unit> {
+    pub fn to_u64(&self) -> Rect<u64, U> {
         self.cast()
     }
 
@@ -592,7 +592,7 @@ impl<T: NumCast + Copy, Unit> Rect<T, Unit> {
     /// to `round()`, `round_in()` or `round_out()` before the cast in order to
     /// obtain the desired conversion behavior.
     #[inline]
-    pub fn to_i32(&self) -> Rect<i32, Unit> {
+    pub fn to_i32(&self) -> Rect<i32, U> {
         self.cast()
     }
 
@@ -602,7 +602,7 @@ impl<T: NumCast + Copy, Unit> Rect<T, Unit> {
     /// to `round()`, `round_in()` or `round_out()` before the cast in order to
     /// obtain the desired conversion behavior.
     #[inline]
-    pub fn to_i64(&self) -> Rect<i64, Unit> {
+    pub fn to_i64(&self) -> Rect<i64, U> {
         self.cast()
     }
 }

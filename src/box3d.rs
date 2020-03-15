@@ -451,7 +451,7 @@ where
     }
 }
 
-impl<T, Unit> Box3D<T, Unit>
+impl<T, U> Box3D<T, U>
 where
     T: Copy,
 {
@@ -466,7 +466,7 @@ where
 
     /// Tag a unitless value with units.
     #[inline]
-    pub fn from_untyped(c: &Box3D<T, UnknownUnit>) -> Box3D<T, Unit> {
+    pub fn from_untyped(c: &Box3D<T, UnknownUnit>) -> Box3D<T, U> {
         Box3D {
             min: Point3D::from_untyped(c.min),
             max: Point3D::from_untyped(c.max),
@@ -480,9 +480,9 @@ where
     }
 }
 
-impl<T0, Unit> Box3D<T0, Unit>
+impl<T, U> Box3D<T, U>
 where
-    T0: NumCast + Copy,
+    T: NumCast + Copy,
 {
     /// Cast from one numeric representation to another, preserving the units.
     ///
@@ -490,7 +490,7 @@ where
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using round(), round_in or round_out() before casting.
     #[inline]
-    pub fn cast<T1: NumCast>(&self) -> Box3D<T1, Unit> {
+    pub fn cast<NewT: NumCast>(&self) -> Box3D<NewT, U> {
         Box3D::new(
             self.min.cast(),
             self.max.cast(),
@@ -502,7 +502,7 @@ where
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using round(), round_in or round_out() before casting.
-    pub fn try_cast<T1: NumCast>(&self) -> Option<Box3D<T1, Unit>> {
+    pub fn try_cast<NewT: NumCast>(&self) -> Option<Box3D<NewT, U>> {
         match (self.min.try_cast(), self.max.try_cast()) {
             (Some(a), Some(b)) => Some(Box3D::new(a, b)),
             _ => None,
@@ -555,16 +555,16 @@ where
 }
 
 // Convenience functions for common casts
-impl<T: NumCast + Copy, Unit> Box3D<T, Unit> {
+impl<T: NumCast + Copy, U> Box3D<T, U> {
     /// Cast into an `f32` box3d.
     #[inline]
-    pub fn to_f32(&self) -> Box3D<f32, Unit> {
+    pub fn to_f32(&self) -> Box3D<f32, U> {
         self.cast()
     }
 
     /// Cast into an `f64` box3d.
     #[inline]
-    pub fn to_f64(&self) -> Box3D<f64, Unit> {
+    pub fn to_f64(&self) -> Box3D<f64, U> {
         self.cast()
     }
 
@@ -574,7 +574,7 @@ impl<T: NumCast + Copy, Unit> Box3D<T, Unit> {
     /// to `round()`, `round_in()` or `round_out()` before the cast in order to
     /// obtain the desired conversion behavior.
     #[inline]
-    pub fn to_usize(&self) -> Box3D<usize, Unit> {
+    pub fn to_usize(&self) -> Box3D<usize, U> {
         self.cast()
     }
 
@@ -584,7 +584,7 @@ impl<T: NumCast + Copy, Unit> Box3D<T, Unit> {
     /// to `round()`, `round_in()` or `round_out()` before the cast in order to
     /// obtain the desired conversion behavior.
     #[inline]
-    pub fn to_u32(&self) -> Box3D<u32, Unit> {
+    pub fn to_u32(&self) -> Box3D<u32, U> {
         self.cast()
     }
 
@@ -594,7 +594,7 @@ impl<T: NumCast + Copy, Unit> Box3D<T, Unit> {
     /// to `round()`, `round_in()` or `round_out()` before the cast in order to
     /// obtain the desired conversion behavior.
     #[inline]
-    pub fn to_i32(&self) -> Box3D<i32, Unit> {
+    pub fn to_i32(&self) -> Box3D<i32, U> {
         self.cast()
     }
 
@@ -604,7 +604,7 @@ impl<T: NumCast + Copy, Unit> Box3D<T, Unit> {
     /// to `round()`, `round_in()` or `round_out()` before the cast in order to
     /// obtain the desired conversion behavior.
     #[inline]
-    pub fn to_i64(&self) -> Box3D<i64, Unit> {
+    pub fn to_i64(&self) -> Box3D<i64, U> {
         self.cast()
     }
 }
