@@ -177,6 +177,63 @@ impl<T: Copy, U> Size2D<T, U> {
         Size2D::new(self.width, self.height)
     }
 
+    /// Rounds each component to the nearest integer value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    ///
+    /// ```rust
+    /// # use euclid::size2;
+    /// enum Mm {}
+    ///
+    /// assert_eq!(size2::<_, Mm>(-0.1, -0.8).round(), size2::<_, Mm>(0.0, -1.0))
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn round(&self) -> Self
+    where
+        T: Round,
+    {
+        Size2D::new(self.width.round(), self.height.round())
+    }
+
+    /// Rounds each component to the smallest integer equal or greater than the original value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    ///
+    /// ```rust
+    /// # use euclid::size2;
+    /// enum Mm {}
+    ///
+    /// assert_eq!(size2::<_, Mm>(-0.1, -0.8).ceil(), size2::<_, Mm>(0.0, 0.0))
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn ceil(&self) -> Self
+    where
+        T: Ceil,
+    {
+        Size2D::new(self.width.ceil(), self.height.ceil())
+    }
+
+    /// Rounds each component to the biggest integer equal or lower than the original value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    ///
+    /// ```rust
+    /// # use euclid::size2;
+    /// enum Mm {}
+    ///
+    /// assert_eq!(size2::<_, Mm>(-0.1, -0.8).floor(), size2::<_, Mm>(-1.0, -1.0))
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn floor(&self) -> Self
+    where
+        T: Floor,
+    {
+        Size2D::new(self.width.floor(), self.height.floor())
+    }
+
     /// Returns result of multiplication of both components
     pub fn area(&self) -> T::Output
     where
@@ -395,33 +452,27 @@ impl<T: PartialEq, U> Size2D<T, U> {
 }
 
 
-impl<T: Round, U> Size2D<T, U> {
-    /// Rounds each component to the nearest integer value.
-    ///
-    /// This behavior is preserved for negative values (unlike the basic cast).
+impl<T: Round, U> Round for Size2D<T, U> {
+    /// See [`Size2D::round()`](#method.round)
     #[inline]
-    pub fn round(&self) -> Self {
-        Size2D::new(self.width.round(), self.height.round())
+    fn round(self) -> Self {
+        (&self).round()
     }
 }
 
-impl<T: Ceil, U> Size2D<T, U> {
-    /// Rounds each component to the smallest integer equal or greater than the original value.
-    ///
-    /// This behavior is preserved for negative values (unlike the basic cast).
+impl<T: Ceil, U> Ceil for Size2D<T, U> {
+    /// See [`Size2D::ceil()`](#method.ceil)
     #[inline]
-    pub fn ceil(&self) -> Self {
-        Size2D::new(self.width.ceil(), self.height.ceil())
+    fn ceil(self) -> Self {
+        (&self).ceil()
     }
 }
 
-impl<T: Floor, U> Size2D<T, U> {
-    /// Rounds each component to the biggest integer equal or lower than the original value.
-    ///
-    /// This behavior is preserved for negative values (unlike the basic cast).
+impl<T: Floor, U> Floor for Size2D<T, U> {
+    /// See [`Size2D::floor()`](#method.floor)
     #[inline]
-    pub fn floor(&self) -> Self {
-        Size2D::new(self.width.floor(), self.height.floor())
+    fn floor(self) -> Self {
+        (&self).floor()
     }
 }
 
@@ -966,6 +1017,63 @@ impl<T: Copy, U> Size3D<T, U> {
         Size3D::new(self.width, self.height, self.depth)
     }
 
+    /// Rounds each component to the nearest integer value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    ///
+    /// ```rust
+    /// # use euclid::size3;
+    /// enum Mm {}
+    ///
+    /// assert_eq!(size3::<_, Mm>(-0.1, -0.8, 0.4).round(), size3::<_, Mm>(0.0, -1.0, 0.0))
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn round(&self) -> Self
+    where
+        T: Round,
+    {
+        Size3D::new(self.width.round(), self.height.round(), self.depth.round())
+    }
+
+    /// Rounds each component to the smallest integer equal or greater than the original value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    ///
+    /// ```rust
+    /// # use euclid::size3;
+    /// enum Mm {}
+    ///
+    /// assert_eq!(size3::<_, Mm>(-0.1, -0.8, 0.4).ceil(), size3::<_, Mm>(0.0, 0.0, 1.0))
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn ceil(&self) -> Self
+    where
+        T: Ceil,
+    {
+        Size3D::new(self.width.ceil(), self.height.ceil(), self.depth.ceil())
+    }
+
+    /// Rounds each component to the biggest integer equal or lower than the original value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    ///
+    /// ```rust
+    /// # use euclid::size3;
+    /// enum Mm {}
+    ///
+    /// assert_eq!(size3::<_, Mm>(-0.1, -0.8, 0.4).floor(), size3::<_, Mm>(-1.0, -1.0, 0.0))
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn floor(&self) -> Self
+    where
+        T: Floor,
+    {
+        Size3D::new(self.width.floor(), self.height.floor(), self.depth.floor())
+    }
+
     /// Returns result of multiplication of all components
     pub fn volume(&self) -> T
     where
@@ -1180,33 +1288,27 @@ impl<T: PartialEq, U> Size3D<T, U> {
 }
 
 
-impl<T: Round, U> Size3D<T, U> {
-    /// Rounds each component to the nearest integer value.
-    ///
-    /// This behavior is preserved for negative values (unlike the basic cast).
+impl<T: Round, U> Round for Size3D<T, U> {
+    /// See [`Size3D::round()`](#method.round)
     #[inline]
-    pub fn round(&self) -> Self {
-        Size3D::new(self.width.round(), self.height.round(), self.depth.round())
+    fn round(self) -> Self {
+        (&self).round()
     }
 }
 
-impl<T: Ceil, U> Size3D<T, U> {
-    /// Rounds each component to the smallest integer equal or greater than the original value.
-    ///
-    /// This behavior is preserved for negative values (unlike the basic cast).
+impl<T: Ceil, U> Ceil for Size3D<T, U> {
+    /// See [`Size3D::ceil()`](#method.ceil)
     #[inline]
-    pub fn ceil(&self) -> Self {
-        Size3D::new(self.width.ceil(), self.height.ceil(), self.depth.ceil())
+    fn ceil(self) -> Self {
+        (&self).ceil()
     }
 }
 
-impl<T: Floor, U> Size3D<T, U> {
-    /// Rounds each component to the biggest integer equal or lower than the original value.
-    ///
-    /// This behavior is preserved for negative values (unlike the basic cast).
+impl<T: Floor, U> Floor for Size3D<T, U> {
+    /// See [`Size3D::floor()`](#method.floor)
     #[inline]
-    pub fn floor(&self) -> Self {
-        Size3D::new(self.width.floor(), self.height.floor(), self.depth.floor())
+    fn floor(self) -> Self {
+        (&self).floor()
     }
 }
 
