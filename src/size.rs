@@ -56,7 +56,7 @@ impl<'de, T, U> serde::Deserialize<'de> for Size2D<T, U>
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
         where D: serde::Deserializer<'de>
     {
-        let (width, height) = try!(serde::Deserialize::deserialize(deserializer));
+        let (width, height) = serde::Deserialize::deserialize(deserializer)?;
         Ok(Size2D { width, height, _unit: PhantomData })
     }
 }
@@ -601,7 +601,7 @@ impl<'de, T, U> serde::Deserialize<'de> for Size3D<T, U>
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
         where D: serde::Deserializer<'de>
     {
-        let (width, height, depth) = try!(serde::Deserialize::deserialize(deserializer));
+        let (width, height, depth) = serde::Deserialize::deserialize(deserializer)?;
         Ok(Size3D { width, height, depth, _unit: PhantomData })
     }
 }

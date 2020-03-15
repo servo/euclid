@@ -79,7 +79,7 @@ impl<'de, T, Src, Dst> serde::Deserialize<'de> for Transform2D<T, Src, Dst>
             m11, m12,
             m21, m22,
             m31, m32,
-        ) = try!(serde::Deserialize::deserialize(deserializer));
+        ) = serde::Deserialize::deserialize(deserializer)?;
         Ok(Transform2D {
             m11, m12,
             m21, m22,

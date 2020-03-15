@@ -56,7 +56,7 @@ where
         D: Deserializer<'de>,
     {
         Ok(Length(
-            try!(Deserialize::deserialize(deserializer)),
+            Deserialize::deserialize(deserializer)?,
             PhantomData,
         ))
     }

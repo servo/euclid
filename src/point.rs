@@ -53,7 +53,7 @@ impl<'de, T, U> serde::Deserialize<'de> for Point2D<T, U>
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
         where D: serde::Deserializer<'de>
     {
-        let (x, y) = try!(serde::Deserialize::deserialize(deserializer));
+        let (x, y) = serde::Deserialize::deserialize(deserializer)?;
         Ok(Point2D { x, y, _unit: PhantomData })
     }
 }
@@ -519,7 +519,7 @@ impl<'de, T, U> serde::Deserialize<'de> for Point3D<T, U>
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
         where D: serde::Deserializer<'de>
     {
-        let (x, y, z) = try!(serde::Deserialize::deserialize(deserializer));
+        let (x, y, z) = serde::Deserialize::deserialize(deserializer)?;
         Ok(Point3D { x, y, z, _unit: PhantomData })
     }
 }

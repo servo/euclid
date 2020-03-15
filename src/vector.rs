@@ -59,7 +59,7 @@ impl<'de, T, U> serde::Deserialize<'de> for Vector2D<T, U>
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
         where D: serde::Deserializer<'de>
     {
-        let (x, y) = try!(serde::Deserialize::deserialize(deserializer));
+        let (x, y) = serde::Deserialize::deserialize(deserializer)?;
         Ok(Vector2D { x, y, _unit: PhantomData })
     }
 }
@@ -704,7 +704,7 @@ impl<'de, T, U> serde::Deserialize<'de> for Vector3D<T, U>
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
         where D: serde::Deserializer<'de>
     {
-        let (x, y, z) = try!(serde::Deserialize::deserialize(deserializer));
+        let (x, y, z) = serde::Deserialize::deserialize(deserializer)?;
         Ok(Vector3D { x, y, z, _unit: PhantomData })
     }
 }

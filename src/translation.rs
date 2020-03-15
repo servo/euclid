@@ -326,7 +326,7 @@ impl<'de, T, Src, Dst> serde::Deserialize<'de> for Translation3D<T, Src, Dst>
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
         where D: serde::Deserializer<'de>
     {
-        let (x, y, z) = try!(serde::Deserialize::deserialize(deserializer));
+        let (x, y, z) = serde::Deserialize::deserialize(deserializer)?;
         Ok(Translation3D { x, y, z, _unit: PhantomData })
     }
 }

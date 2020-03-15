@@ -93,7 +93,7 @@ impl<'de, T, Src, Dst> serde::Deserialize<'de> for Transform3D<T, Src, Dst>
             m21, m22, m23, m24,
             m31, m32, m33, m34,
             m41, m42, m43, m44,
-        ) = try!(serde::Deserialize::deserialize(deserializer));
+        ) = serde::Deserialize::deserialize(deserializer)?;
         Ok(Transform3D {
             m11, m12, m13, m14,
             m21, m22, m23, m24,
