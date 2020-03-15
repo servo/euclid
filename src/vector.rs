@@ -407,43 +407,6 @@ where
     }
 }
 
-impl<T: Add<T, Output = T>, U> Add for Vector2D<T, U> {
-    type Output = Self;
-    fn add(self, other: Self) -> Self {
-        Vector2D::new(self.x + other.x, self.y + other.y)
-    }
-}
-
-impl<T: Copy + Add<T, Output = T>, U> AddAssign for Vector2D<T, U> {
-    #[inline]
-    fn add_assign(&mut self, other: Self) {
-        *self = *self + other
-    }
-}
-
-impl<T: Copy + Sub<T, Output = T>, U> SubAssign<Vector2D<T, U>> for Vector2D<T, U> {
-    #[inline]
-    fn sub_assign(&mut self, other: Self) {
-        *self = *self - other
-    }
-}
-
-impl<T: Sub<T, Output = T>, U> Sub for Vector2D<T, U> {
-    type Output = Self;
-    #[inline]
-    fn sub(self, other: Self) -> Self {
-        vec2(self.x - other.x, self.y - other.y)
-    }
-}
-
-impl<T: Neg<Output = T>, U> Neg for Vector2D<T, U> {
-    type Output = Self;
-    #[inline]
-    fn neg(self) -> Self {
-        vec2(-self.x, -self.y)
-    }
-}
-
 impl<T: PartialOrd, U> Vector2D<T, U> {
     /// Returns the vector each component of which are minimum of this vector and another.
     #[inline]
@@ -467,88 +430,6 @@ impl<T: PartialOrd, U> Vector2D<T, U> {
         T: Copy,
     {
         self.max(start).min(end)
-    }
-}
-
-impl<T: Copy + Mul<T, Output = T>, U> Mul<T> for Vector2D<T, U> {
-    type Output = Self;
-    #[inline]
-    fn mul(self, scale: T) -> Self {
-        vec2(self.x * scale, self.y * scale)
-    }
-}
-
-impl<T: Copy + Div<T, Output = T>, U> Div<T> for Vector2D<T, U> {
-    type Output = Self;
-    #[inline]
-    fn div(self, scale: T) -> Self {
-        vec2(self.x / scale, self.y / scale)
-    }
-}
-
-impl<T: Copy + Mul<T, Output = T>, U> MulAssign<T> for Vector2D<T, U> {
-    #[inline]
-    fn mul_assign(&mut self, scale: T) {
-        *self = *self * scale
-    }
-}
-
-impl<T: Copy + Div<T, Output = T>, U> DivAssign<T> for Vector2D<T, U> {
-    #[inline]
-    fn div_assign(&mut self, scale: T) {
-        *self = *self / scale
-    }
-}
-
-impl<T: Copy + Mul<T, Output = T>, U1, U2> Mul<Scale<T, U1, U2>> for Vector2D<T, U1> {
-    type Output = Vector2D<T, U2>;
-    #[inline]
-    fn mul(self, scale: Scale<T, U1, U2>) -> Self::Output {
-        vec2(self.x * scale.get(), self.y * scale.get())
-    }
-}
-
-impl<T: Copy + Div<T, Output = T>, U1, U2> Div<Scale<T, U1, U2>> for Vector2D<T, U2> {
-    type Output = Vector2D<T, U1>;
-    #[inline]
-    fn div(self, scale: Scale<T, U1, U2>) -> Self::Output {
-        vec2(self.x / scale.get(), self.y / scale.get())
-    }
-}
-
-impl<T: Round, U> Vector2D<T, U> {
-    /// Rounds each component to the nearest integer value.
-    ///
-    /// This behavior is preserved for negative values (unlike the basic cast).
-    /// For example `{ -0.1, -0.8 }.round() == { 0.0, -1.0 }`.
-    #[inline]
-    #[must_use]
-    pub fn round(&self) -> Self {
-        vec2(self.x.round(), self.y.round())
-    }
-}
-
-impl<T: Ceil, U> Vector2D<T, U> {
-    /// Rounds each component to the smallest integer equal or greater than the original value.
-    ///
-    /// This behavior is preserved for negative values (unlike the basic cast).
-    /// For example `{ -0.1, -0.8 }.ceil() == { 0.0, 0.0 }`.
-    #[inline]
-    #[must_use]
-    pub fn ceil(&self) -> Self {
-        vec2(self.x.ceil(), self.y.ceil())
-    }
-}
-
-impl<T: Floor, U> Vector2D<T, U> {
-    /// Rounds each component to the biggest integer equal or lower than the original value.
-    ///
-    /// This behavior is preserved for negative values (unlike the basic cast).
-    /// For example `{ -0.1, -0.8 }.floor() == { -1.0, -1.0 }`.
-    #[inline]
-    #[must_use]
-    pub fn floor(&self) -> Self {
-        vec2(self.x.floor(), self.y.floor())
     }
 }
 
@@ -630,6 +511,127 @@ impl<T: NumCast + Copy, U> Vector2D<T, U> {
     }
 }
 
+
+impl<T: Add<T, Output = T>, U> Add for Vector2D<T, U> {
+    type Output = Self;
+    fn add(self, other: Self) -> Self {
+        Vector2D::new(self.x + other.x, self.y + other.y)
+    }
+}
+
+impl<T: Copy + Add<T, Output = T>, U> AddAssign for Vector2D<T, U> {
+    #[inline]
+    fn add_assign(&mut self, other: Self) {
+        *self = *self + other
+    }
+}
+
+impl<T: Copy + Sub<T, Output = T>, U> SubAssign<Vector2D<T, U>> for Vector2D<T, U> {
+    #[inline]
+    fn sub_assign(&mut self, other: Self) {
+        *self = *self - other
+    }
+}
+
+impl<T: Sub<T, Output = T>, U> Sub for Vector2D<T, U> {
+    type Output = Self;
+    #[inline]
+    fn sub(self, other: Self) -> Self {
+        vec2(self.x - other.x, self.y - other.y)
+    }
+}
+
+impl<T: Neg<Output = T>, U> Neg for Vector2D<T, U> {
+    type Output = Self;
+    #[inline]
+    fn neg(self) -> Self {
+        vec2(-self.x, -self.y)
+    }
+}
+
+impl<T: Copy + Mul<T, Output = T>, U> Mul<T> for Vector2D<T, U> {
+    type Output = Self;
+    #[inline]
+    fn mul(self, scale: T) -> Self {
+        vec2(self.x * scale, self.y * scale)
+    }
+}
+
+impl<T: Copy + Div<T, Output = T>, U> Div<T> for Vector2D<T, U> {
+    type Output = Self;
+    #[inline]
+    fn div(self, scale: T) -> Self {
+        vec2(self.x / scale, self.y / scale)
+    }
+}
+
+impl<T: Copy + Mul<T, Output = T>, U> MulAssign<T> for Vector2D<T, U> {
+    #[inline]
+    fn mul_assign(&mut self, scale: T) {
+        *self = *self * scale
+    }
+}
+
+impl<T: Copy + Div<T, Output = T>, U> DivAssign<T> for Vector2D<T, U> {
+    #[inline]
+    fn div_assign(&mut self, scale: T) {
+        *self = *self / scale
+    }
+}
+
+impl<T: Copy + Mul<T, Output = T>, U1, U2> Mul<Scale<T, U1, U2>> for Vector2D<T, U1> {
+    type Output = Vector2D<T, U2>;
+    #[inline]
+    fn mul(self, scale: Scale<T, U1, U2>) -> Self::Output {
+        vec2(self.x * scale.get(), self.y * scale.get())
+    }
+}
+
+impl<T: Copy + Div<T, Output = T>, U1, U2> Div<Scale<T, U1, U2>> for Vector2D<T, U2> {
+    type Output = Vector2D<T, U1>;
+    #[inline]
+    fn div(self, scale: Scale<T, U1, U2>) -> Self::Output {
+        vec2(self.x / scale.get(), self.y / scale.get())
+    }
+}
+
+
+impl<T: Round, U> Vector2D<T, U> {
+    /// Rounds each component to the nearest integer value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    /// For example `{ -0.1, -0.8 }.round() == { 0.0, -1.0 }`.
+    #[inline]
+    #[must_use]
+    pub fn round(&self) -> Self {
+        vec2(self.x.round(), self.y.round())
+    }
+}
+
+impl<T: Ceil, U> Vector2D<T, U> {
+    /// Rounds each component to the smallest integer equal or greater than the original value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    /// For example `{ -0.1, -0.8 }.ceil() == { 0.0, 0.0 }`.
+    #[inline]
+    #[must_use]
+    pub fn ceil(&self) -> Self {
+        vec2(self.x.ceil(), self.y.ceil())
+    }
+}
+
+impl<T: Floor, U> Vector2D<T, U> {
+    /// Rounds each component to the biggest integer equal or lower than the original value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    /// For example `{ -0.1, -0.8 }.floor() == { -1.0, -1.0 }`.
+    #[inline]
+    #[must_use]
+    pub fn floor(&self) -> Self {
+        vec2(self.x.floor(), self.y.floor())
+    }
+}
+
 impl<T: ApproxEq<T>, U> ApproxEq<Vector2D<T, U>> for Vector2D<T, U> {
     #[inline]
     fn approx_epsilon() -> Self {
@@ -641,6 +643,7 @@ impl<T: ApproxEq<T>, U> ApproxEq<Vector2D<T, U>> for Vector2D<T, U> {
         self.x.approx_eq_eps(&other.x, &eps.x) && self.y.approx_eq_eps(&other.y, &eps.y)
     }
 }
+
 
 impl<T, U> Into<[T; 2]> for Vector2D<T, U> {
     fn into(self) -> [T; 2] {
@@ -685,6 +688,8 @@ where
         vec2(self.x.abs(), self.y.abs())
     }
 }
+
+
 
 /// A 3d Vector tagged with a unit.
 #[repr(C)]
@@ -759,18 +764,6 @@ impl<T: Zero, U> Vector3D<T, U> {
     #[inline]
     pub fn zero() -> Self {
         vec3(Zero::zero(), Zero::zero(), Zero::zero())
-    }
-}
-
-impl<T: Copy + Zero, U> Vector3D<T, U> {
-    #[inline]
-    pub fn to_array_4d(&self) -> [T; 4] {
-        [self.x, self.y, self.z, Zero::zero()]
-    }
-
-    #[inline]
-    pub fn to_tuple_4d(&self) -> (T, T, T, T) {
-        (self.x, self.y, self.z, Zero::zero())
     }
 }
 
@@ -850,10 +843,26 @@ impl<T: Copy, U> Vector3D<T, U> {
         [self.x, self.y, self.z]
     }
 
+    #[inline]
+    pub fn to_array_4d(&self) -> [T; 4]
+    where
+        T: Zero,
+    {
+        [self.x, self.y, self.z, Zero::zero()]
+    }
+
     /// Cast into a tuple with x, y and z.
     #[inline]
     pub fn to_tuple(&self) -> (T, T, T) {
         (self.x, self.y, self.z)
+    }
+
+    #[inline]
+    pub fn to_tuple_4d(&self) -> (T, T, T, T)
+    where
+        T: Zero,
+    {
+        (self.x, self.y, self.z, Zero::zero())
     }
 
     /// Drop the units, preserving only the numeric value.
@@ -1062,74 +1071,6 @@ where
     }
 }
 
-impl<T: Add<T, Output = T>, U> Add for Vector3D<T, U> {
-    type Output = Self;
-    #[inline]
-    fn add(self, other: Self) -> Self {
-        vec3(self.x + other.x, self.y + other.y, self.z + other.z)
-    }
-}
-
-impl<T: Sub<T, Output = T>, U> Sub for Vector3D<T, U> {
-    type Output = Self;
-    #[inline]
-    fn sub(self, other: Self) -> Self {
-        vec3(self.x - other.x, self.y - other.y, self.z - other.z)
-    }
-}
-
-impl<T: Copy + Add<T, Output = T>, U> AddAssign for Vector3D<T, U> {
-    #[inline]
-    fn add_assign(&mut self, other: Self) {
-        *self = *self + other
-    }
-}
-
-impl<T: Copy + Sub<T, Output = T>, U> SubAssign<Vector3D<T, U>> for Vector3D<T, U> {
-    #[inline]
-    fn sub_assign(&mut self, other: Self) {
-        *self = *self - other
-    }
-}
-
-impl<T: Neg<Output = T>, U> Neg for Vector3D<T, U> {
-    type Output = Self;
-    #[inline]
-    fn neg(self) -> Self {
-        vec3(-self.x, -self.y, -self.z)
-    }
-}
-
-impl<T: Copy + Mul<T, Output = T>, U> Mul<T> for Vector3D<T, U> {
-    type Output = Self;
-    #[inline]
-    fn mul(self, scale: T) -> Self {
-        Self::new(self.x * scale, self.y * scale, self.z * scale)
-    }
-}
-
-impl<T: Copy + Div<T, Output = T>, U> Div<T> for Vector3D<T, U> {
-    type Output = Self;
-    #[inline]
-    fn div(self, scale: T) -> Self {
-        Self::new(self.x / scale, self.y / scale, self.z / scale)
-    }
-}
-
-impl<T: Copy + Mul<T, Output = T>, U> MulAssign<T> for Vector3D<T, U> {
-    #[inline]
-    fn mul_assign(&mut self, scale: T) {
-        *self = *self * scale
-    }
-}
-
-impl<T: Copy + Div<T, Output = T>, U> DivAssign<T> for Vector3D<T, U> {
-    #[inline]
-    fn div_assign(&mut self, scale: T) {
-        *self = *self / scale
-    }
-}
-
 impl<T: PartialOrd, U> Vector3D<T, U> {
     /// Returns the vector each component of which are minimum of this vector and another.
     #[inline]
@@ -1161,55 +1102,6 @@ impl<T: PartialOrd, U> Vector3D<T, U> {
         T: Copy,
     {
         self.max(start).min(end)
-    }
-}
-
-impl<T: Copy + Mul<T, Output = T>, U1, U2> Mul<Scale<T, U1, U2>> for Vector3D<T, U1> {
-    type Output = Vector3D<T, U2>;
-    #[inline]
-    fn mul(self, scale: Scale<T, U1, U2>) -> Self::Output {
-        vec3(self.x * scale.get(), self.y * scale.get(), self.z * scale.get())
-    }
-}
-
-impl<T: Copy + Div<T, Output = T>, U1, U2> Div<Scale<T, U1, U2>> for Vector3D<T, U2> {
-    type Output = Vector3D<T, U1>;
-    #[inline]
-    fn div(self, scale: Scale<T, U1, U2>) -> Self::Output {
-        vec3(self.x / scale.get(), self.y / scale.get(), self.z / scale.get())
-    }
-}
-
-impl<T: Round, U> Vector3D<T, U> {
-    /// Rounds each component to the nearest integer value.
-    ///
-    /// This behavior is preserved for negative values (unlike the basic cast).
-    #[inline]
-    #[must_use]
-    pub fn round(&self) -> Self {
-        vec3(self.x.round(), self.y.round(), self.z.round())
-    }
-}
-
-impl<T: Ceil, U> Vector3D<T, U> {
-    /// Rounds each component to the smallest integer equal or greater than the original value.
-    ///
-    /// This behavior is preserved for negative values (unlike the basic cast).
-    #[inline]
-    #[must_use]
-    pub fn ceil(&self) -> Self {
-        vec3(self.x.ceil(), self.y.ceil(), self.z.ceil())
-    }
-}
-
-impl<T: Floor, U> Vector3D<T, U> {
-    /// Rounds each component to the biggest integer equal or lower than the original value.
-    ///
-    /// This behavior is preserved for negative values (unlike the basic cast).
-    #[inline]
-    #[must_use]
-    pub fn floor(&self) -> Self {
-        vec3(self.x.floor(), self.y.floor(), self.z.floor())
     }
 }
 
@@ -1295,6 +1187,125 @@ impl<T: NumCast + Copy, U> Vector3D<T, U> {
     }
 }
 
+
+impl<T: Neg<Output = T>, U> Neg for Vector3D<T, U> {
+    type Output = Self;
+    #[inline]
+    fn neg(self) -> Self {
+        vec3(-self.x, -self.y, -self.z)
+    }
+}
+
+impl<T: Add<T, Output = T>, U> Add for Vector3D<T, U> {
+    type Output = Self;
+    #[inline]
+    fn add(self, other: Self) -> Self {
+        vec3(self.x + other.x, self.y + other.y, self.z + other.z)
+    }
+}
+
+impl<T: Sub<T, Output = T>, U> Sub for Vector3D<T, U> {
+    type Output = Self;
+    #[inline]
+    fn sub(self, other: Self) -> Self {
+        vec3(self.x - other.x, self.y - other.y, self.z - other.z)
+    }
+}
+
+impl<T: Copy + Add<T, Output = T>, U> AddAssign for Vector3D<T, U> {
+    #[inline]
+    fn add_assign(&mut self, other: Self) {
+        *self = *self + other
+    }
+}
+
+impl<T: Copy + Sub<T, Output = T>, U> SubAssign<Vector3D<T, U>> for Vector3D<T, U> {
+    #[inline]
+    fn sub_assign(&mut self, other: Self) {
+        *self = *self - other
+    }
+}
+
+impl<T: Copy + Mul<T, Output = T>, U> Mul<T> for Vector3D<T, U> {
+    type Output = Self;
+    #[inline]
+    fn mul(self, scale: T) -> Self {
+        Self::new(self.x * scale, self.y * scale, self.z * scale)
+    }
+}
+
+impl<T: Copy + Div<T, Output = T>, U> Div<T> for Vector3D<T, U> {
+    type Output = Self;
+    #[inline]
+    fn div(self, scale: T) -> Self {
+        Self::new(self.x / scale, self.y / scale, self.z / scale)
+    }
+}
+
+impl<T: Copy + Mul<T, Output = T>, U> MulAssign<T> for Vector3D<T, U> {
+    #[inline]
+    fn mul_assign(&mut self, scale: T) {
+        *self = *self * scale
+    }
+}
+
+impl<T: Copy + Div<T, Output = T>, U> DivAssign<T> for Vector3D<T, U> {
+    #[inline]
+    fn div_assign(&mut self, scale: T) {
+        *self = *self / scale
+    }
+}
+
+impl<T: Copy + Mul<T, Output = T>, U1, U2> Mul<Scale<T, U1, U2>> for Vector3D<T, U1> {
+    type Output = Vector3D<T, U2>;
+    #[inline]
+    fn mul(self, scale: Scale<T, U1, U2>) -> Self::Output {
+        vec3(self.x * scale.get(), self.y * scale.get(), self.z * scale.get())
+    }
+}
+
+impl<T: Copy + Div<T, Output = T>, U1, U2> Div<Scale<T, U1, U2>> for Vector3D<T, U2> {
+    type Output = Vector3D<T, U1>;
+    #[inline]
+    fn div(self, scale: Scale<T, U1, U2>) -> Self::Output {
+        vec3(self.x / scale.get(), self.y / scale.get(), self.z / scale.get())
+    }
+}
+
+
+impl<T: Round, U> Vector3D<T, U> {
+    /// Rounds each component to the nearest integer value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    #[inline]
+    #[must_use]
+    pub fn round(&self) -> Self {
+        vec3(self.x.round(), self.y.round(), self.z.round())
+    }
+}
+
+impl<T: Ceil, U> Vector3D<T, U> {
+    /// Rounds each component to the smallest integer equal or greater than the original value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    #[inline]
+    #[must_use]
+    pub fn ceil(&self) -> Self {
+        vec3(self.x.ceil(), self.y.ceil(), self.z.ceil())
+    }
+}
+
+impl<T: Floor, U> Vector3D<T, U> {
+    /// Rounds each component to the biggest integer equal or lower than the original value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    #[inline]
+    #[must_use]
+    pub fn floor(&self) -> Self {
+        vec3(self.x.floor(), self.y.floor(), self.z.floor())
+    }
+}
+
 impl<T: ApproxEq<T>, U> ApproxEq<Vector3D<T, U>> for Vector3D<T, U> {
     #[inline]
     fn approx_epsilon() -> Self {
@@ -1311,6 +1322,7 @@ impl<T: ApproxEq<T>, U> ApproxEq<Vector3D<T, U>> for Vector3D<T, U> {
             && self.z.approx_eq_eps(&other.z, &eps.z)
     }
 }
+
 
 impl<T, U> Into<[T; 3]> for Vector3D<T, U> {
     fn into(self) -> [T; 3] {
