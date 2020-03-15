@@ -19,7 +19,7 @@ use num::*;
 
 use num_traits::{NumCast, Signed};
 use core::fmt;
-use core::ops::{Add, Div, Mul, Sub};
+use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 use core::marker::PhantomData;
 use core::cmp::{Eq, PartialEq};
 use core::hash::{Hash};
@@ -442,6 +442,14 @@ impl<T: Add, U> Add for Size2D<T, U> {
     }
 }
 
+impl<T: AddAssign, U> AddAssign for Size2D<T, U> {
+    #[inline]
+    fn add_assign(&mut self, other: Self) {
+        self.width  += other.width;
+        self.height += other.height;
+    }
+}
+
 
 impl<T: Sub, U> Sub for Size2D<T, U> {
     type Output = Size2D<T::Output, U>;
@@ -449,6 +457,14 @@ impl<T: Sub, U> Sub for Size2D<T, U> {
     #[inline]
     fn sub(self, other: Self) -> Self::Output {
         Size2D::new(self.width - other.width, self.height - other.height)
+    }
+}
+
+impl<T: SubAssign, U> SubAssign for Size2D<T, U> {
+    #[inline]
+    fn sub_assign(&mut self, other: Self) {
+        self.width  -= other.width;
+        self.height -= other.height;
     }
 }
 
@@ -462,12 +478,27 @@ impl<T: Clone + Mul, U> Mul<T> for Size2D<T, U> {
     }
 }
 
+impl<T: Clone + MulAssign, U> MulAssign<T> for Size2D<T, U> {
+    #[inline]
+    fn mul_assign(&mut self, other: T) {
+        self.width  *= other.clone();
+        self.height *= other;
+    }
+}
+
 impl<T: Clone + Mul, U1, U2> Mul<Scale<T, U1, U2>> for Size2D<T, U1> {
     type Output = Size2D<T::Output, U2>;
 
     #[inline]
     fn mul(self, scale: Scale<T, U1, U2>) -> Self::Output {
         Size2D::new(self.width * scale.0.clone(), self.height * scale.0)
+    }
+}
+
+impl<T: Clone + MulAssign, U> MulAssign<Scale<T, U, U>> for Size2D<T, U> {
+    #[inline]
+    fn mul_assign(&mut self, other: Scale<T, U, U>) {
+        *self *= other.0;
     }
 }
 
@@ -481,12 +512,27 @@ impl<T: Clone + Div, U> Div<T> for Size2D<T, U> {
     }
 }
 
+impl<T: Clone + DivAssign, U> DivAssign<T> for Size2D<T, U> {
+    #[inline]
+    fn div_assign(&mut self, other: T) {
+        self.width  /= other.clone();
+        self.height /= other;
+    }
+}
+
 impl<T: Clone + Div, U1, U2> Div<Scale<T, U1, U2>> for Size2D<T, U2> {
     type Output = Size2D<T::Output, U1>;
 
     #[inline]
     fn div(self, scale: Scale<T, U1, U2>) -> Self::Output {
         Size2D::new(self.width / scale.0.clone(), self.height / scale.0)
+    }
+}
+
+impl<T: Clone + DivAssign, U> DivAssign<Scale<T, U, U>> for Size2D<T, U> {
+    #[inline]
+    fn div_assign(&mut self, other: Scale<T, U, U>) {
+        *self /= other.0;
     }
 }
 
@@ -610,6 +656,25 @@ mod size2d {
         }
 
         #[test]
+        pub fn test_add_assign() {
+            let mut s = Size2D::new(1.0, 2.0);
+            s += Size2D::new(3.0, 4.0);
+            assert_eq!(s, Size2D::new(4.0, 6.0));
+
+            let mut s = Size2D::new(1.0, 2.0);
+            s += Size2D::new(0.0, 0.0);
+            assert_eq!(s, Size2D::new(1.0, 2.0));
+
+            let mut s = Size2D::new(1.0, 2.0);
+            s += Size2D::new(-3.0, -4.0);
+            assert_eq!(s, Size2D::new(-2.0, -2.0));
+
+            let mut s = Size2D::new(0.0, 0.0);
+            s += Size2D::new(0.0, 0.0);
+            assert_eq!(s, Size2D::new(0.0, 0.0));
+        }
+
+        #[test]
         pub fn test_sub() {
             let s1 = Size2D::new(1.0, 2.0);
             let s2 = Size2D::new(3.0, 4.0);
@@ -628,6 +693,25 @@ mod size2d {
             assert_eq!(s1 - s2, Size2D::new(0.0, 0.0));
         }
 
+        #[test]
+        pub fn test_sub_assign() {
+            let mut s = Size2D::new(1.0, 2.0);
+            s -= Size2D::new(3.0, 4.0);
+            assert_eq!(s, Size2D::new(-2.0, -2.0));
+
+            let mut s = Size2D::new(1.0, 2.0);
+            s -= Size2D::new(0.0, 0.0);
+            assert_eq!(s, Size2D::new(1.0, 2.0));
+
+            let mut s = Size2D::new(1.0, 2.0);
+            s -= Size2D::new(-3.0, -4.0);
+            assert_eq!(s, Size2D::new(4.0, 6.0));
+
+            let mut s = Size2D::new(0.0, 0.0);
+            s -= Size2D::new(0.0, 0.0);
+            assert_eq!(s, Size2D::new(0.0, 0.0));
+        }
+
 
         #[test]
         pub fn test_mul_scalar() {
@@ -639,6 +723,15 @@ mod size2d {
         }
 
         #[test]
+        pub fn test_mul_assign_scalar() {
+            let mut s1 = Size2D::new(3.0, 5.0);
+
+            s1 *= 5.0;
+
+            assert_eq!(s1, Size2D::new(15.0, 25.0));
+        }
+
+        #[test]
         pub fn test_mul_scale() {
             let s1 = Size2DMm::new(1.0, 2.0);
             let cm_per_mm: Scale<f32, Mm, Cm> = Scale::new(0.1);
@@ -646,6 +739,16 @@ mod size2d {
             let result = s1 * cm_per_mm;
 
             assert_eq!(result, Size2DCm::new(0.1, 0.2));
+        }
+
+        #[test]
+        pub fn test_mul_assign_scale() {
+            let mut s1 = Size2DMm::new(1.0, 2.0);
+            let scale: Scale<f32, Mm, Mm> = Scale::new(0.1);
+
+            s1 *= scale;
+
+            assert_eq!(s1, Size2DMm::new(0.1, 0.2));
         }
 
 
@@ -659,6 +762,15 @@ mod size2d {
         }
 
         #[test]
+        pub fn test_div_assign_scalar() {
+            let mut s1: Size2D<f32> = Size2D::new(15.0, 25.0);
+
+            s1 /= 5.0;
+
+            assert_eq!(s1, Size2D::new(3.0, 5.0));
+        }
+
+        #[test]
         pub fn test_div_scale() {
             let s1 = Size2DCm::new(0.1, 0.2);
             let cm_per_mm: Scale<f32, Mm, Cm> = Scale::new(0.1);
@@ -666,6 +778,16 @@ mod size2d {
             let result = s1 / cm_per_mm;
 
             assert_eq!(result, Size2DMm::new(1.0, 2.0));
+        }
+
+        #[test]
+        pub fn test_div_assign_scale() {
+            let mut s1 = Size2DMm::new(0.1, 0.2);
+            let scale: Scale<f32, Mm, Mm> = Scale::new(0.1);
+
+            s1 /= scale;
+
+            assert_eq!(s1, Size2DMm::new(1.0, 2.0));
         }
     }
 }
@@ -1087,6 +1209,15 @@ impl<T: Add, U> Add for Size3D<T, U> {
     }
 }
 
+impl<T: AddAssign, U> AddAssign for Size3D<T, U> {
+    #[inline]
+    fn add_assign(&mut self, other: Self) {
+        self.width  += other.width;
+        self.height += other.height;
+        self.depth  += other.depth;
+    }
+}
+
 
 impl<T: Sub, U> Sub for Size3D<T, U> {
     type Output = Size3D<T::Output, U>;
@@ -1094,6 +1225,15 @@ impl<T: Sub, U> Sub for Size3D<T, U> {
     #[inline]
     fn sub(self, other: Self) -> Self::Output {
         Size3D::new(self.width - other.width, self.height - other.height, self.depth - other.depth)
+    }
+}
+
+impl<T: SubAssign, U> SubAssign for Size3D<T, U> {
+    #[inline]
+    fn sub_assign(&mut self, other: Self) {
+        self.width  -= other.width;
+        self.height -= other.height;
+        self.depth  -= other.depth;
     }
 }
 
@@ -1111,6 +1251,15 @@ impl<T: Clone + Mul, U> Mul<T> for Size3D<T, U> {
     }
 }
 
+impl<T: Clone + MulAssign, U> MulAssign<T> for Size3D<T, U> {
+    #[inline]
+    fn mul_assign(&mut self, other: T) {
+        self.width  *= other.clone();
+        self.height *= other.clone();
+        self.depth  *= other;
+    }
+}
+
 impl<T: Clone + Mul, U1, U2> Mul<Scale<T, U1, U2>> for Size3D<T, U1> {
     type Output = Size3D<T::Output, U2>;
 
@@ -1121,6 +1270,13 @@ impl<T: Clone + Mul, U1, U2> Mul<Scale<T, U1, U2>> for Size3D<T, U1> {
             self.height * scale.0.clone(),
             self.depth  * scale.0
         )
+    }
+}
+
+impl<T: Clone + MulAssign, U> MulAssign<Scale<T, U, U>> for Size3D<T, U> {
+    #[inline]
+    fn mul_assign(&mut self, other: Scale<T, U, U>) {
+        *self *= other.0;
     }
 }
 
@@ -1138,6 +1294,15 @@ impl<T: Clone + Div, U> Div<T> for Size3D<T, U> {
     }
 }
 
+impl<T: Clone + DivAssign, U> DivAssign<T> for Size3D<T, U> {
+    #[inline]
+    fn div_assign(&mut self, other: T) {
+        self.width  /= other.clone();
+        self.height /= other.clone();
+        self.depth  /= other;
+    }
+}
+
 impl<T: Clone + Div, U1, U2> Div<Scale<T, U1, U2>> for Size3D<T, U2> {
     type Output = Size3D<T::Output, U1>;
 
@@ -1148,6 +1313,13 @@ impl<T: Clone + Div, U1, U2> Div<Scale<T, U1, U2>> for Size3D<T, U2> {
             self.height / scale.0.clone(),
             self.depth  / scale.0
         )
+    }
+}
+
+impl<T: Clone + DivAssign, U> DivAssign<Scale<T, U, U>> for Size3D<T, U> {
+    #[inline]
+    fn div_assign(&mut self, other: Scale<T, U, U>) {
+        *self /= other.0;
     }
 }
 
@@ -1215,6 +1387,25 @@ mod size3d {
         }
 
         #[test]
+        pub fn test_add_assign() {
+            let mut s = Size3D::new(1.0, 2.0, 3.0);
+            s += Size3D::new(4.0, 5.0, 6.0);
+            assert_eq!(s, Size3D::new(5.0, 7.0, 9.0));
+
+            let mut s = Size3D::new(1.0, 2.0, 3.0);
+            s += Size3D::new(0.0, 0.0, 0.0);
+            assert_eq!(s, Size3D::new(1.0, 2.0, 3.0));
+
+            let mut s = Size3D::new( 1.0,  2.0,  3.0);
+            s += Size3D::new(-4.0, -5.0, -6.0);
+            assert_eq!(s, Size3D::new(-3.0, -3.0, -3.0));
+
+            let mut s = Size3D::new(0.0, 0.0, 0.0);
+            s += Size3D::new(0.0, 0.0, 0.0);
+            assert_eq!(s, Size3D::new(0.0, 0.0, 0.0));
+        }
+
+        #[test]
         pub fn test_sub() {
             let s1 = Size3D::new(1.0, 2.0, 3.0);
             let s2 = Size3D::new(4.0, 5.0, 6.0);
@@ -1233,6 +1424,25 @@ mod size3d {
             assert_eq!(s1 - s2, Size3D::new(0.0, 0.0, 0.0));
         }
 
+        #[test]
+        pub fn test_sub_assign() {
+            let mut s = Size3D::new(1.0, 2.0, 3.0);
+            s -= Size3D::new(4.0, 5.0, 6.0);
+            assert_eq!(s, Size3D::new(-3.0, -3.0, -3.0));
+
+            let mut s = Size3D::new(1.0, 2.0, 3.0);
+            s -= Size3D::new(0.0, 0.0, 0.0);
+            assert_eq!(s, Size3D::new(1.0, 2.0, 3.0));
+
+            let mut s = Size3D::new( 1.0,  2.0,  3.0);
+            s -= Size3D::new(-4.0, -5.0, -6.0);
+            assert_eq!(s, Size3D::new(5.0, 7.0, 9.0));
+
+            let mut s = Size3D::new(0.0, 0.0, 0.0);
+            s -= Size3D::new(0.0, 0.0, 0.0);
+            assert_eq!(s, Size3D::new(0.0, 0.0, 0.0));
+        }
+
 
         #[test]
         pub fn test_mul_scalar() {
@@ -1244,6 +1454,15 @@ mod size3d {
         }
 
         #[test]
+        pub fn test_mul_assign_scalar() {
+            let mut s1: Size3D<f32> = Size3D::new(3.0, 5.0, 7.0);
+
+            s1 *= 5.0;
+
+            assert_eq!(s1, Size3D::new(15.0, 25.0, 35.0));
+        }
+
+        #[test]
         pub fn test_mul_scale() {
             let s1 = Size3DMm::new(1.0, 2.0, 3.0);
             let cm_per_mm: Scale<f32, Mm, Cm> = Scale::new(0.1);
@@ -1251,6 +1470,16 @@ mod size3d {
             let result = s1 * cm_per_mm;
 
             assert_eq!(result, Size3DCm::new(0.1, 0.2, 0.3));
+        }
+
+        #[test]
+        pub fn test_mul_assign_scale() {
+            let mut s1 = Size3DMm::new(1.0, 2.0, 3.0);
+            let scale: Scale<f32, Mm, Mm> = Scale::new(0.1);
+
+            s1 *= scale;
+
+            assert_eq!(s1, Size3DMm::new(0.1, 0.2, 0.3));
         }
 
 
@@ -1264,6 +1493,15 @@ mod size3d {
         }
 
         #[test]
+        pub fn test_div_assign_scalar() {
+            let mut s1: Size3D<f32> = Size3D::new(15.0, 25.0, 35.0);
+
+            s1 /= 5.0;
+
+            assert_eq!(s1, Size3D::new(3.0, 5.0, 7.0));
+        }
+
+        #[test]
         pub fn test_div_scale() {
             let s1 = Size3DCm::new(0.1, 0.2, 0.3);
             let cm_per_mm: Scale<f32, Mm, Cm> = Scale::new(0.1);
@@ -1271,6 +1509,16 @@ mod size3d {
             let result = s1 / cm_per_mm;
 
             assert_eq!(result, Size3DMm::new(1.0, 2.0, 3.0));
+        }
+
+        #[test]
+        pub fn test_div_assign_scale() {
+            let mut s1 = Size3DMm::new(0.1, 0.2, 0.3);
+            let scale: Scale<f32, Mm, Mm> = Scale::new(0.1);
+
+            s1 /= scale;
+
+            assert_eq!(s1, Size3DMm::new(1.0, 2.0, 3.0));
         }
     }
 }
