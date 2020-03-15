@@ -9,13 +9,14 @@
 
 use super::UnknownUnit;
 use approxeq::ApproxEq;
+use approxord::{min, max};
 use length::Length;
 use scale::Scale;
 use size::{Size2D, Size3D};
 #[cfg(feature = "mint")]
 use mint;
 use num::*;
-use num_traits::{Float, NumCast};
+use num_traits::NumCast;
 use vector::{Vector2D, Vector3D, vec2, vec3};
 use core::fmt;
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
@@ -255,19 +256,26 @@ impl<T: Sub<T, Output = T>, U> Sub<Vector2D<T, U>> for Point2D<T, U> {
     }
 }
 
-impl<T: Float, U> Point2D<T, U> {
+impl<T: PartialOrd, U> Point2D<T, U> {
     #[inline]
     pub fn min(self, other: Self) -> Self {
-        point2(self.x.min(other.x), self.y.min(other.y))
+        point2(min(self.x, other.x), min(self.y, other.y))
     }
 
     #[inline]
     pub fn max(self, other: Self) -> Self {
-        point2(self.x.max(other.x), self.y.max(other.y))
+        point2(max(self.x, other.x), max(self.y, other.y))
     }
 
+    /// Returns the point each component of which clamped by corresponding
+    /// components of `start` and `end`.
+    ///
+    /// Shortcut for `self.max(start).min(end)`.
     #[inline]
-    pub fn clamp(&self, start: Self, end: Self) -> Self {
+    pub fn clamp(&self, start: Self, end: Self) -> Self
+    where
+        T: Copy,
+    {
         self.max(start).min(end)
     }
 }
@@ -780,27 +788,34 @@ impl<T: Copy + Div<T, Output = T>, U1, U2> Div<Scale<T, U1, U2>> for Point3D<T, 
     }
 }
 
-impl<T: Float, U> Point3D<T, U> {
+impl<T: PartialOrd, U> Point3D<T, U> {
     #[inline]
     pub fn min(self, other: Self) -> Self {
         point3(
-            self.x.min(other.x),
-            self.y.min(other.y),
-            self.z.min(other.z),
+            min(self.x, other.x),
+            min(self.y, other.y),
+            min(self.z, other.z),
         )
     }
 
     #[inline]
     pub fn max(self, other: Self) -> Self {
         point3(
-            self.x.max(other.x),
-            self.y.max(other.y),
-            self.z.max(other.z),
+            max(self.x, other.x),
+            max(self.y, other.y),
+            max(self.z, other.z),
         )
     }
 
+    /// Returns the point each component of which clamped by corresponding
+    /// components of `start` and `end`.
+    ///
+    /// Shortcut for `self.max(start).min(end)`.
     #[inline]
-    pub fn clamp(&self, start: Self, end: Self) -> Self {
+    pub fn clamp(&self, start: Self, end: Self) -> Self
+    where
+        T: Copy,
+    {
         self.max(start).min(end)
     }
 }

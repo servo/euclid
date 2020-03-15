@@ -9,6 +9,7 @@
 
 use super::UnknownUnit;
 use approxeq::ApproxEq;
+use approxord::{min, max};
 use length::Length;
 #[cfg(feature = "mint")]
 use mint;
@@ -428,24 +429,28 @@ impl<T: Neg<Output = T>, U> Neg for Vector2D<T, U> {
     }
 }
 
-impl<T: Float, U> Vector2D<T, U> {
+impl<T: PartialOrd, U> Vector2D<T, U> {
     /// Returns the vector each component of which are minimum of this vector and another.
     #[inline]
     pub fn min(self, other: Self) -> Self {
-        vec2(self.x.min(other.x), self.y.min(other.y))
+        vec2(min(self.x, other.x), min(self.y, other.y))
     }
 
     /// Returns the vector each component of which are maximum of this vector and another.
     #[inline]
     pub fn max(self, other: Self) -> Self {
-        vec2(self.x.max(other.x), self.y.max(other.y))
+        vec2(max(self.x, other.x), max(self.y, other.y))
     }
 
-    /// Returns the vector each component of which is clamped by corresponding components of `start` and `end`.
+    /// Returns the vector each component of which is clamped by corresponding
+    /// components of `start` and `end`.
     ///
     /// Shortcut for `self.max(start).min(end)`.
     #[inline]
-    pub fn clamp(&self, start: Self, end: Self) -> Self {
+    pub fn clamp(&self, start: Self, end: Self) -> Self
+    where
+        T: Copy,
+    {
         self.max(start).min(end)
     }
 }
@@ -1100,14 +1105,14 @@ impl<T: Copy + Div<T, Output = T>, U> DivAssign<T> for Vector3D<T, U> {
     }
 }
 
-impl<T: Float, U> Vector3D<T, U> {
+impl<T: PartialOrd, U> Vector3D<T, U> {
     /// Returns the vector each component of which are minimum of this vector and another.
     #[inline]
     pub fn min(self, other: Self) -> Self {
         vec3(
-            self.x.min(other.x),
-            self.y.min(other.y),
-            self.z.min(other.z),
+            min(self.x, other.x),
+            min(self.y, other.y),
+            min(self.z, other.z),
         )
     }
 
@@ -1115,17 +1120,21 @@ impl<T: Float, U> Vector3D<T, U> {
     #[inline]
     pub fn max(self, other: Self) -> Self {
         vec3(
-            self.x.max(other.x),
-            self.y.max(other.y),
-            self.z.max(other.z),
+            max(self.x, other.x),
+            max(self.y, other.y),
+            max(self.z, other.z),
         )
     }
 
-    /// Returns the vector each component of which is clamped by corresponding components of `start` and `end`.
+    /// Returns the vector each component of which is clamped by corresponding
+    /// components of `start` and `end`.
     ///
     /// Shortcut for `self.max(start).min(end)`.
     #[inline]
-    pub fn clamp(&self, start: Self, end: Self) -> Self {
+    pub fn clamp(&self, start: Self, end: Self) -> Self
+    where
+        T: Copy,
+    {
         self.max(start).min(end)
     }
 }

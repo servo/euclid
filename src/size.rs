@@ -8,6 +8,7 @@
 // except according to those terms.
 
 use super::UnknownUnit;
+use approxord::{max, min};
 #[cfg(feature = "mint")]
 use mint;
 use length::Length;
@@ -16,7 +17,7 @@ use vector::{Vector2D, vec2, BoolVector2D};
 use vector::{Vector3D, vec3, BoolVector3D};
 use num::*;
 
-use num_traits::{Float, NumCast, Signed};
+use num_traits::{NumCast, Signed};
 use core::fmt;
 use core::ops::{Add, Div, Mul, Sub};
 use core::marker::PhantomData;
@@ -419,13 +420,13 @@ impl<T: PartialEq, U> Size2D<T, U> {
     }
 }
 
-impl<T: Float, U> Size2D<T, U> {
+impl<T: PartialOrd, U> Size2D<T, U> {
     /// Returns the size each component of which are minimum of this size and another.
     #[inline]
     pub fn min(self, other: Self) -> Self {
         size2(
-            self.width.min(other.width),
-            self.height.min(other.height),
+            min(self.width,  other.width),
+            min(self.height, other.height),
         )
     }
 
@@ -433,16 +434,20 @@ impl<T: Float, U> Size2D<T, U> {
     #[inline]
     pub fn max(self, other: Self) -> Self {
         size2(
-            self.width.max(other.width),
-            self.height.max(other.height),
+            max(self.width,  other.width),
+            max(self.height, other.height),
         )
     }
 
-    /// Returns the size each component of which clamped by corresponding components of `start` and `end`.
+    /// Returns the size each component of which clamped by corresponding
+    /// components of `start` and `end`.
     ///
     /// Shortcut for `self.max(start).min(end)`.
     #[inline]
-    pub fn clamp(&self, start: Self, end: Self) -> Self {
+    pub fn clamp(&self, start: Self, end: Self) -> Self
+    where
+        T: Copy,
+    {
         self.max(start).min(end)
     }
 }
@@ -961,14 +966,14 @@ impl<T: PartialEq, U> Size3D<T, U> {
     }
 }
 
-impl<T: Float, U> Size3D<T, U> {
+impl<T: PartialOrd, U> Size3D<T, U> {
     /// Returns the size each component of which are minimum of this size and another.
     #[inline]
     pub fn min(self, other: Self) -> Self {
         size3(
-            self.width.min(other.width),
-            self.height.min(other.height),
-            self.depth.min(other.depth),
+            min(self.width,  other.width),
+            min(self.height, other.height),
+            min(self.depth,  other.depth),
         )
     }
 
@@ -976,17 +981,21 @@ impl<T: Float, U> Size3D<T, U> {
     #[inline]
     pub fn max(self, other: Self) -> Self {
         size3(
-            self.width.max(other.width),
-            self.height.max(other.height),
-            self.depth.max(other.depth),
+            max(self.width,  other.width),
+            max(self.height, other.height),
+            max(self.depth,  other.depth),
         )
     }
 
-    /// Returns the size each component of which clamped by corresponding components of `start` and `end`.
+    /// Returns the size each component of which clamped by corresponding
+    /// components of `start` and `end`.
     ///
     /// Shortcut for `self.max(start).min(end)`.
     #[inline]
-    pub fn clamp(&self, start: Self, end: Self) -> Self {
+    pub fn clamp(&self, start: Self, end: Self) -> Self
+    where
+        T: Copy,
+    {
         self.max(start).min(end)
     }
 }
