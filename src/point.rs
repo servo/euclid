@@ -91,20 +91,6 @@ impl<T, U> Hash for Point2D<T, U>
 
 mint_vec!(Point2D[x, y] = Point2);
 
-impl<T: Zero, U> Point2D<T, U> {
-    /// Constructor, setting all components to zero.
-    #[inline]
-    pub fn origin() -> Self {
-        point2(Zero::zero(), Zero::zero())
-    }
-
-    /// The same as [`origin()`](#method.origin).
-    #[inline]
-    pub fn zero() -> Self {
-        Self::origin()
-    }
-}
-
 impl<T: Copy + Zero, U> Point2D<T, U> {
     /// Convert into a 3d point.
     #[inline]
@@ -131,7 +117,26 @@ impl<T: Default, U> Default for Point2D<T, U> {
     }
 }
 
+
 impl<T, U> Point2D<T, U> {
+    /// Constructor, setting all components to zero.
+    #[inline]
+    pub fn origin() -> Self
+    where
+        T: Zero,
+    {
+        point2(Zero::zero(), Zero::zero())
+    }
+
+    /// The same as [`origin()`](#method.origin).
+    #[inline]
+    pub fn zero() -> Self
+    where
+        T: Zero,
+    {
+        Self::origin()
+    }
+
     /// Constructor taking scalar values directly.
     #[inline]
     pub const fn new(x: T, y: T) -> Self {
@@ -596,6 +601,8 @@ impl<T, U> From<(T, T)> for Point2D<T, U> {
     }
 }
 
+
+
 /// A 3d Point tagged with a unit.
 #[repr(C)]
 pub struct Point3D<T, U> {
@@ -664,20 +671,6 @@ impl<T, U> Hash for Point3D<T, U>
     }
 }
 
-impl<T: Zero, U> Point3D<T, U> {
-    /// Constructor, setting all components to zero.
-    #[inline]
-    pub fn origin() -> Self {
-        point3(Zero::zero(), Zero::zero(), Zero::zero())
-    }
-
-    /// The same as [`origin()`](#method.origin).
-    #[inline]
-    pub fn zero() -> Self {
-        Self::origin()
-    }
-}
-
 impl<T: Copy + One, U> Point3D<T, U> {
     #[inline]
     pub fn to_array_4d(&self) -> [T; 4] {
@@ -743,7 +736,26 @@ impl<T: Default, U> Default for Point3D<T, U> {
     }
 }
 
+
 impl<T, U> Point3D<T, U> {
+    /// Constructor, setting all components to zero.
+    #[inline]
+    pub fn origin() -> Self
+    where
+        T: Zero,
+    {
+        point3(Zero::zero(), Zero::zero(), Zero::zero())
+    }
+
+    /// The same as [`origin()`](#method.origin).
+    #[inline]
+    pub fn zero() -> Self
+    where
+        T: Zero,
+    {
+        Self::origin()
+    }
+
     /// Constructor taking scalar values directly.
     #[inline]
     pub const fn new(x: T, y: T, z: T) -> Self {
