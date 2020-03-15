@@ -581,6 +581,14 @@ impl<T: Clone + Mul, U1, U2> Mul<Scale<T, U1, U2>> for Vector2D<T, U1> {
     }
 }
 
+impl<T: Clone + MulAssign, U> MulAssign<Scale<T, U, U>> for Vector2D<T, U> {
+    #[inline]
+    fn mul_assign(&mut self, scale: Scale<T, U, U>) {
+        self.x *= scale.0.clone();
+        self.y *= scale.0;
+    }
+}
+
 
 impl<T: Clone + Div, U> Div<T> for Vector2D<T, U> {
     type Output = Vector2D<T::Output, U>;
@@ -604,6 +612,14 @@ impl<T: Clone + Div, U1, U2> Div<Scale<T, U1, U2>> for Vector2D<T, U2> {
     #[inline]
     fn div(self, scale: Scale<T, U1, U2>) -> Self::Output {
         vec2(self.x / scale.0.clone(), self.y / scale.0)
+    }
+}
+
+impl<T: Clone + DivAssign, U> DivAssign<Scale<T, U, U>> for Vector2D<T, U> {
+    #[inline]
+    fn div_assign(&mut self, scale: Scale<T, U, U>) {
+        self.x /= scale.0.clone();
+        self.y /= scale.0;
     }
 }
 
@@ -1273,6 +1289,15 @@ impl<T: Clone + Mul, U1, U2> Mul<Scale<T, U1, U2>> for Vector3D<T, U1> {
     }
 }
 
+impl<T: Clone + MulAssign, U> MulAssign<Scale<T, U, U>> for Vector3D<T, U> {
+    #[inline]
+    fn mul_assign(&mut self, scale: Scale<T, U, U>) {
+        self.x *= scale.0.clone();
+        self.y *= scale.0.clone();
+        self.z *= scale.0;
+    }
+}
+
 
 impl<T: Clone + Div, U> Div<T> for Vector3D<T, U> {
     type Output = Vector3D<T::Output, U>;
@@ -1300,6 +1325,15 @@ impl<T: Clone + Div, U1, U2> Div<Scale<T, U1, U2>> for Vector3D<T, U2> {
     #[inline]
     fn div(self, scale: Scale<T, U1, U2>) -> Self::Output {
         vec3(self.x / scale.0.clone(), self.y / scale.0.clone(), self.z / scale.0)
+    }
+}
+
+impl<T: Clone + DivAssign, U> DivAssign<Scale<T, U, U>> for Vector3D<T, U> {
+    #[inline]
+    fn div_assign(&mut self, scale: Scale<T, U, U>) {
+        self.x /= scale.0.clone();
+        self.y /= scale.0.clone();
+        self.z /= scale.0;
     }
 }
 
