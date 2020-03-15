@@ -623,6 +623,13 @@ impl<T: Clone + DivAssign, U> DivAssign<Scale<T, U, U>> for Point2D<T, U> {
 }
 
 
+impl<T: Zero, U> Zero for Point2D<T, U> {
+    #[inline]
+    fn zero() -> Self {
+        Self::origin()
+    }
+}
+
 impl<T: Round, U> Round for Point2D<T, U> {
     /// See [Point2D::round()](#method.round)
     #[inline]
@@ -1335,6 +1342,13 @@ impl<T: Clone + DivAssign, U> DivAssign<Scale<T, U, U>> for Point3D<T, U> {
     }
 }
 
+
+impl<T: Zero, U> Zero for Point3D<T, U> {
+    #[inline]
+    fn zero() -> Self {
+        Self::origin()
+    }
+}
 
 impl<T: Round, U> Round for Point3D<T, U> {
     /// See [Point3D::round()](#method.round)
