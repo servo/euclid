@@ -268,6 +268,63 @@ impl<T: Copy, U> Point2D<T, U> {
         point3(self.x, self.y, Zero::zero())
     }
 
+    /// Rounds each component to the nearest integer value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    ///
+    /// ```rust
+    /// # use euclid::point2;
+    /// enum Mm {}
+    ///
+    /// assert_eq!(point2::<_, Mm>(-0.1, -0.8).round(), point2::<_, Mm>(0.0, -1.0))
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn round(&self) -> Self
+    where
+        T: Round,
+    {
+        point2(self.x.round(), self.y.round())
+    }
+
+    /// Rounds each component to the smallest integer equal or greater than the original value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    ///
+    /// ```rust
+    /// # use euclid::point2;
+    /// enum Mm {}
+    ///
+    /// assert_eq!(point2::<_, Mm>(-0.1, -0.8).ceil(), point2::<_, Mm>(0.0, 0.0))
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn ceil(&self) -> Self
+    where
+        T: Ceil,
+    {
+        point2(self.x.ceil(), self.y.ceil())
+    }
+
+    /// Rounds each component to the biggest integer equal or lower than the original value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    ///
+    /// ```rust
+    /// # use euclid::point2;
+    /// enum Mm {}
+    ///
+    /// assert_eq!(point2::<_, Mm>(-0.1, -0.8).floor(), point2::<_, Mm>(-1.0, -1.0))
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn floor(&self) -> Self
+    where
+        T: Floor,
+    {
+        point2(self.x.floor(), self.y.floor())
+    }
+
     /// Linearly interpolate between this point and another point.
     ///
     /// When `t` is `One::one()`, returned value equals to `other`,
@@ -566,63 +623,27 @@ impl<T: Clone + DivAssign, U> DivAssign<Scale<T, U, U>> for Point2D<T, U> {
 }
 
 
-impl<T: Round, U> Point2D<T, U> {
-    /// Rounds each component to the nearest integer value.
-    ///
-    /// This behavior is preserved for negative values (unlike the basic cast).
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// # use euclid::point2;
-    /// enum Mm {}
-    ///
-    /// assert_eq!(point2::<_, Mm>(-0.1, -0.8).round(), point2::<_, Mm>(0.0, -1.0))
-    /// ```
+impl<T: Round, U> Round for Point2D<T, U> {
+    /// See [Point2D::round()](#method.round)
     #[inline]
-    #[must_use]
-    pub fn round(&self) -> Self {
-        point2(self.x.round(), self.y.round())
+    fn round(self) -> Self {
+        (&self).round()
     }
 }
 
-impl<T: Ceil, U> Point2D<T, U> {
-    /// Rounds each component to the smallest integer equal or greater than the original value.
-    ///
-    /// This behavior is preserved for negative values (unlike the basic cast).
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// # use euclid::point2;
-    /// enum Mm {}
-    ///
-    /// assert_eq!(point2::<_, Mm>(-0.1, -0.8).ceil(), point2::<_, Mm>(0.0, 0.0))
-    /// ```
+impl<T: Ceil, U> Ceil for Point2D<T, U> {
+    /// See [Point2D::ceil()](#method.ceil)
     #[inline]
-    #[must_use]
-    pub fn ceil(&self) -> Self {
-        point2(self.x.ceil(), self.y.ceil())
+    fn ceil(self) -> Self {
+        (&self).ceil()
     }
 }
 
-impl<T: Floor, U> Point2D<T, U> {
-    /// Rounds each component to the biggest integer equal or lower than the original value.
-    ///
-    /// This behavior is preserved for negative values (unlike the basic cast).
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// # use euclid::point2;
-    /// enum Mm {}
-    ///
-    /// assert_eq!(point2::<_, Mm>(-0.1, -0.8).floor(), point2::<_, Mm>(-1.0, -1.0))
-    /// ```
+impl<T: Floor, U> Floor for Point2D<T, U> {
+    /// See [Point2D::floor()](#method.floor)
     #[inline]
-    #[must_use]
-    pub fn floor(&self) -> Self {
-        point2(self.x.floor(), self.y.floor())
+    fn floor(self) -> Self {
+        (&self).floor()
     }
 }
 
@@ -642,6 +663,7 @@ impl<T: ApproxEq<T>, U> ApproxEq<Point2D<T, U>> for Point2D<T, U> {
         self.x.approx_eq_eps(&other.x, &eps.x) && self.y.approx_eq_eps(&other.y, &eps.y)
     }
 }
+
 
 impl<T, U> Into<[T; 2]> for Point2D<T, U> {
     fn into(self) -> [T; 2] {
@@ -924,6 +946,63 @@ impl<T: Copy, U> Point3D<T, U> {
     #[inline]
     pub fn to_2d(&self) -> Point2D<T, U> {
         self.xy()
+    }
+
+    /// Rounds each component to the nearest integer value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    ///
+    /// ```rust
+    /// # use euclid::point3;
+    /// enum Mm {}
+    ///
+    /// assert_eq!(point3::<_, Mm>(-0.1, -0.8, 0.4).round(), point3::<_, Mm>(0.0, -1.0, 0.0))
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn round(&self) -> Self
+    where
+        T: Round,
+    {
+        point3(self.x.round(), self.y.round(), self.z.round())
+    }
+
+    /// Rounds each component to the smallest integer equal or greater than the original value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    ///
+    /// ```rust
+    /// # use euclid::point3;
+    /// enum Mm {}
+    ///
+    /// assert_eq!(point3::<_, Mm>(-0.1, -0.8, 0.4).ceil(), point3::<_, Mm>(0.0, 0.0, 1.0))
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn ceil(&self) -> Self
+    where
+        T: Ceil,
+    {
+        point3(self.x.ceil(), self.y.ceil(), self.z.ceil())
+    }
+
+    /// Rounds each component to the biggest integer equal or lower than the original value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    ///
+    /// ```rust
+    /// # use euclid::point3;
+    /// enum Mm {}
+    ///
+    /// assert_eq!(point3::<_, Mm>(-0.1, -0.8, 0.4).floor(), point3::<_, Mm>(-1.0, -1.0, 0.0))
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn floor(&self) -> Self
+    where
+        T: Floor,
+    {
+        point3(self.x.floor(), self.y.floor(), self.z.floor())
     }
 
     /// Linearly interpolate between this point and another point.
@@ -1257,63 +1336,27 @@ impl<T: Clone + DivAssign, U> DivAssign<Scale<T, U, U>> for Point3D<T, U> {
 }
 
 
-impl<T: Round, U> Point3D<T, U> {
-    /// Rounds each component to the nearest integer value.
-    ///
-    /// This behavior is preserved for negative values (unlike the basic cast).
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// # use euclid::point3;
-    /// enum Mm {}
-    ///
-    /// assert_eq!(point3::<_, Mm>(-0.1, -0.8, 0.4).round(), point3::<_, Mm>(0.0, -1.0, 0.0))
-    /// ```
+impl<T: Round, U> Round for Point3D<T, U> {
+    /// See [Point3D::round()](#method.round)
     #[inline]
-    #[must_use]
-    pub fn round(&self) -> Self {
-        point3(self.x.round(), self.y.round(), self.z.round())
+    fn round(self) -> Self {
+        (&self).round()
     }
 }
 
-impl<T: Ceil, U> Point3D<T, U> {
-    /// Rounds each component to the smallest integer equal or greater than the original value.
-    ///
-    /// This behavior is preserved for negative values (unlike the basic cast).
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// # use euclid::point3;
-    /// enum Mm {}
-    ///
-    /// assert_eq!(point3::<_, Mm>(-0.1, -0.8, 0.4).ceil(), point3::<_, Mm>(0.0, 0.0, 1.0))
-    /// ```
+impl<T: Ceil, U> Ceil for Point3D<T, U> {
+    /// See [Point3D::ceil()](#method.ceil)
     #[inline]
-    #[must_use]
-    pub fn ceil(&self) -> Self {
-        point3(self.x.ceil(), self.y.ceil(), self.z.ceil())
+    fn ceil(self) -> Self {
+        (&self).ceil()
     }
 }
 
-impl<T: Floor, U> Point3D<T, U> {
-    /// Rounds each component to the biggest integer equal or lower than the original value.
-    ///
-    /// This behavior is preserved for negative values (unlike the basic cast).
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// # use euclid::point3;
-    /// enum Mm {}
-    ///
-    /// assert_eq!(point3::<_, Mm>(-0.1, -0.8, 0.4).floor(), point3::<_, Mm>(-1.0, -1.0, 0.0))
-    /// ```
+impl<T: Floor, U> Floor for Point3D<T, U> {
+    /// See [Point3D::floor()](#method.floor)
     #[inline]
-    #[must_use]
-    pub fn floor(&self) -> Self {
-        point3(self.x.floor(), self.y.floor(), self.z.floor())
+    fn floor(self) -> Self {
+        (&self).floor()
     }
 }
 
@@ -1338,6 +1381,7 @@ impl<T: ApproxEq<T>, U> ApproxEq<Point3D<T, U>> for Point3D<T, U> {
             && self.z.approx_eq_eps(&other.z, &eps.z)
     }
 }
+
 
 impl<T, U> Into<[T; 3]> for Point3D<T, U> {
     fn into(self) -> [T; 3] {
