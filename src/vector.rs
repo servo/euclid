@@ -512,6 +512,15 @@ impl<T: NumCast + Copy, U> Vector2D<T, U> {
 }
 
 
+impl<T: Neg<Output = T>, U> Neg for Vector2D<T, U> {
+    type Output = Self;
+    #[inline]
+    fn neg(self) -> Self {
+        vec2(-self.x, -self.y)
+    }
+}
+
+
 impl<T: Add<T, Output = T>, U> Add for Vector2D<T, U> {
     type Output = Self;
     fn add(self, other: Self) -> Self {
@@ -525,6 +534,7 @@ impl<T: Copy + Add<T, Output = T>, U> AddAssign for Vector2D<T, U> {
         *self = *self + other
     }
 }
+
 
 impl<T: Copy + Sub<T, Output = T>, U> SubAssign<Vector2D<T, U>> for Vector2D<T, U> {
     #[inline]
@@ -541,14 +551,6 @@ impl<T: Sub<T, Output = T>, U> Sub for Vector2D<T, U> {
     }
 }
 
-impl<T: Neg<Output = T>, U> Neg for Vector2D<T, U> {
-    type Output = Self;
-    #[inline]
-    fn neg(self) -> Self {
-        vec2(-self.x, -self.y)
-    }
-}
-
 impl<T: Copy + Mul<T, Output = T>, U> Mul<T> for Vector2D<T, U> {
     type Output = Self;
     #[inline]
@@ -556,6 +558,7 @@ impl<T: Copy + Mul<T, Output = T>, U> Mul<T> for Vector2D<T, U> {
         vec2(self.x * scale, self.y * scale)
     }
 }
+
 
 impl<T: Copy + Div<T, Output = T>, U> Div<T> for Vector2D<T, U> {
     type Output = Self;
@@ -1196,19 +1199,12 @@ impl<T: Neg<Output = T>, U> Neg for Vector3D<T, U> {
     }
 }
 
+
 impl<T: Add<T, Output = T>, U> Add for Vector3D<T, U> {
     type Output = Self;
     #[inline]
     fn add(self, other: Self) -> Self {
         vec3(self.x + other.x, self.y + other.y, self.z + other.z)
-    }
-}
-
-impl<T: Sub<T, Output = T>, U> Sub for Vector3D<T, U> {
-    type Output = Self;
-    #[inline]
-    fn sub(self, other: Self) -> Self {
-        vec3(self.x - other.x, self.y - other.y, self.z - other.z)
     }
 }
 
@@ -1219,12 +1215,22 @@ impl<T: Copy + Add<T, Output = T>, U> AddAssign for Vector3D<T, U> {
     }
 }
 
+
+impl<T: Sub<T, Output = T>, U> Sub for Vector3D<T, U> {
+    type Output = Self;
+    #[inline]
+    fn sub(self, other: Self) -> Self {
+        vec3(self.x - other.x, self.y - other.y, self.z - other.z)
+    }
+}
+
 impl<T: Copy + Sub<T, Output = T>, U> SubAssign<Vector3D<T, U>> for Vector3D<T, U> {
     #[inline]
     fn sub_assign(&mut self, other: Self) {
         *self = *self - other
     }
 }
+
 
 impl<T: Copy + Mul<T, Output = T>, U> Mul<T> for Vector3D<T, U> {
     type Output = Self;
@@ -1234,18 +1240,19 @@ impl<T: Copy + Mul<T, Output = T>, U> Mul<T> for Vector3D<T, U> {
     }
 }
 
+impl<T: Copy + Mul<T, Output = T>, U> MulAssign<T> for Vector3D<T, U> {
+    #[inline]
+    fn mul_assign(&mut self, scale: T) {
+        *self = *self * scale
+    }
+}
+
+
 impl<T: Copy + Div<T, Output = T>, U> Div<T> for Vector3D<T, U> {
     type Output = Self;
     #[inline]
     fn div(self, scale: T) -> Self {
         Self::new(self.x / scale, self.y / scale, self.z / scale)
-    }
-}
-
-impl<T: Copy + Mul<T, Output = T>, U> MulAssign<T> for Vector3D<T, U> {
-    #[inline]
-    fn mul_assign(&mut self, scale: T) {
-        *self = *self * scale
     }
 }
 
