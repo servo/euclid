@@ -1380,7 +1380,7 @@ impl BoolVector2D {
         }
     }
 
-    /// Returns new vector with results of negation operaton on each component.
+    /// Returns new vector with results of negation operation on each component.
     #[inline]
     pub fn not(&self) -> Self {
         BoolVector2D {
@@ -1459,7 +1459,7 @@ impl BoolVector3D {
         }
     }
 
-    /// Returns new vector with results of negation operaton on each component.
+    /// Returns new vector with results of negation operation on each component.
     #[inline]
     pub fn not(&self) -> Self {
         BoolVector3D {
@@ -1530,7 +1530,7 @@ impl BoolVector3D {
 }
 
 impl<T: PartialOrd, U> Vector2D<T, U> {
-    /// Returns vector with results of "greater than" operaton on each component.
+    /// Returns vector with results of "greater than" operation on each component.
     #[inline]
     pub fn greater_than(&self, other: Self) -> BoolVector2D {
         BoolVector2D {
@@ -1539,7 +1539,7 @@ impl<T: PartialOrd, U> Vector2D<T, U> {
         }
     }
 
-    /// Returns vector with results of "lower than" operaton on each component.
+    /// Returns vector with results of "lower than" operation on each component.
     #[inline]
     pub fn lower_than(&self, other: Self) -> BoolVector2D {
         BoolVector2D {
@@ -1551,7 +1551,7 @@ impl<T: PartialOrd, U> Vector2D<T, U> {
 
 
 impl<T: PartialEq, U> Vector2D<T, U> {
-    /// Returns vector with results of "equal" operaton on each component.
+    /// Returns vector with results of "equal" operation on each component.
     #[inline]
     pub fn equal(&self, other: Self) -> BoolVector2D {
         BoolVector2D {
@@ -1560,7 +1560,7 @@ impl<T: PartialEq, U> Vector2D<T, U> {
         }
     }
 
-    /// Returns vector with results of "not equal" operaton on each component.
+    /// Returns vector with results of "not equal" operation on each component.
     #[inline]
     pub fn not_equal(&self, other: Self) -> BoolVector2D {
         BoolVector2D {
@@ -1571,7 +1571,7 @@ impl<T: PartialEq, U> Vector2D<T, U> {
 }
 
 impl<T: PartialOrd, U> Vector3D<T, U> {
-    /// Returns vector with results of "greater than" operaton on each component.
+    /// Returns vector with results of "greater than" operation on each component.
     #[inline]
     pub fn greater_than(&self, other: Self) -> BoolVector3D {
         BoolVector3D {
@@ -1581,7 +1581,7 @@ impl<T: PartialOrd, U> Vector3D<T, U> {
         }
     }
 
-    /// Returns vector with results of "lower than" operaton on each component.
+    /// Returns vector with results of "lower than" operation on each component.
     #[inline]
     pub fn lower_than(&self, other: Self) -> BoolVector3D {
         BoolVector3D {
@@ -1594,7 +1594,7 @@ impl<T: PartialOrd, U> Vector3D<T, U> {
 
 
 impl<T: PartialEq, U> Vector3D<T, U> {
-    /// Returns vector with results of "equal" operaton on each component.
+    /// Returns vector with results of "equal" operation on each component.
     #[inline]
     pub fn equal(&self, other: Self) -> BoolVector3D {
         BoolVector3D {
@@ -1604,7 +1604,7 @@ impl<T: PartialEq, U> Vector3D<T, U> {
         }
     }
 
-    /// Returns vector with results of "not equal" operaton on each component.
+    /// Returns vector with results of "not equal" operation on each component.
     #[inline]
     pub fn not_equal(&self, other: Self) -> BoolVector3D {
         BoolVector3D {

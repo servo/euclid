@@ -207,7 +207,7 @@ impl<T: Zero + PartialOrd, U> Size2D<T, U> {
 }
 
 impl<T: Zero, U> Size2D<T, U> {
-    /// The same as [`Zero::zero()`] but avalible without importing trait.
+    /// The same as [`Zero::zero()`] but available without importing trait.
     ///
     /// [`Zero::zero()`]: ./num/trait.Zero.html#tymethod.zero
     pub fn zero() -> Self {
@@ -383,7 +383,7 @@ where
 }
 
 impl<T: PartialOrd, U> Size2D<T, U> {
-    /// Returns vector with results of "greater then" operaton on each component.
+    /// Returns vector with results of "greater then" operation on each component.
     pub fn greater_than(&self, other: Self) -> BoolVector2D {
         BoolVector2D {
             x: self.width > other.width,
@@ -391,7 +391,7 @@ impl<T: PartialOrd, U> Size2D<T, U> {
         }
     }
 
-    /// Returns vector with results of "lower then" operaton on each component.
+    /// Returns vector with results of "lower then" operation on each component.
     pub fn lower_than(&self, other: Self) -> BoolVector2D {
         BoolVector2D {
             x: self.width < other.width,
@@ -402,7 +402,7 @@ impl<T: PartialOrd, U> Size2D<T, U> {
 
 
 impl<T: PartialEq, U> Size2D<T, U> {
-    /// Returns vector with results of "equal" operaton on each component.
+    /// Returns vector with results of "equal" operation on each component.
     pub fn equal(&self, other: Self) -> BoolVector2D {
         BoolVector2D {
             x: self.width == other.width,
@@ -410,7 +410,7 @@ impl<T: PartialEq, U> Size2D<T, U> {
         }
     }
 
-    /// Returns vector with results of "not equal" operaton on each component.
+    /// Returns vector with results of "not equal" operation on each component.
     pub fn not_equal(&self, other: Self) -> BoolVector2D {
         BoolVector2D {
             x: self.width != other.width,
@@ -749,7 +749,7 @@ impl<T: Zero + PartialOrd, U> Size3D<T, U> {
 }
 
 impl<T: Zero, U> Size3D<T, U> {
-    /// The same as [`Zero::zero()`] but avalible without importing trait.
+    /// The same as [`Zero::zero()`] but available without importing trait.
     ///
     /// [`Zero::zero()`]: ./num/trait.Zero.html#tymethod.zero
     pub fn zero() -> Self {
@@ -921,7 +921,7 @@ where
 }
 
 impl<T: PartialOrd, U> Size3D<T, U> {
-    /// Returns vector with results of "greater than" operaton on each component.
+    /// Returns vector with results of "greater than" operation on each component.
     pub fn greater_than(&self, other: Self) -> BoolVector3D {
         BoolVector3D {
             x: self.width > other.width,
@@ -930,7 +930,7 @@ impl<T: PartialOrd, U> Size3D<T, U> {
         }
     }
 
-    /// Returns vector with results of "lower than" operaton on each component.
+    /// Returns vector with results of "lower than" operation on each component.
     pub fn lower_than(&self, other: Self) -> BoolVector3D {
         BoolVector3D {
             x: self.width < other.width,
@@ -942,7 +942,7 @@ impl<T: PartialOrd, U> Size3D<T, U> {
 
 
 impl<T: PartialEq, U> Size3D<T, U> {
-    /// Returns vector with results of "equal" operaton on each component.
+    /// Returns vector with results of "equal" operation on each component.
     pub fn equal(&self, other: Self) -> BoolVector3D {
         BoolVector3D {
             x: self.width == other.width,
@@ -951,7 +951,7 @@ impl<T: PartialEq, U> Size3D<T, U> {
         }
     }
 
-    /// Returns vector with results of "not equal" operaton on each component.
+    /// Returns vector with results of "not equal" operation on each component.
     pub fn not_equal(&self, other: Self) -> BoolVector3D {
         BoolVector3D {
             x: self.width != other.width,
