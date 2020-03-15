@@ -551,11 +551,27 @@ impl<T: Sub<T, Output = T>, U> Sub for Vector2D<T, U> {
     }
 }
 
+
 impl<T: Copy + Mul<T, Output = T>, U> Mul<T> for Vector2D<T, U> {
     type Output = Self;
     #[inline]
     fn mul(self, scale: T) -> Self {
         vec2(self.x * scale, self.y * scale)
+    }
+}
+
+impl<T: Copy + Mul<T, Output = T>, U> MulAssign<T> for Vector2D<T, U> {
+    #[inline]
+    fn mul_assign(&mut self, scale: T) {
+        *self = *self * scale
+    }
+}
+
+impl<T: Copy + Mul<T, Output = T>, U1, U2> Mul<Scale<T, U1, U2>> for Vector2D<T, U1> {
+    type Output = Vector2D<T, U2>;
+    #[inline]
+    fn mul(self, scale: Scale<T, U1, U2>) -> Self::Output {
+        vec2(self.x * scale.get(), self.y * scale.get())
     }
 }
 
@@ -568,25 +584,10 @@ impl<T: Copy + Div<T, Output = T>, U> Div<T> for Vector2D<T, U> {
     }
 }
 
-impl<T: Copy + Mul<T, Output = T>, U> MulAssign<T> for Vector2D<T, U> {
-    #[inline]
-    fn mul_assign(&mut self, scale: T) {
-        *self = *self * scale
-    }
-}
-
 impl<T: Copy + Div<T, Output = T>, U> DivAssign<T> for Vector2D<T, U> {
     #[inline]
     fn div_assign(&mut self, scale: T) {
         *self = *self / scale
-    }
-}
-
-impl<T: Copy + Mul<T, Output = T>, U1, U2> Mul<Scale<T, U1, U2>> for Vector2D<T, U1> {
-    type Output = Vector2D<T, U2>;
-    #[inline]
-    fn mul(self, scale: Scale<T, U1, U2>) -> Self::Output {
-        vec2(self.x * scale.get(), self.y * scale.get())
     }
 }
 
@@ -1247,6 +1248,14 @@ impl<T: Copy + Mul<T, Output = T>, U> MulAssign<T> for Vector3D<T, U> {
     }
 }
 
+impl<T: Copy + Mul<T, Output = T>, U1, U2> Mul<Scale<T, U1, U2>> for Vector3D<T, U1> {
+    type Output = Vector3D<T, U2>;
+    #[inline]
+    fn mul(self, scale: Scale<T, U1, U2>) -> Self::Output {
+        vec3(self.x * scale.get(), self.y * scale.get(), self.z * scale.get())
+    }
+}
+
 
 impl<T: Copy + Div<T, Output = T>, U> Div<T> for Vector3D<T, U> {
     type Output = Self;
@@ -1260,14 +1269,6 @@ impl<T: Copy + Div<T, Output = T>, U> DivAssign<T> for Vector3D<T, U> {
     #[inline]
     fn div_assign(&mut self, scale: T) {
         *self = *self / scale
-    }
-}
-
-impl<T: Copy + Mul<T, Output = T>, U1, U2> Mul<Scale<T, U1, U2>> for Vector3D<T, U1> {
-    type Output = Vector3D<T, U2>;
-    #[inline]
-    fn mul(self, scale: Scale<T, U1, U2>) -> Self::Output {
-        vec3(self.x * scale.get(), self.y * scale.get(), self.z * scale.get())
     }
 }
 
