@@ -536,18 +536,18 @@ impl<T: Copy + Add<T, Output = T>, U> AddAssign for Vector2D<T, U> {
 }
 
 
-impl<T: Copy + Sub<T, Output = T>, U> SubAssign<Vector2D<T, U>> for Vector2D<T, U> {
-    #[inline]
-    fn sub_assign(&mut self, other: Self) {
-        *self = *self - other
-    }
-}
-
 impl<T: Sub<T, Output = T>, U> Sub for Vector2D<T, U> {
     type Output = Self;
     #[inline]
     fn sub(self, other: Self) -> Self {
         vec2(self.x - other.x, self.y - other.y)
+    }
+}
+
+impl<T: Copy + Sub<T, Output = T>, U> SubAssign<Vector2D<T, U>> for Vector2D<T, U> {
+    #[inline]
+    fn sub_assign(&mut self, other: Self) {
+        *self = *self - other
     }
 }
 
