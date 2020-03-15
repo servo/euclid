@@ -95,10 +95,10 @@ impl<T, U> Hash for Vector2D<T, U>
     }
 }
 
-impl<T: Zero, U> Vector2D<T, U> {
+impl<T: Zero, U> Zero for Vector2D<T, U> {
     /// Constructor, setting all components to zero.
     #[inline]
-    pub fn zero() -> Self {
+    fn zero() -> Self {
         Vector2D::new(Zero::zero(), Zero::zero())
     }
 }
@@ -130,6 +130,15 @@ impl<T: Default, U> Default for Vector2D<T, U> {
 }
 
 impl<T, U> Vector2D<T, U> {
+    /// Constructor, setting all components to zero.
+    #[inline]
+    pub fn zero() -> Self
+    where
+        T: Zero,
+    {
+        Vector2D::new(Zero::zero(), Zero::zero())
+    }
+
     /// Constructor taking scalar values directly.
     #[inline]
     pub const fn new(x: T, y: T) -> Self {
@@ -832,10 +841,10 @@ impl<T, U> Hash for Vector3D<T, U>
     }
 }
 
-impl<T: Zero, U> Vector3D<T, U> {
+impl<T: Zero, U> Zero for Vector3D<T, U> {
     /// Constructor, setting all components to zero.
     #[inline]
-    pub fn zero() -> Self {
+    fn zero() -> Self {
         vec3(Zero::zero(), Zero::zero(), Zero::zero())
     }
 }
@@ -859,6 +868,15 @@ impl<T: Default, U> Default for Vector3D<T, U> {
 }
 
 impl<T, U> Vector3D<T, U> {
+    /// Constructor, setting all components to zero.
+    #[inline]
+    pub fn zero() -> Self
+    where
+        T: Zero,
+    {
+        vec3(Zero::zero(), Zero::zero(), Zero::zero())
+    }
+
     /// Constructor taking scalar values directly.
     #[inline]
     pub const fn new(x: T, y: T, z: T) -> Self {
