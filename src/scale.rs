@@ -15,7 +15,9 @@ use num_traits::NumCast;
 use serde;
 use core::fmt;
 use core::ops::{Add, Div, Mul, Neg, Sub};
+use core::hash::{Hash, Hasher};
 use core::marker::PhantomData;
+use core::cmp::Ordering;
 use {Point2D, Rect, Size2D, Vector2D};
 
 /// A scaling factor between two different units of measurement.
@@ -154,6 +156,7 @@ impl<T, Src, Dst> Scale<T, Src, Dst> {
     ///
     /// assert_eq!(cm_per_mm.is_identity(), false);
     /// assert_eq!(mm_per_mm.is_identity(), true);
+    /// assert_eq!(mm_per_mm, Scale::one());
     /// ```
     #[inline]
     pub fn is_identity(&self) -> bool
@@ -294,6 +297,20 @@ impl<T: PartialEq, Src, Dst> PartialEq for Scale<T, Src, Dst> {
     }
 }
 
+impl<T: Eq, Src, Dst> Eq for Scale<T, Src, Dst> {}
+
+impl<T: PartialOrd, Src, Dst> PartialOrd for Scale<T, Src, Dst> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        self.0.partial_cmp(&other.0)
+    }
+}
+
+impl<T: Ord, Src, Dst> Ord for Scale<T, Src, Dst> {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.0.cmp(&other.0)
+    }
+}
+
 impl<T: Clone, Src, Dst> Clone for Scale<T, Src, Dst> {
     fn clone(&self) -> Scale<T, Src, Dst> {
         Scale::new(self.get())
@@ -311,6 +328,25 @@ impl<T: fmt::Debug, Src, Dst> fmt::Debug for Scale<T, Src, Dst> {
 impl<T: fmt::Display, Src, Dst> fmt::Display for Scale<T, Src, Dst> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         self.0.fmt(f)
+    }
+}
+
+impl<T: Default, Src, Dst> Default for Scale<T, Src, Dst> {
+    fn default() -> Self {
+        Self::new(T::default())
+    }
+}
+
+impl<T: Hash, Src, Dst> Hash for Scale<T, Src, Dst> {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.0.hash(state)
+    }
+}
+
+impl<T: One, Src, Dst> One for Scale<T, Src, Dst> {
+    #[inline]
+    fn one() -> Self {
+        Scale::new(T::one())
     }
 }
 
