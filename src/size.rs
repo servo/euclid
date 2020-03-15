@@ -629,11 +629,7 @@ impl<T, U> Into<mint::Vector2<T>> for Size2D<T, U> {
 impl<T, U> From<Vector2D<T, U>> for Size2D<T, U> {
     #[inline]
     fn from(v: Vector2D<T, U>) -> Self {
-        Size2D {
-            width: v.x,
-            height: v.y,
-            _unit: PhantomData,
-        }
+        size2(v.x, v.y)
     }
 }
 
@@ -1454,12 +1450,6 @@ impl<T: Clone + DivAssign, U> DivAssign<Scale<T, U, U>> for Size3D<T, U> {
 }
 
 
-/// Shorthand for `Size3D::new(w, h, d)`.
-#[inline]
-pub const fn size3<T, U>(w: T, h: T, d: T) -> Size3D<T, U> {
-    Size3D::new(w, h, d)
-}
-
 #[cfg(feature = "mint")]
 impl<T, U> From<mint::Vector3<T>> for Size3D<T, U> {
     #[inline]
@@ -1482,6 +1472,48 @@ impl<T, U> Into<mint::Vector3<T>> for Size3D<T, U> {
             z: self.depth,
         }
     }
+}
+
+impl<T, U> From<Vector3D<T, U>> for Size3D<T, U> {
+    #[inline]
+    fn from(v: Vector3D<T, U>) -> Self {
+        size3(v.x, v.y, v.z)
+    }
+}
+
+impl<T, U> Into<[T; 3]> for Size3D<T, U> {
+    #[inline]
+    fn into(self) -> [T; 3] {
+        [self.width, self.height, self.depth]
+    }
+}
+
+impl<T, U> From<[T; 3]> for Size3D<T, U> {
+    #[inline]
+    fn from([w, h, d]: [T; 3]) -> Self {
+        size3(w, h, d)
+    }
+}
+
+impl<T, U> Into<(T, T, T)> for Size3D<T, U> {
+    #[inline]
+    fn into(self) -> (T, T, T) {
+        (self.width, self.height, self.depth)
+    }
+}
+
+impl<T, U> From<(T, T, T)> for Size3D<T, U> {
+    #[inline]
+    fn from(tuple: (T, T, T)) -> Self {
+        size3(tuple.0, tuple.1, tuple.2)
+    }
+}
+
+
+/// Shorthand for `Size3D::new(w, h, d)`.
+#[inline]
+pub const fn size3<T, U>(w: T, h: T, d: T) -> Size3D<T, U> {
+    Size3D::new(w, h, d)
 }
 
 #[cfg(test)]
