@@ -420,6 +420,15 @@ impl<T: Add, U> Add<Size2D<T, U>> for Point2D<T, U> {
     }
 }
 
+impl<T: Add, U> Add<Vector2D<T, U>> for Point2D<T, U> {
+    type Output = Point2D<T::Output, U>;
+
+    #[inline]
+    fn add(self, other: Vector2D<T, U>) -> Self::Output {
+        point2(self.x + other.x, self.y + other.y)
+    }
+}
+
 impl<T: Copy + Add<T, Output = T>, U> AddAssign<Vector2D<T, U>> for Point2D<T, U> {
     #[inline]
     fn add_assign(&mut self, other: Vector2D<T, U>) {
@@ -431,15 +440,6 @@ impl<T: Copy + Sub<T, Output = T>, U> SubAssign<Vector2D<T, U>> for Point2D<T, U
     #[inline]
     fn sub_assign(&mut self, other: Vector2D<T, U>) {
         *self = *self - other
-    }
-}
-
-impl<T: Add, U> Add<Vector2D<T, U>> for Point2D<T, U> {
-    type Output = Point2D<T::Output, U>;
-
-    #[inline]
-    fn add(self, other: Vector2D<T, U>) -> Self::Output {
-        point2(self.x + other.x, self.y + other.y)
     }
 }
 
@@ -479,6 +479,15 @@ impl<T: Copy + Mul<T, Output = T>, U> MulAssign<T> for Point2D<T, U> {
     }
 }
 
+impl<T: Clone + Mul, U1, U2> Mul<Scale<T, U1, U2>> for Point2D<T, U1> {
+    type Output = Point2D<T::Output, U2>;
+
+    #[inline]
+    fn mul(self, scale: Scale<T, U1, U2>) -> Self::Output {
+        point2(self.x * scale.0.clone(), self.y * scale.0)
+    }
+}
+
 
 impl<T: Clone + Div, U> Div<T> for Point2D<T, U> {
     type Output = Point2D<T::Output, U>;
@@ -493,15 +502,6 @@ impl<T: Copy + Div<T, Output = T>, U> DivAssign<T> for Point2D<T, U> {
     #[inline]
     fn div_assign(&mut self, scale: T) {
         *self = *self / scale
-    }
-}
-
-impl<T: Clone + Mul, U1, U2> Mul<Scale<T, U1, U2>> for Point2D<T, U1> {
-    type Output = Point2D<T::Output, U2>;
-
-    #[inline]
-    fn mul(self, scale: Scale<T, U1, U2>) -> Self::Output {
-        point2(self.x * scale.0.clone(), self.y * scale.0)
     }
 }
 
@@ -1031,6 +1031,15 @@ impl<T: Copy + Add<T, Output = T>, U> Point3D<T, U> {
 }
 
 
+impl<T: Add, U> Add<Vector3D<T, U>> for Point3D<T, U> {
+    type Output = Point3D<T::Output, U>;
+
+    #[inline]
+    fn add(self, other: Vector3D<T, U>) -> Self::Output {
+        point3(self.x + other.x, self.y + other.y, self.z + other.z)
+    }
+}
+
 impl<T: Copy + Add<T, Output = T>, U> AddAssign<Vector3D<T, U>> for Point3D<T, U> {
     #[inline]
     fn add_assign(&mut self, other: Vector3D<T, U>) {
@@ -1043,15 +1052,6 @@ impl<T: Copy + Sub<T, Output = T>, U> SubAssign<Vector3D<T, U>> for Point3D<T, U
     #[inline]
     fn sub_assign(&mut self, other: Vector3D<T, U>) {
         *self = *self - other
-    }
-}
-
-impl<T: Add, U> Add<Vector3D<T, U>> for Point3D<T, U> {
-    type Output = Point3D<T::Output, U>;
-
-    #[inline]
-    fn add(self, other: Vector3D<T, U>) -> Self::Output {
-        point3(self.x + other.x, self.y + other.y, self.z + other.z)
     }
 }
 
