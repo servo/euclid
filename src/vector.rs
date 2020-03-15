@@ -207,6 +207,63 @@ impl<T: Copy, U> Vector2D<T, U> {
     pub fn to_tuple(&self) -> (T, T) {
         (self.x, self.y)
     }
+
+    /// Rounds each component to the nearest integer value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    ///
+    /// ```rust
+    /// # use euclid::vec2;
+    /// enum Mm {}
+    ///
+    /// assert_eq!(vec2::<_, Mm>(-0.1, -0.8).round(), vec2::<_, Mm>(0.0, -1.0))
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn round(&self) -> Self
+    where
+        T: Round,
+    {
+        vec2(self.x.round(), self.y.round())
+    }
+
+    /// Rounds each component to the smallest integer equal or greater than the original value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    ///
+    /// ```rust
+    /// # use euclid::vec2;
+    /// enum Mm {}
+    ///
+    /// assert_eq!(vec2::<_, Mm>(-0.1, -0.8).ceil(), vec2::<_, Mm>(0.0, 0.0))
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn ceil(&self) -> Self
+    where
+        T: Ceil,
+    {
+        vec2(self.x.ceil(), self.y.ceil())
+    }
+
+    /// Rounds each component to the biggest integer equal or lower than the original value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    ///
+    /// ```rust
+    /// # use euclid::vec2;
+    /// enum Mm {}
+    ///
+    /// assert_eq!(vec2::<_, Mm>(-0.1, -0.8).floor(), vec2::<_, Mm>(-1.0, -1.0))
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn floor(&self) -> Self
+    where
+        T: Floor,
+    {
+        vec2(self.x.floor(), self.y.floor())
+    }
 }
 
 impl<T, U> Vector2D<T, U>
@@ -624,39 +681,27 @@ impl<T: Clone + DivAssign, U> DivAssign<Scale<T, U, U>> for Vector2D<T, U> {
 }
 
 
-impl<T: Round, U> Vector2D<T, U> {
-    /// Rounds each component to the nearest integer value.
-    ///
-    /// This behavior is preserved for negative values (unlike the basic cast).
-    /// For example `{ -0.1, -0.8 }.round() == { 0.0, -1.0 }`.
+impl<T: Round, U> Round for Vector2D<T, U> {
+    /// See [`Vector2D::round()`](#method.round)
     #[inline]
-    #[must_use]
-    pub fn round(&self) -> Self {
-        vec2(self.x.round(), self.y.round())
+    fn round(self) -> Self {
+        (&self).round()
     }
 }
 
-impl<T: Ceil, U> Vector2D<T, U> {
-    /// Rounds each component to the smallest integer equal or greater than the original value.
-    ///
-    /// This behavior is preserved for negative values (unlike the basic cast).
-    /// For example `{ -0.1, -0.8 }.ceil() == { 0.0, 0.0 }`.
+impl<T: Ceil, U> Ceil for Vector2D<T, U> {
+    /// See [`Vector2D::ceil()`](#method.ceil)
     #[inline]
-    #[must_use]
-    pub fn ceil(&self) -> Self {
-        vec2(self.x.ceil(), self.y.ceil())
+    fn ceil(self) -> Self {
+        (&self).ceil()
     }
 }
 
-impl<T: Floor, U> Vector2D<T, U> {
-    /// Rounds each component to the biggest integer equal or lower than the original value.
-    ///
-    /// This behavior is preserved for negative values (unlike the basic cast).
-    /// For example `{ -0.1, -0.8 }.floor() == { -1.0, -1.0 }`.
+impl<T: Floor, U> Floor for Vector2D<T, U> {
+    /// See [`Vector2D::floor()`](#method.floor)
     #[inline]
-    #[must_use]
-    pub fn floor(&self) -> Self {
-        vec2(self.x.floor(), self.y.floor())
+    fn floor(self) -> Self {
+        (&self).floor()
     }
 }
 
@@ -909,6 +954,63 @@ impl<T: Copy, U> Vector3D<T, U> {
     #[inline]
     pub fn to_2d(&self) -> Vector2D<T, U> {
         self.xy()
+    }
+
+    /// Rounds each component to the nearest integer value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    ///
+    /// ```rust
+    /// # use euclid::vec3;
+    /// enum Mm {}
+    ///
+    /// assert_eq!(vec3::<_, Mm>(-0.1, -0.8, 0.4).round(), vec3::<_, Mm>(0.0, -1.0, 0.0))
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn round(&self) -> Self
+    where
+        T: Round,
+    {
+        vec3(self.x.round(), self.y.round(), self.z.round())
+    }
+
+    /// Rounds each component to the smallest integer equal or greater than the original value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    ///
+    /// ```rust
+    /// # use euclid::vec3;
+    /// enum Mm {}
+    ///
+    /// assert_eq!(vec3::<_, Mm>(-0.1, -0.8, 0.4).ceil(), vec3::<_, Mm>(0.0, 0.0, 1.0))
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn ceil(&self) -> Self
+    where
+        T: Ceil,
+    {
+        vec3(self.x.ceil(), self.y.ceil(), self.z.ceil())
+    }
+
+    /// Rounds each component to the biggest integer equal or lower than the original value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    ///
+    /// ```rust
+    /// # use euclid::vec3;
+    /// enum Mm {}
+    ///
+    /// assert_eq!(vec3::<_, Mm>(-0.1, -0.8, 0.4).floor(), vec3::<_, Mm>(-1.0, -1.0, 0.0))
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn floor(&self) -> Self
+    where
+        T: Floor,
+    {
+        vec3(self.x.floor(), self.y.floor(), self.z.floor())
     }
 }
 
@@ -1338,36 +1440,27 @@ impl<T: Clone + DivAssign, U> DivAssign<Scale<T, U, U>> for Vector3D<T, U> {
 }
 
 
-impl<T: Round, U> Vector3D<T, U> {
-    /// Rounds each component to the nearest integer value.
-    ///
-    /// This behavior is preserved for negative values (unlike the basic cast).
+impl<T: Round, U> Round for Vector3D<T, U> {
+    /// See [`Vector3D::round()`](#method.round)
     #[inline]
-    #[must_use]
-    pub fn round(&self) -> Self {
-        vec3(self.x.round(), self.y.round(), self.z.round())
+    fn round(self) -> Self {
+        (&self).round()
     }
 }
 
-impl<T: Ceil, U> Vector3D<T, U> {
-    /// Rounds each component to the smallest integer equal or greater than the original value.
-    ///
-    /// This behavior is preserved for negative values (unlike the basic cast).
+impl<T: Ceil, U> Ceil for Vector3D<T, U> {
+    /// See [`Vector3D::ceil()`](#method.ceil)
     #[inline]
-    #[must_use]
-    pub fn ceil(&self) -> Self {
-        vec3(self.x.ceil(), self.y.ceil(), self.z.ceil())
+    fn ceil(self) -> Self {
+        (&self).ceil()
     }
 }
 
-impl<T: Floor, U> Vector3D<T, U> {
-    /// Rounds each component to the biggest integer equal or lower than the original value.
-    ///
-    /// This behavior is preserved for negative values (unlike the basic cast).
+impl<T: Floor, U> Floor for Vector3D<T, U> {
+    /// See [`Vector3D::floor()`](#method.floor)
     #[inline]
-    #[must_use]
-    pub fn floor(&self) -> Self {
-        vec3(self.x.floor(), self.y.floor(), self.z.floor())
+    fn floor(self) -> Self {
+        (&self).floor()
     }
 }
 
