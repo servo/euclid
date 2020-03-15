@@ -512,18 +512,21 @@ impl<T: NumCast + Copy, U> Vector2D<T, U> {
 }
 
 
-impl<T: Neg<Output = T>, U> Neg for Vector2D<T, U> {
-    type Output = Self;
+impl<T: Neg, U> Neg for Vector2D<T, U> {
+    type Output = Vector2D<T::Output, U>;
+
     #[inline]
-    fn neg(self) -> Self {
+    fn neg(self) -> Self::Output {
         vec2(-self.x, -self.y)
     }
 }
 
 
-impl<T: Add<T, Output = T>, U> Add for Vector2D<T, U> {
-    type Output = Self;
-    fn add(self, other: Self) -> Self {
+impl<T: Add, U> Add for Vector2D<T, U> {
+    type Output = Vector2D<T::Output, U>;
+
+    #[inline]
+    fn add(self, other: Self) -> Self::Output {
         Vector2D::new(self.x + other.x, self.y + other.y)
     }
 }
@@ -536,10 +539,11 @@ impl<T: Copy + Add<T, Output = T>, U> AddAssign for Vector2D<T, U> {
 }
 
 
-impl<T: Sub<T, Output = T>, U> Sub for Vector2D<T, U> {
-    type Output = Self;
+impl<T: Sub, U> Sub for Vector2D<T, U> {
+    type Output = Vector2D<T::Output, U>;
+
     #[inline]
-    fn sub(self, other: Self) -> Self {
+    fn sub(self, other: Self) -> Self::Output {
         vec2(self.x - other.x, self.y - other.y)
     }
 }
@@ -552,11 +556,12 @@ impl<T: Copy + Sub<T, Output = T>, U> SubAssign<Vector2D<T, U>> for Vector2D<T, 
 }
 
 
-impl<T: Copy + Mul<T, Output = T>, U> Mul<T> for Vector2D<T, U> {
-    type Output = Self;
+impl<T: Clone + Mul, U> Mul<T> for Vector2D<T, U> {
+    type Output = Vector2D<T::Output, U>;
+
     #[inline]
-    fn mul(self, scale: T) -> Self {
-        vec2(self.x * scale, self.y * scale)
+    fn mul(self, scale: T) -> Self::Output {
+        vec2(self.x * scale.clone(), self.y * scale)
     }
 }
 
@@ -567,20 +572,22 @@ impl<T: Copy + Mul<T, Output = T>, U> MulAssign<T> for Vector2D<T, U> {
     }
 }
 
-impl<T: Copy + Mul<T, Output = T>, U1, U2> Mul<Scale<T, U1, U2>> for Vector2D<T, U1> {
-    type Output = Vector2D<T, U2>;
+impl<T: Clone + Mul, U1, U2> Mul<Scale<T, U1, U2>> for Vector2D<T, U1> {
+    type Output = Vector2D<T::Output, U2>;
+
     #[inline]
     fn mul(self, scale: Scale<T, U1, U2>) -> Self::Output {
-        vec2(self.x * scale.get(), self.y * scale.get())
+        vec2(self.x * scale.0.clone(), self.y * scale.0)
     }
 }
 
 
-impl<T: Copy + Div<T, Output = T>, U> Div<T> for Vector2D<T, U> {
-    type Output = Self;
+impl<T: Clone + Div, U> Div<T> for Vector2D<T, U> {
+    type Output = Vector2D<T::Output, U>;
+
     #[inline]
-    fn div(self, scale: T) -> Self {
-        vec2(self.x / scale, self.y / scale)
+    fn div(self, scale: T) -> Self::Output {
+        vec2(self.x / scale.clone(), self.y / scale)
     }
 }
 
@@ -591,11 +598,12 @@ impl<T: Copy + Div<T, Output = T>, U> DivAssign<T> for Vector2D<T, U> {
     }
 }
 
-impl<T: Copy + Div<T, Output = T>, U1, U2> Div<Scale<T, U1, U2>> for Vector2D<T, U2> {
-    type Output = Vector2D<T, U1>;
+impl<T: Clone + Div, U1, U2> Div<Scale<T, U1, U2>> for Vector2D<T, U2> {
+    type Output = Vector2D<T::Output, U1>;
+
     #[inline]
     fn div(self, scale: Scale<T, U1, U2>) -> Self::Output {
-        vec2(self.x / scale.get(), self.y / scale.get())
+        vec2(self.x / scale.0.clone(), self.y / scale.0)
     }
 }
 
@@ -1192,19 +1200,21 @@ impl<T: NumCast + Copy, U> Vector3D<T, U> {
 }
 
 
-impl<T: Neg<Output = T>, U> Neg for Vector3D<T, U> {
-    type Output = Self;
+impl<T: Neg, U> Neg for Vector3D<T, U> {
+    type Output = Vector3D<T::Output, U>;
+
     #[inline]
-    fn neg(self) -> Self {
+    fn neg(self) -> Self::Output {
         vec3(-self.x, -self.y, -self.z)
     }
 }
 
 
-impl<T: Add<T, Output = T>, U> Add for Vector3D<T, U> {
-    type Output = Self;
+impl<T: Add, U> Add for Vector3D<T, U> {
+    type Output = Vector3D<T::Output, U>;
+
     #[inline]
-    fn add(self, other: Self) -> Self {
+    fn add(self, other: Self) -> Self::Output {
         vec3(self.x + other.x, self.y + other.y, self.z + other.z)
     }
 }
@@ -1217,10 +1227,11 @@ impl<T: Copy + Add<T, Output = T>, U> AddAssign for Vector3D<T, U> {
 }
 
 
-impl<T: Sub<T, Output = T>, U> Sub for Vector3D<T, U> {
-    type Output = Self;
+impl<T: Sub, U> Sub for Vector3D<T, U> {
+    type Output = Vector3D<T::Output, U>;
+
     #[inline]
-    fn sub(self, other: Self) -> Self {
+    fn sub(self, other: Self) -> Self::Output {
         vec3(self.x - other.x, self.y - other.y, self.z - other.z)
     }
 }
@@ -1233,11 +1244,16 @@ impl<T: Copy + Sub<T, Output = T>, U> SubAssign<Vector3D<T, U>> for Vector3D<T, 
 }
 
 
-impl<T: Copy + Mul<T, Output = T>, U> Mul<T> for Vector3D<T, U> {
-    type Output = Self;
+impl<T: Clone + Mul, U> Mul<T> for Vector3D<T, U> {
+    type Output = Vector3D<T::Output, U>;
+
     #[inline]
-    fn mul(self, scale: T) -> Self {
-        Self::new(self.x * scale, self.y * scale, self.z * scale)
+    fn mul(self, scale: T) -> Self::Output {
+        vec3(
+            self.x * scale.clone(),
+            self.y * scale.clone(),
+            self.z * scale
+        )
     }
 }
 
@@ -1248,20 +1264,26 @@ impl<T: Copy + Mul<T, Output = T>, U> MulAssign<T> for Vector3D<T, U> {
     }
 }
 
-impl<T: Copy + Mul<T, Output = T>, U1, U2> Mul<Scale<T, U1, U2>> for Vector3D<T, U1> {
-    type Output = Vector3D<T, U2>;
+impl<T: Clone + Mul, U1, U2> Mul<Scale<T, U1, U2>> for Vector3D<T, U1> {
+    type Output = Vector3D<T::Output, U2>;
+
     #[inline]
     fn mul(self, scale: Scale<T, U1, U2>) -> Self::Output {
-        vec3(self.x * scale.get(), self.y * scale.get(), self.z * scale.get())
+        vec3(self.x * scale.0.clone(), self.y * scale.0.clone(), self.z * scale.0)
     }
 }
 
 
-impl<T: Copy + Div<T, Output = T>, U> Div<T> for Vector3D<T, U> {
-    type Output = Self;
+impl<T: Clone + Div, U> Div<T> for Vector3D<T, U> {
+    type Output = Vector3D<T::Output, U>;
+
     #[inline]
-    fn div(self, scale: T) -> Self {
-        Self::new(self.x / scale, self.y / scale, self.z / scale)
+    fn div(self, scale: T) -> Self::Output {
+        vec3(
+            self.x / scale.clone(),
+            self.y / scale.clone(),
+            self.z / scale
+        )
     }
 }
 
@@ -1272,11 +1294,12 @@ impl<T: Copy + Div<T, Output = T>, U> DivAssign<T> for Vector3D<T, U> {
     }
 }
 
-impl<T: Copy + Div<T, Output = T>, U1, U2> Div<Scale<T, U1, U2>> for Vector3D<T, U2> {
-    type Output = Vector3D<T, U1>;
+impl<T: Clone + Div, U1, U2> Div<Scale<T, U1, U2>> for Vector3D<T, U2> {
+    type Output = Vector3D<T::Output, U1>;
+
     #[inline]
     fn div(self, scale: Scale<T, U1, U2>) -> Self::Output {
-        vec3(self.x / scale.get(), self.y / scale.get(), self.z / scale.get())
+        vec3(self.x / scale.0.clone(), self.y / scale.0.clone(), self.z / scale.0)
     }
 }
 
