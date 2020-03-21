@@ -520,7 +520,7 @@ impl<T: Floor + Ceil + Round + Add<T, Output = T> + Sub<T, Output = T>, U> Rect<
     #[must_use]
     pub fn round(&self) -> Self {
         let origin = self.origin.round();
-        let size = self.origin.add_size(&self.size).round() - origin;
+        let size = (self.origin + self.size).round() - origin;
         Rect::new(origin, Size2D::new(size.x, size.y))
     }
 
@@ -529,7 +529,7 @@ impl<T: Floor + Ceil + Round + Add<T, Output = T> + Sub<T, Output = T>, U> Rect<
     #[must_use]
     pub fn round_in(&self) -> Self {
         let origin = self.origin.ceil();
-        let size = self.origin.add_size(&self.size).floor() - origin;
+        let size = (self.origin + self.size).floor() - origin;
         Rect::new(origin, Size2D::new(size.x, size.y))
     }
 
@@ -538,7 +538,7 @@ impl<T: Floor + Ceil + Round + Add<T, Output = T> + Sub<T, Output = T>, U> Rect<
     #[must_use]
     pub fn round_out(&self) -> Self {
         let origin = self.origin.floor();
-        let size = self.origin.add_size(&self.size).ceil() - origin;
+        let size = (self.origin + self.size).ceil() - origin;
         Rect::new(origin, Size2D::new(size.x, size.y))
     }
 }
