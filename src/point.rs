@@ -1272,7 +1272,7 @@ mod point2d {
 
     mod ops {
         use default::Point2D;
-        use vec2;
+        use {size2, vec2, Vector2D};
         use scale::Scale;
 
         pub enum Mm {}
@@ -1280,6 +1280,16 @@ mod point2d {
 
         pub type Point2DMm<T> = crate::Point2D<T, Mm>;
         pub type Point2DCm<T> = crate::Point2D<T, Cm>;
+
+        #[test]
+        pub fn test_add_size() {
+            let p1 = Point2DMm::new(1.0, 2.0);
+            let p2 = size2(3.0, 4.0);
+
+            let result = p1 + p2;
+
+            assert_eq!(result, Point2DMm::new(4.0, 6.0));
+        }
 
         #[test]
         pub fn test_add_vec() {
@@ -1300,6 +1310,37 @@ mod point2d {
             assert_eq!(p1, Point2DMm::new(4.0, 6.0));
         }
 
+
+        #[test]
+        pub fn test_sub() {
+            let p1 = Point2DMm::new(1.0, 2.0);
+            let p2 = Point2DMm::new(3.0, 4.0);
+
+            let result = p1 - p2;
+
+            assert_eq!(result, Vector2D::<_, Mm>::new(-2.0, -2.0));
+        }
+
+        #[test]
+        pub fn test_sub_vec() {
+            let p1 = Point2DMm::new(1.0, 2.0);
+            let p2 = vec2(3.0, 4.0);
+
+            let result = p1 - p2;
+
+            assert_eq!(result, Point2DMm::new(-2.0, -2.0));
+        }
+
+        #[test]
+        pub fn test_sub_assign_vec() {
+            let mut p1 = Point2DMm::new(1.0, 2.0);
+
+            p1 -= vec2(3.0, 4.0);
+
+            assert_eq!(p1, Point2DMm::new(-2.0, -2.0));
+        }
+
+
         #[test]
         pub fn test_mul_scalar() {
             let p1: Point2D<f32> = Point2D::new(3.0, 5.0);
@@ -1310,6 +1351,15 @@ mod point2d {
         }
 
         #[test]
+        pub fn test_mul_assign_scalar() {
+            let mut p1: Point2D<f32> = Point2D::new(3.0, 5.0);
+
+            p1 *= 5.0;
+
+            assert_eq!(p1, Point2D::new(15.0, 25.0));
+        }
+
+        #[test]
         pub fn test_mul_scale() {
             let p1 = Point2DMm::new(1.0, 2.0);
             let cm_per_mm: Scale<f32, Mm, Cm> = Scale::new(0.1);
@@ -1317,6 +1367,35 @@ mod point2d {
             let result = p1 * cm_per_mm;
 
             assert_eq!(result, Point2DCm::new(0.1, 0.2));
+        }
+
+
+        #[test]
+        pub fn test_div_scalar() {
+            let p1: Point2D<f32> = Point2D::new(15.0, 25.0);
+
+            let result = p1 / 5.0;
+
+            assert_eq!(result, Point2D::new(3.0, 5.0));
+        }
+
+        #[test]
+        pub fn test_div_assign_scalar() {
+            let mut p1: Point2D<f32> = Point2D::new(15.0, 25.0);
+
+            p1 /= 5.0;
+
+            assert_eq!(p1, Point2D::new(3.0, 5.0));
+        }
+
+        #[test]
+        pub fn test_div_scale() {
+            let p1 = Point2DCm::new(0.1, 0.2);
+            let cm_per_mm: Scale<f32, Mm, Cm> = Scale::new(0.1);
+
+            let result = p1 / cm_per_mm;
+
+            assert_eq!(result, Point2DMm::new(1.0, 2.0));
         }
     }
 }
@@ -1378,5 +1457,106 @@ mod point3d {
         let p2 = Point3D::from(pm);
 
         assert_eq!(p1, p2);
+    }
+
+    mod ops {
+        use default::Point3D;
+        use {vec3, Vector3D};
+        use scale::Scale;
+
+        pub enum Mm {}
+        pub enum Cm {}
+
+        pub type Point3DMm<T> = crate::Point3D<T, Mm>;
+        pub type Point3DCm<T> = crate::Point3D<T, Cm>;
+
+        #[test]
+        pub fn test_add_vec() {
+            let p1 = Point3DMm::new(1.0, 2.0, 3.0);
+            let p2 = vec3(4.0, 5.0, 6.0);
+
+            let result = p1 + p2;
+
+            assert_eq!(result, Point3DMm::new(5.0, 7.0, 9.0));
+        }
+
+        #[test]
+        pub fn test_add_assign_vec() {
+            let mut p1 = Point3DMm::new(1.0, 2.0, 3.0);
+
+            p1 += vec3(4.0, 5.0, 6.0);
+
+            assert_eq!(p1, Point3DMm::new(5.0, 7.0, 9.0));
+        }
+
+
+        #[test]
+        pub fn test_sub() {
+            let p1 = Point3DMm::new(1.0, 2.0, 3.0);
+            let p2 = Point3DMm::new(4.0, 5.0, 6.0);
+
+            let result = p1 - p2;
+
+            assert_eq!(result, Vector3D::<_, Mm>::new(-3.0, -3.0, -3.0));
+        }
+
+        #[test]
+        pub fn test_sub_vec() {
+            let p1 = Point3DMm::new(1.0, 2.0, 3.0);
+            let p2 = vec3(4.0, 5.0, 6.0);
+
+            let result = p1 - p2;
+
+            assert_eq!(result, Point3DMm::new(-3.0, -3.0, -3.0));
+        }
+
+        #[test]
+        pub fn test_sub_assign_vec() {
+            let mut p1 = Point3DMm::new(1.0, 2.0, 3.0);
+
+            p1 -= vec3(4.0, 5.0, 6.0);
+
+            assert_eq!(p1, Point3DMm::new(-3.0, -3.0, -3.0));
+        }
+
+
+        #[test]
+        pub fn test_mul_scalar() {
+            let p1: Point3D<f32> = Point3D::new(3.0, 5.0, 7.0);
+
+            let result = p1 * 5.0;
+
+            assert_eq!(result, Point3D::new(15.0, 25.0, 35.0));
+        }
+
+        #[test]
+        pub fn test_mul_scale() {
+            let p1 = Point3DMm::new(1.0, 2.0, 3.0);
+            let cm_per_mm: Scale<f32, Mm, Cm> = Scale::new(0.1);
+
+            let result = p1 * cm_per_mm;
+
+            assert_eq!(result, Point3DCm::new(0.1, 0.2, 0.3));
+        }
+
+
+        #[test]
+        pub fn test_div_scalar() {
+            let p1: Point3D<f32> = Point3D::new(15.0, 25.0, 35.0);
+
+            let result = p1 / 5.0;
+
+            assert_eq!(result, Point3D::new(3.0, 5.0, 7.0));
+        }
+
+        #[test]
+        pub fn test_div_scale() {
+            let p1 = Point3DCm::new(0.1, 0.2, 0.3);
+            let cm_per_mm: Scale<f32, Mm, Cm> = Scale::new(0.1);
+
+            let result = p1 / cm_per_mm;
+
+            assert_eq!(result, Point3DMm::new(1.0, 2.0, 3.0));
+        }
     }
 }
