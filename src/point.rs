@@ -436,13 +436,6 @@ impl<T: Copy + Add<T, Output = T>, U> AddAssign<Vector2D<T, U>> for Point2D<T, U
     }
 }
 
-impl<T: Copy + Sub<T, Output = T>, U> SubAssign<Vector2D<T, U>> for Point2D<T, U> {
-    #[inline]
-    fn sub_assign(&mut self, other: Vector2D<T, U>) {
-        *self = *self - other
-    }
-}
-
 
 impl<T: Sub, U> Sub for Point2D<T, U> {
     type Output = Vector2D<T::Output, U>;
@@ -459,6 +452,13 @@ impl<T: Sub, U> Sub<Vector2D<T, U>> for Point2D<T, U> {
     #[inline]
     fn sub(self, other: Vector2D<T, U>) -> Self::Output {
         point2(self.x - other.x, self.y - other.y)
+    }
+}
+
+impl<T: Copy + Sub<T, Output = T>, U> SubAssign<Vector2D<T, U>> for Point2D<T, U> {
+    #[inline]
+    fn sub_assign(&mut self, other: Vector2D<T, U>) {
+        *self = *self - other
     }
 }
 
@@ -1048,13 +1048,6 @@ impl<T: Copy + Add<T, Output = T>, U> AddAssign<Vector3D<T, U>> for Point3D<T, U
 }
 
 
-impl<T: Copy + Sub<T, Output = T>, U> SubAssign<Vector3D<T, U>> for Point3D<T, U> {
-    #[inline]
-    fn sub_assign(&mut self, other: Vector3D<T, U>) {
-        *self = *self - other
-    }
-}
-
 impl<T: Sub, U> Sub for Point3D<T, U> {
     type Output = Vector3D<T::Output, U>;
 
@@ -1070,6 +1063,13 @@ impl<T: Sub, U> Sub<Vector3D<T, U>> for Point3D<T, U> {
     #[inline]
     fn sub(self, other: Vector3D<T, U>) -> Self::Output {
         point3(self.x - other.x, self.y - other.y, self.z - other.z)
+    }
+}
+
+impl<T: Copy + Sub<T, Output = T>, U> SubAssign<Vector3D<T, U>> for Point3D<T, U> {
+    #[inline]
+    fn sub_assign(&mut self, other: Vector3D<T, U>) {
+        *self = *self - other
     }
 }
 
