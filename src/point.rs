@@ -91,14 +91,6 @@ impl<T, U> Hash for Point2D<T, U>
 
 mint_vec!(Point2D[x, y] = Point2);
 
-impl<T: Copy + Zero, U> Point2D<T, U> {
-    /// Convert into a 3d point.
-    #[inline]
-    pub fn to_3d(&self) -> Point3D<T, U> {
-        point3(self.x, self.y, Zero::zero())
-    }
-}
-
 impl<T: fmt::Debug, U> fmt::Debug for Point2D<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "({:?},{:?})", self.x, self.y)
@@ -265,6 +257,15 @@ impl<T: Copy, U> Point2D<T, U> {
     #[inline]
     pub fn to_tuple(&self) -> (T, T) {
         (self.x, self.y)
+    }
+
+    /// Convert into a 3d point with z-coordinate equals to zero.
+    #[inline]
+    pub fn to_3d(&self) -> Point3D<T, U>
+    where
+        T: Zero,
+    {
+        point3(self.x, self.y, Zero::zero())
     }
 
     /// Linearly interpolate between this point and another point.
@@ -672,18 +673,6 @@ impl<T, U> Hash for Point3D<T, U>
     }
 }
 
-impl<T: Copy + One, U> Point3D<T, U> {
-    #[inline]
-    pub fn to_array_4d(&self) -> [T; 4] {
-        [self.x, self.y, self.z, One::one()]
-    }
-
-    #[inline]
-    pub fn to_tuple_4d(&self) -> (T, T, T, T) {
-        (self.x, self.y, self.z, One::one())
-    }
-}
-
 impl<T: fmt::Debug, U> fmt::Debug for Point3D<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "({:?},{:?},{:?})", self.x, self.y, self.z)
@@ -795,6 +784,14 @@ impl<T: Copy, U> Point3D<T, U> {
         [self.x, self.y, self.z]
     }
 
+    #[inline]
+    pub fn to_array_4d(&self) -> [T; 4]
+    where
+        T: One,
+    {
+        [self.x, self.y, self.z, One::one()]
+    }
+
     /// Cast into a tuple with x, y and z.
     ///
     /// # Example
@@ -810,6 +807,14 @@ impl<T: Copy, U> Point3D<T, U> {
     #[inline]
     pub fn to_tuple(&self) -> (T, T, T) {
         (self.x, self.y, self.z)
+    }
+
+    #[inline]
+    pub fn to_tuple_4d(&self) -> (T, T, T, T)
+    where
+        T: One,
+    {
+        (self.x, self.y, self.z, One::one())
     }
 
     /// Drop the units, preserving only the numeric value.
