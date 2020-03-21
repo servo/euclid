@@ -301,6 +301,30 @@ impl<T: Copy, U> Point2D<T, U> {
     }
 }
 
+impl<T: PartialOrd, U> Point2D<T, U> {
+    #[inline]
+    pub fn min(self, other: Self) -> Self {
+        point2(min(self.x, other.x), min(self.y, other.y))
+    }
+
+    #[inline]
+    pub fn max(self, other: Self) -> Self {
+        point2(max(self.x, other.x), max(self.y, other.y))
+    }
+
+    /// Returns the point each component of which clamped by corresponding
+    /// components of `start` and `end`.
+    ///
+    /// Shortcut for `self.max(start).min(end)`.
+    #[inline]
+    pub fn clamp(&self, start: Self, end: Self) -> Self
+    where
+        T: Copy,
+    {
+        self.max(start).min(end)
+    }
+}
+
 impl<T: Copy + Add<T, Output = T>, U> Point2D<T, U> {
     #[inline]
     pub fn add_size(&self, other: &Size2D<T, U>) -> Self {
@@ -351,30 +375,6 @@ impl<T: Sub<T, Output = T>, U> Sub<Vector2D<T, U>> for Point2D<T, U> {
     #[inline]
     fn sub(self, other: Vector2D<T, U>) -> Self {
         point2(self.x - other.x, self.y - other.y)
-    }
-}
-
-impl<T: PartialOrd, U> Point2D<T, U> {
-    #[inline]
-    pub fn min(self, other: Self) -> Self {
-        point2(min(self.x, other.x), min(self.y, other.y))
-    }
-
-    #[inline]
-    pub fn max(self, other: Self) -> Self {
-        point2(max(self.x, other.x), max(self.y, other.y))
-    }
-
-    /// Returns the point each component of which clamped by corresponding
-    /// components of `start` and `end`.
-    ///
-    /// Shortcut for `self.max(start).min(end)`.
-    #[inline]
-    pub fn clamp(&self, start: Self, end: Self) -> Self
-    where
-        T: Copy,
-    {
-        self.max(start).min(end)
     }
 }
 
@@ -896,6 +896,38 @@ impl<T: Copy, U> Point3D<T, U> {
     }
 }
 
+impl<T: PartialOrd, U> Point3D<T, U> {
+    #[inline]
+    pub fn min(self, other: Self) -> Self {
+        point3(
+            min(self.x, other.x),
+            min(self.y, other.y),
+            min(self.z, other.z),
+        )
+    }
+
+    #[inline]
+    pub fn max(self, other: Self) -> Self {
+        point3(
+            max(self.x, other.x),
+            max(self.y, other.y),
+            max(self.z, other.z),
+        )
+    }
+
+    /// Returns the point each component of which clamped by corresponding
+    /// components of `start` and `end`.
+    ///
+    /// Shortcut for `self.max(start).min(end)`.
+    #[inline]
+    pub fn clamp(&self, start: Self, end: Self) -> Self
+    where
+        T: Copy,
+    {
+        self.max(start).min(end)
+    }
+}
+
 impl<T: Copy + Add<T, Output = T>, U> Point3D<T, U> {
     #[inline]
     pub fn add_size(&self, other: &Size3D<T, U>) -> Self {
@@ -970,38 +1002,6 @@ impl<T: Copy + Div<T, Output = T>, U1, U2> Div<Scale<T, U1, U2>> for Point3D<T, 
     #[inline]
     fn div(self, scale: Scale<T, U1, U2>) -> Point3D<T, U1> {
         point3(self.x / scale.get(), self.y / scale.get(), self.z / scale.get())
-    }
-}
-
-impl<T: PartialOrd, U> Point3D<T, U> {
-    #[inline]
-    pub fn min(self, other: Self) -> Self {
-        point3(
-            min(self.x, other.x),
-            min(self.y, other.y),
-            min(self.z, other.z),
-        )
-    }
-
-    #[inline]
-    pub fn max(self, other: Self) -> Self {
-        point3(
-            max(self.x, other.x),
-            max(self.y, other.y),
-            max(self.z, other.z),
-        )
-    }
-
-    /// Returns the point each component of which clamped by corresponding
-    /// components of `start` and `end`.
-    ///
-    /// Shortcut for `self.max(start).min(end)`.
-    #[inline]
-    pub fn clamp(&self, start: Self, end: Self) -> Self
-    where
-        T: Copy,
-    {
-        self.max(start).min(end)
     }
 }
 
