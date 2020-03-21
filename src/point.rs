@@ -266,6 +266,38 @@ impl<T: Copy, U> Point2D<T, U> {
     pub fn to_tuple(&self) -> (T, T) {
         (self.x, self.y)
     }
+
+    /// Linearly interpolate between this point and another point.
+    ///
+    /// When `t` is `One::one()`, returned value equals to `other`,
+    /// otherwise equals to `self`.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use euclid::point2;
+    /// use euclid::default::Point2D;
+    ///
+    /// let first: Point2D<_> = point2(0.0, 10.0);
+    /// let last:  Point2D<_> = point2(8.0, -4.0);
+    ///
+    /// assert_eq!(first.lerp(last, -1.0), point2(-8.0,  24.0));
+    /// assert_eq!(first.lerp(last,  0.0), point2( 0.0,  10.0));
+    /// assert_eq!(first.lerp(last,  0.5), point2( 4.0,   3.0));
+    /// assert_eq!(first.lerp(last,  1.0), point2( 8.0,  -4.0));
+    /// assert_eq!(first.lerp(last,  2.0), point2(16.0, -18.0));
+    /// ```
+    #[inline]
+    pub fn lerp(&self, other: Self, t: T) -> Self
+    where
+        T: One + Sub<Output = T> + Mul<Output = T> + Add<Output = T>,
+    {
+        let one_t = T::one() - t;
+        point2(
+            one_t * self.x + t * other.x,
+            one_t * self.y + t * other.y,
+        )
+    }
 }
 
 impl<T: Copy + Add<T, Output = T>, U> Point2D<T, U> {
@@ -529,37 +561,6 @@ impl<T: NumCast + Copy, U> Point2D<T, U> {
     }
 }
 
-impl<T, U> Point2D<T, U>
-where
-    T: Copy + One + Add<Output = T> + Sub<Output = T> + Mul<Output = T>,
-{
-    /// Linearly interpolate between this point and another point.
-    ///
-    /// When `t` is `One::one()`, returned value equals to `other`,
-    /// otherwise equals to `self`.
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// use euclid::point2;
-    /// use euclid::default::Point2D;
-    ///
-    /// let first: Point2D<_> = point2(0.0, 10.0);
-    /// let last:  Point2D<_> = point2(8.0, -4.0);
-    ///
-    /// assert_eq!(first.lerp(last, -1.0), point2(-8.0,  24.0));
-    /// assert_eq!(first.lerp(last,  0.0), point2( 0.0,  10.0));
-    /// assert_eq!(first.lerp(last,  0.5), point2( 4.0,   3.0));
-    /// assert_eq!(first.lerp(last,  1.0), point2( 8.0,  -4.0));
-    /// assert_eq!(first.lerp(last,  2.0), point2(16.0, -18.0));
-    /// ```
-    #[inline]
-    pub fn lerp(&self, other: Self, t: T) -> Self {
-        let one_t = T::one() - t;
-        point2(one_t * self.x + t * other.x, one_t * self.y + t * other.y)
-    }
-}
-
 impl<T: ApproxEq<T>, U> ApproxEq<Point2D<T, U>> for Point2D<T, U> {
     #[inline]
     fn approx_epsilon() -> Self {
@@ -680,41 +681,6 @@ impl<T: Copy + One, U> Point3D<T, U> {
     #[inline]
     pub fn to_tuple_4d(&self) -> (T, T, T, T) {
         (self.x, self.y, self.z, One::one())
-    }
-}
-
-impl<T, U> Point3D<T, U>
-where
-    T: Copy + One + Add<Output = T> + Sub<Output = T> + Mul<Output = T>,
-{
-    /// Linearly interpolate between this point and another point.
-    ///
-    /// When `t` is `One::one()`, returned value equals to `other`,
-    /// otherwise equals to `self`.
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// use euclid::point3;
-    /// use euclid::default::Point3D;
-    ///
-    /// let first: Point3D<_> = point3(0.0, 10.0, -1.0);
-    /// let last:  Point3D<_> = point3(8.0, -4.0,  0.0);
-    ///
-    /// assert_eq!(first.lerp(last, -1.0), point3(-8.0,  24.0, -2.0));
-    /// assert_eq!(first.lerp(last,  0.0), point3( 0.0,  10.0, -1.0));
-    /// assert_eq!(first.lerp(last,  0.5), point3( 4.0,   3.0, -0.5));
-    /// assert_eq!(first.lerp(last,  1.0), point3( 8.0,  -4.0,  0.0));
-    /// assert_eq!(first.lerp(last,  2.0), point3(16.0, -18.0,  1.0));
-    /// ```
-    #[inline]
-    pub fn lerp(&self, other: Self, t: T) -> Self {
-        let one_t = T::one() - t;
-        point3(
-            one_t * self.x + t * other.x,
-            one_t * self.y + t * other.y,
-            one_t * self.z + t * other.z,
-        )
     }
 }
 
@@ -889,6 +855,39 @@ impl<T: Copy, U> Point3D<T, U> {
     #[inline]
     pub fn to_2d(&self) -> Point2D<T, U> {
         self.xy()
+    }
+
+    /// Linearly interpolate between this point and another point.
+    ///
+    /// When `t` is `One::one()`, returned value equals to `other`,
+    /// otherwise equals to `self`.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use euclid::point3;
+    /// use euclid::default::Point3D;
+    ///
+    /// let first: Point3D<_> = point3(0.0, 10.0, -1.0);
+    /// let last:  Point3D<_> = point3(8.0, -4.0,  0.0);
+    ///
+    /// assert_eq!(first.lerp(last, -1.0), point3(-8.0,  24.0, -2.0));
+    /// assert_eq!(first.lerp(last,  0.0), point3( 0.0,  10.0, -1.0));
+    /// assert_eq!(first.lerp(last,  0.5), point3( 4.0,   3.0, -0.5));
+    /// assert_eq!(first.lerp(last,  1.0), point3( 8.0,  -4.0,  0.0));
+    /// assert_eq!(first.lerp(last,  2.0), point3(16.0, -18.0,  1.0));
+    /// ```
+    #[inline]
+    pub fn lerp(&self, other: Self, t: T) -> Self
+    where
+        T: One + Sub<Output = T> + Mul<Output = T> + Add<Output = T>,
+    {
+        let one_t = T::one() - t;
+        point3(
+            one_t * self.x + t * other.x,
+            one_t * self.y + t * other.y,
+            one_t * self.z + t * other.z,
+        )
     }
 }
 
