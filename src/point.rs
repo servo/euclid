@@ -325,6 +325,84 @@ impl<T: PartialOrd, U> Point2D<T, U> {
     }
 }
 
+impl<T: NumCast + Copy, U> Point2D<T, U> {
+    /// Cast from one numeric representation to another, preserving the units.
+    ///
+    /// When casting from floating point to integer coordinates, the decimals are truncated
+    /// as one would expect from a simple cast, but this behavior does not always make sense
+    /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
+    #[inline]
+    pub fn cast<NewT: NumCast>(&self) -> Point2D<NewT, U> {
+        self.try_cast().unwrap()
+    }
+
+    /// Fallible cast from one numeric representation to another, preserving the units.
+    ///
+    /// When casting from floating point to integer coordinates, the decimals are truncated
+    /// as one would expect from a simple cast, but this behavior does not always make sense
+    /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
+    pub fn try_cast<NewT: NumCast>(&self) -> Option<Point2D<NewT, U>> {
+        match (NumCast::from(self.x), NumCast::from(self.y)) {
+            (Some(x), Some(y)) => Some(point2(x, y)),
+            _ => None,
+        }
+    }
+
+    // Convenience functions for common casts
+
+    /// Cast into an `f32` point.
+    #[inline]
+    pub fn to_f32(&self) -> Point2D<f32, U> {
+        self.cast()
+    }
+
+    /// Cast into an `f64` point.
+    #[inline]
+    pub fn to_f64(&self) -> Point2D<f64, U> {
+        self.cast()
+    }
+
+    /// Cast into an `usize` point, truncating decimals if any.
+    ///
+    /// When casting from floating point points, it is worth considering whether
+    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
+    /// the desired conversion behavior.
+    #[inline]
+    pub fn to_usize(&self) -> Point2D<usize, U> {
+        self.cast()
+    }
+
+    /// Cast into an `u32` point, truncating decimals if any.
+    ///
+    /// When casting from floating point points, it is worth considering whether
+    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
+    /// the desired conversion behavior.
+    #[inline]
+    pub fn to_u32(&self) -> Point2D<u32, U> {
+        self.cast()
+    }
+
+    /// Cast into an i32 point, truncating decimals if any.
+    ///
+    /// When casting from floating point points, it is worth considering whether
+    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
+    /// the desired conversion behavior.
+    #[inline]
+    pub fn to_i32(&self) -> Point2D<i32, U> {
+        self.cast()
+    }
+
+    /// Cast into an i64 point, truncating decimals if any.
+    ///
+    /// When casting from floating point points, it is worth considering whether
+    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
+    /// the desired conversion behavior.
+    #[inline]
+    pub fn to_i64(&self) -> Point2D<i64, U> {
+        self.cast()
+    }
+}
+
 impl<T: Copy + Add<T, Output = T>, U> Point2D<T, U> {
     #[inline]
     pub fn add_size(&self, other: &Size2D<T, U>) -> Self {
@@ -481,84 +559,6 @@ impl<T: Floor, U> Point2D<T, U> {
     #[must_use]
     pub fn floor(&self) -> Self {
         point2(self.x.floor(), self.y.floor())
-    }
-}
-
-impl<T: NumCast + Copy, U> Point2D<T, U> {
-    /// Cast from one numeric representation to another, preserving the units.
-    ///
-    /// When casting from floating point to integer coordinates, the decimals are truncated
-    /// as one would expect from a simple cast, but this behavior does not always make sense
-    /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
-    #[inline]
-    pub fn cast<NewT: NumCast>(&self) -> Point2D<NewT, U> {
-        self.try_cast().unwrap()
-    }
-
-    /// Fallible cast from one numeric representation to another, preserving the units.
-    ///
-    /// When casting from floating point to integer coordinates, the decimals are truncated
-    /// as one would expect from a simple cast, but this behavior does not always make sense
-    /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
-    pub fn try_cast<NewT: NumCast>(&self) -> Option<Point2D<NewT, U>> {
-        match (NumCast::from(self.x), NumCast::from(self.y)) {
-            (Some(x), Some(y)) => Some(point2(x, y)),
-            _ => None,
-        }
-    }
-
-    // Convenience functions for common casts
-
-    /// Cast into an `f32` point.
-    #[inline]
-    pub fn to_f32(&self) -> Point2D<f32, U> {
-        self.cast()
-    }
-
-    /// Cast into an `f64` point.
-    #[inline]
-    pub fn to_f64(&self) -> Point2D<f64, U> {
-        self.cast()
-    }
-
-    /// Cast into an `usize` point, truncating decimals if any.
-    ///
-    /// When casting from floating point points, it is worth considering whether
-    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
-    /// the desired conversion behavior.
-    #[inline]
-    pub fn to_usize(&self) -> Point2D<usize, U> {
-        self.cast()
-    }
-
-    /// Cast into an `u32` point, truncating decimals if any.
-    ///
-    /// When casting from floating point points, it is worth considering whether
-    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
-    /// the desired conversion behavior.
-    #[inline]
-    pub fn to_u32(&self) -> Point2D<u32, U> {
-        self.cast()
-    }
-
-    /// Cast into an i32 point, truncating decimals if any.
-    ///
-    /// When casting from floating point points, it is worth considering whether
-    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
-    /// the desired conversion behavior.
-    #[inline]
-    pub fn to_i32(&self) -> Point2D<i32, U> {
-        self.cast()
-    }
-
-    /// Cast into an i64 point, truncating decimals if any.
-    ///
-    /// When casting from floating point points, it is worth considering whether
-    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
-    /// the desired conversion behavior.
-    #[inline]
-    pub fn to_i64(&self) -> Point2D<i64, U> {
-        self.cast()
     }
 }
 
@@ -928,6 +928,88 @@ impl<T: PartialOrd, U> Point3D<T, U> {
     }
 }
 
+impl<T: NumCast + Copy, U> Point3D<T, U> {
+    /// Cast from one numeric representation to another, preserving the units.
+    ///
+    /// When casting from floating point to integer coordinates, the decimals are truncated
+    /// as one would expect from a simple cast, but this behavior does not always make sense
+    /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
+    #[inline]
+    pub fn cast<NewT: NumCast>(&self) -> Point3D<NewT, U> {
+        self.try_cast().unwrap()
+    }
+
+    /// Fallible cast from one numeric representation to another, preserving the units.
+    ///
+    /// When casting from floating point to integer coordinates, the decimals are truncated
+    /// as one would expect from a simple cast, but this behavior does not always make sense
+    /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
+    pub fn try_cast<NewT: NumCast>(&self) -> Option<Point3D<NewT, U>> {
+        match (
+            NumCast::from(self.x),
+            NumCast::from(self.y),
+            NumCast::from(self.z),
+        ) {
+            (Some(x), Some(y), Some(z)) => Some(point3(x, y, z)),
+            _ => None,
+        }
+    }
+
+    // Convenience functions for common casts
+
+    /// Cast into an `f32` point.
+    #[inline]
+    pub fn to_f32(&self) -> Point3D<f32, U> {
+        self.cast()
+    }
+
+    /// Cast into an `f64` point.
+    #[inline]
+    pub fn to_f64(&self) -> Point3D<f64, U> {
+        self.cast()
+    }
+
+    /// Cast into an `usize` point, truncating decimals if any.
+    ///
+    /// When casting from floating point points, it is worth considering whether
+    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
+    /// the desired conversion behavior.
+    #[inline]
+    pub fn to_usize(&self) -> Point3D<usize, U> {
+        self.cast()
+    }
+
+    /// Cast into an `u32` point, truncating decimals if any.
+    ///
+    /// When casting from floating point points, it is worth considering whether
+    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
+    /// the desired conversion behavior.
+    #[inline]
+    pub fn to_u32(&self) -> Point3D<u32, U> {
+        self.cast()
+    }
+
+    /// Cast into an `i32` point, truncating decimals if any.
+    ///
+    /// When casting from floating point points, it is worth considering whether
+    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
+    /// the desired conversion behavior.
+    #[inline]
+    pub fn to_i32(&self) -> Point3D<i32, U> {
+        self.cast()
+    }
+
+    /// Cast into an `i64` point, truncating decimals if any.
+    ///
+    /// When casting from floating point points, it is worth considering whether
+    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
+    /// the desired conversion behavior.
+    #[inline]
+    pub fn to_i64(&self) -> Point3D<i64, U> {
+        self.cast()
+    }
+}
+
 impl<T: Copy + Add<T, Output = T>, U> Point3D<T, U> {
     #[inline]
     pub fn add_size(&self, other: &Size3D<T, U>) -> Self {
@@ -1062,88 +1144,6 @@ impl<T: Floor, U> Point3D<T, U> {
     #[must_use]
     pub fn floor(&self) -> Self {
         point3(self.x.floor(), self.y.floor(), self.z.floor())
-    }
-}
-
-impl<T: NumCast + Copy, U> Point3D<T, U> {
-    /// Cast from one numeric representation to another, preserving the units.
-    ///
-    /// When casting from floating point to integer coordinates, the decimals are truncated
-    /// as one would expect from a simple cast, but this behavior does not always make sense
-    /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
-    #[inline]
-    pub fn cast<NewT: NumCast>(&self) -> Point3D<NewT, U> {
-        self.try_cast().unwrap()
-    }
-
-    /// Fallible cast from one numeric representation to another, preserving the units.
-    ///
-    /// When casting from floating point to integer coordinates, the decimals are truncated
-    /// as one would expect from a simple cast, but this behavior does not always make sense
-    /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
-    pub fn try_cast<NewT: NumCast>(&self) -> Option<Point3D<NewT, U>> {
-        match (
-            NumCast::from(self.x),
-            NumCast::from(self.y),
-            NumCast::from(self.z),
-        ) {
-            (Some(x), Some(y), Some(z)) => Some(point3(x, y, z)),
-            _ => None,
-        }
-    }
-
-    // Convenience functions for common casts
-
-    /// Cast into an `f32` point.
-    #[inline]
-    pub fn to_f32(&self) -> Point3D<f32, U> {
-        self.cast()
-    }
-
-    /// Cast into an `f64` point.
-    #[inline]
-    pub fn to_f64(&self) -> Point3D<f64, U> {
-        self.cast()
-    }
-
-    /// Cast into an `usize` point, truncating decimals if any.
-    ///
-    /// When casting from floating point points, it is worth considering whether
-    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
-    /// the desired conversion behavior.
-    #[inline]
-    pub fn to_usize(&self) -> Point3D<usize, U> {
-        self.cast()
-    }
-
-    /// Cast into an `u32` point, truncating decimals if any.
-    ///
-    /// When casting from floating point points, it is worth considering whether
-    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
-    /// the desired conversion behavior.
-    #[inline]
-    pub fn to_u32(&self) -> Point3D<u32, U> {
-        self.cast()
-    }
-
-    /// Cast into an `i32` point, truncating decimals if any.
-    ///
-    /// When casting from floating point points, it is worth considering whether
-    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
-    /// the desired conversion behavior.
-    #[inline]
-    pub fn to_i32(&self) -> Point3D<i32, U> {
-        self.cast()
-    }
-
-    /// Cast into an `i64` point, truncating decimals if any.
-    ///
-    /// When casting from floating point points, it is worth considering whether
-    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
-    /// the desired conversion behavior.
-    #[inline]
-    pub fn to_i64(&self) -> Point3D<i64, U> {
-        self.cast()
     }
 }
 
