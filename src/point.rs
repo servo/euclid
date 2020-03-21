@@ -98,6 +98,7 @@ impl<T: Zero, U> Point2D<T, U> {
         point2(Zero::zero(), Zero::zero())
     }
 
+    /// The same as [`origin()`](#method.origin).
     #[inline]
     pub fn zero() -> Self {
         Self::origin()
@@ -174,30 +175,88 @@ impl<T: Copy, U> Point2D<T, U> {
     }
 
     /// Swap x and y.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use euclid::{Point2D, point2};
+    /// enum Mm {}
+    ///
+    /// let point: Point2D<_, Mm> = point2(1, -8);
+    ///
+    /// assert_eq!(point.yx(), point2(-8, 1));
+    /// ```
     #[inline]
     pub fn yx(&self) -> Self {
         point2(self.y, self.x)
     }
 
     /// Drop the units, preserving only the numeric value.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use euclid::{Point2D, point2};
+    /// enum Mm {}
+    ///
+    /// let point: Point2D<_, Mm> = point2(1, -8);
+    ///
+    /// assert_eq!(point.x, point.to_untyped().x);
+    /// assert_eq!(point.y, point.to_untyped().y);
+    /// ```
     #[inline]
     pub fn to_untyped(&self) -> Point2D<T, UnknownUnit> {
         point2(self.x, self.y)
     }
 
-    /// Cast the unit
+    /// Cast the unit, preserving the numeric value.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use euclid::{Point2D, point2};
+    /// enum Mm {}
+    /// enum Cm {}
+    ///
+    /// let point: Point2D<_, Mm> = point2(1, -8);
+    ///
+    /// assert_eq!(point.x, point.cast_unit::<Cm>().x);
+    /// assert_eq!(point.y, point.cast_unit::<Cm>().y);
+    /// ```
     #[inline]
     pub fn cast_unit<V>(&self) -> Point2D<T, V> {
         point2(self.x, self.y)
     }
 
     /// Cast into an array with x and y.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use euclid::{Point2D, point2};
+    /// enum Mm {}
+    ///
+    /// let point: Point2D<_, Mm> = point2(1, -8);
+    ///
+    /// assert_eq!(point.to_array(), [1, -8]);
+    /// ```
     #[inline]
     pub fn to_array(&self) -> [T; 2] {
         [self.x, self.y]
     }
 
     /// Cast into a tuple with x and y.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use euclid::{Point2D, point2};
+    /// enum Mm {}
+    ///
+    /// let point: Point2D<_, Mm> = point2(1, -8);
+    ///
+    /// assert_eq!(point.to_tuple(), (1, -8));
+    /// ```
     #[inline]
     pub fn to_tuple(&self) -> (T, T) {
         (self.x, self.y)
@@ -331,7 +390,15 @@ impl<T: Round, U> Point2D<T, U> {
     /// Rounds each component to the nearest integer value.
     ///
     /// This behavior is preserved for negative values (unlike the basic cast).
-    /// For example `{ -0.1, -0.8 }.round() == { 0.0, -1.0 }`.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use euclid::point2;
+    /// enum Mm {}
+    ///
+    /// assert_eq!(point2::<_, Mm>(-0.1, -0.8).round(), point2::<_, Mm>(0.0, -1.0))
+    /// ```
     #[inline]
     #[must_use]
     pub fn round(&self) -> Self {
@@ -343,7 +410,15 @@ impl<T: Ceil, U> Point2D<T, U> {
     /// Rounds each component to the smallest integer equal or greater than the original value.
     ///
     /// This behavior is preserved for negative values (unlike the basic cast).
-    /// For example `{ -0.1, -0.8 }.ceil() == { 0.0, 0.0 }`.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use euclid::point2;
+    /// enum Mm {}
+    ///
+    /// assert_eq!(point2::<_, Mm>(-0.1, -0.8).ceil(), point2::<_, Mm>(0.0, 0.0))
+    /// ```
     #[inline]
     #[must_use]
     pub fn ceil(&self) -> Self {
@@ -355,7 +430,15 @@ impl<T: Floor, U> Point2D<T, U> {
     /// Rounds each component to the biggest integer equal or lower than the original value.
     ///
     /// This behavior is preserved for negative values (unlike the basic cast).
-    /// For example `{ -0.1, -0.8 }.floor() == { -1.0, -1.0 }`.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use euclid::point2;
+    /// enum Mm {}
+    ///
+    /// assert_eq!(point2::<_, Mm>(-0.1, -0.8).floor(), point2::<_, Mm>(-1.0, -1.0))
+    /// ```
     #[inline]
     #[must_use]
     pub fn floor(&self) -> Self {
@@ -447,7 +530,24 @@ where
 {
     /// Linearly interpolate between this point and another point.
     ///
-    /// `t` is expected to be between zero and one.
+    /// When `t` is `One::one()`, returned value equals to `other`,
+    /// otherwise equals to `self`.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use euclid::point2;
+    /// use euclid::default::Point2D;
+    ///
+    /// let first: Point2D<_> = point2(0.0, 10.0);
+    /// let last:  Point2D<_> = point2(8.0, -4.0);
+    ///
+    /// assert_eq!(first.lerp(last, -1.0), point2(-8.0,  24.0));
+    /// assert_eq!(first.lerp(last,  0.0), point2( 0.0,  10.0));
+    /// assert_eq!(first.lerp(last,  0.5), point2( 4.0,   3.0));
+    /// assert_eq!(first.lerp(last,  1.0), point2( 8.0,  -4.0));
+    /// assert_eq!(first.lerp(last,  2.0), point2(16.0, -18.0));
+    /// ```
     #[inline]
     pub fn lerp(&self, other: Self, t: T) -> Self {
         let one_t = T::one() - t;
@@ -571,6 +671,7 @@ impl<T: Zero, U> Point3D<T, U> {
         point3(Zero::zero(), Zero::zero(), Zero::zero())
     }
 
+    /// The same as [`origin()`](#method.origin).
     #[inline]
     pub fn zero() -> Self {
         Self::origin()
@@ -595,7 +696,24 @@ where
 {
     /// Linearly interpolate between this point and another point.
     ///
-    /// `t` is expected to be between zero and one.
+    /// When `t` is `One::one()`, returned value equals to `other`,
+    /// otherwise equals to `self`.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use euclid::point3;
+    /// use euclid::default::Point3D;
+    ///
+    /// let first: Point3D<_> = point3(0.0, 10.0, -1.0);
+    /// let last:  Point3D<_> = point3(8.0, -4.0,  0.0);
+    ///
+    /// assert_eq!(first.lerp(last, -1.0), point3(-8.0,  24.0, -2.0));
+    /// assert_eq!(first.lerp(last,  0.0), point3( 0.0,  10.0, -1.0));
+    /// assert_eq!(first.lerp(last,  0.5), point3( 4.0,   3.0, -0.5));
+    /// assert_eq!(first.lerp(last,  1.0), point3( 8.0,  -4.0,  0.0));
+    /// assert_eq!(first.lerp(last,  2.0), point3(16.0, -18.0,  1.0));
+    /// ```
     #[inline]
     pub fn lerp(&self, other: Self, t: T) -> Self {
         let one_t = T::one() - t;
@@ -683,24 +801,73 @@ impl<T: Copy, U> Point3D<T, U> {
     }
 
     /// Cast into an array with x, y and z.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use euclid::{Point3D, point3};
+    /// enum Mm {}
+    ///
+    /// let point: Point3D<_, Mm> = point3(1, -8, 0);
+    ///
+    /// assert_eq!(point.to_array(), [1, -8, 0]);
+    /// ```
     #[inline]
     pub fn to_array(&self) -> [T; 3] {
         [self.x, self.y, self.z]
     }
 
     /// Cast into a tuple with x, y and z.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use euclid::{Point3D, point3};
+    /// enum Mm {}
+    ///
+    /// let point: Point3D<_, Mm> = point3(1, -8, 0);
+    ///
+    /// assert_eq!(point.to_tuple(), (1, -8, 0));
+    /// ```
     #[inline]
     pub fn to_tuple(&self) -> (T, T, T) {
         (self.x, self.y, self.z)
     }
 
     /// Drop the units, preserving only the numeric value.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use euclid::{Point3D, point3};
+    /// enum Mm {}
+    ///
+    /// let point: Point3D<_, Mm> = point3(1, -8, 0);
+    ///
+    /// assert_eq!(point.x, point.to_untyped().x);
+    /// assert_eq!(point.y, point.to_untyped().y);
+    /// assert_eq!(point.z, point.to_untyped().z);
+    /// ```
     #[inline]
     pub fn to_untyped(&self) -> Point3D<T, UnknownUnit> {
         point3(self.x, self.y, self.z)
     }
 
-    /// Cast the unit
+    /// Cast the unit, preserving the numeric value.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use euclid::{Point3D, point3};
+    /// enum Mm {}
+    /// enum Cm {}
+    ///
+    /// let point: Point3D<_, Mm> = point3(1, -8, 0);
+    ///
+    /// assert_eq!(point.x, point.cast_unit::<Cm>().x);
+    /// assert_eq!(point.y, point.cast_unit::<Cm>().y);
+    /// assert_eq!(point.z, point.cast_unit::<Cm>().z);
+    /// ```
     #[inline]
     pub fn cast_unit<V>(&self) -> Point3D<T, V> {
         point3(self.x, self.y, self.z)
@@ -826,6 +993,15 @@ impl<T: Round, U> Point3D<T, U> {
     /// Rounds each component to the nearest integer value.
     ///
     /// This behavior is preserved for negative values (unlike the basic cast).
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use euclid::point3;
+    /// enum Mm {}
+    ///
+    /// assert_eq!(point3::<_, Mm>(-0.1, -0.8, 0.4).round(), point3::<_, Mm>(0.0, -1.0, 0.0))
+    /// ```
     #[inline]
     #[must_use]
     pub fn round(&self) -> Self {
@@ -837,6 +1013,15 @@ impl<T: Ceil, U> Point3D<T, U> {
     /// Rounds each component to the smallest integer equal or greater than the original value.
     ///
     /// This behavior is preserved for negative values (unlike the basic cast).
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use euclid::point3;
+    /// enum Mm {}
+    ///
+    /// assert_eq!(point3::<_, Mm>(-0.1, -0.8, 0.4).ceil(), point3::<_, Mm>(0.0, 0.0, 1.0))
+    /// ```
     #[inline]
     #[must_use]
     pub fn ceil(&self) -> Self {
@@ -848,6 +1033,15 @@ impl<T: Floor, U> Point3D<T, U> {
     /// Rounds each component to the biggest integer equal or lower than the original value.
     ///
     /// This behavior is preserved for negative values (unlike the basic cast).
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use euclid::point3;
+    /// enum Mm {}
+    ///
+    /// assert_eq!(point3::<_, Mm>(-0.1, -0.8, 0.4).floor(), point3::<_, Mm>(-1.0, -1.0, 0.0))
+    /// ```
     #[inline]
     #[must_use]
     pub fn floor(&self) -> Self {

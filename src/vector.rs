@@ -370,9 +370,24 @@ where
 {
     /// Linearly interpolate each component between this vector and another vector.
     ///
-    /// `t` is expected to be between zero and one.
+    /// When `t` is `One::one()`, returned value equals to `other`,
+    /// otherwise equals to `self`.
     ///
-    /// When `t` is `One::one()`, returned value equals to `other`, otherwise equals to `self`.
+    /// # Example
+    ///
+    /// ```rust
+    /// use euclid::vec2;
+    /// use euclid::default::Vector2D;
+    ///
+    /// let first: Vector2D<_> = vec2(0.0, 10.0);
+    /// let last:  Vector2D<_> = vec2(8.0, -4.0);
+    ///
+    /// assert_eq!(first.lerp(last, -1.0), vec2(-8.0,  24.0));
+    /// assert_eq!(first.lerp(last,  0.0), vec2( 0.0,  10.0));
+    /// assert_eq!(first.lerp(last,  0.5), vec2( 4.0,   3.0));
+    /// assert_eq!(first.lerp(last,  1.0), vec2( 8.0,  -4.0));
+    /// assert_eq!(first.lerp(last,  2.0), vec2(16.0, -18.0));
+    /// ```
     #[inline]
     pub fn lerp(&self, other: Self, t: T) -> Self {
         let one_t = T::one() - t;
@@ -1020,9 +1035,24 @@ where
 {
     /// Linearly interpolate each component between this vector and another vector.
     ///
-    /// `t` is expected to be between zero and one.
+    /// When `t` is `One::one()`, returned value equals to `other`,
+    /// otherwise equals to `self`.
     ///
-    /// When `t` is `One::one()`, returned value equals to `other`, otherwise equals to `self`.
+    /// # Example
+    ///
+    /// ```rust
+    /// use euclid::vec3;
+    /// use euclid::default::Vector3D;
+    ///
+    /// let first: Vector3D<_> = vec3(0.0, 10.0, -1.0);
+    /// let last:  Vector3D<_> = vec3(8.0, -4.0,  0.0);
+    ///
+    /// assert_eq!(first.lerp(last, -1.0), vec3(-8.0,  24.0, -2.0));
+    /// assert_eq!(first.lerp(last,  0.0), vec3( 0.0,  10.0, -1.0));
+    /// assert_eq!(first.lerp(last,  0.5), vec3( 4.0,   3.0, -0.5));
+    /// assert_eq!(first.lerp(last,  1.0), vec3( 8.0,  -4.0,  0.0));
+    /// assert_eq!(first.lerp(last,  2.0), vec3(16.0, -18.0,  1.0));
+    /// ```
     #[inline]
     pub fn lerp(&self, other: Self, t: T) -> Self {
         let one_t = T::one() - t;

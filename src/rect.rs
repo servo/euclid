@@ -330,7 +330,8 @@ where
 {
     /// Linearly interpolate between this rectangle and another rectangle.
     ///
-    /// `t` is expected to be between zero and one.
+    /// When `t` is `One::one()`, returned value equals to `other`,
+    /// otherwise equals to `self`.
     #[inline]
     pub fn lerp(&self, other: Self, t: T) -> Self {
         Self::new(
