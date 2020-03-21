@@ -212,10 +212,7 @@ where
     #[inline]
     pub fn lerp(&self, other: Self, t: T) -> Self {
         let one_t = T::one() - t;
-        size2(
-            one_t * self.width + t * other.width,
-            one_t * self.height + t * other.height,
-        )
+        (*self) * one_t + other * t
     }
 }
 
@@ -801,11 +798,7 @@ where
     #[inline]
     pub fn lerp(&self, other: Self, t: T) -> Self {
         let one_t = T::one() - t;
-        size3(
-            one_t * self.width + t * other.width,
-            one_t * self.height + t * other.height,
-            one_t * self.depth + t * other.depth,
-        )
+        (*self) * one_t + other * t
     }
 }
 
