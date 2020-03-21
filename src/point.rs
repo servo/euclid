@@ -1225,15 +1225,6 @@ mod point2d {
     use mint;
 
     #[test]
-    pub fn test_scalar_mul() {
-        let p1: Point2D<f32> = Point2D::new(3.0, 5.0);
-
-        let result = p1 * 5.0;
-
-        assert_eq!(result, Point2D::new(15.0, 25.0));
-    }
-
-    #[test]
     pub fn test_min() {
         let p1 = Point2D::new(1.0, 3.0);
         let p2 = Point2D::new(2.0, 2.0);
@@ -1270,7 +1261,7 @@ mod point2d {
     pub type Point2DCm<T> = super::Point2D<T, Cm>;
 
     #[test]
-    pub fn test_add() {
+    pub fn test_add_vec() {
         let p1 = Point2DMm::new(1.0, 2.0);
         let p2 = vec2(3.0, 4.0);
 
@@ -1280,7 +1271,7 @@ mod point2d {
     }
 
     #[test]
-    pub fn test_add_assign() {
+    pub fn test_add_assign_vec() {
         let mut p1 = Point2DMm::new(1.0, 2.0);
         p1 += vec2(3.0, 4.0);
 
@@ -1288,7 +1279,16 @@ mod point2d {
     }
 
     #[test]
-    pub fn test_typed_scalar_mul() {
+    pub fn test_scalar_mul() {
+        let p1: Point2D<f32> = Point2D::new(3.0, 5.0);
+
+        let result = p1 * 5.0;
+
+        assert_eq!(result, Point2D::new(15.0, 25.0));
+    }
+
+    #[test]
+    pub fn test_scale_mul() {
         let p1 = Point2DMm::new(1.0, 2.0);
         let cm_per_mm: Scale<f32, Mm, Cm> = Scale::new(0.1);
 
