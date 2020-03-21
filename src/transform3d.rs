@@ -602,17 +602,18 @@ where
 
         Transform3D::row_major(
             _1 - _2 * (yy + zz) * sq,
-            _2 * (x * y * sq - z * sc),
-            _2 * (x * z * sq + y * sc),
-            _0,
-
             _2 * (x * y * sq + z * sc),
-            _1 - _2 * (xx + zz) * sq,
-            _2 * (y * z * sq - x * sc),
+            _2 * (x * z * sq - y * sc),
             _0,
 
-            _2 * (x * z * sq - y * sc),
+
+            _2 * (x * y * sq - z * sc),
+            _1 - _2 * (xx + zz) * sq,
             _2 * (y * z * sq + x * sc),
+            _0,
+
+            _2 * (x * z * sq + y * sc),
+            _2 * (y * z * sq - x * sc),
             _1 - _2 * (xx + yy) * sq,
             _0,
 
@@ -1177,8 +1178,8 @@ mod tests {
         assert_eq!(r1, r2);
         assert_eq!(r1, r3);
 
-        assert!(r1.transform_point3d(point3(1.0, 2.0, 3.0)).unwrap().approx_eq(&point3(2.0, -1.0, 3.0)));
-        assert!(r1.transform_point2d(point2(1.0, 2.0)).unwrap().approx_eq(&point2(2.0, -1.0)));
+        assert!(r1.transform_point3d(point3(1.0, 2.0, 3.0)).unwrap().approx_eq(&point3(-2.0, 1.0, 3.0)));
+        assert!(r1.transform_point2d(point2(1.0, 2.0)).unwrap().approx_eq(&point2(-2.0, 1.0)));
 
         assert!(r1.post_transform(&r1).approx_eq(&Mf32::create_rotation(0.0, 0.0, 1.0, rad(FRAC_PI_2*2.0))));
 
@@ -1323,12 +1324,12 @@ mod tests {
 
         let a = point3(1.0, 1.0, 1.0);
 
-        assert!(r.post_transform(&t).transform_point3d(a).unwrap().approx_eq(&point3(3.0, 2.0, 1.0)));
-        assert!(t.post_transform(&r).transform_point3d(a).unwrap().approx_eq(&point3(4.0, -3.0, 1.0)));
+        assert!(r.post_transform(&t).transform_point3d(a).unwrap().approx_eq(&point3(1.0, 4.0, 1.0)));
+        assert!(t.post_transform(&r).transform_point3d(a).unwrap().approx_eq(&point3(-4.0, 3.0, 1.0)));
         assert!(t.post_transform(&r).transform_point3d(a).unwrap().approx_eq(&r.transform_point3d(t.transform_point3d(a).unwrap()).unwrap()));
 
-        assert!(r.pre_transform(&t).transform_point3d(a).unwrap().approx_eq(&point3(4.0, -3.0, 1.0)));
-        assert!(t.pre_transform(&r).transform_point3d(a).unwrap().approx_eq(&point3(3.0, 2.0, 1.0)));
+        assert!(r.pre_transform(&t).transform_point3d(a).unwrap().approx_eq(&point3(-4.0, 3.0, 1.0)));
+        assert!(t.pre_transform(&r).transform_point3d(a).unwrap().approx_eq(&point3(1.0, 4.0, 1.0)));
         assert!(t.pre_transform(&r).transform_point3d(a).unwrap().approx_eq(&t.transform_point3d(r.transform_point3d(a).unwrap()).unwrap()));
     }
 

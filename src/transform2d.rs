@@ -456,8 +456,8 @@ where
         let cos = theta.get().cos();
         let sin = theta.get().sin();
         Transform2D::row_major(
-            cos, _0 - sin,
-            sin, cos,
+            cos, sin,
+            _0 - sin, cos,
             _0, _0
         )
     }
@@ -611,7 +611,6 @@ where
     }
 }
 
-
 impl <T, Src, Dst> Default for Transform2D<T, Src, Dst>
     where T: Zero + One
 {
@@ -705,7 +704,7 @@ mod test {
         assert_eq!(r1, r2);
         assert_eq!(r1, r3);
 
-        assert!(r1.transform_point(Point2D::new(1.0, 2.0)).approx_eq(&Point2D::new(2.0, -1.0)));
+        assert!(r1.transform_point(Point2D::new(1.0, 2.0)).approx_eq(&Point2D::new(-2.0, 1.0)));
 
         assert!(r1.post_transform(&r1).approx_eq(&Mat::create_rotation(rad(FRAC_PI_2*2.0))));
     }
@@ -783,12 +782,12 @@ mod test {
 
         let a = Point2D::new(1.0, 1.0);
 
-        assert!(r.post_transform(&t).transform_point(a).approx_eq(&Point2D::new(3.0, 2.0)));
-        assert!(t.post_transform(&r).transform_point(a).approx_eq(&Point2D::new(4.0, -3.0)));
+        assert!(r.post_transform(&t).transform_point(a).approx_eq(&Point2D::new(1.0, 4.0)));
+        assert!(t.post_transform(&r).transform_point(a).approx_eq(&Point2D::new(-4.0, 3.0)));
         assert!(t.post_transform(&r).transform_point(a).approx_eq(&r.transform_point(t.transform_point(a))));
 
-        assert!(r.pre_transform(&t).transform_point(a).approx_eq(&Point2D::new(4.0, -3.0)));
-        assert!(t.pre_transform(&r).transform_point(a).approx_eq(&Point2D::new(3.0, 2.0)));
+        assert!(r.pre_transform(&t).transform_point(a).approx_eq(&Point2D::new(-4.0, 3.0)));
+        assert!(t.pre_transform(&r).transform_point(a).approx_eq(&Point2D::new(1.0, 4.0)));
         assert!(t.pre_transform(&r).transform_point(a).approx_eq(&t.transform_point(r.transform_point(a))));
     }
 
