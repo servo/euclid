@@ -168,14 +168,7 @@ impl<T: Clone, Src, Dst> Scale<T, Src, Dst> {
     pub fn get(&self) -> T {
         self.0.clone()
     }
-}
 
-impl<Src, Dst> Scale<f32, Src, Dst> {
-    /// Identity scaling, could be used to safely transit from one space to another.
-    pub const ONE: Self = Scale(1.0, PhantomData);
-}
-
-impl<T: Clone + One + Div<T, Output = T>, Src, Dst> Scale<T, Src, Dst> {
     /// The inverse Scale (1.0 / self).
     ///
     /// # Example
@@ -189,11 +182,20 @@ impl<T: Clone + One + Div<T, Output = T>, Src, Dst> Scale<T, Src, Dst> {
     ///
     /// assert_eq!(cm_per_mm.inv(), Scale::new(10.0));
     /// ```
-    pub fn inv(&self) -> Scale<T, Dst, Src> {
+    pub fn inv(&self) -> Scale<T::Output, Dst, Src>
+    where
+        T: One + Div
+    {
         let one: T = One::one();
-        Scale::new(one / self.get())
+        Scale::new(one / self.0.clone())
     }
 }
+
+impl<Src, Dst> Scale<f32, Src, Dst> {
+    /// Identity scaling, could be used to safely transit from one space to another.
+    pub const ONE: Self = Scale(1.0, PhantomData);
+}
+
 
 // scale0 * scale1
 impl<T: Mul<T, Output = T>, A, B, C> Mul<Scale<T, B, C>> for Scale<T, A, B> {
