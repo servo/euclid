@@ -565,44 +565,6 @@ mod size2d {
     use mint;
 
     #[test]
-    pub fn test_add() {
-        let p1 = Size2D::new(1.0, 2.0);
-        let p2 = Size2D::new(3.0, 4.0);
-        assert_eq!(p1 + p2, Size2D::new(4.0, 6.0));
-
-        let p1 = Size2D::new(1.0, 2.0);
-        let p2 = Size2D::new(0.0, 0.0);
-        assert_eq!(p1 + p2, Size2D::new(1.0, 2.0));
-
-        let p1 = Size2D::new(1.0, 2.0);
-        let p2 = Size2D::new(-3.0, -4.0);
-        assert_eq!(p1 + p2, Size2D::new(-2.0, -2.0));
-
-        let p1 = Size2D::new(0.0, 0.0);
-        let p2 = Size2D::new(0.0, 0.0);
-        assert_eq!(p1 + p2, Size2D::new(0.0, 0.0));
-    }
-
-    #[test]
-    pub fn test_sub() {
-        let p1 = Size2D::new(1.0, 2.0);
-        let p2 = Size2D::new(3.0, 4.0);
-        assert_eq!(p1 - p2, Size2D::new(-2.0, -2.0));
-
-        let p1 = Size2D::new(1.0, 2.0);
-        let p2 = Size2D::new(0.0, 0.0);
-        assert_eq!(p1 - p2, Size2D::new(1.0, 2.0));
-
-        let p1 = Size2D::new(1.0, 2.0);
-        let p2 = Size2D::new(-3.0, -4.0);
-        assert_eq!(p1 - p2, Size2D::new(4.0, 6.0));
-
-        let p1 = Size2D::new(0.0, 0.0);
-        let p2 = Size2D::new(0.0, 0.0);
-        assert_eq!(p1 - p2, Size2D::new(0.0, 0.0));
-    }
-
-    #[test]
     pub fn test_area() {
         let p = Size2D::new(1.5, 2.0);
         assert_eq!(p.area(), 3.0);
@@ -616,6 +578,48 @@ mod size2d {
         let s2 = Size2D::from(sm);
 
         assert_eq!(s1, s2);
+    }
+
+    mod ops {
+        use default::Size2D;
+
+        #[test]
+        pub fn test_add() {
+            let s1 = Size2D::new(1.0, 2.0);
+            let s2 = Size2D::new(3.0, 4.0);
+            assert_eq!(s1 + s2, Size2D::new(4.0, 6.0));
+
+            let s1 = Size2D::new(1.0, 2.0);
+            let s2 = Size2D::new(0.0, 0.0);
+            assert_eq!(s1 + s2, Size2D::new(1.0, 2.0));
+
+            let s1 = Size2D::new(1.0, 2.0);
+            let s2 = Size2D::new(-3.0, -4.0);
+            assert_eq!(s1 + s2, Size2D::new(-2.0, -2.0));
+
+            let s1 = Size2D::new(0.0, 0.0);
+            let s2 = Size2D::new(0.0, 0.0);
+            assert_eq!(s1 + s2, Size2D::new(0.0, 0.0));
+        }
+
+        #[test]
+        pub fn test_sub() {
+            let s1 = Size2D::new(1.0, 2.0);
+            let s2 = Size2D::new(3.0, 4.0);
+            assert_eq!(s1 - s2, Size2D::new(-2.0, -2.0));
+
+            let s1 = Size2D::new(1.0, 2.0);
+            let s2 = Size2D::new(0.0, 0.0);
+            assert_eq!(s1 - s2, Size2D::new(1.0, 2.0));
+
+            let s1 = Size2D::new(1.0, 2.0);
+            let s2 = Size2D::new(-3.0, -4.0);
+            assert_eq!(s1 - s2, Size2D::new(4.0, 6.0));
+
+            let s1 = Size2D::new(0.0, 0.0);
+            let s2 = Size2D::new(0.0, 0.0);
+            assert_eq!(s1 - s2, Size2D::new(0.0, 0.0));
+        }
     }
 }
 
