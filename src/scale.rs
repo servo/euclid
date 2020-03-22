@@ -191,39 +191,6 @@ impl<T: Clone, Src, Dst> Scale<T, Src, Dst> {
     }
 }
 
-impl<Src, Dst> Scale<f32, Src, Dst> {
-    /// Identity scaling, could be used to safely transit from one space to another.
-    pub const ONE: Self = Scale(1.0, PhantomData);
-}
-
-
-// scale0 * scale1
-impl<T: Mul<T, Output = T>, A, B, C> Mul<Scale<T, B, C>> for Scale<T, A, B> {
-    type Output = Scale<T, A, C>;
-    #[inline]
-    fn mul(self, other: Scale<T, B, C>) -> Scale<T, A, C> {
-        Scale::new(self.0 * other.0)
-    }
-}
-
-// scale0 + scale1
-impl<T: Add<T, Output = T>, Src, Dst> Add for Scale<T, Src, Dst> {
-    type Output = Scale<T, Src, Dst>;
-    #[inline]
-    fn add(self, other: Scale<T, Src, Dst>) -> Scale<T, Src, Dst> {
-        Scale::new(self.0 + other.0)
-    }
-}
-
-// scale0 - scale1
-impl<T: Sub<T, Output = T>, Src, Dst> Sub for Scale<T, Src, Dst> {
-    type Output = Scale<T, Src, Dst>;
-    #[inline]
-    fn sub(self, other: Scale<T, Src, Dst>) -> Scale<T, Src, Dst> {
-        Scale::new(self.0 - other.0)
-    }
-}
-
 impl<T: NumCast + Clone, Src, Dst> Scale<T, Src, Dst> {
     /// Cast from one numeric representation to another, preserving the units.
     ///
@@ -280,6 +247,40 @@ impl<T: NumCast + Clone, Src, Dst> Scale<T, Src, Dst> {
         NumCast::from(self.get()).map(Scale::new)
     }
 }
+
+impl<Src, Dst> Scale<f32, Src, Dst> {
+    /// Identity scaling, could be used to safely transit from one space to another.
+    pub const ONE: Self = Scale(1.0, PhantomData);
+}
+
+
+// scale0 * scale1
+impl<T: Mul<T, Output = T>, A, B, C> Mul<Scale<T, B, C>> for Scale<T, A, B> {
+    type Output = Scale<T, A, C>;
+    #[inline]
+    fn mul(self, other: Scale<T, B, C>) -> Scale<T, A, C> {
+        Scale::new(self.0 * other.0)
+    }
+}
+
+// scale0 + scale1
+impl<T: Add<T, Output = T>, Src, Dst> Add for Scale<T, Src, Dst> {
+    type Output = Scale<T, Src, Dst>;
+    #[inline]
+    fn add(self, other: Scale<T, Src, Dst>) -> Scale<T, Src, Dst> {
+        Scale::new(self.0 + other.0)
+    }
+}
+
+// scale0 - scale1
+impl<T: Sub<T, Output = T>, Src, Dst> Sub for Scale<T, Src, Dst> {
+    type Output = Scale<T, Src, Dst>;
+    #[inline]
+    fn sub(self, other: Scale<T, Src, Dst>) -> Scale<T, Src, Dst> {
+        Scale::new(self.0 - other.0)
+    }
+}
+
 
 // FIXME: Switch to `derive(PartialEq, Clone)` after this Rust issue is fixed:
 // https://github.com/rust-lang/rust/issues/26925
