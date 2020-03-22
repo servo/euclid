@@ -12,7 +12,7 @@ use {Size2D, Rect, vec2, point2, vec3, point3};
 use UnknownUnit;
 use num::*;
 use trig::Trig;
-use core::ops::{Add, Sub, Neg, Mul, Div};
+use core::ops::{Add, AddAssign, Sub, SubAssign, Neg, Mul, Div};
 use core::marker::PhantomData;
 use core::fmt;
 use core::cmp::{Eq, PartialEq};
@@ -208,6 +208,13 @@ impl<T: Add, Src, Dst1, Dst2> Add<Translation2D<T, Dst1, Dst2>> for Translation2
     }
 }
 
+impl<T: AddAssign, Src, Dst> AddAssign<Translation2D<T, Dst, Dst>> for Translation2D<T, Src, Dst> {
+    fn add_assign(&mut self, other: Translation2D<T, Dst, Dst>) {
+        self.x += other.x;
+        self.y += other.y;
+    }
+}
+
 
 impl<T: Sub, Src, Dst1, Dst2> Sub<Translation2D<T, Dst1, Dst2>> for Translation2D<T, Src, Dst2> {
     type Output = Translation2D<T::Output, Src, Dst1>;
@@ -217,6 +224,13 @@ impl<T: Sub, Src, Dst1, Dst2> Sub<Translation2D<T, Dst1, Dst2>> for Translation2
             self.x - other.x,
             self.y - other.y,
         )
+    }
+}
+
+impl<T: SubAssign, Src, Dst> SubAssign<Translation2D<T, Dst, Dst>> for Translation2D<T, Src, Dst> {
+    fn sub_assign(&mut self, other: Translation2D<T, Dst, Dst>) {
+        self.x -= other.x;
+        self.y -= other.y;
     }
 }
 
@@ -503,6 +517,14 @@ impl<T: Add, Src, Dst1, Dst2> Add<Translation3D<T, Dst1, Dst2>> for Translation3
     }
 }
 
+impl<T: AddAssign, Src, Dst> AddAssign<Translation3D<T, Dst, Dst>> for Translation3D<T, Src, Dst> {
+    fn add_assign(&mut self, other: Translation3D<T, Dst, Dst>) {
+        self.x += other.x;
+        self.y += other.y;
+        self.z += other.z;
+    }
+}
+
 
 impl<T: Sub, Src, Dst1, Dst2> Sub<Translation3D<T, Dst1, Dst2>> for Translation3D<T, Src, Dst2> {
     type Output = Translation3D<T::Output, Src, Dst1>;
@@ -513,6 +535,14 @@ impl<T: Sub, Src, Dst1, Dst2> Sub<Translation3D<T, Dst1, Dst2>> for Translation3
             self.y - other.y,
             self.z - other.z,
         )
+    }
+}
+
+impl<T: SubAssign, Src, Dst> SubAssign<Translation3D<T, Dst, Dst>> for Translation3D<T, Src, Dst> {
+    fn sub_assign(&mut self, other: Translation3D<T, Dst, Dst>) {
+        self.x -= other.x;
+        self.y -= other.y;
+        self.z -= other.z;
     }
 }
 
@@ -636,6 +666,25 @@ mod _2d {
         }
 
         #[test]
+        pub fn test_add_assign() {
+            let mut t = Translation2D::new(1.0, 2.0);
+            t += Translation2D::new(3.0, 4.0);
+            assert_eq!(t, Translation2D::new(4.0, 6.0));
+
+            let mut t = Translation2D::new(1.0, 2.0);
+            t += Translation2D::new(0.0, 0.0);
+            assert_eq!(t, Translation2D::new(1.0, 2.0));
+
+            let mut t = Translation2D::new(1.0, 2.0);
+            t += Translation2D::new(-3.0, -4.0);
+            assert_eq!(t, Translation2D::new(-2.0, -2.0));
+
+            let mut t = Translation2D::new(0.0, 0.0);
+            t += Translation2D::new(0.0, 0.0);
+            assert_eq!(t, Translation2D::new(0.0, 0.0));
+        }
+
+        #[test]
         pub fn test_sub() {
             let t1 = Translation2D::new(1.0, 2.0);
             let t2 = Translation2D::new(3.0, 4.0);
@@ -652,6 +701,25 @@ mod _2d {
             let t1 = Translation2D::new(0.0, 0.0);
             let t2 = Translation2D::new(0.0, 0.0);
             assert_eq!(t1 - t2, Translation2D::new(0.0, 0.0));
+        }
+
+        #[test]
+        pub fn test_sub_assign() {
+            let mut t = Translation2D::new(1.0, 2.0);
+            t -= Translation2D::new(3.0, 4.0);
+            assert_eq!(t, Translation2D::new(-2.0, -2.0));
+
+            let mut t = Translation2D::new(1.0, 2.0);
+            t -= Translation2D::new(0.0, 0.0);
+            assert_eq!(t, Translation2D::new(1.0, 2.0));
+
+            let mut t = Translation2D::new(1.0, 2.0);
+            t -= Translation2D::new(-3.0, -4.0);
+            assert_eq!(t, Translation2D::new(4.0, 6.0));
+
+            let mut t = Translation2D::new(0.0, 0.0);
+            t -= Translation2D::new(0.0, 0.0);
+            assert_eq!(t, Translation2D::new(0.0, 0.0));
         }
     }
 }
@@ -704,6 +772,25 @@ mod _3d {
         }
 
         #[test]
+        pub fn test_add_assign() {
+            let mut t = Translation3D::new(1.0, 2.0, 3.0);
+            t += Translation3D::new(4.0, 5.0, 6.0);
+            assert_eq!(t, Translation3D::new(5.0, 7.0, 9.0));
+
+            let mut t = Translation3D::new(1.0, 2.0, 3.0);
+            t += Translation3D::new(0.0, 0.0, 0.0);
+            assert_eq!(t, Translation3D::new(1.0, 2.0, 3.0));
+
+            let mut t = Translation3D::new( 1.0,  2.0,  3.0);
+            t += Translation3D::new(-4.0, -5.0, -6.0);
+            assert_eq!(t, Translation3D::new(-3.0, -3.0, -3.0));
+
+            let mut t = Translation3D::new(0.0, 0.0, 0.0);
+            t += Translation3D::new(0.0, 0.0, 0.0);
+            assert_eq!(t, Translation3D::new(0.0, 0.0, 0.0));
+        }
+
+        #[test]
         pub fn test_sub() {
             let t1 = Translation3D::new(1.0, 2.0, 3.0);
             let t2 = Translation3D::new(4.0, 5.0, 6.0);
@@ -720,6 +807,25 @@ mod _3d {
             let t1 = Translation3D::new(0.0, 0.0, 0.0);
             let t2 = Translation3D::new(0.0, 0.0, 0.0);
             assert_eq!(t1 - t2, Translation3D::new(0.0, 0.0, 0.0));
+        }
+
+        #[test]
+        pub fn test_sub_assign() {
+            let mut t = Translation3D::new(1.0, 2.0, 3.0);
+            t -= Translation3D::new(4.0, 5.0, 6.0);
+            assert_eq!(t, Translation3D::new(-3.0, -3.0, -3.0));
+
+            let mut t = Translation3D::new(1.0, 2.0, 3.0);
+            t -= Translation3D::new(0.0, 0.0, 0.0);
+            assert_eq!(t, Translation3D::new(1.0, 2.0, 3.0));
+
+            let mut t = Translation3D::new( 1.0,  2.0,  3.0);
+            t -= Translation3D::new(-4.0, -5.0, -6.0);
+            assert_eq!(t, Translation3D::new(5.0, 7.0, 9.0));
+
+            let mut t = Translation3D::new(0.0, 0.0, 0.0);
+            t -= Translation3D::new(0.0, 0.0, 0.0);
+            assert_eq!(t, Translation3D::new(0.0, 0.0, 0.0));
         }
     }
 }
