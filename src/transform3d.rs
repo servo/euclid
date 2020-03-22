@@ -689,7 +689,7 @@ where
 /// Methods for apply transformations to objects
 impl<T, Src, Dst> Transform3D<T, Src, Dst>
 where
-    T: Copy + Add<Output = T> + Sub<Output = T> + Mul<Output = T> + Div<Output = T> + Zero + PartialOrd,
+    T: Copy + Add<Output = T> + Mul<Output = T>,
 {
     /// Returns the homogeneous vector corresponding to the transformed 2d point.
     ///
@@ -715,7 +715,10 @@ where
     ///
     /// Assuming row vectors, this is equivalent to `p * self`
     #[inline]
-    pub fn transform_point2d(&self, p: Point2D<T, Src>) -> Option<Point2D<T, Dst>> {
+    pub fn transform_point2d(&self, p: Point2D<T, Src>) -> Option<Point2D<T, Dst>>
+    where
+        T: Div<Output = T> + Zero + PartialOrd,
+    {
         //Note: could use `transform_point2d_homogeneous()` but it would waste the calculus of `z`
         let w = p.x * self.m14 + p.y * self.m24 + self.m44;
         if w > T::zero() {
@@ -765,7 +768,10 @@ where
     ///
     /// Assuming row vectors, this is equivalent to `p * self`
     #[inline]
-    pub fn transform_point3d(&self, p: Point3D<T, Src>) -> Option<Point3D<T, Dst>> {
+    pub fn transform_point3d(&self, p: Point3D<T, Src>) -> Option<Point3D<T, Dst>>
+    where
+        T: Div<Output = T> + Zero + PartialOrd,
+    {
         self.transform_point3d_homogeneous(p).to_point3d()
     }
 
@@ -785,7 +791,10 @@ where
 
     /// Returns a rectangle that encompasses the result of transforming the given rectangle by this
     /// transform, if the transform makes sense for it, or `None` otherwise.
-    pub fn transform_rect(&self, rect: &Rect<T, Src>) -> Option<Rect<T, Dst>> {
+    pub fn transform_rect(&self, rect: &Rect<T, Src>) -> Option<Rect<T, Dst>>
+    where
+        T: Sub<Output = T> + Div<Output = T> + Zero + PartialOrd,
+    {
         let min = rect.min();
         let max = rect.max();
         Some(Rect::from_points(&[

@@ -528,7 +528,7 @@ impl<T, Src, Dst> Transform2D<T, Src, Dst> {
 /// Methods for apply transformations to objects
 impl<T, Src, Dst> Transform2D<T, Src, Dst>
 where
-    T: Copy + Add<Output = T> + Sub<Output = T> + Mul<Output = T> + PartialOrd + Zero,
+    T: Copy + Add<Output = T> + Mul<Output = T>,
 {
     /// Returns the given point transformed by this transform.
     ///
@@ -556,7 +556,10 @@ where
     /// transform.
     #[inline]
     #[must_use]
-    pub fn transform_rect(&self, rect: &Rect<T, Src>) -> Rect<T, Dst> {
+    pub fn transform_rect(&self, rect: &Rect<T, Src>) -> Rect<T, Dst>
+    where
+        T: Sub<Output = T> + Zero + PartialOrd,
+    {
         let min = rect.min();
         let max = rect.max();
         Rect::from_points(&[
