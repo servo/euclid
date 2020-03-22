@@ -111,7 +111,19 @@ impl<T: Default, U> Default for Size2D<T, U> {
     }
 }
 
+
 impl<T, U> Size2D<T, U> {
+    /// The same as [`Zero::zero()`] but available without importing trait.
+    ///
+    /// [`Zero::zero()`]: ./num/trait.Zero.html#tymethod.zero
+    #[inline]
+    pub fn zero() -> Self
+    where
+        T: Zero,
+    {
+        Size2D::new(Zero::zero(), Zero::zero())
+    }
+
     /// Constructor taking scalar values.
     #[inline]
     pub const fn new(width: T, height: T) -> Self {
@@ -133,6 +145,7 @@ impl<T, U> Size2D<T, U> {
         Size2D::new(p.width, p.height)
     }
 }
+
 
 impl<T: Round, U> Size2D<T, U> {
     /// Rounds each component to the nearest integer value.
@@ -163,6 +176,7 @@ impl<T: Floor, U> Size2D<T, U> {
         Size2D::new(self.width.floor(), self.height.floor())
     }
 }
+
 
 impl<T: Add<T, Output = T>, U> Add for Size2D<T, U> {
     type Output = Self;
@@ -221,16 +235,6 @@ impl<T: Zero + PartialOrd, U> Size2D<T, U> {
     pub fn is_empty_or_negative(&self) -> bool {
         let zero = T::zero();
         self.width <= zero || self.height <= zero
-    }
-}
-
-impl<T: Zero, U> Size2D<T, U> {
-    /// The same as [`Zero::zero()`] but available without importing trait.
-    ///
-    /// [`Zero::zero()`]: ./num/trait.Zero.html#tymethod.zero
-    #[inline]
-    pub fn zero() -> Self {
-        Size2D::new(Zero::zero(), Zero::zero())
     }
 }
 
@@ -610,6 +614,8 @@ mod size2d {
     }
 }
 
+
+
 /// A 3d size tagged with a unit.
 #[repr(C)]
 pub struct Size3D<T, U> {
@@ -697,7 +703,18 @@ impl<T: Default, U> Default for Size3D<T, U> {
     }
 }
 
+
 impl<T, U> Size3D<T, U> {
+    /// The same as [`Zero::zero()`] but available without importing trait.
+    ///
+    /// [`Zero::zero()`]: ./num/trait.Zero.html#tymethod.zero
+    pub fn zero() -> Self
+    where
+        T: Zero,
+    {
+        Size3D::new(Zero::zero(), Zero::zero(), Zero::zero())
+    }
+
     /// Constructor taking scalar values.
     #[inline]
     pub const fn new(width: T, height: T, depth: T) -> Self {
@@ -708,15 +725,14 @@ impl<T, U> Size3D<T, U> {
             _unit: PhantomData,
         }
     }
-}
 
-impl<T, U> Size3D<T, U> {
     /// Constructor taking scalar strongly typed lengths.
     #[inline]
     pub fn from_lengths(width: Length<T, U>, height: Length<T, U>, depth: Length<T, U>) -> Self {
         Size3D::new(width.0, height.0, depth.0)
     }
 }
+
 
 impl<T: Round, U> Size3D<T, U> {
     /// Rounds each component to the nearest integer value.
@@ -747,6 +763,7 @@ impl<T: Floor, U> Size3D<T, U> {
         Size3D::new(self.width.floor(), self.height.floor(), self.depth.floor())
     }
 }
+
 
 impl<T: Add<T, Output = T>, U> Add for Size3D<T, U> {
     type Output = Self;
@@ -807,16 +824,6 @@ impl<T: Zero + PartialOrd, U> Size3D<T, U> {
     pub fn is_empty_or_negative(&self) -> bool {
         let zero = T::zero();
         self.width <= zero || self.height <= zero || self.depth <= zero
-    }
-}
-
-impl<T: Zero, U> Size3D<T, U> {
-    /// The same as [`Zero::zero()`] but available without importing trait.
-    ///
-    /// [`Zero::zero()`]: ./num/trait.Zero.html#tymethod.zero
-    #[inline]
-    pub fn zero() -> Self {
-        Size3D::new(Zero::zero(), Zero::zero(), Zero::zero())
     }
 }
 
