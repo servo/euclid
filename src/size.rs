@@ -433,53 +433,59 @@ impl<T: Zero, U> Zero for Size2D<T, U> {
 }
 
 
-impl<T: Add<T, Output = T>, U> Add for Size2D<T, U> {
-    type Output = Self;
+impl<T: Add, U> Add for Size2D<T, U> {
+    type Output = Size2D<T::Output, U>;
+
     #[inline]
-    fn add(self, other: Self) -> Self {
+    fn add(self, other: Self) -> Self::Output {
         Size2D::new(self.width + other.width, self.height + other.height)
     }
 }
 
 
-impl<T: Sub<T, Output = T>, U> Sub for Size2D<T, U> {
-    type Output = Self;
+impl<T: Sub, U> Sub for Size2D<T, U> {
+    type Output = Size2D<T::Output, U>;
+
     #[inline]
-    fn sub(self, other: Self) -> Self {
+    fn sub(self, other: Self) -> Self::Output {
         Size2D::new(self.width - other.width, self.height - other.height)
     }
 }
 
 
-impl<T: Copy + Mul<T, Output = T>, U> Mul<T> for Size2D<T, U> {
-    type Output = Self;
+impl<T: Copy + Mul, U> Mul<T> for Size2D<T, U> {
+    type Output = Size2D<T::Output, U>;
+
     #[inline]
-    fn mul(self, scale: T) -> Self {
+    fn mul(self, scale: T) -> Self::Output {
         Size2D::new(self.width * scale, self.height * scale)
     }
 }
 
-impl<T: Copy + Mul<T, Output = T>, U1, U2> Mul<Scale<T, U1, U2>> for Size2D<T, U1> {
-    type Output = Size2D<T, U2>;
+impl<T: Copy + Mul, U1, U2> Mul<Scale<T, U1, U2>> for Size2D<T, U1> {
+    type Output = Size2D<T::Output, U2>;
+
     #[inline]
-    fn mul(self, scale: Scale<T, U1, U2>) -> Size2D<T, U2> {
+    fn mul(self, scale: Scale<T, U1, U2>) -> Self::Output {
         Size2D::new(self.width * scale.get(), self.height * scale.get())
     }
 }
 
 
-impl<T: Copy + Div<T, Output = T>, U> Div<T> for Size2D<T, U> {
-    type Output = Self;
+impl<T: Copy + Div, U> Div<T> for Size2D<T, U> {
+    type Output = Size2D<T::Output, U>;
+
     #[inline]
-    fn div(self, scale: T) -> Self {
+    fn div(self, scale: T) -> Self::Output {
         Size2D::new(self.width / scale, self.height / scale)
     }
 }
 
-impl<T: Copy + Div<T, Output = T>, U1, U2> Div<Scale<T, U1, U2>> for Size2D<T, U2> {
-    type Output = Size2D<T, U1>;
+impl<T: Copy + Div, U1, U2> Div<Scale<T, U1, U2>> for Size2D<T, U2> {
+    type Output = Size2D<T::Output, U1>;
+
     #[inline]
-    fn div(self, scale: Scale<T, U1, U2>) -> Size2D<T, U1> {
+    fn div(self, scale: Scale<T, U1, U2>) -> Self::Output {
         Size2D::new(self.width / scale.get(), self.height / scale.get())
     }
 }
@@ -1021,53 +1027,59 @@ impl<T: Zero, U> Zero for Size3D<T, U> {
 }
 
 
-impl<T: Add<T, Output = T>, U> Add for Size3D<T, U> {
-    type Output = Self;
+impl<T: Add, U> Add for Size3D<T, U> {
+    type Output = Size3D<T::Output, U>;
+
     #[inline]
-    fn add(self, other: Self) -> Self {
+    fn add(self, other: Self) -> Self::Output {
         Size3D::new(self.width + other.width, self.height + other.height, self.depth + other.depth)
     }
 }
 
 
-impl<T: Sub<T, Output = T>, U> Sub for Size3D<T, U> {
-    type Output = Self;
+impl<T: Sub, U> Sub for Size3D<T, U> {
+    type Output = Size3D<T::Output, U>;
+
     #[inline]
-    fn sub(self, other: Self) -> Self {
+    fn sub(self, other: Self) -> Self::Output {
         Size3D::new(self.width - other.width, self.height - other.height, self.depth - other.depth)
     }
 }
 
 
-impl<T: Copy + Mul<T, Output = T>, U> Mul<T> for Size3D<T, U> {
-    type Output = Self;
+impl<T: Copy + Mul, U> Mul<T> for Size3D<T, U> {
+    type Output = Size3D<T::Output, U>;
+
     #[inline]
-    fn mul(self, scale: T) -> Self {
+    fn mul(self, scale: T) -> Self::Output {
         Size3D::new(self.width * scale, self.height * scale, self.depth * scale)
     }
 }
 
-impl<T: Copy + Mul<T, Output = T>, U1, U2> Mul<Scale<T, U1, U2>> for Size3D<T, U1> {
-    type Output = Size3D<T, U2>;
+impl<T: Copy + Mul, U1, U2> Mul<Scale<T, U1, U2>> for Size3D<T, U1> {
+    type Output = Size3D<T::Output, U2>;
+
     #[inline]
-    fn mul(self, scale: Scale<T, U1, U2>) -> Size3D<T, U2> {
+    fn mul(self, scale: Scale<T, U1, U2>) -> Self::Output {
         Size3D::new(self.width * scale.get(), self.height * scale.get(), self.depth * scale.get())
     }
 }
 
 
-impl<T: Copy + Div<T, Output = T>, U> Div<T> for Size3D<T, U> {
-    type Output = Self;
+impl<T: Copy + Div, U> Div<T> for Size3D<T, U> {
+    type Output = Size3D<T::Output, U>;
+
     #[inline]
-    fn div(self, scale: T) -> Self {
+    fn div(self, scale: T) -> Self::Output {
         Size3D::new(self.width / scale, self.height / scale, self.depth / scale)
     }
 }
 
-impl<T: Copy + Div<T, Output = T>, U1, U2> Div<Scale<T, U1, U2>> for Size3D<T, U2> {
-    type Output = Size3D<T, U1>;
+impl<T: Copy + Div, U1, U2> Div<Scale<T, U1, U2>> for Size3D<T, U2> {
+    type Output = Size3D<T::Output, U1>;
+
     #[inline]
-    fn div(self, scale: Scale<T, U1, U2>) -> Size3D<T, U1> {
+    fn div(self, scale: Scale<T, U1, U2>) -> Self::Output {
         Size3D::new(self.width / scale.get(), self.height / scale.get(), self.depth / scale.get())
     }
 }
