@@ -146,6 +146,126 @@ impl<T, U> Size2D<T, U> {
     }
 }
 
+impl<T: Copy, U> Size2D<T, U> {
+    /// Return this size as an array of two elements (width, then height).
+    #[inline]
+    pub fn to_array(&self) -> [T; 2] {
+        [self.width, self.height]
+    }
+
+    /// Return this size as a tuple of two elements (width, then height).
+    #[inline]
+    pub fn to_tuple(&self) -> (T, T) {
+        (self.width, self.height)
+    }
+
+    /// Return this size as a vector with width and height.
+    #[inline]
+    pub fn to_vector(&self) -> Vector2D<T, U> {
+        vec2(self.width, self.height)
+    }
+
+    /// Drop the units, preserving only the numeric value.
+    #[inline]
+    pub fn to_untyped(&self) -> Size2D<T, UnknownUnit> {
+        Size2D::new(self.width, self.height)
+    }
+
+    /// Cast the unit
+    #[inline]
+    pub fn cast_unit<V>(&self) -> Size2D<T, V> {
+        Size2D::new(self.width, self.height)
+    }
+}
+
+impl<T: NumCast + Copy, U> Size2D<T, U> {
+    /// Cast from one numeric representation to another, preserving the units.
+    ///
+    /// When casting from floating point to integer coordinates, the decimals are truncated
+    /// as one would expect from a simple cast, but this behavior does not always make sense
+    /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
+    #[inline]
+    pub fn cast<NewT: NumCast>(&self) -> Size2D<NewT, U> {
+        self.try_cast().unwrap()
+    }
+
+    /// Fallible cast from one numeric representation to another, preserving the units.
+    ///
+    /// When casting from floating point to integer coordinates, the decimals are truncated
+    /// as one would expect from a simple cast, but this behavior does not always make sense
+    /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
+    pub fn try_cast<NewT: NumCast>(&self) -> Option<Size2D<NewT, U>> {
+        match (NumCast::from(self.width), NumCast::from(self.height)) {
+            (Some(w), Some(h)) => Some(Size2D::new(w, h)),
+            _ => None,
+        }
+    }
+
+    // Convenience functions for common casts
+
+    /// Cast into an `f32` size.
+    #[inline]
+    pub fn to_f32(&self) -> Size2D<f32, U> {
+        self.cast()
+    }
+
+    /// Cast into an `f64` size.
+    #[inline]
+    pub fn to_f64(&self) -> Size2D<f64, U> {
+        self.cast()
+    }
+
+    /// Cast into an `uint` size, truncating decimals if any.
+    ///
+    /// When casting from floating point sizes, it is worth considering whether
+    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
+    /// the desired conversion behavior.
+    #[inline]
+    pub fn to_usize(&self) -> Size2D<usize, U> {
+        self.cast()
+    }
+
+    /// Cast into an `u32` size, truncating decimals if any.
+    ///
+    /// When casting from floating point sizes, it is worth considering whether
+    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
+    /// the desired conversion behavior.
+    #[inline]
+    pub fn to_u32(&self) -> Size2D<u32, U> {
+        self.cast()
+    }
+
+    /// Cast into an `u64` size, truncating decimals if any.
+    ///
+    /// When casting from floating point sizes, it is worth considering whether
+    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
+    /// the desired conversion behavior.
+    #[inline]
+    pub fn to_u64(&self) -> Size2D<u64, U> {
+        self.cast()
+    }
+
+    /// Cast into an `i32` size, truncating decimals if any.
+    ///
+    /// When casting from floating point sizes, it is worth considering whether
+    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
+    /// the desired conversion behavior.
+    #[inline]
+    pub fn to_i32(&self) -> Size2D<i32, U> {
+        self.cast()
+    }
+
+    /// Cast into an `i64` size, truncating decimals if any.
+    ///
+    /// When casting from floating point sizes, it is worth considering whether
+    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
+    /// the desired conversion behavior.
+    #[inline]
+    pub fn to_i64(&self) -> Size2D<i64, U> {
+        self.cast()
+    }
+}
+
 
 impl<T: Round, U> Size2D<T, U> {
     /// Rounds each component to the nearest integer value.
@@ -274,126 +394,6 @@ impl<T: Copy + Div<T, Output = T>, U1, U2> Div<Scale<T, U1, U2>> for Size2D<T, U
     #[inline]
     fn div(self, scale: Scale<T, U1, U2>) -> Size2D<T, U1> {
         Size2D::new(self.width / scale.get(), self.height / scale.get())
-    }
-}
-
-impl<T: Copy, U> Size2D<T, U> {
-    /// Return this size as an array of two elements (width, then height).
-    #[inline]
-    pub fn to_array(&self) -> [T; 2] {
-        [self.width, self.height]
-    }
-
-    /// Return this size as a tuple of two elements (width, then height).
-    #[inline]
-    pub fn to_tuple(&self) -> (T, T) {
-        (self.width, self.height)
-    }
-
-    /// Return this size as a vector with width and height.
-    #[inline]
-    pub fn to_vector(&self) -> Vector2D<T, U> {
-        vec2(self.width, self.height)
-    }
-
-    /// Drop the units, preserving only the numeric value.
-    #[inline]
-    pub fn to_untyped(&self) -> Size2D<T, UnknownUnit> {
-        Size2D::new(self.width, self.height)
-    }
-
-    /// Cast the unit
-    #[inline]
-    pub fn cast_unit<V>(&self) -> Size2D<T, V> {
-        Size2D::new(self.width, self.height)
-    }
-}
-
-impl<T: NumCast + Copy, U> Size2D<T, U> {
-    /// Cast from one numeric representation to another, preserving the units.
-    ///
-    /// When casting from floating point to integer coordinates, the decimals are truncated
-    /// as one would expect from a simple cast, but this behavior does not always make sense
-    /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
-    #[inline]
-    pub fn cast<NewT: NumCast>(&self) -> Size2D<NewT, U> {
-        self.try_cast().unwrap()
-    }
-
-    /// Fallible cast from one numeric representation to another, preserving the units.
-    ///
-    /// When casting from floating point to integer coordinates, the decimals are truncated
-    /// as one would expect from a simple cast, but this behavior does not always make sense
-    /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
-    pub fn try_cast<NewT: NumCast>(&self) -> Option<Size2D<NewT, U>> {
-        match (NumCast::from(self.width), NumCast::from(self.height)) {
-            (Some(w), Some(h)) => Some(Size2D::new(w, h)),
-            _ => None,
-        }
-    }
-
-    // Convenience functions for common casts
-
-    /// Cast into an `f32` size.
-    #[inline]
-    pub fn to_f32(&self) -> Size2D<f32, U> {
-        self.cast()
-    }
-
-    /// Cast into an `f64` size.
-    #[inline]
-    pub fn to_f64(&self) -> Size2D<f64, U> {
-        self.cast()
-    }
-
-    /// Cast into an `uint` size, truncating decimals if any.
-    ///
-    /// When casting from floating point sizes, it is worth considering whether
-    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
-    /// the desired conversion behavior.
-    #[inline]
-    pub fn to_usize(&self) -> Size2D<usize, U> {
-        self.cast()
-    }
-
-    /// Cast into an `u32` size, truncating decimals if any.
-    ///
-    /// When casting from floating point sizes, it is worth considering whether
-    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
-    /// the desired conversion behavior.
-    #[inline]
-    pub fn to_u32(&self) -> Size2D<u32, U> {
-        self.cast()
-    }
-
-    /// Cast into an `u64` size, truncating decimals if any.
-    ///
-    /// When casting from floating point sizes, it is worth considering whether
-    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
-    /// the desired conversion behavior.
-    #[inline]
-    pub fn to_u64(&self) -> Size2D<u64, U> {
-        self.cast()
-    }
-
-    /// Cast into an `i32` size, truncating decimals if any.
-    ///
-    /// When casting from floating point sizes, it is worth considering whether
-    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
-    /// the desired conversion behavior.
-    #[inline]
-    pub fn to_i32(&self) -> Size2D<i32, U> {
-        self.cast()
-    }
-
-    /// Cast into an `i64` size, truncating decimals if any.
-    ///
-    /// When casting from floating point sizes, it is worth considering whether
-    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
-    /// the desired conversion behavior.
-    #[inline]
-    pub fn to_i64(&self) -> Size2D<i64, U> {
-        self.cast()
     }
 }
 
@@ -733,6 +733,122 @@ impl<T, U> Size3D<T, U> {
     }
 }
 
+impl<T: Copy, U> Size3D<T, U> {
+    /// Return this size as an array of three elements (width, then height, then depth).
+    #[inline]
+    pub fn to_array(&self) -> [T; 3] {
+        [self.width, self.height, self.depth]
+    }
+
+    /// Return this size as an array of three elements (width, then height, then depth).
+    #[inline]
+    pub fn to_tuple(&self) -> (T, T, T) {
+        (self.width, self.height, self.depth)
+    }
+
+    /// Return this size as a vector with width, height and depth.
+    #[inline]
+    pub fn to_vector(&self) -> Vector3D<T, U> {
+        vec3(self.width, self.height, self.depth)
+    }
+
+    /// Drop the units, preserving only the numeric value.
+    #[inline]
+    pub fn to_untyped(&self) -> Size3D<T, UnknownUnit> {
+        Size3D::new(self.width, self.height, self.depth)
+    }
+
+    /// Tag a unitless value with units.
+    #[inline]
+    pub fn from_untyped(p: Size3D<T, UnknownUnit>) -> Self {
+        Size3D::new(p.width, p.height, p.depth)
+    }
+
+    /// Cast the unit
+    #[inline]
+    pub fn cast_unit<V>(&self) -> Size3D<T, V> {
+        Size3D::new(self.width, self.height, self.depth)
+    }
+}
+
+impl<T: NumCast + Copy, U> Size3D<T, U> {
+    /// Cast from one numeric representation to another, preserving the units.
+    ///
+    /// When casting from floating point to integer coordinates, the decimals are truncated
+    /// as one would expect from a simple cast, but this behavior does not always make sense
+    /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
+    #[inline]
+    pub fn cast<NewT: NumCast + Copy>(&self) -> Size3D<NewT, U> {
+        self.try_cast().unwrap()
+    }
+
+    /// Fallible cast from one numeric representation to another, preserving the units.
+    ///
+    /// When casting from floating point to integer coordinates, the decimals are truncated
+    /// as one would expect from a simple cast, but this behavior does not always make sense
+    /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
+    pub fn try_cast<NewT: NumCast + Copy>(&self) -> Option<Size3D<NewT, U>> {
+        match (NumCast::from(self.width), NumCast::from(self.height), NumCast::from(self.depth)) {
+            (Some(w), Some(h), Some(d)) => Some(Size3D::new(w, h, d)),
+            _ => None,
+        }
+    }
+
+    // Convenience functions for common casts
+
+    /// Cast into an `f32` size.
+    #[inline]
+    pub fn to_f32(&self) -> Size3D<f32, U> {
+        self.cast()
+    }
+
+    /// Cast into an `f64` size.
+    #[inline]
+    pub fn to_f64(&self) -> Size3D<f64, U> {
+        self.cast()
+    }
+
+    /// Cast into an `uint` size, truncating decimals if any.
+    ///
+    /// When casting from floating point sizes, it is worth considering whether
+    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
+    /// the desired conversion behavior.
+    #[inline]
+    pub fn to_usize(&self) -> Size3D<usize, U> {
+        self.cast()
+    }
+
+    /// Cast into an `u32` size, truncating decimals if any.
+    ///
+    /// When casting from floating point sizes, it is worth considering whether
+    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
+    /// the desired conversion behavior.
+    #[inline]
+    pub fn to_u32(&self) -> Size3D<u32, U> {
+        self.cast()
+    }
+
+    /// Cast into an `i32` size, truncating decimals if any.
+    ///
+    /// When casting from floating point sizes, it is worth considering whether
+    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
+    /// the desired conversion behavior.
+    #[inline]
+    pub fn to_i32(&self) -> Size3D<i32, U> {
+        self.cast()
+    }
+
+    /// Cast into an `i64` size, truncating decimals if any.
+    ///
+    /// When casting from floating point sizes, it is worth considering whether
+    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
+    /// the desired conversion behavior.
+    #[inline]
+    pub fn to_i64(&self) -> Size3D<i64, U> {
+        self.cast()
+    }
+}
+
 
 impl<T: Round, U> Size3D<T, U> {
     /// Rounds each component to the nearest integer value.
@@ -863,122 +979,6 @@ impl<T: Copy + Div<T, Output = T>, U1, U2> Div<Scale<T, U1, U2>> for Size3D<T, U
     #[inline]
     fn div(self, scale: Scale<T, U1, U2>) -> Size3D<T, U1> {
         Size3D::new(self.width / scale.get(), self.height / scale.get(), self.depth / scale.get())
-    }
-}
-
-impl<T: Copy, U> Size3D<T, U> {
-    /// Return this size as an array of three elements (width, then height, then depth).
-    #[inline]
-    pub fn to_array(&self) -> [T; 3] {
-        [self.width, self.height, self.depth]
-    }
-
-    /// Return this size as an array of three elements (width, then height, then depth).
-    #[inline]
-    pub fn to_tuple(&self) -> (T, T, T) {
-        (self.width, self.height, self.depth)
-    }
-
-    /// Return this size as a vector with width, height and depth.
-    #[inline]
-    pub fn to_vector(&self) -> Vector3D<T, U> {
-        vec3(self.width, self.height, self.depth)
-    }
-
-    /// Drop the units, preserving only the numeric value.
-    #[inline]
-    pub fn to_untyped(&self) -> Size3D<T, UnknownUnit> {
-        Size3D::new(self.width, self.height, self.depth)
-    }
-
-    /// Tag a unitless value with units.
-    #[inline]
-    pub fn from_untyped(p: Size3D<T, UnknownUnit>) -> Self {
-        Size3D::new(p.width, p.height, p.depth)
-    }
-
-    /// Cast the unit
-    #[inline]
-    pub fn cast_unit<V>(&self) -> Size3D<T, V> {
-        Size3D::new(self.width, self.height, self.depth)
-    }
-}
-
-impl<T: NumCast + Copy, U> Size3D<T, U> {
-    /// Cast from one numeric representation to another, preserving the units.
-    ///
-    /// When casting from floating point to integer coordinates, the decimals are truncated
-    /// as one would expect from a simple cast, but this behavior does not always make sense
-    /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
-    #[inline]
-    pub fn cast<NewT: NumCast + Copy>(&self) -> Size3D<NewT, U> {
-        self.try_cast().unwrap()
-    }
-
-    /// Fallible cast from one numeric representation to another, preserving the units.
-    ///
-    /// When casting from floating point to integer coordinates, the decimals are truncated
-    /// as one would expect from a simple cast, but this behavior does not always make sense
-    /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
-    pub fn try_cast<NewT: NumCast + Copy>(&self) -> Option<Size3D<NewT, U>> {
-        match (NumCast::from(self.width), NumCast::from(self.height), NumCast::from(self.depth)) {
-            (Some(w), Some(h), Some(d)) => Some(Size3D::new(w, h, d)),
-            _ => None,
-        }
-    }
-
-    // Convenience functions for common casts
-
-    /// Cast into an `f32` size.
-    #[inline]
-    pub fn to_f32(&self) -> Size3D<f32, U> {
-        self.cast()
-    }
-
-    /// Cast into an `f64` size.
-    #[inline]
-    pub fn to_f64(&self) -> Size3D<f64, U> {
-        self.cast()
-    }
-
-    /// Cast into an `uint` size, truncating decimals if any.
-    ///
-    /// When casting from floating point sizes, it is worth considering whether
-    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
-    /// the desired conversion behavior.
-    #[inline]
-    pub fn to_usize(&self) -> Size3D<usize, U> {
-        self.cast()
-    }
-
-    /// Cast into an `u32` size, truncating decimals if any.
-    ///
-    /// When casting from floating point sizes, it is worth considering whether
-    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
-    /// the desired conversion behavior.
-    #[inline]
-    pub fn to_u32(&self) -> Size3D<u32, U> {
-        self.cast()
-    }
-
-    /// Cast into an `i32` size, truncating decimals if any.
-    ///
-    /// When casting from floating point sizes, it is worth considering whether
-    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
-    /// the desired conversion behavior.
-    #[inline]
-    pub fn to_i32(&self) -> Size3D<i32, U> {
-        self.cast()
-    }
-
-    /// Cast into an `i64` size, truncating decimals if any.
-    ///
-    /// When casting from floating point sizes, it is worth considering whether
-    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
-    /// the desired conversion behavior.
-    #[inline]
-    pub fn to_i64(&self) -> Size3D<i64, U> {
-        self.cast()
     }
 }
 
