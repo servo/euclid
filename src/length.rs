@@ -123,6 +123,20 @@ impl<T: Clone, U> Length<T, U> {
     }
 }
 
+impl<T: NumCast + Clone, U> Length<T, U> {
+    /// Cast from one numeric representation to another, preserving the units.
+    #[inline]
+    pub fn cast<NewT: NumCast>(&self) -> Length<NewT, U> {
+        self.try_cast().unwrap()
+    }
+
+    /// Fallible cast from one numeric representation to another, preserving the units.
+    pub fn try_cast<NewT: NumCast>(&self) -> Option<Length<NewT, U>> {
+        NumCast::from(self.get()).map(Length::new)
+    }
+}
+
+
 impl<T: fmt::Debug, U> fmt::Debug for Length<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         self.0.fmt(f)
@@ -261,18 +275,6 @@ impl<U, T: Neg<Output = T>> Neg for Length<T, U> {
     }
 }
 
-impl<T: NumCast + Clone, U> Length<T, U> {
-    /// Cast from one numeric representation to another, preserving the units.
-    #[inline]
-    pub fn cast<NewT: NumCast>(&self) -> Length<NewT, U> {
-        self.try_cast().unwrap()
-    }
-
-    /// Fallible cast from one numeric representation to another, preserving the units.
-    pub fn try_cast<NewT: NumCast>(&self) -> Option<Length<NewT, U>> {
-        NumCast::from(self.get()).map(Length::new)
-    }
-}
 
 impl<T: PartialEq, U> PartialEq for Length<T, U> {
     fn eq(&self, other: &Self) -> bool {
