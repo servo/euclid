@@ -255,28 +255,31 @@ impl<Src, Dst> Scale<f32, Src, Dst> {
 
 
 // scale0 * scale1
-impl<T: Mul<T, Output = T>, A, B, C> Mul<Scale<T, B, C>> for Scale<T, A, B> {
-    type Output = Scale<T, A, C>;
+impl<T: Mul, A, B, C> Mul<Scale<T, B, C>> for Scale<T, A, B> {
+    type Output = Scale<T::Output, A, C>;
+
     #[inline]
-    fn mul(self, other: Scale<T, B, C>) -> Scale<T, A, C> {
+    fn mul(self, other: Scale<T, B, C>) -> Self::Output {
         Scale::new(self.0 * other.0)
     }
 }
 
 // scale0 + scale1
-impl<T: Add<T, Output = T>, Src, Dst> Add for Scale<T, Src, Dst> {
-    type Output = Scale<T, Src, Dst>;
+impl<T: Add, Src, Dst> Add for Scale<T, Src, Dst> {
+    type Output = Scale<T::Output, Src, Dst>;
+
     #[inline]
-    fn add(self, other: Scale<T, Src, Dst>) -> Scale<T, Src, Dst> {
+    fn add(self, other: Scale<T, Src, Dst>) -> Self::Output {
         Scale::new(self.0 + other.0)
     }
 }
 
 // scale0 - scale1
-impl<T: Sub<T, Output = T>, Src, Dst> Sub for Scale<T, Src, Dst> {
-    type Output = Scale<T, Src, Dst>;
+impl<T: Sub, Src, Dst> Sub for Scale<T, Src, Dst> {
+    type Output = Scale<T::Output, Src, Dst>;
+
     #[inline]
-    fn sub(self, other: Scale<T, Src, Dst>) -> Scale<T, Src, Dst> {
+    fn sub(self, other: Scale<T, Src, Dst>) -> Self::Output {
         Scale::new(self.0 - other.0)
     }
 }
@@ -332,7 +335,7 @@ mod tests {
 
         let a: Scale<isize, Inch, Inch> = Scale::new(2);
         let b: Scale<isize, Inch, Inch> = Scale::new(3);
-        assert!(a != b);
+        assert_ne!(a, b);
         assert_eq!(a, a.clone());
         assert_eq!(a.clone() + b.clone(), Scale::new(5));
         assert_eq!(a - b, Scale::new(-1));
