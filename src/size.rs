@@ -19,7 +19,7 @@ use num::*;
 
 use num_traits::{NumCast, Signed};
 use core::fmt;
-use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
+use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 use core::marker::PhantomData;
 use core::cmp::{Eq, PartialEq};
 use core::hash::{Hash};
@@ -433,6 +433,16 @@ impl<T: Zero, U> Zero for Size2D<T, U> {
 }
 
 
+impl<T: Neg, U> Neg for Size2D<T, U> {
+    type Output = Size2D<T::Output, U>;
+
+    #[inline]
+    fn neg(self) -> Self::Output {
+        Size2D::new(-self.width, -self.height)
+    }
+}
+
+
 impl<T: Add, U> Add for Size2D<T, U> {
     type Output = Size2D<T::Output, U>;
 
@@ -635,6 +645,14 @@ mod size2d {
 
         pub type Size2DMm<T> = crate::Size2D<T, Mm>;
         pub type Size2DCm<T> = crate::Size2D<T, Cm>;
+
+        #[test]
+        pub fn test_neg() {
+            assert_eq!(-Size2D::new( 1.0,  2.0), Size2D::new(-1.0, -2.0));
+            assert_eq!(-Size2D::new( 0.0,  0.0), Size2D::new(-0.0, -0.0));
+            assert_eq!(-Size2D::new(-1.0, -2.0), Size2D::new( 1.0,  2.0));
+        }
+
 
         #[test]
         pub fn test_add() {
@@ -1200,6 +1218,16 @@ impl<T: Zero, U> Zero for Size3D<T, U> {
 }
 
 
+impl<T: Neg, U> Neg for Size3D<T, U> {
+    type Output = Size3D<T::Output, U>;
+
+    #[inline]
+    fn neg(self) -> Self::Output {
+        Size3D::new(-self.width, -self.height, -self.depth)
+    }
+}
+
+
 impl<T: Add, U> Add for Size3D<T, U> {
     type Output = Size3D<T::Output, U>;
 
@@ -1365,6 +1393,13 @@ mod size3d {
 
         pub type Size3DMm<T> = crate::Size3D<T, Mm>;
         pub type Size3DCm<T> = crate::Size3D<T, Cm>;
+
+        #[test]
+        pub fn test_neg() {
+            assert_eq!(-Size3D::new( 1.0,  2.0,  3.0), Size3D::new(-1.0, -2.0, -3.0));
+            assert_eq!(-Size3D::new( 0.0,  0.0,  0.0), Size3D::new(-0.0, -0.0, -0.0));
+            assert_eq!(-Size3D::new(-1.0, -2.0, -3.0), Size3D::new( 1.0,  2.0,  3.0));
+        }
 
 
         #[test]
