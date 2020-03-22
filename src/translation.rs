@@ -91,6 +91,34 @@ impl<T, Src, Dst> Translation2D<T, Src, Dst> {
         }
     }
 
+    /// Creates no-op translation (both `x` and `y` is `zero()`).
+    #[inline]
+    pub fn identity() -> Self
+    where
+        T: Zero,
+    {
+        Self::new(T::zero(), T::zero())
+    }
+
+    /// Check if translation does nothing (both x and y is `zero()`).
+    ///
+    /// ```rust
+    /// use euclid::default::Translation2D;
+    ///
+    /// assert_eq!(Translation2D::<f32>::identity().is_identity(), true);
+    /// assert_eq!(Translation2D::new(0, 0).is_identity(), true);
+    /// assert_eq!(Translation2D::new(1, 0).is_identity(), false);
+    /// assert_eq!(Translation2D::new(0, 1).is_identity(), false);
+    /// ```
+    #[inline]
+    pub fn is_identity(&self) -> bool
+    where
+        T: Zero + PartialEq
+    {
+        let _0 = T::zero();
+        self.x == _0 && self.y == _0
+    }
+
     /// No-op, just cast the unit.
     #[inline]
     pub fn transform_size(&self, s: Size2D<T, Src>) -> Size2D<T, Dst> {
@@ -98,10 +126,7 @@ impl<T, Src, Dst> Translation2D<T, Src, Dst> {
     }
 }
 
-impl<T, Src, Dst> Translation2D<T, Src, Dst>
-where
-    T : Copy
-{
+impl<T: Copy, Src, Dst> Translation2D<T, Src, Dst> {
     /// Cast into a 2D vector.
     #[inline]
     pub fn to_vector(&self) -> Vector2D<T, Src> {
@@ -138,27 +163,6 @@ where
             y: t.y,
             _unit: PhantomData,
         }
-    }
-}
-
-impl<T, Src, Dst> Translation2D<T, Src, Dst>
-where
-    T: Zero
-{
-    #[inline]
-    pub fn identity() -> Self {
-        Translation2D::new(T::zero(), T::zero())
-    }
-}
-
-impl<T, Src, Dst> Translation2D<T, Src, Dst>
-where
-    T: Zero + PartialEq
-{
-    #[inline]
-    pub fn is_identity(&self) -> bool {
-        let _0 = T::zero();
-        self.x == _0 && self.y == _0
     }
 }
 
@@ -373,6 +377,35 @@ impl<T, Src, Dst> Translation3D<T, Src, Dst> {
         }
     }
 
+    /// Creates no-op translation (`x`, `y` and `z` is `zero()`).
+    #[inline]
+    pub fn identity() -> Self
+    where
+        T: Zero,
+    {
+        Translation3D::new(T::zero(), T::zero(), T::zero())
+    }
+
+    /// Check if translation does nothing (`x`, `y` and `z` is `zero()`).
+    ///
+    /// ```rust
+    /// use euclid::default::Translation3D;
+    ///
+    /// assert_eq!(Translation3D::<f32>::identity().is_identity(), true);
+    /// assert_eq!(Translation3D::new(0, 0, 0).is_identity(), true);
+    /// assert_eq!(Translation3D::new(1, 0, 0).is_identity(), false);
+    /// assert_eq!(Translation3D::new(0, 1, 0).is_identity(), false);
+    /// assert_eq!(Translation3D::new(0, 0, 1).is_identity(), false);
+    /// ```
+    #[inline]
+    pub fn is_identity(&self) -> bool
+    where
+        T: Zero + PartialEq
+    {
+        let _0 = T::zero();
+        self.x == _0 && self.y == _0 && self.z == _0
+    }
+
     /// No-op, just cast the unit.
     #[inline]
     pub fn transform_size(self, s: Size2D<T, Src>) -> Size2D<T, Dst> {
@@ -380,10 +413,7 @@ impl<T, Src, Dst> Translation3D<T, Src, Dst> {
     }
 }
 
-impl<T, Src, Dst> Translation3D<T, Src, Dst>
-where
-    T: Copy
-{
+impl<T: Copy, Src, Dst> Translation3D<T, Src, Dst> {
     /// Cast into a 3D vector.
     #[inline]
     pub fn to_vector(&self) -> Vector3D<T, Src> {
@@ -422,27 +452,6 @@ where
             z: t.z,
             _unit: PhantomData,
         }
-    }
-}
-
-impl<T, Src, Dst> Translation3D<T, Src, Dst>
-where
-    T: Zero
-{
-    #[inline]
-    pub fn identity() -> Self {
-        Translation3D::new(T::zero(), T::zero(), T::zero())
-    }
-}
-
-impl<T, Src, Dst> Translation3D<T, Src, Dst>
-where
-    T: Zero + PartialEq
-{
-    #[inline]
-    pub fn is_identity(&self) -> bool {
-        let _0 = T::zero();
-        self.x == _0 && self.y == _0 && self.z == _0
     }
 }
 
