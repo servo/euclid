@@ -347,50 +347,6 @@ where T: Copy +
         <Self as ApproxEq<T>>::approx_eq_eps(&self, &other, &eps)
     }
 
-    /// Returns the same transform with a different destination unit.
-    #[inline]
-    pub fn with_destination<NewDst>(&self) -> Transform3D<T, Src, NewDst> {
-        Transform3D::row_major(
-            self.m11, self.m12, self.m13, self.m14,
-            self.m21, self.m22, self.m23, self.m24,
-            self.m31, self.m32, self.m33, self.m34,
-            self.m41, self.m42, self.m43, self.m44,
-        )
-    }
-
-    /// Returns the same transform with a different source unit.
-    #[inline]
-    pub fn with_source<NewSrc>(&self) -> Transform3D<T, NewSrc, Dst> {
-        Transform3D::row_major(
-            self.m11, self.m12, self.m13, self.m14,
-            self.m21, self.m22, self.m23, self.m24,
-            self.m31, self.m32, self.m33, self.m34,
-            self.m41, self.m42, self.m43, self.m44,
-        )
-    }
-
-    /// Drop the units, preserving only the numeric value.
-    #[inline]
-    pub fn to_untyped(&self) -> Transform3D<T, UnknownUnit, UnknownUnit> {
-        Transform3D::row_major(
-            self.m11, self.m12, self.m13, self.m14,
-            self.m21, self.m22, self.m23, self.m24,
-            self.m31, self.m32, self.m33, self.m34,
-            self.m41, self.m42, self.m43, self.m44,
-        )
-    }
-
-    /// Tag a unitless value with units.
-    #[inline]
-    pub fn from_untyped(m: &Transform3D<T, UnknownUnit, UnknownUnit>) -> Self {
-        Transform3D::row_major(
-            m.m11, m.m12, m.m13, m.m14,
-            m.m21, m.m22, m.m23, m.m24,
-            m.m31, m.m32, m.m33, m.m34,
-            m.m41, m.m42, m.m43, m.m44,
-        )
-    }
-
     /// Returns the multiplication of the two matrices such that mat's transformation
     /// applies after self's transformation.
     ///
@@ -919,6 +875,50 @@ impl<T: Copy, Src, Dst> Transform3D<T, Src, Dst> {
             array[1][0], array[1][1], array[1][2], array[1][3],
             array[2][0], array[2][1], array[2][2], array[2][3],
             array[3][0], array[3][1], array[3][2], array[3][3],
+        )
+    }
+
+    /// Tag a unitless value with units.
+    #[inline]
+    pub fn from_untyped(m: &Transform3D<T, UnknownUnit, UnknownUnit>) -> Self {
+        Transform3D::row_major(
+            m.m11, m.m12, m.m13, m.m14,
+            m.m21, m.m22, m.m23, m.m24,
+            m.m31, m.m32, m.m33, m.m34,
+            m.m41, m.m42, m.m43, m.m44,
+        )
+    }
+
+    /// Drop the units, preserving only the numeric value.
+    #[inline]
+    pub fn to_untyped(&self) -> Transform3D<T, UnknownUnit, UnknownUnit> {
+        Transform3D::row_major(
+            self.m11, self.m12, self.m13, self.m14,
+            self.m21, self.m22, self.m23, self.m24,
+            self.m31, self.m32, self.m33, self.m34,
+            self.m41, self.m42, self.m43, self.m44,
+        )
+    }
+
+    /// Returns the same transform with a different source unit.
+    #[inline]
+    pub fn with_source<NewSrc>(&self) -> Transform3D<T, NewSrc, Dst> {
+        Transform3D::row_major(
+            self.m11, self.m12, self.m13, self.m14,
+            self.m21, self.m22, self.m23, self.m24,
+            self.m31, self.m32, self.m33, self.m34,
+            self.m41, self.m42, self.m43, self.m44,
+        )
+    }
+
+    /// Returns the same transform with a different destination unit.
+    #[inline]
+    pub fn with_destination<NewDst>(&self) -> Transform3D<T, Src, NewDst> {
+        Transform3D::row_major(
+            self.m11, self.m12, self.m13, self.m14,
+            self.m21, self.m22, self.m23, self.m24,
+            self.m31, self.m32, self.m33, self.m34,
+            self.m41, self.m42, self.m43, self.m44,
         )
     }
 }

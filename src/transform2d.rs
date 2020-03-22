@@ -280,6 +280,26 @@ impl<T: Copy, Src, Dst> Transform2D<T, Src, Dst> {
             p.m31, p.m32
         )
     }
+
+    /// Returns the same transform with a different source unit.
+    #[inline]
+    pub fn with_source<NewSrc>(&self) -> Transform2D<T, NewSrc, Dst> {
+        Transform2D::row_major(
+            self.m11, self.m12,
+            self.m21, self.m22,
+            self.m31, self.m32,
+        )
+    }
+
+    /// Returns the same transform with a different destination unit.
+    #[inline]
+    pub fn with_destination<NewDst>(&self) -> Transform2D<T, Src, NewDst> {
+        Transform2D::row_major(
+            self.m11, self.m12,
+            self.m21, self.m22,
+            self.m31, self.m32,
+        )
+    }
 }
 
 impl<T: NumCast + Copy, Src, Dst> Transform2D<T, Src, Dst> {
@@ -486,26 +506,6 @@ where T: Copy +
             inv_det * (self.m21 * self.m32 - self.m22 * self.m31),
             inv_det * (self.m31 * self.m12 - self.m11 * self.m32),
         ))
-    }
-
-    /// Returns the same transform with a different destination unit.
-    #[inline]
-    pub fn with_destination<NewDst>(&self) -> Transform2D<T, Src, NewDst> {
-        Transform2D::row_major(
-            self.m11, self.m12,
-            self.m21, self.m22,
-            self.m31, self.m32,
-        )
-    }
-
-    /// Returns the same transform with a different source unit.
-    #[inline]
-    pub fn with_source<NewSrc>(&self) -> Transform2D<T, NewSrc, Dst> {
-        Transform2D::row_major(
-            self.m11, self.m12,
-            self.m21, self.m22,
-            self.m31, self.m32,
-        )
     }
 }
 
