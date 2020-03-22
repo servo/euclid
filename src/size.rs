@@ -349,14 +349,6 @@ impl<T: Sub<T, Output = T>, U> Sub for Size2D<T, U> {
     }
 }
 
-impl<T: Zero + PartialOrd, U> Size2D<T, U> {
-    /// Returns `true` if any component of size is zero or negative.
-    pub fn is_empty_or_negative(&self) -> bool {
-        let zero = T::zero();
-        self.width <= zero || self.height <= zero
-    }
-}
-
 impl<T: Zero, U> Zero for Size2D<T, U> {
     #[inline]
     fn zero() -> Self {
@@ -416,43 +408,6 @@ where
 }
 
 impl<T: PartialOrd, U> Size2D<T, U> {
-    /// Returns vector with results of "greater then" operation on each component.
-    pub fn greater_than(&self, other: Self) -> BoolVector2D {
-        BoolVector2D {
-            x: self.width > other.width,
-            y: self.height > other.height,
-        }
-    }
-
-    /// Returns vector with results of "lower then" operation on each component.
-    pub fn lower_than(&self, other: Self) -> BoolVector2D {
-        BoolVector2D {
-            x: self.width < other.width,
-            y: self.height < other.height,
-        }
-    }
-}
-
-
-impl<T: PartialEq, U> Size2D<T, U> {
-    /// Returns vector with results of "equal" operation on each component.
-    pub fn equal(&self, other: Self) -> BoolVector2D {
-        BoolVector2D {
-            x: self.width == other.width,
-            y: self.height == other.height,
-        }
-    }
-
-    /// Returns vector with results of "not equal" operation on each component.
-    pub fn not_equal(&self, other: Self) -> BoolVector2D {
-        BoolVector2D {
-            x: self.width != other.width,
-            y: self.height != other.height,
-        }
-    }
-}
-
-impl<T: PartialOrd, U> Size2D<T, U> {
     /// Returns the size each component of which are minimum of this size and another.
     #[inline]
     pub fn min(self, other: Self) -> Self {
@@ -481,6 +436,49 @@ impl<T: PartialOrd, U> Size2D<T, U> {
         T: Copy,
     {
         self.max(start).min(end)
+    }
+
+    /// Returns vector with results of "greater then" operation on each component.
+    pub fn greater_than(&self, other: Self) -> BoolVector2D {
+        BoolVector2D {
+            x: self.width > other.width,
+            y: self.height > other.height,
+        }
+    }
+
+    /// Returns vector with results of "lower then" operation on each component.
+    pub fn lower_than(&self, other: Self) -> BoolVector2D {
+        BoolVector2D {
+            x: self.width < other.width,
+            y: self.height < other.height,
+        }
+    }
+
+    /// Returns `true` if any component of size is zero or negative.
+    pub fn is_empty_or_negative(&self) -> bool
+    where
+        T: Zero,
+    {
+        let zero = T::zero();
+        self.width <= zero || self.height <= zero
+    }
+}
+
+impl<T: PartialEq, U> Size2D<T, U> {
+    /// Returns vector with results of "equal" operation on each component.
+    pub fn equal(&self, other: Self) -> BoolVector2D {
+        BoolVector2D {
+            x: self.width == other.width,
+            y: self.height == other.height,
+        }
+    }
+
+    /// Returns vector with results of "not equal" operation on each component.
+    pub fn not_equal(&self, other: Self) -> BoolVector2D {
+        BoolVector2D {
+            x: self.width != other.width,
+            y: self.height != other.height,
+        }
     }
 }
 
@@ -933,14 +931,6 @@ impl<T: Sub<T, Output = T>, U> Sub for Size3D<T, U> {
     }
 }
 
-impl<T: Zero + PartialOrd, U> Size3D<T, U> {
-    /// Returns `true` if any component of size is zero or negative.
-    pub fn is_empty_or_negative(&self) -> bool {
-        let zero = T::zero();
-        self.width <= zero || self.height <= zero || self.depth <= zero
-    }
-}
-
 impl<T: Zero, U> Zero for Size3D<T, U> {
     #[inline]
     fn zero() -> Self {
@@ -1000,47 +990,6 @@ where
 }
 
 impl<T: PartialOrd, U> Size3D<T, U> {
-    /// Returns vector with results of "greater than" operation on each component.
-    pub fn greater_than(&self, other: Self) -> BoolVector3D {
-        BoolVector3D {
-            x: self.width > other.width,
-            y: self.height > other.height,
-            z: self.depth > other.depth,
-        }
-    }
-
-    /// Returns vector with results of "lower than" operation on each component.
-    pub fn lower_than(&self, other: Self) -> BoolVector3D {
-        BoolVector3D {
-            x: self.width < other.width,
-            y: self.height < other.height,
-            z: self.depth < other.depth,
-        }
-    }
-}
-
-
-impl<T: PartialEq, U> Size3D<T, U> {
-    /// Returns vector with results of "equal" operation on each component.
-    pub fn equal(&self, other: Self) -> BoolVector3D {
-        BoolVector3D {
-            x: self.width == other.width,
-            y: self.height == other.height,
-            z: self.depth == other.depth,
-        }
-    }
-
-    /// Returns vector with results of "not equal" operation on each component.
-    pub fn not_equal(&self, other: Self) -> BoolVector3D {
-        BoolVector3D {
-            x: self.width != other.width,
-            y: self.height != other.height,
-            z: self.depth != other.depth,
-        }
-    }
-}
-
-impl<T: PartialOrd, U> Size3D<T, U> {
     /// Returns the size each component of which are minimum of this size and another.
     #[inline]
     pub fn min(self, other: Self) -> Self {
@@ -1071,6 +1020,53 @@ impl<T: PartialOrd, U> Size3D<T, U> {
         T: Copy,
     {
         self.max(start).min(end)
+    }
+
+    /// Returns vector with results of "greater than" operation on each component.
+    pub fn greater_than(&self, other: Self) -> BoolVector3D {
+        BoolVector3D {
+            x: self.width > other.width,
+            y: self.height > other.height,
+            z: self.depth > other.depth,
+        }
+    }
+
+    /// Returns vector with results of "lower than" operation on each component.
+    pub fn lower_than(&self, other: Self) -> BoolVector3D {
+        BoolVector3D {
+            x: self.width < other.width,
+            y: self.height < other.height,
+            z: self.depth < other.depth,
+        }
+    }
+
+    /// Returns `true` if any component of size is zero or negative.
+    pub fn is_empty_or_negative(&self) -> bool
+    where
+        T: Zero,
+    {
+        let zero = T::zero();
+        self.width <= zero || self.height <= zero || self.depth <= zero
+    }
+}
+
+impl<T: PartialEq, U> Size3D<T, U> {
+    /// Returns vector with results of "equal" operation on each component.
+    pub fn equal(&self, other: Self) -> BoolVector3D {
+        BoolVector3D {
+            x: self.width == other.width,
+            y: self.height == other.height,
+            z: self.depth == other.depth,
+        }
+    }
+
+    /// Returns vector with results of "not equal" operation on each component.
+    pub fn not_equal(&self, other: Self) -> BoolVector3D {
+        BoolVector3D {
+            x: self.width != other.width,
+            y: self.height != other.height,
+            z: self.depth != other.depth,
+        }
     }
 }
 
