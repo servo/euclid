@@ -168,7 +168,7 @@ impl<T: Copy, U> Size2D<T, U> {
     /// Drop the units, preserving only the numeric value.
     #[inline]
     pub fn to_untyped(&self) -> Size2D<T, UnknownUnit> {
-        Size2D::new(self.width, self.height)
+        self.cast_unit()
     }
 
     /// Cast the unit
@@ -974,6 +974,12 @@ impl<T, U> Size3D<T, U> {
     pub fn from_lengths(width: Length<T, U>, height: Length<T, U>, depth: Length<T, U>) -> Self {
         Size3D::new(width.0, height.0, depth.0)
     }
+
+    /// Tag a unitless value with units.
+    #[inline]
+    pub fn from_untyped(p: Size3D<T, UnknownUnit>) -> Self {
+        Size3D::new(p.width, p.height, p.depth)
+    }
 }
 
 impl<T: Copy, U> Size3D<T, U> {
@@ -998,13 +1004,7 @@ impl<T: Copy, U> Size3D<T, U> {
     /// Drop the units, preserving only the numeric value.
     #[inline]
     pub fn to_untyped(&self) -> Size3D<T, UnknownUnit> {
-        Size3D::new(self.width, self.height, self.depth)
-    }
-
-    /// Tag a unitless value with units.
-    #[inline]
-    pub fn from_untyped(p: Size3D<T, UnknownUnit>) -> Self {
-        Size3D::new(p.width, p.height, p.depth)
+        self.cast_unit()
     }
 
     /// Cast the unit
@@ -1115,7 +1115,7 @@ impl<T: NumCast + Copy, U> Size3D<T, U> {
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
     #[inline]
-    pub fn cast<NewT: NumCast + Copy>(&self) -> Size3D<NewT, U> {
+    pub fn cast<NewT: NumCast>(&self) -> Size3D<NewT, U> {
         self.try_cast().unwrap()
     }
 
@@ -1124,7 +1124,7 @@ impl<T: NumCast + Copy, U> Size3D<T, U> {
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
-    pub fn try_cast<NewT: NumCast + Copy>(&self) -> Option<Size3D<NewT, U>> {
+    pub fn try_cast<NewT: NumCast>(&self) -> Option<Size3D<NewT, U>> {
         match (NumCast::from(self.width), NumCast::from(self.height), NumCast::from(self.depth)) {
             (Some(w), Some(h), Some(d)) => Some(Size3D::new(w, h, d)),
             _ => None,
@@ -1454,12 +1454,7 @@ impl<T: Clone + DivAssign, U> DivAssign<Scale<T, U, U>> for Size3D<T, U> {
 impl<T, U> From<mint::Vector3<T>> for Size3D<T, U> {
     #[inline]
     fn from(v: mint::Vector3<T>) -> Self {
-        Size3D {
-            width: v.x,
-            height: v.y,
-            depth: v.z,
-            _unit: PhantomData,
-        }
+        size3(v.x, v.y, v.z)
     }
 }
 #[cfg(feature = "mint")]
