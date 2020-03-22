@@ -93,6 +93,34 @@ impl<T: Clone, U> Length<T, U> {
     pub fn cast_unit<V>(&self) -> Length<T, V> {
         Length::new(self.0.clone())
     }
+
+    /// Linearly interpolate between this length and another length.
+    ///
+    /// When `t` is `One::one()`, returned value equals to `other`,
+    /// otherwise equals to `self`.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use euclid::default::Length;
+    ///
+    /// let first = Length::new(0.0);
+    /// let last  = Length::new(8.0);
+    ///
+    /// assert_eq!(first.lerp(last, -1.0), Length::new(-8.0));
+    /// assert_eq!(first.lerp(last,  0.0), Length::new( 0.0));
+    /// assert_eq!(first.lerp(last,  0.5), Length::new( 4.0));
+    /// assert_eq!(first.lerp(last,  1.0), Length::new( 8.0));
+    /// assert_eq!(first.lerp(last,  2.0), Length::new(16.0));
+    /// ```
+    #[inline]
+    pub fn lerp(&self, other: Self, t: T) -> Self
+    where
+        T: One + Sub<Output = T> + Mul<Output = T> + Add<Output = T>,
+    {
+        let one_t = T::one() - t.clone();
+        Length::new(one_t * self.0.clone() + t * other.0)
+    }
 }
 
 impl<T: fmt::Debug, U> fmt::Debug for Length<T, U> {
@@ -270,21 +298,6 @@ impl<T: Zero, U> Zero for Length<T, U> {
     #[inline]
     fn zero() -> Self {
         Length::new(Zero::zero())
-    }
-}
-
-impl<T, U> Length<T, U>
-where
-    T: Copy + One + Add<Output = T> + Sub<Output = T> + Mul<Output = T>,
-{
-    /// Linearly interpolate between this length and another length.
-    ///
-    /// When `t` is `One::one()`, returned value equals to `other`,
-    /// otherwise equals to `self`.
-    #[inline]
-    pub fn lerp(&self, other: Self, t: T) -> Self {
-        let one_t = T::one() - t;
-        Length::new(one_t * self.get() + t * other.get())
     }
 }
 
