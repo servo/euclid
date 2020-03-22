@@ -197,13 +197,10 @@ impl<T: Copy, Src, Dst> Translation2D<T, Src, Dst> {
 }
 
 
-impl<T, Src, Dst1, Dst2> Add<Translation2D<T, Dst1, Dst2>>
-for Translation2D<T, Src, Dst1>
-where
-    T: Add<T, Output = T>
-{
-    type Output = Translation2D<T, Src, Dst2>;
-    fn add(self, other: Translation2D<T, Dst1, Dst2>) -> Translation2D<T, Src, Dst2> {
+impl<T: Add, Src, Dst1, Dst2> Add<Translation2D<T, Dst1, Dst2>> for Translation2D<T, Src, Dst1> {
+    type Output = Translation2D<T::Output, Src, Dst2>;
+
+    fn add(self, other: Translation2D<T, Dst1, Dst2>) -> Self::Output {
         Translation2D::new(
             self.x + other.x,
             self.y + other.y,
@@ -211,20 +208,18 @@ where
     }
 }
 
-impl<T, Src, Dst1, Dst2>
-    Sub<Translation2D<T, Dst1, Dst2>>
-    for Translation2D<T, Src, Dst2>
-where
-    T: Sub<T, Output = T>
-{
-    type Output = Translation2D<T, Src, Dst1>;
-    fn sub(self, other: Translation2D<T, Dst1, Dst2>) -> Translation2D<T, Src, Dst1> {
+
+impl<T: Sub, Src, Dst1, Dst2> Sub<Translation2D<T, Dst1, Dst2>> for Translation2D<T, Src, Dst2> {
+    type Output = Translation2D<T::Output, Src, Dst1>;
+
+    fn sub(self, other: Translation2D<T, Dst1, Dst2>) -> Self::Output {
         Translation2D::new(
             self.x - other.x,
             self.y - other.y,
         )
     }
 }
+
 
 impl<T, Src, Dst> Translation2D<T, Src, Dst>
 where
@@ -366,6 +361,7 @@ impl<T, Src, Dst> Hash for Translation3D<T, Src, Dst>
     }
 }
 
+
 impl<T, Src, Dst> Translation3D<T, Src, Dst> {
     #[inline]
     pub const fn new(x: T, y: T, z: T) -> Self {
@@ -495,13 +491,10 @@ impl<T: Copy, Src, Dst> Translation3D<T, Src, Dst> {
 }
 
 
-impl<T, Src, Dst1, Dst2> Add<Translation3D<T, Dst1, Dst2>>
-for Translation3D<T, Src, Dst1>
-where
-    T: Add<T, Output = T>
-{
-    type Output = Translation3D<T, Src, Dst2>;
-    fn add(self, other: Translation3D<T, Dst1, Dst2>) -> Translation3D<T, Src, Dst2> {
+impl<T: Add, Src, Dst1, Dst2> Add<Translation3D<T, Dst1, Dst2>> for Translation3D<T, Src, Dst1> {
+    type Output = Translation3D<T::Output, Src, Dst2>;
+
+    fn add(self, other: Translation3D<T, Dst1, Dst2>) -> Self::Output {
         Translation3D::new(
             self.x + other.x,
             self.y + other.y,
@@ -510,14 +503,11 @@ where
     }
 }
 
-impl<T, Src, Dst1, Dst2>
-    Sub<Translation3D<T, Dst1, Dst2>>
-    for Translation3D<T, Src, Dst2>
-where
-    T: Sub<T, Output = T>
-{
-    type Output = Translation3D<T, Src, Dst1>;
-    fn sub(self, other: Translation3D<T, Dst1, Dst2>) -> Translation3D<T, Src, Dst1> {
+
+impl<T: Sub, Src, Dst1, Dst2> Sub<Translation3D<T, Dst1, Dst2>> for Translation3D<T, Src, Dst2> {
+    type Output = Translation3D<T::Output, Src, Dst1>;
+
+    fn sub(self, other: Translation3D<T, Dst1, Dst2>) -> Self::Output {
         Translation3D::new(
             self.x - other.x,
             self.y - other.y,
@@ -525,6 +515,7 @@ where
         )
     }
 }
+
 
 impl<T, Src, Dst> Translation3D<T, Src, Dst>
 where
@@ -596,44 +587,139 @@ impl<T: fmt::Display, Src, Dst> fmt::Display for Translation3D<T, Src, Dst> {
     }
 }
 
-#[test]
-fn simple_translation2d() {
-    use rect;
 
-    struct A;
-    struct B;
+#[cfg(test)]
+mod _2d {
+    #[test]
+    fn simple() {
+        use {Rect, Translation2D, rect};
 
-    type Translation = Translation2D<i32, A, B>;
-    type SrcRect = Rect<i32, A>;
-    type DstRect = Rect<i32, B>;
+        struct A;
+        struct B;
 
-    let tx = Translation::new(10, -10);
-    let r1: SrcRect = rect(10, 20, 30, 40);
-    let r2: DstRect = tx.transform_rect(&r1);
-    assert_eq!(r2, rect(20, 10, 30, 40));
+        type Translation = Translation2D<i32, A, B>;
+        type SrcRect = Rect<i32, A>;
+        type DstRect = Rect<i32, B>;
 
-    let inv_tx = tx.inverse();
-    assert_eq!(inv_tx.transform_rect(&r2), r1);
+        let tx = Translation::new(10, -10);
+        let r1: SrcRect = rect(10, 20, 30, 40);
+        let r2: DstRect = tx.transform_rect(&r1);
+        assert_eq!(r2, rect(20, 10, 30, 40));
 
-    assert!((tx + inv_tx).is_identity());
+        let inv_tx = tx.inverse();
+        assert_eq!(inv_tx.transform_rect(&r2), r1);
+
+        assert!((tx + inv_tx).is_identity());
+    }
+
+    /// Operation tests
+    mod ops {
+        use crate::default::Translation2D;
+
+        #[test]
+        fn test_add() {
+            let t1 = Translation2D::new(1.0, 2.0);
+            let t2 = Translation2D::new(3.0, 4.0);
+            assert_eq!(t1 + t2, Translation2D::new(4.0, 6.0));
+
+            let t1 = Translation2D::new(1.0, 2.0);
+            let t2 = Translation2D::new(0.0, 0.0);
+            assert_eq!(t1 + t2, Translation2D::new(1.0, 2.0));
+
+            let t1 = Translation2D::new(1.0, 2.0);
+            let t2 = Translation2D::new(-3.0, -4.0);
+            assert_eq!(t1 + t2, Translation2D::new(-2.0, -2.0));
+
+            let t1 = Translation2D::new(0.0, 0.0);
+            let t2 = Translation2D::new(0.0, 0.0);
+            assert_eq!(t1 + t2, Translation2D::new(0.0, 0.0));
+        }
+
+        #[test]
+        pub fn test_sub() {
+            let t1 = Translation2D::new(1.0, 2.0);
+            let t2 = Translation2D::new(3.0, 4.0);
+            assert_eq!(t1 - t2, Translation2D::new(-2.0, -2.0));
+
+            let t1 = Translation2D::new(1.0, 2.0);
+            let t2 = Translation2D::new(0.0, 0.0);
+            assert_eq!(t1 - t2, Translation2D::new(1.0, 2.0));
+
+            let t1 = Translation2D::new(1.0, 2.0);
+            let t2 = Translation2D::new(-3.0, -4.0);
+            assert_eq!(t1 - t2, Translation2D::new(4.0, 6.0));
+
+            let t1 = Translation2D::new(0.0, 0.0);
+            let t2 = Translation2D::new(0.0, 0.0);
+            assert_eq!(t1 - t2, Translation2D::new(0.0, 0.0));
+        }
+    }
 }
 
-#[test]
-fn simple_translation3d() {
-    struct A;
-    struct B;
+#[cfg(test)]
+mod _3d {
+    #[test]
+    fn simple() {
+        use {Point3D, Translation3D, point3};
 
-    type Translation = Translation3D<i32, A, B>;
-    type SrcPoint = Point3D<i32, A>;
-    type DstPoint = Point3D<i32, B>;
+        struct A;
+        struct B;
 
-    let tx = Translation::new(10, -10, 100);
-    let p1: SrcPoint = point3(10, 20, 30);
-    let p2: DstPoint = tx.transform_point3d(&p1);
-    assert_eq!(p2, point3(20, 10, 130));
+        type Translation = Translation3D<i32, A, B>;
+        type SrcPoint = Point3D<i32, A>;
+        type DstPoint = Point3D<i32, B>;
 
-    let inv_tx = tx.inverse();
-    assert_eq!(inv_tx.transform_point3d(&p2), p1);
+        let tx = Translation::new(10, -10, 100);
+        let p1: SrcPoint = point3(10, 20, 30);
+        let p2: DstPoint = tx.transform_point3d(&p1);
+        assert_eq!(p2, point3(20, 10, 130));
 
-    assert!((tx + inv_tx).is_identity());
+        let inv_tx = tx.inverse();
+        assert_eq!(inv_tx.transform_point3d(&p2), p1);
+
+        assert!((tx + inv_tx).is_identity());
+    }
+
+    /// Operation tests
+    mod ops {
+        use default::Translation3D;
+
+        #[test]
+        pub fn test_add() {
+            let t1 = Translation3D::new(1.0, 2.0, 3.0);
+            let t2 = Translation3D::new(4.0, 5.0, 6.0);
+            assert_eq!(t1 + t2, Translation3D::new(5.0, 7.0, 9.0));
+
+            let t1 = Translation3D::new(1.0, 2.0, 3.0);
+            let t2 = Translation3D::new(0.0, 0.0, 0.0);
+            assert_eq!(t1 + t2, Translation3D::new(1.0, 2.0, 3.0));
+
+            let t1 = Translation3D::new( 1.0,  2.0,  3.0);
+            let t2 = Translation3D::new(-4.0, -5.0, -6.0);
+            assert_eq!(t1 + t2, Translation3D::new(-3.0, -3.0, -3.0));
+
+            let t1 = Translation3D::new(0.0, 0.0, 0.0);
+            let t2 = Translation3D::new(0.0, 0.0, 0.0);
+            assert_eq!(t1 + t2, Translation3D::new(0.0, 0.0, 0.0));
+        }
+
+        #[test]
+        pub fn test_sub() {
+            let t1 = Translation3D::new(1.0, 2.0, 3.0);
+            let t2 = Translation3D::new(4.0, 5.0, 6.0);
+            assert_eq!(t1 - t2, Translation3D::new(-3.0, -3.0, -3.0));
+
+            let t1 = Translation3D::new(1.0, 2.0, 3.0);
+            let t2 = Translation3D::new(0.0, 0.0, 0.0);
+            assert_eq!(t1 - t2, Translation3D::new(1.0, 2.0, 3.0));
+
+            let t1 = Translation3D::new( 1.0,  2.0,  3.0);
+            let t2 = Translation3D::new(-4.0, -5.0, -6.0);
+            assert_eq!(t1 - t2, Translation3D::new(5.0, 7.0, 9.0));
+
+            let t1 = Translation3D::new(0.0, 0.0, 0.0);
+            let t2 = Translation3D::new(0.0, 0.0, 0.0);
+            assert_eq!(t1 - t2, Translation3D::new(0.0, 0.0, 0.0));
+        }
+    }
 }
