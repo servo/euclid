@@ -303,95 +303,7 @@ impl<T: NumCast + Copy, U> Size2D<T, U> {
     }
 }
 
-
-impl<T: Round, U> Size2D<T, U> {
-    /// Rounds each component to the nearest integer value.
-    ///
-    /// This behavior is preserved for negative values (unlike the basic cast).
-    #[inline]
-    pub fn round(&self) -> Self {
-        Size2D::new(self.width.round(), self.height.round())
-    }
-}
-
-impl<T: Ceil, U> Size2D<T, U> {
-    /// Rounds each component to the smallest integer equal or greater than the original value.
-    ///
-    /// This behavior is preserved for negative values (unlike the basic cast).
-    #[inline]
-    pub fn ceil(&self) -> Self {
-        Size2D::new(self.width.ceil(), self.height.ceil())
-    }
-}
-
-impl<T: Floor, U> Size2D<T, U> {
-    /// Rounds each component to the biggest integer equal or lower than the original value.
-    ///
-    /// This behavior is preserved for negative values (unlike the basic cast).
-    #[inline]
-    pub fn floor(&self) -> Self {
-        Size2D::new(self.width.floor(), self.height.floor())
-    }
-}
-
-
-impl<T: Add<T, Output = T>, U> Add for Size2D<T, U> {
-    type Output = Self;
-    fn add(self, other: Self) -> Self {
-        Size2D::new(self.width + other.width, self.height + other.height)
-    }
-}
-
-impl<T: Sub<T, Output = T>, U> Sub for Size2D<T, U> {
-    type Output = Self;
-    fn sub(self, other: Self) -> Self {
-        Size2D::new(self.width - other.width, self.height - other.height)
-    }
-}
-
-impl<T: Zero, U> Zero for Size2D<T, U> {
-    #[inline]
-    fn zero() -> Self {
-        Size2D::new(Zero::zero(), Zero::zero())
-    }
-}
-
-impl<T: Copy + Mul<T, Output = T>, U> Mul<T> for Size2D<T, U> {
-    type Output = Self;
-    #[inline]
-    fn mul(self, scale: T) -> Self {
-        Size2D::new(self.width * scale, self.height * scale)
-    }
-}
-
-impl<T: Copy + Div<T, Output = T>, U> Div<T> for Size2D<T, U> {
-    type Output = Self;
-    #[inline]
-    fn div(self, scale: T) -> Self {
-        Size2D::new(self.width / scale, self.height / scale)
-    }
-}
-
-impl<T: Copy + Mul<T, Output = T>, U1, U2> Mul<Scale<T, U1, U2>> for Size2D<T, U1> {
-    type Output = Size2D<T, U2>;
-    #[inline]
-    fn mul(self, scale: Scale<T, U1, U2>) -> Size2D<T, U2> {
-        Size2D::new(self.width * scale.get(), self.height * scale.get())
-    }
-}
-
-impl<T: Copy + Div<T, Output = T>, U1, U2> Div<Scale<T, U1, U2>> for Size2D<T, U2> {
-    type Output = Size2D<T, U1>;
-    #[inline]
-    fn div(self, scale: Scale<T, U1, U2>) -> Size2D<T, U1> {
-        Size2D::new(self.width / scale.get(), self.height / scale.get())
-    }
-}
-
-impl<T, U> Size2D<T, U>
-where
-    T: Signed,
-{
+impl<T: Signed, U> Size2D<T, U> {
     /// Computes the absolute value of each component.
     ///
     /// For `f32` and `f64`, `NaN` will be returned for component if the component is `NaN`.
@@ -479,6 +391,93 @@ impl<T: PartialEq, U> Size2D<T, U> {
             x: self.width != other.width,
             y: self.height != other.height,
         }
+    }
+}
+
+
+impl<T: Round, U> Size2D<T, U> {
+    /// Rounds each component to the nearest integer value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    #[inline]
+    pub fn round(&self) -> Self {
+        Size2D::new(self.width.round(), self.height.round())
+    }
+}
+
+impl<T: Ceil, U> Size2D<T, U> {
+    /// Rounds each component to the smallest integer equal or greater than the original value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    #[inline]
+    pub fn ceil(&self) -> Self {
+        Size2D::new(self.width.ceil(), self.height.ceil())
+    }
+}
+
+impl<T: Floor, U> Size2D<T, U> {
+    /// Rounds each component to the biggest integer equal or lower than the original value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    #[inline]
+    pub fn floor(&self) -> Self {
+        Size2D::new(self.width.floor(), self.height.floor())
+    }
+}
+
+
+impl<T: Add<T, Output = T>, U> Add for Size2D<T, U> {
+    type Output = Self;
+    #[inline]
+    fn add(self, other: Self) -> Self {
+        Size2D::new(self.width + other.width, self.height + other.height)
+    }
+}
+
+impl<T: Sub<T, Output = T>, U> Sub for Size2D<T, U> {
+    type Output = Self;
+    #[inline]
+    fn sub(self, other: Self) -> Self {
+        Size2D::new(self.width - other.width, self.height - other.height)
+    }
+}
+
+impl<T: Zero, U> Zero for Size2D<T, U> {
+    #[inline]
+    fn zero() -> Self {
+        Size2D::new(Zero::zero(), Zero::zero())
+    }
+}
+
+impl<T: Copy + Mul<T, Output = T>, U> Mul<T> for Size2D<T, U> {
+    type Output = Self;
+    #[inline]
+    fn mul(self, scale: T) -> Self {
+        Size2D::new(self.width * scale, self.height * scale)
+    }
+}
+
+impl<T: Copy + Div<T, Output = T>, U> Div<T> for Size2D<T, U> {
+    type Output = Self;
+    #[inline]
+    fn div(self, scale: T) -> Self {
+        Size2D::new(self.width / scale, self.height / scale)
+    }
+}
+
+impl<T: Copy + Mul<T, Output = T>, U1, U2> Mul<Scale<T, U1, U2>> for Size2D<T, U1> {
+    type Output = Size2D<T, U2>;
+    #[inline]
+    fn mul(self, scale: Scale<T, U1, U2>) -> Size2D<T, U2> {
+        Size2D::new(self.width * scale.get(), self.height * scale.get())
+    }
+}
+
+impl<T: Copy + Div<T, Output = T>, U1, U2> Div<Scale<T, U1, U2>> for Size2D<T, U2> {
+    type Output = Size2D<T, U1>;
+    #[inline]
+    fn div(self, scale: Scale<T, U1, U2>) -> Size2D<T, U1> {
+        Size2D::new(self.width / scale.get(), self.height / scale.get())
     }
 }
 
@@ -883,97 +882,7 @@ impl<T: NumCast + Copy, U> Size3D<T, U> {
     }
 }
 
-
-impl<T: Round, U> Size3D<T, U> {
-    /// Rounds each component to the nearest integer value.
-    ///
-    /// This behavior is preserved for negative values (unlike the basic cast).
-    #[inline]
-    pub fn round(&self) -> Self {
-        Size3D::new(self.width.round(), self.height.round(), self.depth.round())
-    }
-}
-
-impl<T: Ceil, U> Size3D<T, U> {
-    /// Rounds each component to the smallest integer equal or greater than the original value.
-    ///
-    /// This behavior is preserved for negative values (unlike the basic cast).
-    #[inline]
-    pub fn ceil(&self) -> Self {
-        Size3D::new(self.width.ceil(), self.height.ceil(), self.depth.ceil())
-    }
-}
-
-impl<T: Floor, U> Size3D<T, U> {
-    /// Rounds each component to the biggest integer equal or lower than the original value.
-    ///
-    /// This behavior is preserved for negative values (unlike the basic cast).
-    #[inline]
-    pub fn floor(&self) -> Self {
-        Size3D::new(self.width.floor(), self.height.floor(), self.depth.floor())
-    }
-}
-
-
-impl<T: Add<T, Output = T>, U> Add for Size3D<T, U> {
-    type Output = Self;
-    #[inline]
-    fn add(self, other: Self) -> Self {
-        Size3D::new(self.width + other.width, self.height + other.height, self.depth + other.depth)
-    }
-}
-
-impl<T: Sub<T, Output = T>, U> Sub for Size3D<T, U> {
-    type Output = Self;
-    #[inline]
-    fn sub(self, other: Self) -> Self {
-        Size3D::new(self.width - other.width, self.height - other.height, self.depth - other.depth)
-    }
-}
-
-impl<T: Zero, U> Zero for Size3D<T, U> {
-    #[inline]
-    fn zero() -> Self {
-        Size3D::new(Zero::zero(), Zero::zero(), Zero::zero())
-    }
-}
-
-impl<T: Copy + Mul<T, Output = T>, U> Mul<T> for Size3D<T, U> {
-    type Output = Self;
-    #[inline]
-    fn mul(self, scale: T) -> Self {
-        Size3D::new(self.width * scale, self.height * scale, self.depth * scale)
-    }
-}
-
-impl<T: Copy + Div<T, Output = T>, U> Div<T> for Size3D<T, U> {
-    type Output = Self;
-    #[inline]
-    fn div(self, scale: T) -> Self {
-        Size3D::new(self.width / scale, self.height / scale, self.depth / scale)
-    }
-}
-
-impl<T: Copy + Mul<T, Output = T>, U1, U2> Mul<Scale<T, U1, U2>> for Size3D<T, U1> {
-    type Output = Size3D<T, U2>;
-    #[inline]
-    fn mul(self, scale: Scale<T, U1, U2>) -> Size3D<T, U2> {
-        Size3D::new(self.width * scale.get(), self.height * scale.get(), self.depth * scale.get())
-    }
-}
-
-impl<T: Copy + Div<T, Output = T>, U1, U2> Div<Scale<T, U1, U2>> for Size3D<T, U2> {
-    type Output = Size3D<T, U1>;
-    #[inline]
-    fn div(self, scale: Scale<T, U1, U2>) -> Size3D<T, U1> {
-        Size3D::new(self.width / scale.get(), self.height / scale.get(), self.depth / scale.get())
-    }
-}
-
-impl<T, U> Size3D<T, U>
-where
-    T: Signed,
-{
+impl<T: Signed, U> Size3D<T, U> {
     /// Computes the absolute value of each component.
     ///
     /// For `f32` and `f64`, `NaN` will be returned for component if the component is `NaN`.
@@ -1067,6 +976,93 @@ impl<T: PartialEq, U> Size3D<T, U> {
             y: self.height != other.height,
             z: self.depth != other.depth,
         }
+    }
+}
+
+
+impl<T: Round, U> Size3D<T, U> {
+    /// Rounds each component to the nearest integer value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    #[inline]
+    pub fn round(&self) -> Self {
+        Size3D::new(self.width.round(), self.height.round(), self.depth.round())
+    }
+}
+
+impl<T: Ceil, U> Size3D<T, U> {
+    /// Rounds each component to the smallest integer equal or greater than the original value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    #[inline]
+    pub fn ceil(&self) -> Self {
+        Size3D::new(self.width.ceil(), self.height.ceil(), self.depth.ceil())
+    }
+}
+
+impl<T: Floor, U> Size3D<T, U> {
+    /// Rounds each component to the biggest integer equal or lower than the original value.
+    ///
+    /// This behavior is preserved for negative values (unlike the basic cast).
+    #[inline]
+    pub fn floor(&self) -> Self {
+        Size3D::new(self.width.floor(), self.height.floor(), self.depth.floor())
+    }
+}
+
+
+impl<T: Add<T, Output = T>, U> Add for Size3D<T, U> {
+    type Output = Self;
+    #[inline]
+    fn add(self, other: Self) -> Self {
+        Size3D::new(self.width + other.width, self.height + other.height, self.depth + other.depth)
+    }
+}
+
+impl<T: Sub<T, Output = T>, U> Sub for Size3D<T, U> {
+    type Output = Self;
+    #[inline]
+    fn sub(self, other: Self) -> Self {
+        Size3D::new(self.width - other.width, self.height - other.height, self.depth - other.depth)
+    }
+}
+
+impl<T: Zero, U> Zero for Size3D<T, U> {
+    #[inline]
+    fn zero() -> Self {
+        Size3D::new(Zero::zero(), Zero::zero(), Zero::zero())
+    }
+}
+
+impl<T: Copy + Mul<T, Output = T>, U> Mul<T> for Size3D<T, U> {
+    type Output = Self;
+    #[inline]
+    fn mul(self, scale: T) -> Self {
+        Size3D::new(self.width * scale, self.height * scale, self.depth * scale)
+    }
+}
+
+impl<T: Copy + Div<T, Output = T>, U> Div<T> for Size3D<T, U> {
+    type Output = Self;
+    #[inline]
+    fn div(self, scale: T) -> Self {
+        Size3D::new(self.width / scale, self.height / scale, self.depth / scale)
+    }
+}
+
+impl<T: Copy + Mul<T, Output = T>, U1, U2> Mul<Scale<T, U1, U2>> for Size3D<T, U1> {
+    type Output = Size3D<T, U2>;
+    #[inline]
+    fn mul(self, scale: Scale<T, U1, U2>) -> Size3D<T, U2> {
+        Size3D::new(self.width * scale.get(), self.height * scale.get(), self.depth * scale.get())
+    }
+}
+
+impl<T: Copy + Div<T, Output = T>, U1, U2> Div<Scale<T, U1, U2>> for Size3D<T, U2> {
+    type Output = Size3D<T, U1>;
+    #[inline]
+    fn div(self, scale: Scale<T, U1, U2>) -> Size3D<T, U1> {
+        Size3D::new(self.width / scale.get(), self.height / scale.get(), self.depth / scale.get())
     }
 }
 
