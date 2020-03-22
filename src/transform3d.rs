@@ -243,6 +243,22 @@ impl<T, Src, Dst> Transform3D<T, Src, Dst> {
             _unit: PhantomData,
         }
     }
+
+    /// Returns `true` if this transform can be represented with a `Transform2D`.
+    ///
+    /// See <https://drafts.csswg.org/css-transforms/#2d-transform>
+    #[inline]
+    pub fn is_2d(&self) -> bool
+    where
+        T: Zero + One + PartialEq,
+    {
+        let (_0, _1): (T, T) = (Zero::zero(), One::one());
+        self.m31 == _0 && self.m32 == _0 &&
+        self.m13 == _0 && self.m23 == _0 &&
+        self.m43 == _0 && self.m14 == _0 &&
+        self.m24 == _0 && self.m34 == _0 &&
+        self.m33 == _1 && self.m44 == _1
+    }
 }
 
 impl <T, Src, Dst> Transform3D<T, Src, Dst>
@@ -295,31 +311,6 @@ where T: Copy +
             _0                 , _2 / (top - bottom), _0                , _0,
             _0                 , _0                 , -_2 / (far - near), _0,
             tx                 , ty                 , tz                , _1
-        )
-    }
-
-    /// Returns true if this transform can be represented with a `Transform2D`.
-    ///
-    /// See <https://drafts.csswg.org/css-transforms/#2d-transform>
-    #[inline]
-    pub fn is_2d(&self) -> bool {
-        let (_0, _1): (T, T) = (Zero::zero(), One::one());
-        self.m31 == _0 && self.m32 == _0 &&
-        self.m13 == _0 && self.m23 == _0 &&
-        self.m43 == _0 && self.m14 == _0 &&
-        self.m24 == _0 && self.m34 == _0 &&
-        self.m33 == _1 && self.m44 == _1
-    }
-
-    /// Create a 2D transform picking the relevant terms from this transform.
-    ///
-    /// This method assumes that self represents a 2d transformation, callers
-    /// should check that self.is_2d() returns true beforehand.
-    pub fn to_2d(&self) -> Transform2D<T, Src, Dst> {
-        Transform2D::row_major(
-            self.m11, self.m12,
-            self.m21, self.m22,
-            self.m41, self.m42
         )
     }
 
@@ -931,6 +922,20 @@ impl<T: Copy, Src, Dst> Transform3D<T, Src, Dst> {
             self.m21, self.m22, self.m23, self.m24,
             self.m31, self.m32, self.m33, self.m34,
             self.m41, self.m42, self.m43, self.m44,
+        )
+    }
+
+    /// Create a 2D transform picking the relevant terms from this transform.
+    ///
+    /// This method assumes that self represents a 2d transformation, callers
+    /// should check that [`self.is_2d()`] returns `true` beforehand.
+    ///
+    /// [`self.is_2d()`]: #method.is_2d
+    pub fn to_2d(&self) -> Transform2D<T, Src, Dst> {
+        Transform2D::row_major(
+            self.m11, self.m12,
+            self.m21, self.m22,
+            self.m41, self.m42
         )
     }
 }
