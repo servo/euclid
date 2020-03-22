@@ -582,6 +582,13 @@ mod size2d {
 
     mod ops {
         use default::Size2D;
+        use scale::Scale;
+
+        pub enum Mm {}
+        pub enum Cm {}
+
+        pub type Size2DMm<T> = crate::Size2D<T, Mm>;
+        pub type Size2DCm<T> = crate::Size2D<T, Cm>;
 
         #[test]
         pub fn test_add() {
@@ -619,6 +626,46 @@ mod size2d {
             let s1 = Size2D::new(0.0, 0.0);
             let s2 = Size2D::new(0.0, 0.0);
             assert_eq!(s1 - s2, Size2D::new(0.0, 0.0));
+        }
+
+
+        #[test]
+        pub fn test_mul_scalar() {
+            let s1: Size2D<f32> = Size2D::new(3.0, 5.0);
+
+            let result = s1 * 5.0;
+
+            assert_eq!(result, Size2D::new(15.0, 25.0));
+        }
+
+        #[test]
+        pub fn test_mul_scale() {
+            let s1 = Size2DMm::new(1.0, 2.0);
+            let cm_per_mm: Scale<f32, Mm, Cm> = Scale::new(0.1);
+
+            let result = s1 * cm_per_mm;
+
+            assert_eq!(result, Size2DCm::new(0.1, 0.2));
+        }
+
+
+        #[test]
+        pub fn test_div_scalar() {
+            let s1: Size2D<f32> = Size2D::new(15.0, 25.0);
+
+            let result = s1 / 5.0;
+
+            assert_eq!(result, Size2D::new(3.0, 5.0));
+        }
+
+        #[test]
+        pub fn test_div_scale() {
+            let s1 = Size2DCm::new(0.1, 0.2);
+            let cm_per_mm: Scale<f32, Mm, Cm> = Scale::new(0.1);
+
+            let result = s1 / cm_per_mm;
+
+            assert_eq!(result, Size2DMm::new(1.0, 2.0));
         }
     }
 }
@@ -1131,6 +1178,99 @@ impl<T, U> Into<mint::Vector3<T>> for Size3D<T, U> {
             x: self.width,
             y: self.height,
             z: self.depth,
+        }
+    }
+}
+
+#[cfg(test)]
+mod size3d {
+    mod ops {
+        use default::Size3D;
+        use scale::Scale;
+
+        pub enum Mm {}
+        pub enum Cm {}
+
+        pub type Size3DMm<T> = crate::Size3D<T, Mm>;
+        pub type Size3DCm<T> = crate::Size3D<T, Cm>;
+
+
+        #[test]
+        pub fn test_add() {
+            let s1 = Size3D::new(1.0, 2.0, 3.0);
+            let s2 = Size3D::new(4.0, 5.0, 6.0);
+            assert_eq!(s1 + s2, Size3D::new(5.0, 7.0, 9.0));
+
+            let s1 = Size3D::new(1.0, 2.0, 3.0);
+            let s2 = Size3D::new(0.0, 0.0, 0.0);
+            assert_eq!(s1 + s2, Size3D::new(1.0, 2.0, 3.0));
+
+            let s1 = Size3D::new( 1.0,  2.0,  3.0);
+            let s2 = Size3D::new(-4.0, -5.0, -6.0);
+            assert_eq!(s1 + s2, Size3D::new(-3.0, -3.0, -3.0));
+
+            let s1 = Size3D::new(0.0, 0.0, 0.0);
+            let s2 = Size3D::new(0.0, 0.0, 0.0);
+            assert_eq!(s1 + s2, Size3D::new(0.0, 0.0, 0.0));
+        }
+
+        #[test]
+        pub fn test_sub() {
+            let s1 = Size3D::new(1.0, 2.0, 3.0);
+            let s2 = Size3D::new(4.0, 5.0, 6.0);
+            assert_eq!(s1 - s2, Size3D::new(-3.0, -3.0, -3.0));
+
+            let s1 = Size3D::new(1.0, 2.0, 3.0);
+            let s2 = Size3D::new(0.0, 0.0, 0.0);
+            assert_eq!(s1 - s2, Size3D::new(1.0, 2.0, 3.0));
+
+            let s1 = Size3D::new( 1.0,  2.0,  3.0);
+            let s2 = Size3D::new(-4.0, -5.0, -6.0);
+            assert_eq!(s1 - s2, Size3D::new(5.0, 7.0, 9.0));
+
+            let s1 = Size3D::new(0.0, 0.0, 0.0);
+            let s2 = Size3D::new(0.0, 0.0, 0.0);
+            assert_eq!(s1 - s2, Size3D::new(0.0, 0.0, 0.0));
+        }
+
+
+        #[test]
+        pub fn test_mul_scalar() {
+            let s1: Size3D<f32> = Size3D::new(3.0, 5.0, 7.0);
+
+            let result = s1 * 5.0;
+
+            assert_eq!(result, Size3D::new(15.0, 25.0, 35.0));
+        }
+
+        #[test]
+        pub fn test_mul_scale() {
+            let s1 = Size3DMm::new(1.0, 2.0, 3.0);
+            let cm_per_mm: Scale<f32, Mm, Cm> = Scale::new(0.1);
+
+            let result = s1 * cm_per_mm;
+
+            assert_eq!(result, Size3DCm::new(0.1, 0.2, 0.3));
+        }
+
+
+        #[test]
+        pub fn test_div_scalar() {
+            let s1: Size3D<f32> = Size3D::new(15.0, 25.0, 35.0);
+
+            let result = s1 / 5.0;
+
+            assert_eq!(result, Size3D::new(3.0, 5.0, 7.0));
+        }
+
+        #[test]
+        pub fn test_div_scale() {
+            let s1 = Size3DCm::new(0.1, 0.2, 0.3);
+            let cm_per_mm: Scale<f32, Mm, Cm> = Scale::new(0.1);
+
+            let result = s1 / cm_per_mm;
+
+            assert_eq!(result, Size3DMm::new(1.0, 2.0, 3.0));
         }
     }
 }
