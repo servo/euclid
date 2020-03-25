@@ -318,7 +318,8 @@ where
 {
     /// Linearly interpolate between this box and another box.
     ///
-    /// `t` is expected to be between zero and one.
+    /// When `t` is `One::one()`, returned value equals to `other`,
+    /// otherwise equals to `self`.
     #[inline]
     pub fn lerp(&self, other: Self, t: T) -> Self {
         Self::new(
@@ -449,17 +450,19 @@ where
     }
 }
 
-impl<T, Unit> Box2D<T, Unit>
+impl<T, U> Box2D<T, U>
 where
     T: Copy,
 {
     /// Drop the units, preserving only the numeric value.
+    #[inline]
     pub fn to_untyped(&self) -> Box2D<T, UnknownUnit> {
         Box2D::new(self.min.to_untyped(), self.max.to_untyped())
     }
 
     /// Tag a unitless value with units.
-    pub fn from_untyped(c: &Box2D<T, UnknownUnit>) -> Box2D<T, Unit> {
+    #[inline]
+    pub fn from_untyped(c: &Box2D<T, UnknownUnit>) -> Box2D<T, U> {
         Box2D::new(
             Point2D::from_untyped(c.min),
             Point2D::from_untyped(c.max),
@@ -467,21 +470,23 @@ where
     }
 
     /// Cast the unit
+    #[inline]
     pub fn cast_unit<V>(&self) -> Box2D<T, V> {
         Box2D::new(self.min.cast_unit(), self.max.cast_unit())
     }
 }
 
-impl<T0, Unit> Box2D<T0, Unit>
+impl<T, U> Box2D<T, U>
 where
-    T0: NumCast + Copy,
+    T: NumCast + Copy,
 {
     /// Cast from one numeric representation to another, preserving the units.
     ///
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using round(), round_in or round_out() before casting.
-    pub fn cast<T1: NumCast>(&self) -> Box2D<T1, Unit> {
+    #[inline]
+    pub fn cast<NewT: NumCast>(&self) -> Box2D<NewT, U> {
         Box2D::new(
             self.min.cast(),
             self.max.cast(),
@@ -493,7 +498,7 @@ where
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using round(), round_in or round_out() before casting.
-    pub fn try_cast<T1: NumCast>(&self) -> Option<Box2D<T1, Unit>> {
+    pub fn try_cast<NewT: NumCast>(&self) -> Option<Box2D<NewT, U>> {
         match (self.min.try_cast(), self.max.try_cast()) {
             (Some(a), Some(b)) => Some(Box2D::new(a, b)),
             _ => None,
@@ -544,14 +549,16 @@ where
 }
 
 // Convenience functions for common casts
-impl<T: NumCast + Copy, Unit> Box2D<T, Unit> {
+impl<T: NumCast + Copy, U> Box2D<T, U> {
     /// Cast into an `f32` box.
-    pub fn to_f32(&self) -> Box2D<f32, Unit> {
+    #[inline]
+    pub fn to_f32(&self) -> Box2D<f32, U> {
         self.cast()
     }
 
     /// Cast into an `f64` box.
-    pub fn to_f64(&self) -> Box2D<f64, Unit> {
+    #[inline]
+    pub fn to_f64(&self) -> Box2D<f64, U> {
         self.cast()
     }
 
@@ -560,7 +567,8 @@ impl<T: NumCast + Copy, Unit> Box2D<T, Unit> {
     /// When casting from floating point boxes, it is worth considering whether
     /// to `round()`, `round_in()` or `round_out()` before the cast in order to
     /// obtain the desired conversion behavior.
-    pub fn to_usize(&self) -> Box2D<usize, Unit> {
+    #[inline]
+    pub fn to_usize(&self) -> Box2D<usize, U> {
         self.cast()
     }
 
@@ -569,7 +577,8 @@ impl<T: NumCast + Copy, Unit> Box2D<T, Unit> {
     /// When casting from floating point boxes, it is worth considering whether
     /// to `round()`, `round_in()` or `round_out()` before the cast in order to
     /// obtain the desired conversion behavior.
-    pub fn to_u32(&self) -> Box2D<u32, Unit> {
+    #[inline]
+    pub fn to_u32(&self) -> Box2D<u32, U> {
         self.cast()
     }
 
@@ -578,7 +587,8 @@ impl<T: NumCast + Copy, Unit> Box2D<T, Unit> {
     /// When casting from floating point boxes, it is worth considering whether
     /// to `round()`, `round_in()` or `round_out()` before the cast in order to
     /// obtain the desired conversion behavior.
-    pub fn to_i32(&self) -> Box2D<i32, Unit> {
+    #[inline]
+    pub fn to_i32(&self) -> Box2D<i32, U> {
         self.cast()
     }
 
@@ -587,7 +597,8 @@ impl<T: NumCast + Copy, Unit> Box2D<T, Unit> {
     /// When casting from floating point boxes, it is worth considering whether
     /// to `round()`, `round_in()` or `round_out()` before the cast in order to
     /// obtain the desired conversion behavior.
-    pub fn to_i64(&self) -> Box2D<i64, Unit> {
+    #[inline]
+    pub fn to_i64(&self) -> Box2D<i64, U> {
         self.cast()
     }
 }

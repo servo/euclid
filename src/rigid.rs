@@ -1,3 +1,7 @@
+//! All matrix multiplication in this module is in row-vector notation,
+//! i.e. a vector `v` is transformed with `v * T`, and if you want to apply `T1`
+//! before `T2` you use `T1 * T2`
+
 use approxeq::ApproxEq;
 use num_traits::Float;
 use trig::Trig;
@@ -18,10 +22,6 @@ pub struct RigidTransform3D<T, Src, Dst> {
     pub rotation: Rotation3D<T, Src, Dst>,
     pub translation: Vector3D<T, Dst>,
 }
-
-// All matrix multiplication in this file is in row-vector notation,
-// i.e. a vector `v` is transformed with `v * T`, and if you want to apply `T1`
-// before `T2` you use `T1 * T2`
 
 impl<T, Src, Dst> RigidTransform3D<T, Src, Dst> {
     /// Construct a new rigid transformation, where the `rotation` applies first

@@ -38,16 +38,16 @@ use core::fmt;
 #[repr(C)]
 pub struct Length<T, Unit>(pub T, #[doc(hidden)] pub PhantomData<Unit>);
 
-impl<T: Clone, Unit> Clone for Length<T, Unit> {
+impl<T: Clone, U> Clone for Length<T, U> {
     fn clone(&self) -> Self {
         Length(self.0.clone(), PhantomData)
     }
 }
 
-impl<T: Copy, Unit> Copy for Length<T, Unit> {}
+impl<T: Copy, U> Copy for Length<T, U> {}
 
 #[cfg(feature = "serde")]
-impl<'de, Unit, T> Deserialize<'de> for Length<T, Unit>
+impl<'de, T, U> Deserialize<'de> for Length<T, U>
 where
     T: Deserialize<'de>,
 {
@@ -56,14 +56,14 @@ where
         D: Deserializer<'de>,
     {
         Ok(Length(
-            try!(Deserialize::deserialize(deserializer)),
+            Deserialize::deserialize(deserializer)?,
             PhantomData,
         ))
     }
 }
 
 #[cfg(feature = "serde")]
-impl<T, Unit> Serialize for Length<T, Unit>
+impl<T, U> Serialize for Length<T, U>
 where
     T: Serialize,
 {
@@ -75,18 +75,20 @@ where
     }
 }
 
-impl<T, Unit> Length<T, Unit> {
+impl<T, U> Length<T, U> {
+    #[inline]
     pub const fn new(x: T) -> Self {
         Length(x, PhantomData)
     }
 }
 
-impl<Unit, T: Clone> Length<T, Unit> {
+impl<T: Clone, U> Length<T, U> {
     pub fn get(&self) -> T {
         self.0.clone()
     }
 
     /// Cast the unit
+    #[inline]
     pub fn cast_unit<V>(&self) -> Length<T, V> {
         Length::new(self.0.clone())
     }
@@ -230,39 +232,41 @@ impl<U, T: Neg<Output = T>> Neg for Length<T, U> {
     }
 }
 
-impl<Unit, T0: NumCast + Clone> Length<T0, Unit> {
+impl<T: NumCast + Clone, U> Length<T, U> {
     /// Cast from one numeric representation to another, preserving the units.
-    pub fn cast<T1: NumCast>(&self) -> Length<T1, Unit> {
+    #[inline]
+    pub fn cast<NewT: NumCast>(&self) -> Length<NewT, U> {
         self.try_cast().unwrap()
     }
 
     /// Fallible cast from one numeric representation to another, preserving the units.
-    pub fn try_cast<T1: NumCast>(&self) -> Option<Length<T1, Unit>> {
+    pub fn try_cast<NewT: NumCast>(&self) -> Option<Length<NewT, U>> {
         NumCast::from(self.get()).map(Length::new)
     }
 }
 
-impl<Unit, T: PartialEq> PartialEq for Length<T, Unit> {
+impl<T: PartialEq, U> PartialEq for Length<T, U> {
     fn eq(&self, other: &Self) -> bool {
         self.0.eq(&other.0)
     }
 }
 
-impl<Unit, T: PartialOrd> PartialOrd for Length<T, Unit> {
+impl<T: PartialOrd, U> PartialOrd for Length<T, U> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         self.0.partial_cmp(&other.0)
     }
 }
 
-impl<Unit, T: Eq> Eq for Length<T, Unit> {}
+impl<T: Eq, U> Eq for Length<T, U> {}
 
-impl<Unit, T: Ord> Ord for Length<T, Unit> {
+impl<T: Ord, U> Ord for Length<T, U> {
     fn cmp(&self, other: &Self) -> Ordering {
         self.0.cmp(&other.0)
     }
 }
 
-impl<Unit, T: Zero> Zero for Length<T, Unit> {
+impl<T: Zero, U> Zero for Length<T, U> {
+    #[inline]
     fn zero() -> Self {
         Length::new(Zero::zero())
     }
@@ -274,7 +278,8 @@ where
 {
     /// Linearly interpolate between this length and another length.
     ///
-    /// `t` is expected to be between zero and one.
+    /// When `t` is `One::one()`, returned value equals to `other`,
+    /// otherwise equals to `self`.
     #[inline]
     pub fn lerp(&self, other: Self, t: T) -> Self {
         let one_t = T::one() - t;

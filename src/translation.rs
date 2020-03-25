@@ -326,7 +326,7 @@ impl<'de, T, Src, Dst> serde::Deserialize<'de> for Translation3D<T, Src, Dst>
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
         where D: serde::Deserializer<'de>
     {
-        let (x, y, z) = try!(serde::Deserialize::deserialize(deserializer));
+        let (x, y, z) = serde::Deserialize::deserialize(deserializer)?;
         Ok(Translation3D { x, y, z, _unit: PhantomData })
     }
 }
@@ -385,6 +385,7 @@ where
     T: Copy
 {
     /// Cast into a 3D vector.
+    #[inline]
     pub fn to_vector(&self) -> Vector3D<T, Src> {
         vec3(self.x, self.y, self.z)
     }

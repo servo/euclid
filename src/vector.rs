@@ -9,6 +9,7 @@
 
 use super::UnknownUnit;
 use approxeq::ApproxEq;
+use approxord::{min, max};
 use length::Length;
 #[cfg(feature = "mint")]
 use mint;
@@ -59,7 +60,7 @@ impl<'de, T, U> serde::Deserialize<'de> for Vector2D<T, U>
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
         where D: serde::Deserializer<'de>
     {
-        let (x, y) = try!(serde::Deserialize::deserialize(deserializer));
+        let (x, y) = serde::Deserialize::deserialize(deserializer)?;
         Ok(Vector2D { x, y, _unit: PhantomData })
     }
 }
@@ -369,9 +370,24 @@ where
 {
     /// Linearly interpolate each component between this vector and another vector.
     ///
-    /// `t` is expected to be between zero and one.
+    /// When `t` is `One::one()`, returned value equals to `other`,
+    /// otherwise equals to `self`.
     ///
-    /// When `t` is `One::one()`, returned value equals to `other`, otherwise equals to `self`.
+    /// # Example
+    ///
+    /// ```rust
+    /// use euclid::vec2;
+    /// use euclid::default::Vector2D;
+    ///
+    /// let first: Vector2D<_> = vec2(0.0, 10.0);
+    /// let last:  Vector2D<_> = vec2(8.0, -4.0);
+    ///
+    /// assert_eq!(first.lerp(last, -1.0), vec2(-8.0,  24.0));
+    /// assert_eq!(first.lerp(last,  0.0), vec2( 0.0,  10.0));
+    /// assert_eq!(first.lerp(last,  0.5), vec2( 4.0,   3.0));
+    /// assert_eq!(first.lerp(last,  1.0), vec2( 8.0,  -4.0));
+    /// assert_eq!(first.lerp(last,  2.0), vec2(16.0, -18.0));
+    /// ```
     #[inline]
     pub fn lerp(&self, other: Self, t: T) -> Self {
         let one_t = T::one() - t;
@@ -428,24 +444,28 @@ impl<T: Neg<Output = T>, U> Neg for Vector2D<T, U> {
     }
 }
 
-impl<T: Float, U> Vector2D<T, U> {
+impl<T: PartialOrd, U> Vector2D<T, U> {
     /// Returns the vector each component of which are minimum of this vector and another.
     #[inline]
     pub fn min(self, other: Self) -> Self {
-        vec2(self.x.min(other.x), self.y.min(other.y))
+        vec2(min(self.x, other.x), min(self.y, other.y))
     }
 
     /// Returns the vector each component of which are maximum of this vector and another.
     #[inline]
     pub fn max(self, other: Self) -> Self {
-        vec2(self.x.max(other.x), self.y.max(other.y))
+        vec2(max(self.x, other.x), max(self.y, other.y))
     }
 
-    /// Returns the vector each component of which is clamped by corresponding components of `start` and `end`.
+    /// Returns the vector each component of which is clamped by corresponding
+    /// components of `start` and `end`.
     ///
     /// Shortcut for `self.max(start).min(end)`.
     #[inline]
-    pub fn clamp(&self, start: Self, end: Self) -> Self {
+    pub fn clamp(&self, start: Self, end: Self) -> Self
+    where
+        T: Copy,
+    {
         self.max(start).min(end)
     }
 }
@@ -548,7 +568,6 @@ impl<T: NumCast + Copy, U> Vector2D<T, U> {
     /// When casting from floating vector to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
-    #[inline]
     pub fn try_cast<NewT: NumCast>(&self) -> Option<Vector2D<NewT, U>> {
         match (NumCast::from(self.x), NumCast::from(self.y)) {
             (Some(x), Some(y)) => Some(Vector2D::new(x, y)),
@@ -704,7 +723,7 @@ impl<'de, T, U> serde::Deserialize<'de> for Vector3D<T, U>
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
         where D: serde::Deserializer<'de>
     {
-        let (x, y, z) = try!(serde::Deserialize::deserialize(deserializer));
+        let (x, y, z) = serde::Deserialize::deserialize(deserializer)?;
         Ok(Vector3D { x, y, z, _unit: PhantomData })
     }
 }
@@ -849,6 +868,7 @@ impl<T: Copy, U> Vector3D<T, U> {
     }
 
     /// Cast the unit
+    #[inline]
     pub fn cast_unit<V>(&self) -> Vector3D<T, V> {
         vec3(self.x, self.y, self.z)
     }
@@ -1015,9 +1035,24 @@ where
 {
     /// Linearly interpolate each component between this vector and another vector.
     ///
-    /// `t` is expected to be between zero and one.
+    /// When `t` is `One::one()`, returned value equals to `other`,
+    /// otherwise equals to `self`.
     ///
-    /// When `t` is `One::one()`, returned value equals to `other`, otherwise equals to `self`.
+    /// # Example
+    ///
+    /// ```rust
+    /// use euclid::vec3;
+    /// use euclid::default::Vector3D;
+    ///
+    /// let first: Vector3D<_> = vec3(0.0, 10.0, -1.0);
+    /// let last:  Vector3D<_> = vec3(8.0, -4.0,  0.0);
+    ///
+    /// assert_eq!(first.lerp(last, -1.0), vec3(-8.0,  24.0, -2.0));
+    /// assert_eq!(first.lerp(last,  0.0), vec3( 0.0,  10.0, -1.0));
+    /// assert_eq!(first.lerp(last,  0.5), vec3( 4.0,   3.0, -0.5));
+    /// assert_eq!(first.lerp(last,  1.0), vec3( 8.0,  -4.0,  0.0));
+    /// assert_eq!(first.lerp(last,  2.0), vec3(16.0, -18.0,  1.0));
+    /// ```
     #[inline]
     pub fn lerp(&self, other: Self, t: T) -> Self {
         let one_t = T::one() - t;
@@ -1100,14 +1135,14 @@ impl<T: Copy + Div<T, Output = T>, U> DivAssign<T> for Vector3D<T, U> {
     }
 }
 
-impl<T: Float, U> Vector3D<T, U> {
+impl<T: PartialOrd, U> Vector3D<T, U> {
     /// Returns the vector each component of which are minimum of this vector and another.
     #[inline]
     pub fn min(self, other: Self) -> Self {
         vec3(
-            self.x.min(other.x),
-            self.y.min(other.y),
-            self.z.min(other.z),
+            min(self.x, other.x),
+            min(self.y, other.y),
+            min(self.z, other.z),
         )
     }
 
@@ -1115,17 +1150,21 @@ impl<T: Float, U> Vector3D<T, U> {
     #[inline]
     pub fn max(self, other: Self) -> Self {
         vec3(
-            self.x.max(other.x),
-            self.y.max(other.y),
-            self.z.max(other.z),
+            max(self.x, other.x),
+            max(self.y, other.y),
+            max(self.z, other.z),
         )
     }
 
-    /// Returns the vector each component of which is clamped by corresponding components of `start` and `end`.
+    /// Returns the vector each component of which is clamped by corresponding
+    /// components of `start` and `end`.
     ///
     /// Shortcut for `self.max(start).min(end)`.
     #[inline]
-    pub fn clamp(&self, start: Self, end: Self) -> Self {
+    pub fn clamp(&self, start: Self, end: Self) -> Self
+    where
+        T: Copy,
+    {
         self.max(start).min(end)
     }
 }
@@ -1195,7 +1234,6 @@ impl<T: NumCast + Copy, U> Vector3D<T, U> {
     /// When casting from floating vector to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
-    #[inline]
     pub fn try_cast<NewT: NumCast>(&self) -> Option<Vector3D<NewT, U>> {
         match (
             NumCast::from(self.x),
@@ -1380,7 +1418,7 @@ impl BoolVector2D {
         }
     }
 
-    /// Returns new vector with results of negation operaton on each component.
+    /// Returns new vector with results of negation operation on each component.
     #[inline]
     pub fn not(&self) -> Self {
         BoolVector2D {
@@ -1459,7 +1497,7 @@ impl BoolVector3D {
         }
     }
 
-    /// Returns new vector with results of negation operaton on each component.
+    /// Returns new vector with results of negation operation on each component.
     #[inline]
     pub fn not(&self) -> Self {
         BoolVector3D {
@@ -1530,7 +1568,7 @@ impl BoolVector3D {
 }
 
 impl<T: PartialOrd, U> Vector2D<T, U> {
-    /// Returns vector with results of "greater than" operaton on each component.
+    /// Returns vector with results of "greater than" operation on each component.
     #[inline]
     pub fn greater_than(&self, other: Self) -> BoolVector2D {
         BoolVector2D {
@@ -1539,7 +1577,7 @@ impl<T: PartialOrd, U> Vector2D<T, U> {
         }
     }
 
-    /// Returns vector with results of "lower than" operaton on each component.
+    /// Returns vector with results of "lower than" operation on each component.
     #[inline]
     pub fn lower_than(&self, other: Self) -> BoolVector2D {
         BoolVector2D {
@@ -1551,7 +1589,7 @@ impl<T: PartialOrd, U> Vector2D<T, U> {
 
 
 impl<T: PartialEq, U> Vector2D<T, U> {
-    /// Returns vector with results of "equal" operaton on each component.
+    /// Returns vector with results of "equal" operation on each component.
     #[inline]
     pub fn equal(&self, other: Self) -> BoolVector2D {
         BoolVector2D {
@@ -1560,7 +1598,7 @@ impl<T: PartialEq, U> Vector2D<T, U> {
         }
     }
 
-    /// Returns vector with results of "not equal" operaton on each component.
+    /// Returns vector with results of "not equal" operation on each component.
     #[inline]
     pub fn not_equal(&self, other: Self) -> BoolVector2D {
         BoolVector2D {
@@ -1571,7 +1609,7 @@ impl<T: PartialEq, U> Vector2D<T, U> {
 }
 
 impl<T: PartialOrd, U> Vector3D<T, U> {
-    /// Returns vector with results of "greater than" operaton on each component.
+    /// Returns vector with results of "greater than" operation on each component.
     #[inline]
     pub fn greater_than(&self, other: Self) -> BoolVector3D {
         BoolVector3D {
@@ -1581,7 +1619,7 @@ impl<T: PartialOrd, U> Vector3D<T, U> {
         }
     }
 
-    /// Returns vector with results of "lower than" operaton on each component.
+    /// Returns vector with results of "lower than" operation on each component.
     #[inline]
     pub fn lower_than(&self, other: Self) -> BoolVector3D {
         BoolVector3D {
@@ -1594,7 +1632,7 @@ impl<T: PartialOrd, U> Vector3D<T, U> {
 
 
 impl<T: PartialEq, U> Vector3D<T, U> {
-    /// Returns vector with results of "equal" operaton on each component.
+    /// Returns vector with results of "equal" operation on each component.
     #[inline]
     pub fn equal(&self, other: Self) -> BoolVector3D {
         BoolVector3D {
@@ -1604,7 +1642,7 @@ impl<T: PartialEq, U> Vector3D<T, U> {
         }
     }
 
-    /// Returns vector with results of "not equal" operaton on each component.
+    /// Returns vector with results of "not equal" operation on each component.
     #[inline]
     pub fn not_equal(&self, other: Self) -> BoolVector3D {
         BoolVector3D {
