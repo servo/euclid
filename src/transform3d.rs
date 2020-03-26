@@ -325,30 +325,26 @@ where T: Copy +
 
     /// Returns true is this transform is approximately equal to the other one, using
     /// T's default epsilon value.
+    ///
+    /// The same as [`ApproxEq::approx_eq()`] but available without importing trait.
+    ///
+    /// [`ApproxEq::approx_eq()`]: ./approxeq/trait.ApproxEq.html#method.approx_eq
+    #[inline]
     pub fn approx_eq(&self, other: &Self) -> bool
     where T : ApproxEq<T> {
-        self.m11.approx_eq(&other.m11) && self.m12.approx_eq(&other.m12) &&
-        self.m13.approx_eq(&other.m13) && self.m14.approx_eq(&other.m14) &&
-        self.m21.approx_eq(&other.m21) && self.m22.approx_eq(&other.m22) &&
-        self.m23.approx_eq(&other.m23) && self.m24.approx_eq(&other.m24) &&
-        self.m31.approx_eq(&other.m31) && self.m32.approx_eq(&other.m32) &&
-        self.m33.approx_eq(&other.m33) && self.m34.approx_eq(&other.m34) &&
-        self.m41.approx_eq(&other.m41) && self.m42.approx_eq(&other.m42) &&
-        self.m43.approx_eq(&other.m43) && self.m44.approx_eq(&other.m44)
+        <Self as ApproxEq<T>>::approx_eq(&self, &other)
     }
 
     /// Returns true is this transform is approximately equal to the other one, using
     /// a provided epsilon value.
+    ///
+    /// The same as [`ApproxEq::approx_eq_eps()`] but available without importing trait.
+    ///
+    /// [`ApproxEq::approx_eq_eps()`]: ./approxeq/trait.ApproxEq.html#method.approx_eq_eps
+    #[inline]
     pub fn approx_eq_eps(&self, other: &Self, eps: &T) -> bool
     where T : ApproxEq<T> {
-        self.m11.approx_eq_eps(&other.m11, eps) && self.m12.approx_eq_eps(&other.m12, eps) &&
-        self.m13.approx_eq_eps(&other.m13, eps) && self.m14.approx_eq_eps(&other.m14, eps) &&
-        self.m21.approx_eq_eps(&other.m21, eps) && self.m22.approx_eq_eps(&other.m22, eps) &&
-        self.m23.approx_eq_eps(&other.m23, eps) && self.m24.approx_eq_eps(&other.m24, eps) &&
-        self.m31.approx_eq_eps(&other.m31, eps) && self.m32.approx_eq_eps(&other.m32, eps) &&
-        self.m33.approx_eq_eps(&other.m33, eps) && self.m34.approx_eq_eps(&other.m34, eps) &&
-        self.m41.approx_eq_eps(&other.m41, eps) && self.m42.approx_eq_eps(&other.m42, eps) &&
-        self.m43.approx_eq_eps(&other.m43, eps) && self.m44.approx_eq_eps(&other.m44, eps)
+        <Self as ApproxEq<T>>::approx_eq_eps(&self, &other, &eps)
     }
 
     /// Returns the same transform with a different destination unit.
@@ -955,6 +951,22 @@ impl<T: NumCast + Copy, Src, Dst> Transform3D<T, Src, Dst> {
             },
             _ => None
         }
+    }
+}
+
+impl<T: ApproxEq<T>, Src, Dst> ApproxEq<T> for Transform3D<T, Src, Dst> {
+    #[inline]
+    fn approx_epsilon() -> T { T::approx_epsilon() }
+
+    fn approx_eq_eps(&self, other: &Self, eps: &T) -> bool {
+        self.m11.approx_eq_eps(&other.m11, eps) && self.m12.approx_eq_eps(&other.m12, eps) &&
+        self.m13.approx_eq_eps(&other.m13, eps) && self.m14.approx_eq_eps(&other.m14, eps) &&
+        self.m21.approx_eq_eps(&other.m21, eps) && self.m22.approx_eq_eps(&other.m22, eps) &&
+        self.m23.approx_eq_eps(&other.m23, eps) && self.m24.approx_eq_eps(&other.m24, eps) &&
+        self.m31.approx_eq_eps(&other.m31, eps) && self.m32.approx_eq_eps(&other.m32, eps) &&
+        self.m33.approx_eq_eps(&other.m33, eps) && self.m34.approx_eq_eps(&other.m34, eps) &&
+        self.m41.approx_eq_eps(&other.m41, eps) && self.m42.approx_eq_eps(&other.m42, eps) &&
+        self.m43.approx_eq_eps(&other.m43, eps) && self.m44.approx_eq_eps(&other.m44, eps)
     }
 }
 

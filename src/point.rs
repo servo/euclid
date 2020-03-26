@@ -661,11 +661,6 @@ impl<T: ApproxEq<T>, U> ApproxEq<Point2D<T, U>> for Point2D<T, U> {
     }
 
     #[inline]
-    fn approx_eq(&self, other: &Self) -> bool {
-        self.x.approx_eq(&other.x) && self.y.approx_eq(&other.y)
-    }
-
-    #[inline]
     fn approx_eq_eps(&self, other: &Self, eps: &Self) -> bool {
         self.x.approx_eq_eps(&other.x, &eps.x) && self.y.approx_eq_eps(&other.y, &eps.y)
     }
@@ -1382,11 +1377,6 @@ impl<T: ApproxEq<T>, U> ApproxEq<Point3D<T, U>> for Point3D<T, U> {
             T::approx_epsilon(),
             T::approx_epsilon(),
         )
-    }
-
-    #[inline]
-    fn approx_eq(&self, other: &Self) -> bool {
-        self.x.approx_eq(&other.x) && self.y.approx_eq(&other.y) && self.z.approx_eq(&other.z)
     }
 
     #[inline]
