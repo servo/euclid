@@ -21,7 +21,7 @@ use core::hash::{Hash};
 use serde::{Deserialize, Serialize};
 use crate::Vector2D;
 
-/// A group of 2D side offsets, which correspond to top/left/bottom/right for borders, padding,
+/// A group of 2D side offsets, which correspond to top/right/bottom/left for borders, padding,
 /// and margins in CSS, optionally tagged with a unit.
 #[repr(C)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -97,6 +97,9 @@ impl<T: Default, U> Default for SideOffsets2D<T, U> {
 
 impl<T, U> SideOffsets2D<T, U> {
     /// Constructor taking a scalar for each side.
+    ///
+    /// Sides are specified in top-right-bottom-left order following
+    /// CSS's convention.
     pub const fn new(top: T, right: T, bottom: T, left: T) -> Self {
         SideOffsets2D {
             top,
@@ -108,6 +111,9 @@ impl<T, U> SideOffsets2D<T, U> {
     }
 
     /// Constructor taking a typed Length for each side.
+    ///
+    /// Sides are specified in top-right-bottom-left order following
+    /// CSS's convention.
     pub fn from_lengths(
         top: Length<T, U>,
         right: Length<T, U>,
