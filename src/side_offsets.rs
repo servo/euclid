@@ -13,14 +13,15 @@
 use length::Length;
 use num::Zero;
 use core::fmt;
-use core::ops::Add;
+use core::ops::{Add, Neg};
 use core::marker::PhantomData;
 use core::cmp::{Eq, PartialEq};
 use core::hash::{Hash};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
+use crate::Vector2D;
 
-/// A group of 2D side offsets, which correspond to top/left/bottom/right for borders, padding,
+/// A group of 2D side offsets, which correspond to top/right/bottom/left for borders, padding,
 /// and margins in CSS, optionally tagged with a unit.
 #[repr(C)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -96,6 +97,9 @@ impl<T: Default, U> Default for SideOffsets2D<T, U> {
 
 impl<T, U> SideOffsets2D<T, U> {
     /// Constructor taking a scalar for each side.
+    ///
+    /// Sides are specified in top-right-bottom-left order following
+    /// CSS's convention.
     pub const fn new(top: T, right: T, bottom: T, left: T) -> Self {
         SideOffsets2D {
             top,
@@ -107,6 +111,9 @@ impl<T, U> SideOffsets2D<T, U> {
     }
 
     /// Constructor taking a typed Length for each side.
+    ///
+    /// Sides are specified in top-right-bottom-left order following
+    /// CSS's convention.
     pub fn from_lengths(
         top: Length<T, U>,
         right: Length<T, U>,
@@ -114,6 +121,42 @@ impl<T, U> SideOffsets2D<T, U> {
         left: Length<T, U>,
     ) -> Self {
         SideOffsets2D::new(top.0, right.0, bottom.0, left.0)
+    }
+
+    /// Construct side offsets from min and a max vector offsets.
+    ///
+    /// The outer rect of the resulting side offsets is equivalent to translating
+    /// a rectangle's upper-left corner with the min vector and translating the
+    /// bottom-right corner with the max vector.
+    pub fn from_vectors_outer(min: Vector2D<T, U>, max: Vector2D<T,U>) -> Self
+    where
+        T: Neg<Output = T>
+    {
+        SideOffsets2D {
+            left: -min.x,
+            top: -min.y,
+            right: max.x,
+            bottom: max.y,
+            _unit: PhantomData,
+        }
+    }
+
+    /// Construct side offsets from min and a max vector offsets.
+    ///
+    /// The inner rect of the resulting side offsets is equivalent to translating
+    /// a rectangle's upper-left corner with the min vector and translating the
+    /// bottom-right corner with the max vector.
+    pub fn from_vectors_inner(min: Vector2D<T, U>, max: Vector2D<T,U>) -> Self
+    where
+        T: Neg<Output = T>
+    {
+        SideOffsets2D {
+            left: min.x,
+            top: min.y,
+            right: -max.x,
+            bottom: -max.y,
+            _unit: PhantomData,
+        }
     }
 }
 
@@ -162,4 +205,21 @@ impl<T: Zero, U> SideOffsets2D<T, U> {
     pub fn zero() -> Self {
         SideOffsets2D::new(Zero::zero(), Zero::zero(), Zero::zero(), Zero::zero())
     }
+}
+
+#[test]
+fn from_vectors() {
+    use crate::{vec2, point2};
+    type Box2D = crate::default::Box2D<i32>;
+
+    let b = Box2D {
+        min: point2(10, 10),
+        max: point2(20, 20),
+    };
+
+    let outer = b.outer_box(SideOffsets2D::from_vectors_outer(vec2(-1, -2), vec2(3, 4)));
+    let inner = b.inner_box(SideOffsets2D::from_vectors_inner(vec2(1, 2), vec2(-3, -4)));
+
+    assert_eq!(outer, Box2D { min: point2(9, 8), max: point2(23, 24) });
+    assert_eq!(inner, Box2D { min: point2(11, 12), max: point2(17, 16) });
 }
