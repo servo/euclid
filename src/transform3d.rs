@@ -168,6 +168,7 @@ impl<T, Src, Dst> Hash for Transform3D<T, Src, Dst>
     }
 }
 
+
 impl<T, Src, Dst> Transform3D<T, Src, Dst> {
     /// Create a transform specifying its components in row-major order.
     ///
@@ -258,6 +259,163 @@ impl<T, Src, Dst> Transform3D<T, Src, Dst> {
         self.m43 == _0 && self.m14 == _0 &&
         self.m24 == _0 && self.m34 == _0 &&
         self.m33 == _1 && self.m44 == _1
+    }
+}
+
+impl<T: Copy, Src, Dst> Transform3D<T, Src, Dst> {
+    /// Returns an array containing this transform's terms in row-major order (the order
+    /// in which the transform is actually laid out in memory).
+    ///
+    /// Beware: This library is written with the assumption that row vectors
+    /// are being used. If your matrices use column vectors (i.e. transforming a vector
+    /// is `T * v`), then please use `to_column_major_array`
+    #[inline]
+    pub fn to_row_major_array(&self) -> [T; 16] {
+        [
+            self.m11, self.m12, self.m13, self.m14,
+            self.m21, self.m22, self.m23, self.m24,
+            self.m31, self.m32, self.m33, self.m34,
+            self.m41, self.m42, self.m43, self.m44
+        ]
+    }
+
+    /// Returns an array containing this transform's terms in column-major order.
+    ///
+    /// Beware: This library is written with the assumption that row vectors
+    /// are being used. If your matrices use column vectors (i.e. transforming a vector
+    /// is `T * v`), then please use `to_row_major_array`
+    #[inline]
+    pub fn to_column_major_array(&self) -> [T; 16] {
+        [
+            self.m11, self.m21, self.m31, self.m41,
+            self.m12, self.m22, self.m32, self.m42,
+            self.m13, self.m23, self.m33, self.m43,
+            self.m14, self.m24, self.m34, self.m44
+        ]
+    }
+
+    /// Returns an array containing this transform's 4 rows in (in row-major order)
+    /// as arrays.
+    ///
+    /// This is a convenience method to interface with other libraries like glium.
+    ///
+    /// Beware: This library is written with the assumption that row vectors
+    /// are being used. If your matrices use column vectors (i.e. transforming a vector
+    /// is `T * v`), then please use `to_column_arrays`
+    #[inline]
+    pub fn to_row_arrays(&self) -> [[T; 4]; 4] {
+        [
+            [self.m11, self.m12, self.m13, self.m14],
+            [self.m21, self.m22, self.m23, self.m24],
+            [self.m31, self.m32, self.m33, self.m34],
+            [self.m41, self.m42, self.m43, self.m44]
+        ]
+    }
+
+    /// Returns an array containing this transform's 4 columns in (in row-major order,
+    /// or 4 rows in column-major order) as arrays.
+    ///
+    /// This is a convenience method to interface with other libraries like glium.
+    ///
+    /// Beware: This library is written with the assumption that row vectors
+    /// are being used. If your matrices use column vectors (i.e. transforming a vector
+    /// is `T * v`), then please use `to_row_arrays`
+    #[inline]
+    pub fn to_column_arrays(&self) -> [[T; 4]; 4] {
+        [
+            [self.m11, self.m21, self.m31, self.m41],
+            [self.m12, self.m22, self.m32, self.m42],
+            [self.m13, self.m23, self.m33, self.m43],
+            [self.m14, self.m24, self.m34, self.m44]
+        ]
+    }
+
+    /// Creates a transform from an array of 16 elements in row-major order.
+    ///
+    /// Beware: This library is written with the assumption that row vectors
+    /// are being used. If your matrices use column vectors (i.e. transforming a vector
+    /// is `T * v`), please provide column-major data to this function.
+    #[inline]
+    pub fn from_array(array: [T; 16]) -> Self {
+        Self::row_major(
+            array[0],  array[1],  array[2],  array[3],
+            array[4],  array[5],  array[6],  array[7],
+            array[8],  array[9],  array[10], array[11],
+            array[12], array[13], array[14], array[15],
+        )
+    }
+
+    /// Creates a transform from 4 rows of 4 elements (row-major order).
+    ///
+    /// Beware: This library is written with the assumption that row vectors
+    /// are being used. If your matrices use column vectors (i.e. transforming a vector
+    /// is `T * v`), please provide column-major data to tis function.
+    #[inline]
+    pub fn from_row_arrays(array: [[T; 4]; 4]) -> Self {
+        Self::row_major(
+            array[0][0], array[0][1], array[0][2], array[0][3],
+            array[1][0], array[1][1], array[1][2], array[1][3],
+            array[2][0], array[2][1], array[2][2], array[2][3],
+            array[3][0], array[3][1], array[3][2], array[3][3],
+        )
+    }
+
+    /// Tag a unitless value with units.
+    #[inline]
+    pub fn from_untyped(m: &Transform3D<T, UnknownUnit, UnknownUnit>) -> Self {
+        Transform3D::row_major(
+            m.m11, m.m12, m.m13, m.m14,
+            m.m21, m.m22, m.m23, m.m24,
+            m.m31, m.m32, m.m33, m.m34,
+            m.m41, m.m42, m.m43, m.m44,
+        )
+    }
+
+    /// Drop the units, preserving only the numeric value.
+    #[inline]
+    pub fn to_untyped(&self) -> Transform3D<T, UnknownUnit, UnknownUnit> {
+        Transform3D::row_major(
+            self.m11, self.m12, self.m13, self.m14,
+            self.m21, self.m22, self.m23, self.m24,
+            self.m31, self.m32, self.m33, self.m34,
+            self.m41, self.m42, self.m43, self.m44,
+        )
+    }
+
+    /// Returns the same transform with a different source unit.
+    #[inline]
+    pub fn with_source<NewSrc>(&self) -> Transform3D<T, NewSrc, Dst> {
+        Transform3D::row_major(
+            self.m11, self.m12, self.m13, self.m14,
+            self.m21, self.m22, self.m23, self.m24,
+            self.m31, self.m32, self.m33, self.m34,
+            self.m41, self.m42, self.m43, self.m44,
+        )
+    }
+
+    /// Returns the same transform with a different destination unit.
+    #[inline]
+    pub fn with_destination<NewDst>(&self) -> Transform3D<T, Src, NewDst> {
+        Transform3D::row_major(
+            self.m11, self.m12, self.m13, self.m14,
+            self.m21, self.m22, self.m23, self.m24,
+            self.m31, self.m32, self.m33, self.m34,
+            self.m41, self.m42, self.m43, self.m44,
+        )
+    }
+
+    /// Create a 2D transform picking the relevant terms from this transform.
+    ///
+    /// This method assumes that self represents a 2d transformation, callers
+    /// should check that [`self.is_2d()`] returns `true` beforehand.
+    ///
+    /// [`self.is_2d()`]: #method.is_2d
+    pub fn to_2d(&self) -> Transform2D<T, Src, Dst> {
+        Transform2D::row_major(
+            self.m11, self.m12,
+            self.m21, self.m22,
+            self.m41, self.m42
+        )
     }
 }
 
@@ -783,163 +941,6 @@ where T: Copy +
     }
 }
 
-impl<T: Copy, Src, Dst> Transform3D<T, Src, Dst> {
-    /// Returns an array containing this transform's terms in row-major order (the order
-    /// in which the transform is actually laid out in memory).
-    ///
-    /// Beware: This library is written with the assumption that row vectors
-    /// are being used. If your matrices use column vectors (i.e. transforming a vector
-    /// is `T * v`), then please use `to_column_major_array`
-    #[inline]
-    pub fn to_row_major_array(&self) -> [T; 16] {
-        [
-            self.m11, self.m12, self.m13, self.m14,
-            self.m21, self.m22, self.m23, self.m24,
-            self.m31, self.m32, self.m33, self.m34,
-            self.m41, self.m42, self.m43, self.m44
-        ]
-    }
-
-    /// Returns an array containing this transform's terms in column-major order.
-    ///
-    /// Beware: This library is written with the assumption that row vectors
-    /// are being used. If your matrices use column vectors (i.e. transforming a vector
-    /// is `T * v`), then please use `to_row_major_array`
-    #[inline]
-    pub fn to_column_major_array(&self) -> [T; 16] {
-        [
-            self.m11, self.m21, self.m31, self.m41,
-            self.m12, self.m22, self.m32, self.m42,
-            self.m13, self.m23, self.m33, self.m43,
-            self.m14, self.m24, self.m34, self.m44
-        ]
-    }
-
-    /// Returns an array containing this transform's 4 rows in (in row-major order)
-    /// as arrays.
-    ///
-    /// This is a convenience method to interface with other libraries like glium.
-    ///
-    /// Beware: This library is written with the assumption that row vectors
-    /// are being used. If your matrices use column vectors (i.e. transforming a vector
-    /// is `T * v`), then please use `to_column_arrays`
-    #[inline]
-    pub fn to_row_arrays(&self) -> [[T; 4]; 4] {
-        [
-            [self.m11, self.m12, self.m13, self.m14],
-            [self.m21, self.m22, self.m23, self.m24],
-            [self.m31, self.m32, self.m33, self.m34],
-            [self.m41, self.m42, self.m43, self.m44]
-        ]
-    }
-
-    /// Returns an array containing this transform's 4 columns in (in row-major order,
-    /// or 4 rows in column-major order) as arrays.
-    ///
-    /// This is a convenience method to interface with other libraries like glium.
-    ///
-    /// Beware: This library is written with the assumption that row vectors
-    /// are being used. If your matrices use column vectors (i.e. transforming a vector
-    /// is `T * v`), then please use `to_row_arrays`
-    #[inline]
-    pub fn to_column_arrays(&self) -> [[T; 4]; 4] {
-        [
-            [self.m11, self.m21, self.m31, self.m41],
-            [self.m12, self.m22, self.m32, self.m42],
-            [self.m13, self.m23, self.m33, self.m43],
-            [self.m14, self.m24, self.m34, self.m44]
-        ]
-    }
-
-    /// Creates a transform from an array of 16 elements in row-major order.
-    ///
-    /// Beware: This library is written with the assumption that row vectors
-    /// are being used. If your matrices use column vectors (i.e. transforming a vector
-    /// is `T * v`), please provide column-major data to this function.
-    #[inline]
-    pub fn from_array(array: [T; 16]) -> Self {
-        Self::row_major(
-            array[0],  array[1],  array[2],  array[3],
-            array[4],  array[5],  array[6],  array[7],
-            array[8],  array[9],  array[10], array[11],
-            array[12], array[13], array[14], array[15],
-        )
-    }
-
-    /// Creates a transform from 4 rows of 4 elements (row-major order).
-    ///
-    /// Beware: This library is written with the assumption that row vectors
-    /// are being used. If your matrices use column vectors (i.e. transforming a vector
-    /// is `T * v`), please provide column-major data to tis function.
-    #[inline]
-    pub fn from_row_arrays(array: [[T; 4]; 4]) -> Self {
-        Self::row_major(
-            array[0][0], array[0][1], array[0][2], array[0][3],
-            array[1][0], array[1][1], array[1][2], array[1][3],
-            array[2][0], array[2][1], array[2][2], array[2][3],
-            array[3][0], array[3][1], array[3][2], array[3][3],
-        )
-    }
-
-    /// Tag a unitless value with units.
-    #[inline]
-    pub fn from_untyped(m: &Transform3D<T, UnknownUnit, UnknownUnit>) -> Self {
-        Transform3D::row_major(
-            m.m11, m.m12, m.m13, m.m14,
-            m.m21, m.m22, m.m23, m.m24,
-            m.m31, m.m32, m.m33, m.m34,
-            m.m41, m.m42, m.m43, m.m44,
-        )
-    }
-
-    /// Drop the units, preserving only the numeric value.
-    #[inline]
-    pub fn to_untyped(&self) -> Transform3D<T, UnknownUnit, UnknownUnit> {
-        Transform3D::row_major(
-            self.m11, self.m12, self.m13, self.m14,
-            self.m21, self.m22, self.m23, self.m24,
-            self.m31, self.m32, self.m33, self.m34,
-            self.m41, self.m42, self.m43, self.m44,
-        )
-    }
-
-    /// Returns the same transform with a different source unit.
-    #[inline]
-    pub fn with_source<NewSrc>(&self) -> Transform3D<T, NewSrc, Dst> {
-        Transform3D::row_major(
-            self.m11, self.m12, self.m13, self.m14,
-            self.m21, self.m22, self.m23, self.m24,
-            self.m31, self.m32, self.m33, self.m34,
-            self.m41, self.m42, self.m43, self.m44,
-        )
-    }
-
-    /// Returns the same transform with a different destination unit.
-    #[inline]
-    pub fn with_destination<NewDst>(&self) -> Transform3D<T, Src, NewDst> {
-        Transform3D::row_major(
-            self.m11, self.m12, self.m13, self.m14,
-            self.m21, self.m22, self.m23, self.m24,
-            self.m31, self.m32, self.m33, self.m34,
-            self.m41, self.m42, self.m43, self.m44,
-        )
-    }
-
-    /// Create a 2D transform picking the relevant terms from this transform.
-    ///
-    /// This method assumes that self represents a 2d transformation, callers
-    /// should check that [`self.is_2d()`] returns `true` beforehand.
-    ///
-    /// [`self.is_2d()`]: #method.is_2d
-    pub fn to_2d(&self) -> Transform2D<T, Src, Dst> {
-        Transform2D::row_major(
-            self.m11, self.m12,
-            self.m21, self.m22,
-            self.m41, self.m42
-        )
-    }
-}
-
 impl<T: NumCast + Copy, Src, Dst> Transform3D<T, Src, Dst> {
     /// Cast from one numeric representation to another, preserving the units.
     #[inline]
@@ -970,6 +971,7 @@ impl<T: NumCast + Copy, Src, Dst> Transform3D<T, Src, Dst> {
         }
     }
 }
+
 
 impl<T: ApproxEq<T>, Src, Dst> ApproxEq<T> for Transform3D<T, Src, Dst> {
     #[inline]
