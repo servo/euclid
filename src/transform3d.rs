@@ -420,33 +420,41 @@ impl<T: Copy, Src, Dst> Transform3D<T, Src, Dst> {
 }
 
 impl <T, Src, Dst> Transform3D<T, Src, Dst>
-where T: Copy +
-         PartialEq +
-         One + Zero {
-    #[inline]
-    pub fn identity() -> Self {
-        let (_0, _1): (T, T) = (Zero::zero(), One::one());
-        Transform3D::row_major(
-            _1, _0, _0, _0,
-            _0, _1, _0, _0,
-            _0, _0, _1, _0,
-            _0, _0, _0, _1
-        )
-    }
-
-    // Intentional not public, because it checks for exact equivalence
-    // while most consumers will probably want some sort of approximate
-    // equivalence to deal with floating-point errors.
-    #[inline]
-    fn is_identity(&self) -> bool {
-        *self == Transform3D::identity()
-    }
-}
-
-impl <T, Src, Dst> Transform3D<T, Src, Dst>
 where
     T: Zero + One,
 {
+    /// Creates an identity matrix:
+    ///
+    /// ```text
+    /// 1 0 0 0
+    /// 0 1 0 0
+    /// 0 0 1 0
+    /// 0 0 0 1
+    /// ```
+    #[inline]
+    pub fn identity() -> Self {
+        let _0 = || T::zero();
+        let _1 = || T::one();
+
+        Self::row_major(
+            _1(), _0(), _0(), _0(),
+            _0(), _1(), _0(), _0(),
+            _0(), _0(), _1(), _0(),
+            _0(), _0(), _0(), _1(),
+        )
+    }
+
+    /// Intentional not public, because it checks for exact equivalence
+    /// while most consumers will probably want some sort of approximate
+    /// equivalence to deal with floating-point errors.
+    #[inline]
+    fn is_identity(&self) -> bool
+    where
+        T: PartialEq,
+    {
+        *self == Self::identity()
+    }
+
     /// Create a 2d skew transform.
     ///
     /// See <https://drafts.csswg.org/css-transforms/#funcdef-skew>
@@ -489,6 +497,7 @@ where
         )
     }
 }
+
 
 /// Methods for combining generic transformations
 impl <T, Src, Dst> Transform3D<T, Src, Dst>
@@ -1050,8 +1059,9 @@ impl<T: ApproxEq<T>, Src, Dst> ApproxEq<T> for Transform3D<T, Src, Dst> {
 }
 
 impl <T, Src, Dst> Default for Transform3D<T, Src, Dst>
-    where T: Copy + PartialEq + One + Zero
+    where T: Zero + One
 {
+    /// Returns the [identity transform](#method.identity).
     fn default() -> Self {
         Self::identity()
     }
