@@ -194,6 +194,31 @@ impl<T, Src, Dst> Transform3D<T, Src, Dst> {
         }
     }
 
+    /// Create a 4 by 4 transform representing a 2d transformation, specifying its components
+    /// in row-major order:
+    ///
+    /// ```text
+    /// m11  m12   0   0
+    /// m21  m22   0   0
+    ///   0    0   1   0
+    /// m41  m42   0   1
+    /// ```
+    #[inline]
+    pub fn row_major_2d(m11: T, m12: T, m21: T, m22: T, m41: T, m42: T) -> Self
+    where
+        T: Zero + One,
+    {
+        let _0 = || T::zero();
+        let _1 = || T::one();
+
+        Self::row_major(
+            m11,  m12,  _0(), _0(),
+            m21,  m22,  _0(), _0(),
+            _0(), _0(), _1(), _0(),
+            m41,  m42,  _0(), _1()
+       )
+    }
+
     /// Create a transform specifying its components in column-major order.
     ///
     /// For example, the translation terms m41, m42, m43 on the last column with the
@@ -254,19 +279,6 @@ where T: Copy +
          PartialOrd +
          Trig +
          One + Zero {
-
-    /// Create a 4 by 4 transform representing a 2d transformation, specifying its components
-    /// in row-major order.
-    #[inline]
-    pub fn row_major_2d(m11: T, m12: T, m21: T, m22: T, m41: T, m42: T) -> Self {
-        let (_0, _1): (T, T) = (Zero::zero(), One::one());
-        Transform3D::row_major(
-            m11, m12, _0, _0,
-            m21, m22, _0, _0,
-             _0,  _0, _1, _0,
-            m41, m42, _0, _1
-       )
-    }
 
     /// Create an orthogonal projection transform.
     pub fn ortho(left: T, right: T,

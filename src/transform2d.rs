@@ -17,7 +17,7 @@ use crate::point::{Point2D, point2};
 use crate::vector::{Vector2D, vec2};
 use crate::rect::Rect;
 use crate::transform3d::Transform3D;
-use core::ops::{Add, Mul, Div, Sub, Neg};
+use core::ops::{Add, Mul, Div, Sub};
 use core::marker::PhantomData;
 use core::cmp::{Eq, PartialEq};
 use core::hash::{Hash};
@@ -300,6 +300,14 @@ impl<T: Copy, Src, Dst> Transform2D<T, Src, Dst> {
             self.m31, self.m32,
         )
     }
+
+    /// Create a 3D transform from the current transform
+    pub fn to_3d(&self) -> Transform3D<T, Src, Dst>
+    where
+        T: Zero + One,
+    {
+        Transform3D::row_major_2d(self.m11, self.m12, self.m21, self.m22, self.m31, self.m32)
+    }
 }
 
 impl<T: NumCast + Copy, Src, Dst> Transform2D<T, Src, Dst> {
@@ -544,23 +552,6 @@ where T: Copy +
     pub fn pre_rotate(&self, theta: Angle<T>) -> Self {
         self.pre_transform(&Transform2D::create_rotation(theta))
     }
-}
-
-impl <T, Src, Dst> Transform2D<T, Src, Dst>
-where T: Copy +
-         Add<T, Output=T> +
-         Sub<T, Output=T> +
-         Mul<T, Output=T> +
-         Div<T, Output=T> +
-         Neg<Output=T> +
-         PartialOrd +
-         Trig +
-         One + Zero {
-    /// Create a 3D transform from the current transform
-    pub fn to_3d(&self) -> Transform3D<T, Src, Dst> {
-        Transform3D::row_major_2d(self.m11, self.m12, self.m21, self.m22, self.m31, self.m32)
-    }
-
 }
 
 impl <T, Src, Dst> Default for Transform2D<T, Src, Dst>
