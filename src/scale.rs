@@ -258,6 +258,7 @@ impl<Src, Dst> Scale<f32, Src, Dst> {
 
 
 // scale0 * scale1
+// (A,B) * (B,C) = (A,C)
 impl<T: Mul, A, B, C> Mul<Scale<T, B, C>> for Scale<T, A, B> {
     type Output = Scale<T::Output, A, C>;
 
@@ -366,7 +367,16 @@ mod tests {
         let mm_per_cm: Scale<f32, Cm, Mm> = cm_per_mm.inv();
         assert_eq!(mm_per_cm.get(), 10.0);
 
+        let one: Scale<f32, Mm, Mm> = cm_per_mm * mm_per_cm;
+        assert_eq!(one.get(), 1.0);
+
+        let one: Scale<f32, Cm, Cm> = mm_per_cm * cm_per_mm;
+        assert_eq!(one.get(), 1.0);
+
         let cm_per_inch: Scale<f32, Inch, Cm> = mm_per_inch * cm_per_mm;
+        //  mm     cm     cm
+        // ---- x ---- = ----
+        // inch    mm    inch
         assert_eq!(cm_per_inch, Scale::new(2.54));
 
         let a: Scale<isize, Inch, Inch> = Scale::new(2);
