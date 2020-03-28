@@ -357,15 +357,11 @@ where T: Copy +
     }
 }
 
+/// Methods for combining generic transformations
 impl<T, Src, Dst> Transform2D<T, Src, Dst>
-where T: Copy +
-         Add<T, Output=T> +
-         Mul<T, Output=T> +
-         Div<T, Output=T> +
-         Sub<T, Output=T> +
-         PartialOrd +
-         One + Zero  {
-
+where
+    T: Copy + Add<Output = T> + Mul<Output = T>,
+{
     /// Returns the multiplication of the two matrices such that mat's transformation
     /// applies after self's transformation.
     ///
@@ -375,8 +371,10 @@ where T: Copy +
         Transform2D::row_major(
             self.m11 * mat.m11 + self.m12 * mat.m21,
             self.m11 * mat.m12 + self.m12 * mat.m22,
+
             self.m21 * mat.m11 + self.m22 * mat.m21,
             self.m21 * mat.m12 + self.m22 * mat.m22,
+
             self.m31 * mat.m11 + self.m32 * mat.m21 + mat.m31,
             self.m31 * mat.m12 + self.m32 * mat.m22 + mat.m32,
         )
@@ -391,12 +389,18 @@ where T: Copy +
     pub fn pre_transform<NewSrc>(&self, mat: &Transform2D<T, NewSrc, Src>) -> Transform2D<T, NewSrc, Dst> {
         mat.post_transform(self)
     }
+}
 
+/// Methods for creating and combining translation transformations
+impl<T, Src, Dst> Transform2D<T, Src, Dst>
+where
+    T: Copy + Add<Output = T> + Mul<Output = T> + Zero + One,
+{
     /// Returns a translation transform.
     #[inline]
     pub fn create_translation(x: T, y: T) -> Self {
-         let (_0, _1): (T, T) = (Zero::zero(), One::one());
-         Transform2D::row_major(
+        let (_0, _1): (T, T) = (Zero::zero(), One::one());
+        Self::row_major(
             _1, _0,
             _0, _1,
              x,  y
@@ -416,7 +420,13 @@ where T: Copy +
     pub fn pre_translate(&self, v: Vector2D<T, Src>) -> Self {
         self.pre_transform(&Transform2D::create_translation(v.x, v.y))
     }
+}
 
+/// Methods for creating and combining scale transformations
+impl<T, Src, Dst> Transform2D<T, Src, Dst>
+where
+    T: Copy + Add<Output = T> + Mul<Output = T> + Zero,
+{
     /// Returns a scale transform.
     pub fn create_scale(x: T, y: T) -> Self {
         let _0 = Zero::zero();
@@ -444,7 +454,13 @@ where T: Copy +
             self.m31,     self.m32
         )
     }
+}
 
+/// Methods for apply transformations to objects
+impl<T, Src, Dst> Transform2D<T, Src, Dst>
+where
+    T: Copy + Add<Output = T> + Sub<Output = T> + Mul<Output = T> + PartialOrd + Zero,
+{
     /// Returns the given point transformed by this transform.
     ///
     /// Assuming row vectors, this is equivalent to `p * self`
@@ -481,7 +497,12 @@ where T: Copy +
             self.transform_point(point2(min.x, max.y)),
         ])
     }
+}
 
+impl<T, Src, Dst> Transform2D<T, Src, Dst>
+where
+    T: Copy + Sub<Output = T> + Mul<Output = T> + Div<Output = T> + PartialEq + Zero + One,
+{
     /// Computes and returns the determinant of this transform.
     pub fn determinant(&self) -> T {
         self.m11 * self.m22 - self.m12 * self.m21
@@ -517,15 +538,11 @@ where T: Copy +
     }
 }
 
+/// Methods for creating and combining rotation transformations
 impl<T, Src, Dst> Transform2D<T, Src, Dst>
-where T: Copy +
-         Add<T, Output=T> +
-         Mul<T, Output=T> +
-         Div<T, Output=T> +
-         Sub<T, Output=T> +
-         Trig +
-         PartialOrd +
-         One + Zero  {
+where
+    T: Copy + Add<Output = T> + Sub<Output = T> + Mul<Output = T> + Zero + Trig,
+{
     /// Returns a rotation transform.
     #[inline]
     pub fn create_rotation(theta: Angle<T>) -> Self {

@@ -11,8 +11,7 @@ use crate::{Vector2D, Point2D, Vector3D, Point3D, Transform2D, Transform3D};
 use crate::{Box2D, Box3D, Size2D, Rect, vec2, point2, vec3, point3};
 use crate::UnknownUnit;
 use crate::num::*;
-use crate::trig::Trig;
-use core::ops::{Add, AddAssign, Sub, SubAssign, Neg, Mul, Div};
+use core::ops::{Add, AddAssign, Sub, SubAssign, Neg, Mul};
 use core::marker::PhantomData;
 use core::fmt;
 use core::cmp::{Eq, PartialEq};
@@ -249,15 +248,7 @@ impl<T: SubAssign, Src, Dst> SubAssign<Translation2D<T, Dst, Dst>> for Translati
 
 impl<T, Src, Dst> Translation2D<T, Src, Dst>
 where
-    T: Copy
-        + Add<T, Output = T>
-        + Mul<T, Output = T>
-        + Div<T, Output = T>
-        + Sub<T, Output = T>
-        + Trig
-        + PartialOrd
-        + One
-        + Zero,
+    T: Copy + Add<Output = T> + Mul<Output = T> + Zero + One,
 {
     /// Returns the matrix representation of this translation.
     #[inline]
@@ -282,15 +273,7 @@ impl<T, Src, Dst> Into<Vector2D<T, Src>> for Translation2D<T, Src, Dst>
 
 impl<T, Src, Dst> Into<Transform2D<T, Src, Dst>> for Translation2D<T, Src, Dst>
 where
-    T: Copy
-        + Add<T, Output = T>
-        + Mul<T, Output = T>
-        + Div<T, Output = T>
-        + Sub<T, Output = T>
-        + Trig
-        + PartialOrd
-        + One
-        + Zero,
+    T: Copy + Add<Output = T> + Mul<Output = T> + Zero + One,
 {
     fn into(self) -> Transform2D<T, Src, Dst> {
         self.to_transform()
@@ -585,15 +568,7 @@ impl<T: SubAssign, Src, Dst> SubAssign<Translation3D<T, Dst, Dst>> for Translati
 
 impl<T, Src, Dst> Translation3D<T, Src, Dst>
 where
-    T: Copy +
-        Add<T, Output=T> +
-        Sub<T, Output=T> +
-        Mul<T, Output=T> +
-        Div<T, Output=T> +
-        Neg<Output=T> +
-        PartialOrd +
-        Trig +
-        One + Zero,
+    T: Copy + Add<Output = T> + Mul<Output = T> + Zero + One,
 {
     /// Returns the matrix representation of this translation.
     #[inline]
@@ -618,15 +593,7 @@ impl<T, Src, Dst> Into<Vector3D<T, Src>> for Translation3D<T, Src, Dst>
 
 impl<T, Src, Dst> Into<Transform3D<T, Src, Dst>> for Translation3D<T, Src, Dst>
 where
-    T: Copy +
-        Add<T, Output=T> +
-        Sub<T, Output=T> +
-        Mul<T, Output=T> +
-        Div<T, Output=T> +
-        Neg<Output=T> +
-        PartialOrd +
-        Trig +
-        One + Zero,
+    T: Copy + Add<Output = T> + Mul<Output = T> + Zero + One,
 {
     fn into(self) -> Transform3D<T, Src, Dst> {
         self.to_transform()

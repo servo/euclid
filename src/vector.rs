@@ -342,15 +342,7 @@ impl<T: Copy, U> Vector2D<T, U> {
 
 impl<T, U> Vector2D<T, U>
 where
-    T: Copy
-        + Add<T, Output = T>
-        + Mul<T, Output = T>
-        + Div<T, Output = T>
-        + Sub<T, Output = T>
-        + Trig
-        + PartialOrd
-        + One
-        + Zero
+    T: Copy + Add<Output = T> + Mul<Output = T> + Zero + One,
 {
     /// Creates translation by this vector in vector units.
     #[inline]
@@ -1130,16 +1122,7 @@ impl<T: Copy, U> Vector3D<T, U> {
 
 impl<T, U> Vector3D<T, U>
 where
-    T: Copy
-        + Add<T, Output = T>
-        + Mul<T, Output = T>
-        + Div<T, Output = T>
-        + Sub<T, Output = T>
-        + Trig
-        + PartialOrd
-        + One
-        + Zero
-        + Neg<Output = T>
+    T: Copy + Add<Output = T> + Mul<Output = T> + Zero + One,
 {
     /// Creates translation by this vector in vector units
     #[inline]

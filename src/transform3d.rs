@@ -490,6 +490,51 @@ where
     }
 }
 
+/// Methods for combining generic transformations
+impl <T, Src, Dst> Transform3D<T, Src, Dst>
+where
+    T: Copy + Add<Output = T> + Mul<Output = T>,
+{
+    /// Returns the multiplication of the two matrices such that mat's transformation
+    /// applies after self's transformation.
+    ///
+    /// Assuming row vectors, this is equivalent to self * mat
+    #[must_use]
+    pub fn post_transform<NewDst>(&self, mat: &Transform3D<T, Dst, NewDst>) -> Transform3D<T, Src, NewDst> {
+        Transform3D::row_major(
+            self.m11 * mat.m11  +  self.m12 * mat.m21  +  self.m13 * mat.m31  +  self.m14 * mat.m41,
+            self.m11 * mat.m12  +  self.m12 * mat.m22  +  self.m13 * mat.m32  +  self.m14 * mat.m42,
+            self.m11 * mat.m13  +  self.m12 * mat.m23  +  self.m13 * mat.m33  +  self.m14 * mat.m43,
+            self.m11 * mat.m14  +  self.m12 * mat.m24  +  self.m13 * mat.m34  +  self.m14 * mat.m44,
+
+            self.m21 * mat.m11  +  self.m22 * mat.m21  +  self.m23 * mat.m31  +  self.m24 * mat.m41,
+            self.m21 * mat.m12  +  self.m22 * mat.m22  +  self.m23 * mat.m32  +  self.m24 * mat.m42,
+            self.m21 * mat.m13  +  self.m22 * mat.m23  +  self.m23 * mat.m33  +  self.m24 * mat.m43,
+            self.m21 * mat.m14  +  self.m22 * mat.m24  +  self.m23 * mat.m34  +  self.m24 * mat.m44,
+
+            self.m31 * mat.m11  +  self.m32 * mat.m21  +  self.m33 * mat.m31  +  self.m34 * mat.m41,
+            self.m31 * mat.m12  +  self.m32 * mat.m22  +  self.m33 * mat.m32  +  self.m34 * mat.m42,
+            self.m31 * mat.m13  +  self.m32 * mat.m23  +  self.m33 * mat.m33  +  self.m34 * mat.m43,
+            self.m31 * mat.m14  +  self.m32 * mat.m24  +  self.m33 * mat.m34  +  self.m34 * mat.m44,
+
+            self.m41 * mat.m11  +  self.m42 * mat.m21  +  self.m43 * mat.m31  +  self.m44 * mat.m41,
+            self.m41 * mat.m12  +  self.m42 * mat.m22  +  self.m43 * mat.m32  +  self.m44 * mat.m42,
+            self.m41 * mat.m13  +  self.m42 * mat.m23  +  self.m43 * mat.m33  +  self.m44 * mat.m43,
+            self.m41 * mat.m14  +  self.m42 * mat.m24  +  self.m43 * mat.m34  +  self.m44 * mat.m44,
+        )
+    }
+
+    /// Returns the multiplication of the two matrices such that mat's transformation
+    /// applies before self's transformation.
+    ///
+    /// Assuming row vectors, this is equivalent to mat * self
+    #[inline]
+    #[must_use]
+    pub fn pre_transform<NewSrc>(&self, mat: &Transform3D<T, NewSrc, Src>) -> Transform3D<T, NewSrc, Dst> {
+        mat.post_transform(self)
+    }
+}
+
 impl <T, Src, Dst> Transform3D<T, Src, Dst>
 where T: Copy +
          Add<T, Output=T> +
@@ -498,7 +543,6 @@ where T: Copy +
          Div<T, Output=T> +
          Neg<Output=T> +
          PartialOrd +
-         Trig +
          One + Zero {
 
     /// Create an orthogonal projection transform.
@@ -529,42 +573,6 @@ where T: Copy +
                   self.m12 * self.m21 * self.m44 + self.m11 * self.m22 * self.m44;
         let _0: T = Zero::zero();
         (m33 * det) < _0
-    }
-
-    /// Returns the multiplication of the two matrices such that mat's transformation
-    /// applies after self's transformation.
-    ///
-    /// Assuming row vectors, this is equivalent to self * mat
-    #[must_use]
-    pub fn post_transform<NewDst>(&self, mat: &Transform3D<T, Dst, NewDst>) -> Transform3D<T, Src, NewDst> {
-        Transform3D::row_major(
-            self.m11 * mat.m11  +  self.m12 * mat.m21  +  self.m13 * mat.m31  +  self.m14 * mat.m41,
-            self.m11 * mat.m12  +  self.m12 * mat.m22  +  self.m13 * mat.m32  +  self.m14 * mat.m42,
-            self.m11 * mat.m13  +  self.m12 * mat.m23  +  self.m13 * mat.m33  +  self.m14 * mat.m43,
-            self.m11 * mat.m14  +  self.m12 * mat.m24  +  self.m13 * mat.m34  +  self.m14 * mat.m44,
-            self.m21 * mat.m11  +  self.m22 * mat.m21  +  self.m23 * mat.m31  +  self.m24 * mat.m41,
-            self.m21 * mat.m12  +  self.m22 * mat.m22  +  self.m23 * mat.m32  +  self.m24 * mat.m42,
-            self.m21 * mat.m13  +  self.m22 * mat.m23  +  self.m23 * mat.m33  +  self.m24 * mat.m43,
-            self.m21 * mat.m14  +  self.m22 * mat.m24  +  self.m23 * mat.m34  +  self.m24 * mat.m44,
-            self.m31 * mat.m11  +  self.m32 * mat.m21  +  self.m33 * mat.m31  +  self.m34 * mat.m41,
-            self.m31 * mat.m12  +  self.m32 * mat.m22  +  self.m33 * mat.m32  +  self.m34 * mat.m42,
-            self.m31 * mat.m13  +  self.m32 * mat.m23  +  self.m33 * mat.m33  +  self.m34 * mat.m43,
-            self.m31 * mat.m14  +  self.m32 * mat.m24  +  self.m33 * mat.m34  +  self.m34 * mat.m44,
-            self.m41 * mat.m11  +  self.m42 * mat.m21  +  self.m43 * mat.m31  +  self.m44 * mat.m41,
-            self.m41 * mat.m12  +  self.m42 * mat.m22  +  self.m43 * mat.m32  +  self.m44 * mat.m42,
-            self.m41 * mat.m13  +  self.m42 * mat.m23  +  self.m43 * mat.m33  +  self.m44 * mat.m43,
-            self.m41 * mat.m14  +  self.m42 * mat.m24  +  self.m43 * mat.m34  +  self.m44 * mat.m44,
-        )
-    }
-
-    /// Returns the multiplication of the two matrices such that mat's transformation
-    /// applies before self's transformation.
-    ///
-    /// Assuming row vectors, this is equivalent to mat * self
-    #[inline]
-    #[must_use]
-    pub fn pre_transform<NewSrc>(&self, mat: &Transform3D<T, NewSrc, Src>) -> Transform3D<T, NewSrc, Dst> {
-        mat.post_transform(self)
     }
 
     /// Returns whether it is possible to compute the inverse transform.
@@ -696,7 +704,13 @@ where T: Copy +
     pub fn from_scale(scale: Scale<T, Src, Dst>) -> Self {
         Transform3D::create_scale(scale.get(), scale.get(), scale.get())
     }
+}
 
+/// Methods for apply transformations to objects
+impl<T, Src, Dst> Transform3D<T, Src, Dst>
+where
+    T: Copy + Add<Output = T> + Sub<Output = T> + Mul<Output = T> + Div<Output = T> + Zero + PartialOrd,
+{
     /// Returns the homogeneous vector corresponding to the transformed 2d point.
     ///
     /// The input point must be use the unit Src, and the returned point has the unit Dst.
@@ -801,7 +815,13 @@ where T: Copy +
             self.transform_point2d(point2(min.x, max.y))?,
         ]))
     }
+}
 
+/// Methods for creating and combining translation transformations
+impl <T, Src, Dst> Transform3D<T, Src, Dst>
+where
+    T: Copy + Add<Output = T> + Mul<Output = T> + Zero + One,
+{
     /// Create a 3d translation transform
     pub fn create_translation(x: T, y: T, z: T) -> Self {
         let (_0, _1): (T, T) = (Zero::zero(), One::one());
@@ -824,7 +844,12 @@ where T: Copy +
     pub fn post_translate(&self, v: Vector3D<T, Dst>) -> Self {
         self.post_transform(&Transform3D::create_translation(v.x, v.y, v.z))
     }
+}
 
+impl <T, Src, Dst> Transform3D<T, Src, Dst>
+where
+    T: Copy + Mul<Output = T> + Div<Output = T> + Zero + One + PartialEq,
+{
     /// Returns a projection of this transform in 2d space.
     pub fn project_to_2d(&self) -> Self {
         let (_0, _1): (T, T) = (Zero::zero(), One::one());
@@ -860,7 +885,13 @@ where T: Copy +
 
         result
     }
+}
 
+/// Methods for creating and combining scale transformations
+impl<T, Src, Dst> Transform3D<T, Src, Dst>
+where
+    T: Copy + Add<Output = T> + Mul<Output = T> + Zero + One,
+{
     /// Create a 3d scale transform
     pub fn create_scale(x: T, y: T, z: T) -> Self {
         let (_0, _1): (T, T) = (Zero::zero(), One::one());
@@ -888,7 +919,13 @@ where T: Copy +
     pub fn post_scale(&self, x: T, y: T, z: T) -> Self {
         self.post_transform(&Transform3D::create_scale(x, y, z))
     }
+}
 
+/// Methods for creating and combining rotation transformations
+impl<T, Src, Dst> Transform3D<T, Src, Dst>
+where
+    T: Copy + Add<Output = T> + Sub<Output = T> + Mul<Output = T> + Div<Output = T> + Zero + One + Trig,
+{
     /// Create a 3d rotation transform from an angle / axis.
     /// The supplied axis must be normalized.
     pub fn create_rotation(x: T, y: T, z: T, theta: Angle<T>) -> Self {
