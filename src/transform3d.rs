@@ -531,30 +531,6 @@ where T: Copy +
         (m33 * det) < _0
     }
 
-    /// Returns true is this transform is approximately equal to the other one, using
-    /// T's default epsilon value.
-    ///
-    /// The same as [`ApproxEq::approx_eq()`] but available without importing trait.
-    ///
-    /// [`ApproxEq::approx_eq()`]: ./approxeq/trait.ApproxEq.html#method.approx_eq
-    #[inline]
-    pub fn approx_eq(&self, other: &Self) -> bool
-    where T : ApproxEq<T> {
-        <Self as ApproxEq<T>>::approx_eq(&self, &other)
-    }
-
-    /// Returns true is this transform is approximately equal to the other one, using
-    /// a provided epsilon value.
-    ///
-    /// The same as [`ApproxEq::approx_eq_eps()`] but available without importing trait.
-    ///
-    /// [`ApproxEq::approx_eq_eps()`]: ./approxeq/trait.ApproxEq.html#method.approx_eq_eps
-    #[inline]
-    pub fn approx_eq_eps(&self, other: &Self, eps: &T) -> bool
-    where T : ApproxEq<T> {
-        <Self as ApproxEq<T>>::approx_eq_eps(&self, &other, &eps)
-    }
-
     /// Returns the multiplication of the two matrices such that mat's transformation
     /// applies after self's transformation.
     ///
@@ -991,6 +967,30 @@ impl<T: NumCast + Copy, Src, Dst> Transform3D<T, Src, Dst> {
             },
             _ => None
         }
+    }
+}
+
+impl<T: ApproxEq<T>, Src, Dst> Transform3D<T, Src, Dst> {
+    /// Returns true is this transform is approximately equal to the other one, using
+    /// T's default epsilon value.
+    ///
+    /// The same as [`ApproxEq::approx_eq()`] but available without importing trait.
+    ///
+    /// [`ApproxEq::approx_eq()`]: ./approxeq/trait.ApproxEq.html#method.approx_eq
+    #[inline]
+    pub fn approx_eq(&self, other: &Self) -> bool {
+        <Self as ApproxEq<T>>::approx_eq(&self, &other)
+    }
+
+    /// Returns true is this transform is approximately equal to the other one, using
+    /// a provided epsilon value.
+    ///
+    /// The same as [`ApproxEq::approx_eq_eps()`] but available without importing trait.
+    ///
+    /// [`ApproxEq::approx_eq_eps()`]: ./approxeq/trait.ApproxEq.html#method.approx_eq_eps
+    #[inline]
+    pub fn approx_eq_eps(&self, other: &Self, eps: &T) -> bool {
+        <Self as ApproxEq<T>>::approx_eq_eps(&self, &other, &eps)
     }
 }
 
