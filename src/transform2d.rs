@@ -132,6 +132,7 @@ impl<T, Src, Dst> Hash for Transform2D<T, Src, Dst>
     }
 }
 
+
 impl<T, Src, Dst> Transform2D<T, Src, Dst> {
     /// Create a transform specifying its matrix elements in row-major order.
     ///
@@ -357,6 +358,7 @@ where T: Copy +
     }
 }
 
+
 /// Methods for combining generic transformations
 impl<T, Src, Dst> Transform2D<T, Src, Dst>
 where
@@ -419,6 +421,39 @@ where
     #[must_use]
     pub fn pre_translate(&self, v: Vector2D<T, Src>) -> Self {
         self.pre_transform(&Transform2D::create_translation(v.x, v.y))
+    }
+}
+
+/// Methods for creating and combining rotation transformations
+impl<T, Src, Dst> Transform2D<T, Src, Dst>
+where
+    T: Copy + Add<Output = T> + Sub<Output = T> + Mul<Output = T> + Zero + Trig,
+{
+    /// Returns a rotation transform.
+    #[inline]
+    pub fn create_rotation(theta: Angle<T>) -> Self {
+        let _0 = Zero::zero();
+        let cos = theta.get().cos();
+        let sin = theta.get().sin();
+        Transform2D::row_major(
+            cos, _0 - sin,
+            sin, cos,
+            _0, _0
+        )
+    }
+
+    /// Applies a rotation after self's transformation and returns the resulting transform.
+    #[inline]
+    #[must_use]
+    pub fn post_rotate(&self, theta: Angle<T>) -> Self {
+        self.post_transform(&Transform2D::create_rotation(theta))
+    }
+
+    /// Applies a rotation before self's transformation and returns the resulting transform.
+    #[inline]
+    #[must_use]
+    pub fn pre_rotate(&self, theta: Angle<T>) -> Self {
+        self.pre_transform(&Transform2D::create_rotation(theta))
     }
 }
 
@@ -499,6 +534,7 @@ where
     }
 }
 
+
 impl<T, Src, Dst> Transform2D<T, Src, Dst>
 where
     T: Copy + Sub<Output = T> + Mul<Output = T> + Div<Output = T> + PartialEq + Zero + One,
@@ -538,38 +574,6 @@ where
     }
 }
 
-/// Methods for creating and combining rotation transformations
-impl<T, Src, Dst> Transform2D<T, Src, Dst>
-where
-    T: Copy + Add<Output = T> + Sub<Output = T> + Mul<Output = T> + Zero + Trig,
-{
-    /// Returns a rotation transform.
-    #[inline]
-    pub fn create_rotation(theta: Angle<T>) -> Self {
-        let _0 = Zero::zero();
-        let cos = theta.get().cos();
-        let sin = theta.get().sin();
-        Transform2D::row_major(
-            cos, _0 - sin,
-            sin, cos,
-            _0, _0
-        )
-    }
-
-    /// Applies a rotation after self's transformation and returns the resulting transform.
-    #[inline]
-    #[must_use]
-    pub fn post_rotate(&self, theta: Angle<T>) -> Self {
-        self.post_transform(&Transform2D::create_rotation(theta))
-    }
-
-    /// Applies a rotation before self's transformation and returns the resulting transform.
-    #[inline]
-    #[must_use]
-    pub fn pre_rotate(&self, theta: Angle<T>) -> Self {
-        self.pre_transform(&Transform2D::create_rotation(theta))
-    }
-}
 
 impl <T, Src, Dst> Default for Transform2D<T, Src, Dst>
     where T: Copy + PartialEq + One + Zero

@@ -535,6 +535,236 @@ where
     }
 }
 
+/// Methods for creating and combining translation transformations
+impl <T, Src, Dst> Transform3D<T, Src, Dst>
+where
+    T: Copy + Add<Output = T> + Mul<Output = T> + Zero + One,
+{
+    /// Create a 3d translation transform
+    pub fn create_translation(x: T, y: T, z: T) -> Self {
+        let (_0, _1): (T, T) = (Zero::zero(), One::one());
+        Transform3D::row_major(
+            _1, _0, _0, _0,
+            _0, _1, _0, _0,
+            _0, _0, _1, _0,
+             x,  y,  z, _1
+        )
+    }
+
+    /// Returns a transform with a translation applied before self's transformation.
+    #[must_use]
+    pub fn pre_translate(&self, v: Vector3D<T, Src>) -> Self {
+        self.pre_transform(&Transform3D::create_translation(v.x, v.y, v.z))
+    }
+
+    /// Returns a transform with a translation applied after self's transformation.
+    #[must_use]
+    pub fn post_translate(&self, v: Vector3D<T, Dst>) -> Self {
+        self.post_transform(&Transform3D::create_translation(v.x, v.y, v.z))
+    }
+}
+
+/// Methods for creating and combining rotation transformations
+impl<T, Src, Dst> Transform3D<T, Src, Dst>
+where
+    T: Copy + Add<Output = T> + Sub<Output = T> + Mul<Output = T> + Div<Output = T> + Zero + One + Trig,
+{
+    /// Create a 3d rotation transform from an angle / axis.
+    /// The supplied axis must be normalized.
+    pub fn create_rotation(x: T, y: T, z: T, theta: Angle<T>) -> Self {
+        let (_0, _1): (T, T) = (Zero::zero(), One::one());
+        let _2 = _1 + _1;
+
+        let xx = x * x;
+        let yy = y * y;
+        let zz = z * z;
+
+        let half_theta = theta.get() / _2;
+        let sc = half_theta.sin() * half_theta.cos();
+        let sq = half_theta.sin() * half_theta.sin();
+
+        Transform3D::row_major(
+            _1 - _2 * (yy + zz) * sq,
+            _2 * (x * y * sq - z * sc),
+            _2 * (x * z * sq + y * sc),
+            _0,
+
+            _2 * (x * y * sq + z * sc),
+            _1 - _2 * (xx + zz) * sq,
+            _2 * (y * z * sq - x * sc),
+            _0,
+
+            _2 * (x * z * sq - y * sc),
+            _2 * (y * z * sq + x * sc),
+            _1 - _2 * (xx + yy) * sq,
+            _0,
+
+            _0,
+            _0,
+            _0,
+            _1
+        )
+    }
+
+    /// Returns a transform with a rotation applied after self's transformation.
+    #[must_use]
+    pub fn post_rotate(&self, x: T, y: T, z: T, theta: Angle<T>) -> Self {
+        self.post_transform(&Transform3D::create_rotation(x, y, z, theta))
+    }
+
+    /// Returns a transform with a rotation applied before self's transformation.
+    #[must_use]
+    pub fn pre_rotate(&self, x: T, y: T, z: T, theta: Angle<T>) -> Self {
+        self.pre_transform(&Transform3D::create_rotation(x, y, z, theta))
+    }
+}
+
+/// Methods for creating and combining scale transformations
+impl<T, Src, Dst> Transform3D<T, Src, Dst>
+where
+    T: Copy + Add<Output = T> + Mul<Output = T> + Zero + One,
+{
+    /// Create a 3d scale transform
+    pub fn create_scale(x: T, y: T, z: T) -> Self {
+        let (_0, _1): (T, T) = (Zero::zero(), One::one());
+        Transform3D::row_major(
+             x, _0, _0, _0,
+            _0,  y, _0, _0,
+            _0, _0,  z, _0,
+            _0, _0, _0, _1
+        )
+    }
+
+    /// Returns a transform with a scale applied before self's transformation.
+    #[must_use]
+    pub fn pre_scale(&self, x: T, y: T, z: T) -> Self {
+        Transform3D::row_major(
+            self.m11 * x, self.m12 * x, self.m13 * x, self.m14 * x,
+            self.m21 * y, self.m22 * y, self.m23 * y, self.m24 * y,
+            self.m31 * z, self.m32 * z, self.m33 * z, self.m34 * z,
+            self.m41    , self.m42,     self.m43,     self.m44
+        )
+    }
+
+    /// Returns a transform with a scale applied after self's transformation.
+    #[must_use]
+    pub fn post_scale(&self, x: T, y: T, z: T) -> Self {
+        self.post_transform(&Transform3D::create_scale(x, y, z))
+    }
+}
+
+/// Methods for apply transformations to objects
+impl<T, Src, Dst> Transform3D<T, Src, Dst>
+where
+    T: Copy + Add<Output = T> + Sub<Output = T> + Mul<Output = T> + Div<Output = T> + Zero + PartialOrd,
+{
+    /// Returns the homogeneous vector corresponding to the transformed 2d point.
+    ///
+    /// The input point must be use the unit Src, and the returned point has the unit Dst.
+    ///
+    /// Assuming row vectors, this is equivalent to `p * self`
+    #[inline]
+    pub fn transform_point2d_homogeneous(
+        &self, p: Point2D<T, Src>
+    ) -> HomogeneousVector<T, Dst> {
+        let x = p.x * self.m11 + p.y * self.m21 + self.m41;
+        let y = p.x * self.m12 + p.y * self.m22 + self.m42;
+        let z = p.x * self.m13 + p.y * self.m23 + self.m43;
+        let w = p.x * self.m14 + p.y * self.m24 + self.m44;
+
+        HomogeneousVector::new(x, y, z, w)
+    }
+
+    /// Returns the given 2d point transformed by this transform, if the transform makes sense,
+    /// or `None` otherwise.
+    ///
+    /// The input point must be use the unit Src, and the returned point has the unit Dst.
+    ///
+    /// Assuming row vectors, this is equivalent to `p * self`
+    #[inline]
+    pub fn transform_point2d(&self, p: Point2D<T, Src>) -> Option<Point2D<T, Dst>> {
+        //Note: could use `transform_point2d_homogeneous()` but it would waste the calculus of `z`
+        let w = p.x * self.m14 + p.y * self.m24 + self.m44;
+        if w > T::zero() {
+            let x = p.x * self.m11 + p.y * self.m21 + self.m41;
+            let y = p.x * self.m12 + p.y * self.m22 + self.m42;
+
+            Some(Point2D::new(x / w, y / w))
+        } else {
+            None
+        }
+    }
+
+    /// Returns the given 2d vector transformed by this matrix.
+    ///
+    /// The input point must be use the unit Src, and the returned point has the unit Dst.
+    ///
+    /// Assuming row vectors, this is equivalent to `v * self`
+    #[inline]
+    pub fn transform_vector2d(&self, v: Vector2D<T, Src>) -> Vector2D<T, Dst> {
+        vec2(
+            v.x * self.m11 + v.y * self.m21,
+            v.x * self.m12 + v.y * self.m22,
+        )
+    }
+
+    /// Returns the homogeneous vector corresponding to the transformed 3d point.
+    ///
+    /// The input point must be use the unit Src, and the returned point has the unit Dst.
+    ///
+    /// Assuming row vectors, this is equivalent to `p * self`
+    #[inline]
+    pub fn transform_point3d_homogeneous(
+        &self, p: Point3D<T, Src>
+    ) -> HomogeneousVector<T, Dst> {
+        let x = p.x * self.m11 + p.y * self.m21 + p.z * self.m31 + self.m41;
+        let y = p.x * self.m12 + p.y * self.m22 + p.z * self.m32 + self.m42;
+        let z = p.x * self.m13 + p.y * self.m23 + p.z * self.m33 + self.m43;
+        let w = p.x * self.m14 + p.y * self.m24 + p.z * self.m34 + self.m44;
+
+        HomogeneousVector::new(x, y, z, w)
+    }
+
+    /// Returns the given 3d point transformed by this transform, if the transform makes sense,
+    /// or `None` otherwise.
+    ///
+    /// The input point must be use the unit Src, and the returned point has the unit Dst.
+    ///
+    /// Assuming row vectors, this is equivalent to `p * self`
+    #[inline]
+    pub fn transform_point3d(&self, p: Point3D<T, Src>) -> Option<Point3D<T, Dst>> {
+        self.transform_point3d_homogeneous(p).to_point3d()
+    }
+
+    /// Returns the given 3d vector transformed by this matrix.
+    ///
+    /// The input point must be use the unit Src, and the returned point has the unit Dst.
+    ///
+    /// Assuming row vectors, this is equivalent to `v * self`
+    #[inline]
+    pub fn transform_vector3d(&self, v: Vector3D<T, Src>) -> Vector3D<T, Dst> {
+        vec3(
+            v.x * self.m11 + v.y * self.m21 + v.z * self.m31,
+            v.x * self.m12 + v.y * self.m22 + v.z * self.m32,
+            v.x * self.m13 + v.y * self.m23 + v.z * self.m33,
+        )
+    }
+
+    /// Returns a rectangle that encompasses the result of transforming the given rectangle by this
+    /// transform, if the transform makes sense for it, or `None` otherwise.
+    pub fn transform_rect(&self, rect: &Rect<T, Src>) -> Option<Rect<T, Dst>> {
+        let min = rect.min();
+        let max = rect.max();
+        Some(Rect::from_points(&[
+            self.transform_point2d(min)?,
+            self.transform_point2d(max)?,
+            self.transform_point2d(point2(max.x, min.y))?,
+            self.transform_point2d(point2(min.x, max.y))?,
+        ]))
+    }
+}
+
+
 impl <T, Src, Dst> Transform3D<T, Src, Dst>
 where T: Copy +
          Add<T, Output=T> +
@@ -706,146 +936,6 @@ where T: Copy +
     }
 }
 
-/// Methods for apply transformations to objects
-impl<T, Src, Dst> Transform3D<T, Src, Dst>
-where
-    T: Copy + Add<Output = T> + Sub<Output = T> + Mul<Output = T> + Div<Output = T> + Zero + PartialOrd,
-{
-    /// Returns the homogeneous vector corresponding to the transformed 2d point.
-    ///
-    /// The input point must be use the unit Src, and the returned point has the unit Dst.
-    ///
-    /// Assuming row vectors, this is equivalent to `p * self`
-    #[inline]
-    pub fn transform_point2d_homogeneous(
-        &self, p: Point2D<T, Src>
-    ) -> HomogeneousVector<T, Dst> {
-        let x = p.x * self.m11 + p.y * self.m21 + self.m41;
-        let y = p.x * self.m12 + p.y * self.m22 + self.m42;
-        let z = p.x * self.m13 + p.y * self.m23 + self.m43;
-        let w = p.x * self.m14 + p.y * self.m24 + self.m44;
-
-        HomogeneousVector::new(x, y, z, w)
-    }
-
-    /// Returns the given 2d point transformed by this transform, if the transform makes sense,
-    /// or `None` otherwise.
-    ///
-    /// The input point must be use the unit Src, and the returned point has the unit Dst.
-    ///
-    /// Assuming row vectors, this is equivalent to `p * self`
-    #[inline]
-    pub fn transform_point2d(&self, p: Point2D<T, Src>) -> Option<Point2D<T, Dst>> {
-        //Note: could use `transform_point2d_homogeneous()` but it would waste the calculus of `z`
-        let w = p.x * self.m14 + p.y * self.m24 + self.m44;
-        if w > T::zero() {
-            let x = p.x * self.m11 + p.y * self.m21 + self.m41;
-            let y = p.x * self.m12 + p.y * self.m22 + self.m42;
-
-            Some(Point2D::new(x / w, y / w))
-        } else {
-            None
-        }
-    }
-
-    /// Returns the given 2d vector transformed by this matrix.
-    ///
-    /// The input point must be use the unit Src, and the returned point has the unit Dst.
-    ///
-    /// Assuming row vectors, this is equivalent to `v * self`
-    #[inline]
-    pub fn transform_vector2d(&self, v: Vector2D<T, Src>) -> Vector2D<T, Dst> {
-        vec2(
-            v.x * self.m11 + v.y * self.m21,
-            v.x * self.m12 + v.y * self.m22,
-        )
-    }
-
-    /// Returns the homogeneous vector corresponding to the transformed 3d point.
-    ///
-    /// The input point must be use the unit Src, and the returned point has the unit Dst.
-    ///
-    /// Assuming row vectors, this is equivalent to `p * self`
-    #[inline]
-    pub fn transform_point3d_homogeneous(
-        &self, p: Point3D<T, Src>
-    ) -> HomogeneousVector<T, Dst> {
-        let x = p.x * self.m11 + p.y * self.m21 + p.z * self.m31 + self.m41;
-        let y = p.x * self.m12 + p.y * self.m22 + p.z * self.m32 + self.m42;
-        let z = p.x * self.m13 + p.y * self.m23 + p.z * self.m33 + self.m43;
-        let w = p.x * self.m14 + p.y * self.m24 + p.z * self.m34 + self.m44;
-
-        HomogeneousVector::new(x, y, z, w)
-    }
-
-    /// Returns the given 3d point transformed by this transform, if the transform makes sense,
-    /// or `None` otherwise.
-    ///
-    /// The input point must be use the unit Src, and the returned point has the unit Dst.
-    ///
-    /// Assuming row vectors, this is equivalent to `p * self`
-    #[inline]
-    pub fn transform_point3d(&self, p: Point3D<T, Src>) -> Option<Point3D<T, Dst>> {
-        self.transform_point3d_homogeneous(p).to_point3d()
-    }
-
-    /// Returns the given 3d vector transformed by this matrix.
-    ///
-    /// The input point must be use the unit Src, and the returned point has the unit Dst.
-    ///
-    /// Assuming row vectors, this is equivalent to `v * self`
-    #[inline]
-    pub fn transform_vector3d(&self, v: Vector3D<T, Src>) -> Vector3D<T, Dst> {
-        vec3(
-            v.x * self.m11 + v.y * self.m21 + v.z * self.m31,
-            v.x * self.m12 + v.y * self.m22 + v.z * self.m32,
-            v.x * self.m13 + v.y * self.m23 + v.z * self.m33,
-        )
-    }
-
-    /// Returns a rectangle that encompasses the result of transforming the given rectangle by this
-    /// transform, if the transform makes sense for it, or `None` otherwise.
-    pub fn transform_rect(&self, rect: &Rect<T, Src>) -> Option<Rect<T, Dst>> {
-        let min = rect.min();
-        let max = rect.max();
-        Some(Rect::from_points(&[
-            self.transform_point2d(min)?,
-            self.transform_point2d(max)?,
-            self.transform_point2d(point2(max.x, min.y))?,
-            self.transform_point2d(point2(min.x, max.y))?,
-        ]))
-    }
-}
-
-/// Methods for creating and combining translation transformations
-impl <T, Src, Dst> Transform3D<T, Src, Dst>
-where
-    T: Copy + Add<Output = T> + Mul<Output = T> + Zero + One,
-{
-    /// Create a 3d translation transform
-    pub fn create_translation(x: T, y: T, z: T) -> Self {
-        let (_0, _1): (T, T) = (Zero::zero(), One::one());
-        Transform3D::row_major(
-            _1, _0, _0, _0,
-            _0, _1, _0, _0,
-            _0, _0, _1, _0,
-             x,  y,  z, _1
-        )
-    }
-
-    /// Returns a transform with a translation applied before self's transformation.
-    #[must_use]
-    pub fn pre_translate(&self, v: Vector3D<T, Src>) -> Self {
-        self.pre_transform(&Transform3D::create_translation(v.x, v.y, v.z))
-    }
-
-    /// Returns a transform with a translation applied after self's transformation.
-    #[must_use]
-    pub fn post_translate(&self, v: Vector3D<T, Dst>) -> Self {
-        self.post_transform(&Transform3D::create_translation(v.x, v.y, v.z))
-    }
-}
-
 impl <T, Src, Dst> Transform3D<T, Src, Dst>
 where
     T: Copy + Mul<Output = T> + Div<Output = T> + Zero + One + PartialEq,
@@ -884,95 +974,6 @@ where
         }
 
         result
-    }
-}
-
-/// Methods for creating and combining scale transformations
-impl<T, Src, Dst> Transform3D<T, Src, Dst>
-where
-    T: Copy + Add<Output = T> + Mul<Output = T> + Zero + One,
-{
-    /// Create a 3d scale transform
-    pub fn create_scale(x: T, y: T, z: T) -> Self {
-        let (_0, _1): (T, T) = (Zero::zero(), One::one());
-        Transform3D::row_major(
-             x, _0, _0, _0,
-            _0,  y, _0, _0,
-            _0, _0,  z, _0,
-            _0, _0, _0, _1
-        )
-    }
-
-    /// Returns a transform with a scale applied before self's transformation.
-    #[must_use]
-    pub fn pre_scale(&self, x: T, y: T, z: T) -> Self {
-        Transform3D::row_major(
-            self.m11 * x, self.m12 * x, self.m13 * x, self.m14 * x,
-            self.m21 * y, self.m22 * y, self.m23 * y, self.m24 * y,
-            self.m31 * z, self.m32 * z, self.m33 * z, self.m34 * z,
-            self.m41    , self.m42,     self.m43,     self.m44
-        )
-    }
-
-    /// Returns a transform with a scale applied after self's transformation.
-    #[must_use]
-    pub fn post_scale(&self, x: T, y: T, z: T) -> Self {
-        self.post_transform(&Transform3D::create_scale(x, y, z))
-    }
-}
-
-/// Methods for creating and combining rotation transformations
-impl<T, Src, Dst> Transform3D<T, Src, Dst>
-where
-    T: Copy + Add<Output = T> + Sub<Output = T> + Mul<Output = T> + Div<Output = T> + Zero + One + Trig,
-{
-    /// Create a 3d rotation transform from an angle / axis.
-    /// The supplied axis must be normalized.
-    pub fn create_rotation(x: T, y: T, z: T, theta: Angle<T>) -> Self {
-        let (_0, _1): (T, T) = (Zero::zero(), One::one());
-        let _2 = _1 + _1;
-
-        let xx = x * x;
-        let yy = y * y;
-        let zz = z * z;
-
-        let half_theta = theta.get() / _2;
-        let sc = half_theta.sin() * half_theta.cos();
-        let sq = half_theta.sin() * half_theta.sin();
-
-        Transform3D::row_major(
-            _1 - _2 * (yy + zz) * sq,
-            _2 * (x * y * sq - z * sc),
-            _2 * (x * z * sq + y * sc),
-            _0,
-
-            _2 * (x * y * sq + z * sc),
-            _1 - _2 * (xx + zz) * sq,
-            _2 * (y * z * sq - x * sc),
-            _0,
-
-            _2 * (x * z * sq - y * sc),
-            _2 * (y * z * sq + x * sc),
-            _1 - _2 * (xx + yy) * sq,
-            _0,
-
-            _0,
-            _0,
-            _0,
-            _1
-        )
-    }
-
-    /// Returns a transform with a rotation applied after self's transformation.
-    #[must_use]
-    pub fn post_rotate(&self, x: T, y: T, z: T, theta: Angle<T>) -> Self {
-        self.post_transform(&Transform3D::create_rotation(x, y, z, theta))
-    }
-
-    /// Returns a transform with a rotation applied before self's transformation.
-    #[must_use]
-    pub fn pre_rotate(&self, x: T, y: T, z: T, theta: Angle<T>) -> Self {
-        self.pre_transform(&Transform3D::create_rotation(x, y, z, theta))
     }
 }
 
