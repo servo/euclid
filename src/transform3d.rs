@@ -444,6 +444,53 @@ where T: Copy +
 }
 
 impl <T, Src, Dst> Transform3D<T, Src, Dst>
+where
+    T: Zero + One,
+{
+    /// Create a 2d skew transform.
+    ///
+    /// See <https://drafts.csswg.org/css-transforms/#funcdef-skew>
+    pub fn create_skew(alpha: Angle<T>, beta: Angle<T>) -> Self
+    where
+        T: Trig,
+    {
+        let _0 = || T::zero();
+        let _1 = || T::one();
+        let (sx, sy) = (beta.radians.tan(), alpha.radians.tan());
+
+        Self::row_major(
+            _1(), sx,   _0(), _0(),
+            sy,   _1(), _0(), _0(),
+            _0(), _0(), _1(), _0(),
+            _0(), _0(), _0(), _1(),
+        )
+    }
+
+    /// Create a simple perspective projection transform:
+    ///
+    /// ```text
+    /// 1   0   0   0
+    /// 0   1   0   0
+    /// 0   0   1 -1/d
+    /// 0   0   0   1
+    /// ```
+    pub fn create_perspective(d: T) -> Self
+    where
+        T: Neg<Output = T> + Div<Output = T>,
+    {
+        let _0 = || T::zero();
+        let _1 = || T::one();
+
+        Self::row_major(
+            _1(), _0(), _0(),  _0(),
+            _0(), _1(), _0(),  _0(),
+            _0(), _0(), _1(), -_1() / d,
+            _0(), _0(), _0(),  _1(),
+        )
+    }
+}
+
+impl <T, Src, Dst> Transform3D<T, Src, Dst>
 where T: Copy +
          Add<T, Output=T> +
          Sub<T, Output=T> +
@@ -913,31 +960,6 @@ where T: Copy +
     #[must_use]
     pub fn pre_rotate(&self, x: T, y: T, z: T, theta: Angle<T>) -> Self {
         self.pre_transform(&Transform3D::create_rotation(x, y, z, theta))
-    }
-
-    /// Create a 2d skew transform.
-    ///
-    /// See <https://drafts.csswg.org/css-transforms/#funcdef-skew>
-    pub fn create_skew(alpha: Angle<T>, beta: Angle<T>) -> Self {
-        let (_0, _1): (T, T) = (Zero::zero(), One::one());
-        let (sx, sy) = (beta.get().tan(), alpha.get().tan());
-        Transform3D::row_major(
-            _1, sx, _0, _0,
-            sy, _1, _0, _0,
-            _0, _0, _1, _0,
-            _0, _0, _0, _1
-        )
-    }
-
-    /// Create a simple perspective projection transform
-    pub fn create_perspective(d: T) -> Self {
-        let (_0, _1): (T, T) = (Zero::zero(), One::one());
-        Transform3D::row_major(
-            _1, _0, _0, _0,
-            _0, _1, _0, _0,
-            _0, _0, _1, -_1 / d,
-            _0, _0, _0, _1
-        )
     }
 }
 
