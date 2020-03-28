@@ -338,15 +338,13 @@ impl<T: Copy, U> Vector2D<T, U> {
     {
         Angle::radians(Trig::fast_atan2(self.y, self.x))
     }
-}
 
-impl<T, U> Vector2D<T, U>
-where
-    T: Copy + Add<Output = T> + Mul<Output = T> + Zero + One,
-{
     /// Creates translation by this vector in vector units.
     #[inline]
-    pub fn to_transform(&self) -> Transform2D<T, U, U> {
+    pub fn to_transform(&self) -> Transform2D<T, U, U>
+    where
+        T: Zero + One,
+    {
         Transform2D::create_translation(self.x, self.y)
     }
 }
@@ -1118,15 +1116,13 @@ impl<T: Copy, U> Vector3D<T, U> {
     {
         vec3(self.x.floor(), self.y.floor(), self.z.floor())
     }
-}
 
-impl<T, U> Vector3D<T, U>
-where
-    T: Copy + Add<Output = T> + Mul<Output = T> + Zero + One,
-{
     /// Creates translation by this vector in vector units
     #[inline]
-    pub fn to_transform(&self) -> Transform3D<T, U, U> {
+    pub fn to_transform(&self) -> Transform3D<T, U, U>
+    where
+        T: Zero + One,
+    {
         Transform3D::create_translation(self.x, self.y, self.z)
     }
 }

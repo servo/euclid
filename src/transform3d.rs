@@ -433,15 +433,7 @@ where
     /// ```
     #[inline]
     pub fn identity() -> Self {
-        let _0 = || T::zero();
-        let _1 = || T::one();
-
-        Self::row_major(
-            _1(), _0(), _0(), _0(),
-            _0(), _1(), _0(), _0(),
-            _0(), _0(), _1(), _0(),
-            _0(), _0(), _0(), _1(),
-        )
+        Self::create_translation(T::zero(), T::zero(), T::zero())
     }
 
     /// Intentional not public, because it checks for exact equivalence
@@ -547,28 +539,44 @@ where
 /// Methods for creating and combining translation transformations
 impl <T, Src, Dst> Transform3D<T, Src, Dst>
 where
-    T: Copy + Add<Output = T> + Mul<Output = T> + Zero + One,
+    T: Zero + One,
 {
-    /// Create a 3d translation transform
+    /// Create a 3d translation transform:
+    ///
+    /// ```text
+    /// 1 0 0 0
+    /// 0 1 0 0
+    /// 0 0 1 0
+    /// x y z 1
+    /// ```
+    #[inline]
     pub fn create_translation(x: T, y: T, z: T) -> Self {
-        let (_0, _1): (T, T) = (Zero::zero(), One::one());
-        Transform3D::row_major(
-            _1, _0, _0, _0,
-            _0, _1, _0, _0,
-            _0, _0, _1, _0,
-             x,  y,  z, _1
+        let _0 = || T::zero();
+        let _1 = || T::one();
+
+        Self::row_major(
+            _1(), _0(), _0(), _0(),
+            _0(), _1(), _0(), _0(),
+            _0(), _0(), _1(), _0(),
+             x,    y,    z,   _1(),
         )
     }
 
     /// Returns a transform with a translation applied before self's transformation.
     #[must_use]
-    pub fn pre_translate(&self, v: Vector3D<T, Src>) -> Self {
+    pub fn pre_translate(&self, v: Vector3D<T, Src>) -> Self
+    where
+        T: Copy + Add<Output = T> + Mul<Output = T>,
+    {
         self.pre_transform(&Transform3D::create_translation(v.x, v.y, v.z))
     }
 
     /// Returns a transform with a translation applied after self's transformation.
     #[must_use]
-    pub fn post_translate(&self, v: Vector3D<T, Dst>) -> Self {
+    pub fn post_translate(&self, v: Vector3D<T, Dst>) -> Self
+    where
+        T: Copy + Add<Output = T> + Mul<Output = T>,
+    {
         self.post_transform(&Transform3D::create_translation(v.x, v.y, v.z))
     }
 }
@@ -631,22 +639,35 @@ where
 /// Methods for creating and combining scale transformations
 impl<T, Src, Dst> Transform3D<T, Src, Dst>
 where
-    T: Copy + Add<Output = T> + Mul<Output = T> + Zero + One,
+    T: Zero + One,
 {
-    /// Create a 3d scale transform
+    /// Create a 3d scale transform:
+    ///
+    /// ```text
+    /// x 0 0 0
+    /// 0 y 0 0
+    /// 0 0 z 0
+    /// 0 0 0 1
+    /// ```
+    #[inline]
     pub fn create_scale(x: T, y: T, z: T) -> Self {
-        let (_0, _1): (T, T) = (Zero::zero(), One::one());
-        Transform3D::row_major(
-             x, _0, _0, _0,
-            _0,  y, _0, _0,
-            _0, _0,  z, _0,
-            _0, _0, _0, _1
+        let _0 = || T::zero();
+        let _1 = || T::one();
+
+        Self::row_major(
+             x,   _0(), _0(), _0(),
+            _0(),  y,   _0(), _0(),
+            _0(), _0(),  z,   _0(),
+            _0(), _0(), _0(), _1(),
         )
     }
 
     /// Returns a transform with a scale applied before self's transformation.
     #[must_use]
-    pub fn pre_scale(&self, x: T, y: T, z: T) -> Self {
+    pub fn pre_scale(&self, x: T, y: T, z: T) -> Self
+    where
+        T: Copy + Add<Output = T> + Mul<Output = T>,
+    {
         Transform3D::row_major(
             self.m11 * x, self.m12 * x, self.m13 * x, self.m14 * x,
             self.m21 * y, self.m22 * y, self.m23 * y, self.m24 * y,
@@ -657,7 +678,10 @@ where
 
     /// Returns a transform with a scale applied after self's transformation.
     #[must_use]
-    pub fn post_scale(&self, x: T, y: T, z: T) -> Self {
+    pub fn post_scale(&self, x: T, y: T, z: T) -> Self
+    where
+        T: Copy + Add<Output = T> + Mul<Output = T>,
+    {
         self.post_transform(&Transform3D::create_scale(x, y, z))
     }
 }

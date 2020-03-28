@@ -350,14 +350,7 @@ where
     /// ```
     #[inline]
     pub fn identity() -> Self {
-        let _0 = || T::zero();
-        let _1 = || T::one();
-
-        Self::row_major(
-            _1(), _0(),
-            _0(), _1(),
-            _0(), _0(),
-        )
+        Self::create_translation(T::zero(), T::zero())
     }
 
     /// Intentional not public, because it checks for exact equivalence
@@ -409,30 +402,44 @@ where
 /// Methods for creating and combining translation transformations
 impl<T, Src, Dst> Transform2D<T, Src, Dst>
 where
-    T: Copy + Add<Output = T> + Mul<Output = T> + Zero + One,
+    T: Zero + One,
 {
-    /// Returns a translation transform.
+    /// Create a 2d translation transform:
+    ///
+    /// ```text
+    /// 1 0
+    /// 0 1
+    /// x y
+    /// ```
     #[inline]
     pub fn create_translation(x: T, y: T) -> Self {
-        let (_0, _1): (T, T) = (Zero::zero(), One::one());
+        let _0 = || T::zero();
+        let _1 = || T::one();
+
         Self::row_major(
-            _1, _0,
-            _0, _1,
-             x,  y
+            _1(), _0(),
+            _0(), _1(),
+             x,    y,
         )
     }
 
     /// Applies a translation after self's transformation and returns the resulting transform.
     #[inline]
     #[must_use]
-    pub fn post_translate(&self, v: Vector2D<T, Dst>) -> Self {
+    pub fn post_translate(&self, v: Vector2D<T, Dst>) -> Self
+    where
+        T: Copy + Add<Output = T> + Mul<Output = T>,
+    {
         self.post_transform(&Transform2D::create_translation(v.x, v.y))
     }
 
     /// Applies a translation before self's transformation and returns the resulting transform.
     #[inline]
     #[must_use]
-    pub fn pre_translate(&self, v: Vector2D<T, Src>) -> Self {
+    pub fn pre_translate(&self, v: Vector2D<T, Src>) -> Self
+    where
+        T: Copy + Add<Output = T> + Mul<Output = T>,
+    {
         self.pre_transform(&Transform2D::create_translation(v.x, v.y))
     }
 }
@@ -471,31 +478,45 @@ where
 }
 
 /// Methods for creating and combining scale transformations
-impl<T, Src, Dst> Transform2D<T, Src, Dst>
-where
-    T: Copy + Add<Output = T> + Mul<Output = T> + Zero,
-{
-    /// Returns a scale transform.
-    pub fn create_scale(x: T, y: T) -> Self {
-        let _0 = Zero::zero();
-        Transform2D::row_major(
-             x, _0,
-            _0,  y,
-            _0, _0
+impl<T, Src, Dst> Transform2D<T, Src, Dst> {
+    /// Create a 2d scale transform:
+    ///
+    /// ```text
+    /// x 0
+    /// 0 y
+    /// 0 0
+    /// ```
+    #[inline]
+    pub fn create_scale(x: T, y: T) -> Self
+    where
+        T: Zero,
+    {
+        let _0 = || Zero::zero();
+
+        Self::row_major(
+             x,   _0(),
+            _0(),  y,
+            _0(), _0(),
         )
     }
 
     /// Applies a scale after self's transformation and returns the resulting transform.
     #[inline]
     #[must_use]
-    pub fn post_scale(&self, x: T, y: T) -> Self {
+    pub fn post_scale(&self, x: T, y: T) -> Self
+    where
+        T: Copy + Add<Output = T> + Mul<Output = T> + Zero,
+    {
         self.post_transform(&Transform2D::create_scale(x, y))
     }
 
     /// Applies a scale before self's transformation and returns the resulting transform.
     #[inline]
     #[must_use]
-    pub fn pre_scale(&self, x: T, y: T) -> Self {
+    pub fn pre_scale(&self, x: T, y: T) -> Self
+    where
+        T: Copy + Mul<Output = T>,
+    {
         Transform2D::row_major(
             self.m11 * x, self.m12 * x,
             self.m21 * y, self.m22 * y,
