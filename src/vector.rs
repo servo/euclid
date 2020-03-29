@@ -274,6 +274,18 @@ impl<T: Copy, U> Vector2D<T, U> {
     {
         vec2(self.x.floor(), self.y.floor())
     }
+
+    /// Returns the signed angle between this vector and the x axis.
+    /// Positive values counted counterclockwise, where 0 is `+x` axis, `PI/2`
+    /// is `+y` axis.
+    ///
+    /// The returned angle is between -PI and PI.
+    pub fn angle_from_x_axis(&self) -> Angle<T>
+    where
+        T: Trig,
+    {
+        Angle::radians(Trig::fast_atan2(self.y, self.x))
+    }
 }
 
 impl<T, U> Vector2D<T, U>
@@ -292,18 +304,6 @@ where
     #[inline]
     pub fn to_transform(&self) -> Transform2D<T, U, U> {
         Transform2D::create_translation(self.x, self.y)
-    }
-}
-
-impl<T, U> Vector2D<T, U>
-where
-    T: Trig + Copy + Sub<T, Output = T>,
-{
-    /// Returns the signed angle between this vector and the x axis.
-    ///
-    /// The returned angle is between -PI and PI.
-    pub fn angle_from_x_axis(&self) -> Angle<T> {
-        Angle::radians(Trig::fast_atan2(self.y, self.x))
     }
 }
 
