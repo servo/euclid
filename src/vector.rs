@@ -33,7 +33,9 @@ use serde;
 /// A 2d Vector tagged with a unit.
 #[repr(C)]
 pub struct Vector2D<T, U> {
+    /// The `x` (traditionally, horizontal) coordinate
     pub x: T,
+    /// The `y` (traditionally, vertical) coordinate
     pub y: T,
     #[doc(hidden)]
     pub _unit: PhantomData<U>,
@@ -754,8 +756,11 @@ impl<T, U> From<Size2D<T, U>> for Vector2D<T, U> {
 /// A 3d Vector tagged with a unit.
 #[repr(C)]
 pub struct Vector3D<T, U> {
+    /// The `x` (traditionally, horizontal) coordinate
     pub x: T,
+    /// The `y` (traditionally, vertical) coordinate
     pub y: T,
+    /// The `z` (traditionally, depth) coordinate
     pub z: T,
     #[doc(hidden)]
     pub _unit: PhantomData<U>,
@@ -946,6 +951,7 @@ impl<T: Copy, U> Vector3D<T, U> {
         [self.x, self.y, self.z]
     }
 
+    /// Cast into an array with x, y, z and 0.
     #[inline]
     pub fn to_array_4d(&self) -> [T; 4]
     where
@@ -960,6 +966,7 @@ impl<T: Copy, U> Vector3D<T, U> {
         (self.x, self.y, self.z)
     }
 
+    /// Cast into a tuple with x, y, z and 0.
     #[inline]
     pub fn to_tuple_4d(&self) -> (T, T, T, T)
     where
@@ -1503,7 +1510,9 @@ impl<T, U> From<(T, T, T)> for Vector3D<T, U> {
 /// [`Vector2D`]: struct.Vector2D.html
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct BoolVector2D {
+    /// Result of boolean operation on `x` vector coordinates or `width` component of size
     pub x: bool,
+    /// Result of boolean operation on `y` vector coordinates or `height` component of size
     pub y: bool,
 }
 
@@ -1513,8 +1522,11 @@ pub struct BoolVector2D {
 /// [`Vector3D`]: struct.Vector3D.html
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct BoolVector3D {
+    /// Result of boolean operation on `x` vector coordinates or `width` component of size
     pub x: bool,
+    /// Result of boolean operation on `y` vector coordinates or `height` component of size
     pub y: bool,
+    /// Result of boolean operation on `z` vector coordinates or `depth` component of size
     pub z: bool,
 }
 
@@ -1679,6 +1691,7 @@ impl BoolVector3D {
         )
     }
 
+    /// Returns a 2d vector using this vector's x and y coordinates
     #[inline]
     pub fn xy(&self) -> BoolVector2D {
         BoolVector2D {
@@ -1687,6 +1700,7 @@ impl BoolVector3D {
         }
     }
 
+    /// Returns a 2d vector using this vector's x and z coordinates
     #[inline]
     pub fn xz(&self) -> BoolVector2D {
         BoolVector2D {
@@ -1695,6 +1709,7 @@ impl BoolVector3D {
         }
     }
 
+    /// Returns a 2d vector using this vector's y and z coordinates
     #[inline]
     pub fn yz(&self) -> BoolVector2D {
         BoolVector2D {
