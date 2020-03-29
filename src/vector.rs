@@ -309,19 +309,6 @@ where
 
 impl<T, U> Vector2D<T, U>
 where
-    T: Copy + Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>
-    + Trig,
-{
-    /// Returns the signed angle between this vector and another vector.
-    ///
-    /// The returned angle is between -PI and PI.
-    pub fn angle_to(&self, other: Self) -> Angle<T> {
-        Angle::radians(Trig::fast_atan2(self.cross(other), self.dot(other)))
-    }
-}
-
-impl<T, U> Vector2D<T, U>
-where
     T: Mul<T, Output = T> + Add<T, Output = T>,
 {
     /// Dot product.
@@ -361,6 +348,16 @@ where
         T: Sub<T, Output = T> + Div<T, Output = T>
     {
         onto * (self.dot(onto) / onto.square_length())
+    }
+
+    /// Returns the signed angle between this vector and another vector.
+    ///
+    /// The returned angle is between -PI and PI.
+    pub fn angle_to(&self, other: Self) -> Angle<T>
+    where
+        T: Sub<Output = T> + Trig,
+    {
+        Angle::radians(Trig::fast_atan2(self.cross(other), self.dot(other)))
     }
 }
 
@@ -1040,18 +1037,6 @@ where
 
 impl<T, U> Vector3D<T, U>
 where
-    T: Float + Trig
-{
-    /// Returns the positive angle between this vector and another vector.
-    ///
-    /// The returned angle is between 0 and PI.
-    pub fn angle_to(&self, other: Self) -> Angle<T> {
-        Angle::radians(Trig::fast_atan2(self.cross(other).length(), self.dot(other)))
-    }
-}
-
-impl<T, U> Vector3D<T, U>
-where
     T: Mul<T, Output = T> + Add<T, Output = T>
 {
     /// Dot product.
@@ -1099,6 +1084,16 @@ where
 }
 
 impl<T: Float, U> Vector3D<T, U> {
+    /// Returns the positive angle between this vector and another vector.
+    ///
+    /// The returned angle is between 0 and PI.
+    pub fn angle_to(&self, other: Self) -> Angle<T>
+    where
+        T: Trig,
+    {
+        Angle::radians(Trig::fast_atan2(self.cross(other).length(), self.dot(other)))
+    }
+
     /// Returns the vector length.
     #[inline]
     pub fn length(&self) -> T {
