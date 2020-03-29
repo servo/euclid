@@ -395,11 +395,7 @@ where
     }
 }
 
-impl<T, U> Vector2D<T, U>
-where
-    T: Copy + Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>
-    + PartialOrd + Float
-{
+impl<T: Float, U> Vector2D<T, U> {
     /// Return this vector capped to a maximum length.
     #[inline]
     pub fn with_max_length(&self, max_length: T) -> Self {
@@ -459,12 +455,7 @@ where
         let one_t = T::one() - t;
         (*self) * one_t + other * t
     }
-}
 
-impl<T, U> Vector2D<T, U>
-where
-    T: Copy + One + Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>,
-{
     /// Returns a reflection vector using an incident ray and a surface normal.
     #[inline]
     pub fn reflect(&self, normal: Self) -> Self {
@@ -1054,9 +1045,7 @@ where
 
 impl<T, U> Vector3D<T, U>
 where
-    T: Copy + Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>
-    + Trig
-    + Float
+    T: Float + Trig
 {
     /// Returns the positive angle between this vector and another vector.
     ///
@@ -1146,11 +1135,7 @@ where
     }
 }
 
-impl<T, U> Vector3D<T, U>
-where
-    T: Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>
-    + PartialOrd + Float
-{
+impl<T: Float, U> Vector3D<T, U> {
     /// Return this vector capped to a maximum length.
     #[inline]
     pub fn with_max_length(&self, max_length: T) -> Self {
