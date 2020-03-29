@@ -153,6 +153,18 @@ impl<T, U> Vector2D<T, U> {
         vec2(p.x, p.y)
     }
 
+    /// Computes the vector with absolute values of each component.
+    ///
+    /// For `f32` and `f64`, `NaN` will be returned for component if the component is `NaN`.
+    ///
+    /// For signed integers, `::MIN` will be returned for component if the component is `::MIN`.
+    pub fn abs(&self) -> Self
+    where
+        T: Signed,
+    {
+        vec2(self.x.abs(), self.y.abs())
+    }
+
     /// Dot product.
     #[inline]
     pub fn dot(self, other: Self) -> T
@@ -737,20 +749,6 @@ impl<T, U> From<Size2D<T, U>> for Vector2D<T, U> {
     }
 }
 
-impl<T, U> Vector2D<T, U>
-where
-    T: Signed,
-{
-    /// Computes the vector with absolute values of each component.
-    ///
-    /// For `f32` and `f64`, `NaN` will be returned for component if the component is `NaN`.
-    ///
-    /// For signed integers, `::MIN` will be returned for component if the component is `::MIN`.
-    pub fn abs(&self) -> Self {
-        vec2(self.x.abs(), self.y.abs())
-    }
-}
-
 
 
 /// A 3d Vector tagged with a unit.
@@ -878,6 +876,18 @@ impl<T, U> Vector3D<T, U> {
     #[inline]
     pub fn from_untyped(p: Vector3D<T, UnknownUnit>) -> Self {
         vec3(p.x, p.y, p.z)
+    }
+
+    /// Computes the vector with absolute values of each component.
+    ///
+    /// For `f32` and `f64`, `NaN` will be returned for component if the component is `NaN`.
+    ///
+    /// For signed integers, `::MIN` will be returned for component if the component is `::MIN`.
+    pub fn abs(&self) -> Self
+    where
+        T: Signed,
+    {
+        vec3(self.x.abs(), self.y.abs(), self.z.abs())
     }
 
     /// Dot product.
@@ -1486,19 +1496,6 @@ impl<T, U> From<(T, T, T)> for Vector3D<T, U> {
     }
 }
 
-impl<T, U> Vector3D<T, U>
-where
-    T: Signed,
-{
-    /// Computes the vector with absolute values of each component.
-    ///
-    /// For `f32` and `f64`, `NaN` will be returned for component if the component is `NaN`.
-    ///
-    /// For signed integers, `::MIN` will be returned for component if the component is `::MIN`.
-    pub fn abs(&self) -> Self {
-        vec3(self.x.abs(), self.y.abs(), self.z.abs())
-    }
-}
 
 /// Result of boolean operations on [`Size2D`] or [`Vector2D`].
 ///
