@@ -152,6 +152,24 @@ impl<T, U> Vector2D<T, U> {
     pub fn from_untyped(p: Vector2D<T, UnknownUnit>) -> Self {
         vec2(p.x, p.y)
     }
+
+    /// Dot product.
+    #[inline]
+    pub fn dot(self, other: Self) -> T
+    where
+        T: Add<Output = T> + Mul<Output = T>,
+    {
+        self.x * other.x + self.y * other.y
+    }
+
+    /// Returns the norm of the cross product [self.x, self.y, 0] x [other.x, other.y, 0].
+    #[inline]
+    pub fn cross(self, other: Self) -> T
+    where
+        T: Sub<Output = T> + Mul<Output = T>,
+    {
+        self.x * other.y - self.y * other.x
+    }
 }
 
 impl<T: Copy, U> Vector2D<T, U> {
@@ -309,30 +327,9 @@ where
 
 impl<T, U> Vector2D<T, U>
 where
-    T: Mul<T, Output = T> + Add<T, Output = T>,
-{
-    /// Dot product.
-    #[inline]
-    pub fn dot(self, other: Self) -> T {
-        self.x * other.x + self.y * other.y
-    }
-}
-
-impl<T, U> Vector2D<T, U>
-where
-    T: Mul<T, Output = T> + Sub<T, Output = T>,
-{
-    /// Returns the norm of the cross product [self.x, self.y, 0] x [other.x, other.y, 0]..
-    #[inline]
-    pub fn cross(self, other: Self) -> T {
-        self.x * other.y - self.y * other.x
-    }
-}
-
-impl<T, U> Vector2D<T, U>
-where
     T: Copy + Mul<T, Output = T> + Add<T, Output = T>,
 {
+
     /// Returns length square.
     #[inline]
     pub fn square_length(&self) -> T {
@@ -882,9 +879,31 @@ impl<T, U> Vector3D<T, U> {
     pub fn from_untyped(p: Vector3D<T, UnknownUnit>) -> Self {
         vec3(p.x, p.y, p.z)
     }
+
+    /// Dot product.
+    #[inline]
+    pub fn dot(self, other: Self) -> T
+    where
+        T: Add<Output = T> + Mul<Output = T>,
+    {
+        self.x * other.x + self.y * other.y + self.z * other.z
+    }
 }
 
 impl<T: Copy, U> Vector3D<T, U> {
+    /// Cross product.
+    #[inline]
+    pub fn cross(self, other: Self) -> Self
+    where
+        T: Sub<Output = T> + Mul<Output = T>,
+    {
+        vec3(
+            self.y * other.z - self.z * other.y,
+            self.z * other.x - self.x * other.z,
+            self.x * other.y - self.y * other.x,
+        )
+    }
+
     /// Cast this vector into a point.
     ///
     /// Equivalent to adding this vector to the origin.
@@ -1032,32 +1051,6 @@ where
     #[inline]
     pub fn to_transform(&self) -> Transform3D<T, U, U> {
         Transform3D::create_translation(self.x, self.y, self.z)
-    }
-}
-
-impl<T, U> Vector3D<T, U>
-where
-    T: Mul<T, Output = T> + Add<T, Output = T>
-{
-    /// Dot product.
-    #[inline]
-    pub fn dot(self, other: Self) -> T {
-        self.x * other.x + self.y * other.y + self.z * other.z
-    }
-}
-
-impl<T, U> Vector3D<T, U>
-where
-    T: Copy + Mul<T, Output = T> + Sub<T, Output = T>
-{
-    /// Cross product.
-    #[inline]
-    pub fn cross(self, other: Self) -> Self {
-        vec3(
-            self.y * other.z - self.z * other.y,
-            self.z * other.x - self.x * other.z,
-            self.x * other.y - self.y * other.x,
-        )
     }
 }
 
