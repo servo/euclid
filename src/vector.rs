@@ -343,22 +343,44 @@ where
 
 impl<T, U> Vector2D<T, U>
 where
-    T: Copy + Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>,
+    T: Copy + Mul<T, Output = T> + Add<T, Output = T>,
 {
+    /// Returns length square.
     #[inline]
-    pub fn normalize(self) -> Self
+    pub fn square_length(&self) -> T {
+        self.x * self.x + self.y * self.y
+    }
+
+    /// Returns this vector projected onto another one.
+    ///
+    /// Projecting onto a nil vector will cause a division by zero.
+    #[inline]
+    pub fn project_onto_vector(&self, onto: Self) -> Self
     where
-        T: Float,
+        T: Sub<T, Output = T> + Div<T, Output = T>
     {
+        onto * (self.dot(onto) / onto.square_length())
+    }
+}
+
+impl<T: Float, U> Vector2D<T, U> {
+    /// Returns the vector length.
+    #[inline]
+    pub fn length(&self) -> T {
+        self.square_length().sqrt()
+    }
+
+    /// Returns the vector with length of one unit
+    #[inline]
+    #[must_use]
+    pub fn normalize(self) -> Self {
         self / self.length()
     }
 
     /// Return the normalized vector even if the length is larger than the max value of Float.
     #[inline]
-    pub fn robust_normalize(self) -> Self
-    where
-        T: Float,
-    {
+    #[must_use]
+    pub fn robust_normalize(self) -> Self {
         let length = self.length();
         if length.is_infinite() {
             let scaled = self / T::max_value();
@@ -368,34 +390,6 @@ where
         }
     }
 
-    /// Returns length square.
-    #[inline]
-    pub fn square_length(&self) -> T {
-        self.x * self.x + self.y * self.y
-    }
-
-    /// Returns the vector length.
-    #[inline]
-    pub fn length(&self) -> T
-    where
-        T: Float,
-    {
-        self.square_length().sqrt()
-    }
-
-    /// Returns this vector projected onto another one.
-    ///
-    /// Projecting onto a nil vector will cause a division by zero.
-    #[inline]
-    pub fn project_onto_vector(&self, onto: Self) -> Self
-    where
-        T: Div<T, Output = T>
-    {
-        onto * (self.dot(onto) / onto.square_length())
-    }
-}
-
-impl<T: Float, U> Vector2D<T, U> {
     /// Return this vector capped to a maximum length.
     #[inline]
     pub fn with_max_length(&self, max_length: T) -> Self {
@@ -1083,22 +1077,44 @@ where
 
 impl<T, U> Vector3D<T, U>
 where
-    T: Copy + Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T>
+    T: Copy + Mul<T, Output = T> + Add<T, Output = T>
 {
+    /// Returns length square.
     #[inline]
-    pub fn normalize(self) -> Self
+    pub fn square_length(&self) -> T {
+        self.x * self.x + self.y * self.y + self.z * self.z
+    }
+
+    /// Returns this vector projected onto another one.
+    ///
+    /// Projecting onto a nil vector will cause a division by zero.
+    #[inline]
+    pub fn project_onto_vector(&self, onto: Self) -> Self
     where
-        T: Float,
+        T: Sub<T, Output = T> + Div<T, Output = T>
     {
+        onto * (self.dot(onto) / onto.square_length())
+    }
+}
+
+impl<T: Float, U> Vector3D<T, U> {
+    /// Returns the vector length.
+    #[inline]
+    pub fn length(&self) -> T {
+        self.square_length().sqrt()
+    }
+
+    /// Returns the vector with length of one unit
+    #[inline]
+    #[must_use]
+    pub fn normalize(self) -> Self {
         self / self.length()
     }
 
     /// Return the normalized vector even if the length is larger than the max value of Float.
     #[inline]
-    pub fn robust_normalize(self) -> Self
-    where
-        T: Float,
-    {
+    #[must_use]
+    pub fn robust_normalize(self) -> Self {
         let length = self.length();
         if length.is_infinite() {
             let scaled = self / T::max_value();
@@ -1108,34 +1124,6 @@ where
         }
     }
 
-    /// Returns length square.
-    #[inline]
-    pub fn square_length(&self) -> T {
-        self.x * self.x + self.y * self.y + self.z * self.z
-    }
-
-    /// Returns the vector length.
-    #[inline]
-    pub fn length(&self) -> T
-    where
-        T: Float,
-    {
-        self.square_length().sqrt()
-    }
-
-    /// Returns this vector projected onto another one.
-    ///
-    /// Projecting onto a nil vector will cause a division by zero.
-    #[inline]
-    pub fn project_onto_vector(&self, onto: Self) -> Self
-    where
-        T: Div<T, Output = T>
-    {
-        onto * (self.dot(onto) / onto.square_length())
-    }
-}
-
-impl<T: Float, U> Vector3D<T, U> {
     /// Return this vector capped to a maximum length.
     #[inline]
     pub fn with_max_length(&self, max_length: T) -> Self {
