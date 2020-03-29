@@ -103,14 +103,6 @@ impl<T: Zero, U> Zero for Vector2D<T, U> {
     }
 }
 
-impl<T: Copy + Zero, U> Vector2D<T, U> {
-    /// Convert into a 3d vector.
-    #[inline]
-    pub fn to_3d(&self) -> Vector3D<T, U> {
-        vec3(self.x, self.y, Zero::zero())
-    }
-}
-
 impl<T: fmt::Debug, U> fmt::Debug for Vector2D<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "({:?},{:?})", self.x, self.y)
@@ -215,6 +207,15 @@ impl<T: Copy, U> Vector2D<T, U> {
     #[inline]
     pub fn to_tuple(&self) -> (T, T) {
         (self.x, self.y)
+    }
+
+    /// Convert into a 3d vector with `z` coordinate equals to `T::zero()`.
+    #[inline]
+    pub fn to_3d(&self) -> Vector3D<T, U>
+    where
+        T: Zero,
+    {
+        vec3(self.x, self.y, Zero::zero())
     }
 
     /// Rounds each component to the nearest integer value.
