@@ -487,6 +487,44 @@ impl<T: PartialOrd, U> Vector2D<T, U> {
     {
         self.max(start).min(end)
     }
+
+    /// Returns vector with results of "greater than" operation on each component.
+    #[inline]
+    pub fn greater_than(&self, other: Self) -> BoolVector2D {
+        BoolVector2D {
+            x: self.x > other.x,
+            y: self.y > other.y,
+        }
+    }
+
+    /// Returns vector with results of "lower than" operation on each component.
+    #[inline]
+    pub fn lower_than(&self, other: Self) -> BoolVector2D {
+        BoolVector2D {
+            x: self.x < other.x,
+            y: self.y < other.y,
+        }
+    }
+}
+
+impl<T: PartialEq, U> Vector2D<T, U> {
+    /// Returns vector with results of "equal" operation on each component.
+    #[inline]
+    pub fn equal(&self, other: Self) -> BoolVector2D {
+        BoolVector2D {
+            x: self.x == other.x,
+            y: self.y == other.y,
+        }
+    }
+
+    /// Returns vector with results of "not equal" operation on each component.
+    #[inline]
+    pub fn not_equal(&self, other: Self) -> BoolVector2D {
+        BoolVector2D {
+            x: self.x != other.x,
+            y: self.y != other.y,
+        }
+    }
 }
 
 impl<T: NumCast + Copy, U> Vector2D<T, U> {
@@ -1222,6 +1260,48 @@ impl<T: PartialOrd, U> Vector3D<T, U> {
     {
         self.max(start).min(end)
     }
+
+    /// Returns vector with results of "greater than" operation on each component.
+    #[inline]
+    pub fn greater_than(&self, other: Self) -> BoolVector3D {
+        BoolVector3D {
+            x: self.x > other.x,
+            y: self.y > other.y,
+            z: self.z > other.z,
+        }
+    }
+
+    /// Returns vector with results of "lower than" operation on each component.
+    #[inline]
+    pub fn lower_than(&self, other: Self) -> BoolVector3D {
+        BoolVector3D {
+            x: self.x < other.x,
+            y: self.y < other.y,
+            z: self.z < other.z,
+        }
+    }
+}
+
+impl<T: PartialEq, U> Vector3D<T, U> {
+    /// Returns vector with results of "equal" operation on each component.
+    #[inline]
+    pub fn equal(&self, other: Self) -> BoolVector3D {
+        BoolVector3D {
+            x: self.x == other.x,
+            y: self.y == other.y,
+            z: self.z == other.z,
+        }
+    }
+
+    /// Returns vector with results of "not equal" operation on each component.
+    #[inline]
+    pub fn not_equal(&self, other: Self) -> BoolVector3D {
+        BoolVector3D {
+            x: self.x != other.x,
+            y: self.y != other.y,
+            z: self.z != other.z,
+        }
+    }
 }
 
 impl<T: NumCast + Copy, U> Vector3D<T, U> {
@@ -1711,91 +1791,6 @@ impl BoolVector3D {
     }
 }
 
-impl<T: PartialOrd, U> Vector2D<T, U> {
-    /// Returns vector with results of "greater than" operation on each component.
-    #[inline]
-    pub fn greater_than(&self, other: Self) -> BoolVector2D {
-        BoolVector2D {
-            x: self.x > other.x,
-            y: self.y > other.y,
-        }
-    }
-
-    /// Returns vector with results of "lower than" operation on each component.
-    #[inline]
-    pub fn lower_than(&self, other: Self) -> BoolVector2D {
-        BoolVector2D {
-            x: self.x < other.x,
-            y: self.y < other.y,
-        }
-    }
-}
-
-
-impl<T: PartialEq, U> Vector2D<T, U> {
-    /// Returns vector with results of "equal" operation on each component.
-    #[inline]
-    pub fn equal(&self, other: Self) -> BoolVector2D {
-        BoolVector2D {
-            x: self.x == other.x,
-            y: self.y == other.y,
-        }
-    }
-
-    /// Returns vector with results of "not equal" operation on each component.
-    #[inline]
-    pub fn not_equal(&self, other: Self) -> BoolVector2D {
-        BoolVector2D {
-            x: self.x != other.x,
-            y: self.y != other.y,
-        }
-    }
-}
-
-impl<T: PartialOrd, U> Vector3D<T, U> {
-    /// Returns vector with results of "greater than" operation on each component.
-    #[inline]
-    pub fn greater_than(&self, other: Self) -> BoolVector3D {
-        BoolVector3D {
-            x: self.x > other.x,
-            y: self.y > other.y,
-            z: self.z > other.z,
-        }
-    }
-
-    /// Returns vector with results of "lower than" operation on each component.
-    #[inline]
-    pub fn lower_than(&self, other: Self) -> BoolVector3D {
-        BoolVector3D {
-            x: self.x < other.x,
-            y: self.y < other.y,
-            z: self.z < other.z,
-        }
-    }
-}
-
-
-impl<T: PartialEq, U> Vector3D<T, U> {
-    /// Returns vector with results of "equal" operation on each component.
-    #[inline]
-    pub fn equal(&self, other: Self) -> BoolVector3D {
-        BoolVector3D {
-            x: self.x == other.x,
-            y: self.y == other.y,
-            z: self.z == other.z,
-        }
-    }
-
-    /// Returns vector with results of "not equal" operation on each component.
-    #[inline]
-    pub fn not_equal(&self, other: Self) -> BoolVector3D {
-        BoolVector3D {
-            x: self.x != other.x,
-            y: self.y != other.y,
-            z: self.z != other.z,
-        }
-    }
-}
 
 /// Convenience constructor.
 #[inline]
