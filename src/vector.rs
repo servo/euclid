@@ -78,19 +78,15 @@ impl<T, U> serde::Serialize for Vector2D<T, U>
     }
 }
 
-impl<T, U> Eq for Vector2D<T, U> where T: Eq {}
+impl<T: Eq, U> Eq for Vector2D<T, U> {}
 
-impl<T, U> PartialEq for Vector2D<T, U>
-    where T: PartialEq
-{
+impl<T: PartialEq, U> PartialEq for Vector2D<T, U> {
     fn eq(&self, other: &Self) -> bool {
         self.x == other.x && self.y == other.y
     }
 }
 
-impl<T, U> Hash for Vector2D<T, U>
-    where T: Hash
-{
+impl<T: Hash, U> Hash for Vector2D<T, U> {
     fn hash<H: ::core::hash::Hasher>(&self, h: &mut H) {
         self.x.hash(h);
         self.y.hash(h);
@@ -804,19 +800,15 @@ impl<T, U> serde::Serialize for Vector3D<T, U>
     }
 }
 
-impl<T, U> Eq for Vector3D<T, U> where T: Eq {}
+impl<T: Eq, U> Eq for Vector3D<T, U> {}
 
-impl<T, U> PartialEq for Vector3D<T, U>
-    where T: PartialEq
-{
+impl<T: PartialEq, U> PartialEq for Vector3D<T, U> {
     fn eq(&self, other: &Self) -> bool {
         self.x == other.x && self.y == other.y && self.z == other.z
     }
 }
 
-impl<T, U> Hash for Vector3D<T, U>
-    where T: Hash
-{
+impl<T: Hash, U> Hash for Vector3D<T, U> {
     fn hash<H: ::core::hash::Hasher>(&self, h: &mut H) {
         self.x.hash(h);
         self.y.hash(h);
