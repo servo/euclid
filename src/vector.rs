@@ -153,9 +153,24 @@ impl<T, U> Vector2D<T, U> {
 
     /// Computes the vector with absolute values of each component.
     ///
-    /// For `f32` and `f64`, `NaN` will be returned for component if the component is `NaN`.
+    /// # Example
     ///
-    /// For signed integers, `::MIN` will be returned for component if the component is `::MIN`.
+    /// ```rust
+    /// # use std::{i32, f32};
+    /// # use euclid::vec2;
+    /// enum U {}
+    ///
+    /// assert_eq!(vec2::<_, U>(-1, 2).abs(), vec2(1, 2));
+    ///
+    /// let vec = vec2::<_, U>(f32::NAN, -f32::MAX).abs();
+    /// assert!(vec.x.is_nan());
+    /// assert_eq!(vec.y, f32::MAX);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// The behavior for each component follows the scalar type's implementation of
+    /// `num_traits::Signed::abs`.
     pub fn abs(&self) -> Self
     where
         T: Signed,
@@ -915,9 +930,25 @@ impl<T, U> Vector3D<T, U> {
 
     /// Computes the vector with absolute values of each component.
     ///
-    /// For `f32` and `f64`, `NaN` will be returned for component if the component is `NaN`.
+    /// # Example
     ///
-    /// For signed integers, `::MIN` will be returned for component if the component is `::MIN`.
+    /// ```rust
+    /// # use std::{i32, f32};
+    /// # use euclid::vec3;
+    /// enum U {}
+    ///
+    /// assert_eq!(vec3::<_, U>(-1, 0, 2).abs(), vec3(1, 0, 2));
+    ///
+    /// let vec = vec3::<_, U>(f32::NAN, 0.0, -f32::MAX).abs();
+    /// assert!(vec.x.is_nan());
+    /// assert_eq!(vec.y, 0.0);
+    /// assert_eq!(vec.z, f32::MAX);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// The behavior for each component follows the scalar type's implementation of
+    /// `num_traits::Signed::abs`.
     pub fn abs(&self) -> Self
     where
         T: Signed,
