@@ -34,6 +34,15 @@ impl<T, Src, Dst> RigidTransform3D<T, Src, Dst> {
     }
 }
 
+impl<T: Copy, Src, Dst> RigidTransform3D<T, Src, Dst> {
+    pub fn cast_unit<Src2, Dst2>(&self) -> RigidTransform3D<T, Src2, Dst2> {
+        RigidTransform3D {
+            rotation: self.rotation.cast_unit(),
+            translation: self.translation.cast_unit(),
+        }
+    }
+}
+
 impl<T: Float + ApproxEq<T>, Src, Dst> RigidTransform3D<T, Src, Dst> {
     /// Construct an identity transform
     #[inline]
