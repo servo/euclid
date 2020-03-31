@@ -83,6 +83,16 @@ impl<T, Src, Dst> Rotation2D<T, Src, Dst> {
     }
 }
 
+impl<T: Copy, Src, Dst> Rotation2D<T, Src, Dst> {
+    #[inline]
+    pub fn cast_unit<Src2, Dst2>(&self) -> Rotation2D<T, Src2, Dst2> {
+        Rotation2D {
+            angle: self.angle,
+            _unit: PhantomData
+        }
+    }
+}
+
 impl<T, Src, Dst> Rotation2D<T, Src, Dst>
 where
     T: Clone,
@@ -281,6 +291,17 @@ where
     #[inline]
     pub fn vector_part(&self) -> Vector3D<T, UnknownUnit> {
         vec3(self.i, self.j, self.k)
+    }
+
+    #[inline]
+    pub fn cast_unit<Src2, Dst2>(&self) -> Rotation3D<T, Src2, Dst2> {
+        Rotation3D {
+            i: self.i,
+            j: self.j,
+            k: self.k,
+            r: self.r,
+            _unit: PhantomData
+        }
     }
 }
 
