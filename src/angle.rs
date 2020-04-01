@@ -12,6 +12,7 @@ use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, Sub, S
 use core::cmp::{Eq, PartialEq};
 use core::hash::{Hash};
 use trig::Trig;
+use approxeq::ApproxEq;
 #[cfg(feature = "serde")]
 use serde;
 
@@ -181,6 +182,18 @@ impl<T: Neg<Output = T>> Neg for Angle<T> {
     type Output = Self;
     fn neg(self) -> Self {
         Angle::radians(-self.radians)
+    }
+}
+
+impl<T: ApproxEq<T>> ApproxEq<T> for Angle<T> {
+    #[inline]
+    fn approx_epsilon() -> T {
+        T::approx_epsilon()
+    }
+
+    #[inline]
+    fn approx_eq_eps(&self, other: &Angle<T>, approx_epsilon: &T) -> bool {
+        self.radians.approx_eq_eps(&other.radians, approx_epsilon)
     }
 }
 
