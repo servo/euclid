@@ -93,13 +93,25 @@ mint_vec!(Point2D[x, y] = Point2);
 
 impl<T: fmt::Debug, U> fmt::Debug for Point2D<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "({:?},{:?})", self.x, self.y)
+        write!(f, "(")?;
+        fmt::Debug::fmt(&self.x, f)?;
+        write!(f, ",")?;
+        fmt::Debug::fmt(&self.y, f)?;
+        write!(f, ")")?;
+
+        Ok(())
     }
 }
 
 impl<T: fmt::Display, U> fmt::Display for Point2D<T, U> {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        write!(formatter, "({},{})", self.x, self.y)
+        write!(formatter, "(")?;
+        fmt::Display::fmt(&self.x, formatter)?;
+        write!(formatter, ",")?;
+        fmt::Display::fmt(&self.y, formatter)?;
+        write!(formatter, ")")?;
+
+        Ok(())
     }
 }
 
@@ -763,13 +775,29 @@ impl<T, U> Hash for Point3D<T, U>
 
 impl<T: fmt::Debug, U> fmt::Debug for Point3D<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "({:?},{:?},{:?})", self.x, self.y, self.z)
+        write!(f, "(")?;
+        fmt::Debug::fmt(&self.x, f)?;
+        write!(f, ",")?;
+        fmt::Debug::fmt(&self.y, f)?;
+        write!(f, ",")?;
+        fmt::Debug::fmt(&self.z, f)?;
+        write!(f, ")")?;
+
+        Ok(())
     }
 }
 
 impl<T: fmt::Display, U> fmt::Display for Point3D<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "({},{},{})", self.x, self.y, self.z)
+        write!(f, "(")?;
+        fmt::Display::fmt(&self.x, f)?;
+        write!(f, ",")?;
+        fmt::Display::fmt(&self.y, f)?;
+        write!(f, ",")?;
+        fmt::Display::fmt(&self.z, f)?;
+        write!(f, ")")?;
+
+        Ok(())
     }
 }
 
@@ -1670,6 +1698,17 @@ mod point2d {
             p1 /= scale;
 
             assert_eq!(p1, Point2DMm::new(1.0, 2.0));
+        }
+
+        #[test]
+        pub fn test_point_debug_formatting() {
+            let n = 1.23456789;
+            let p1 = Point2D::new(n, -n);
+            let should_be = format!("({:.4},{:.4})", n, -n);
+
+            let got = format!("{:.4?}", p1);
+
+            assert_eq!(got, should_be);
         }
     }
 }
