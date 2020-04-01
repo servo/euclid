@@ -12,6 +12,7 @@ use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, Sub, S
 use core::cmp::{Eq, PartialEq};
 use core::hash::{Hash};
 use trig::Trig;
+use approxeq::ApproxEq;
 #[cfg(feature = "serde")]
 use serde;
 
@@ -184,61 +185,65 @@ impl<T: Neg<Output = T>> Neg for Angle<T> {
     }
 }
 
+impl<T: ApproxEq<T>> ApproxEq<T> for Angle<T> {
+    #[inline]
+    fn approx_epsilon() -> T {
+        T::approx_epsilon()
+    }
+
+    #[inline]
+    fn approx_eq_eps(&self, other: &Angle<T>, approx_epsilon: &T) -> bool {
+        self.radians.approx_eq_eps(&other.radians, approx_epsilon)
+    }
+}
+
 #[test]
 fn wrap_angles() {
-    use approxeq::ApproxEq;
     use core::f32::consts::{FRAC_PI_2, PI};
 
-    assert!(Angle::radians(0.0).positive().radians.approx_eq(&0.0));
+    assert!(Angle::radians(0.0).positive().approx_eq(&Angle::zero()));
     assert!(
         Angle::radians(FRAC_PI_2)
             .positive()
-            .radians
-            .approx_eq(&FRAC_PI_2)
+            .approx_eq(&Angle::frac_pi_2())
     );
     assert!(
         Angle::radians(-FRAC_PI_2)
             .positive()
-            .radians
-            .approx_eq(&(3.0 * FRAC_PI_2))
+            .approx_eq(&Angle::radians(3.0 * FRAC_PI_2))
     );
     assert!(
         Angle::radians(3.0 * FRAC_PI_2)
             .positive()
-            .radians
-            .approx_eq(&(3.0 * FRAC_PI_2))
+            .approx_eq(&Angle::radians(3.0 * FRAC_PI_2))
     );
     assert!(
         Angle::radians(5.0 * FRAC_PI_2)
             .positive()
-            .radians
-            .approx_eq(&FRAC_PI_2)
+            .approx_eq(&Angle::frac_pi_2())
     );
-    assert!(Angle::radians(2.0 * PI).positive().radians.approx_eq(&0.0));
-    assert!(Angle::radians(-2.0 * PI).positive().radians.approx_eq(&0.0));
-    assert!(Angle::radians(PI).positive().radians.approx_eq(&PI));
-    assert!(Angle::radians(-PI).positive().radians.approx_eq(&PI));
+    assert!(Angle::radians(2.0 * PI).positive().approx_eq(&Angle::zero()));
+    assert!(Angle::radians(-2.0 * PI).positive().approx_eq(&Angle::zero()));
+    assert!(Angle::radians(PI).positive().approx_eq(&Angle::pi()));
+    assert!(Angle::radians(-PI).positive().approx_eq(&Angle::pi()));
 
     assert!(
         Angle::radians(FRAC_PI_2)
             .signed()
-            .radians
-            .approx_eq(&FRAC_PI_2)
+            .approx_eq(&Angle::frac_pi_2())
     );
     assert!(
         Angle::radians(3.0 * FRAC_PI_2)
             .signed()
-            .radians
-            .approx_eq(&-FRAC_PI_2)
+            .approx_eq(&-Angle::frac_pi_2())
     );
     assert!(
         Angle::radians(5.0 * FRAC_PI_2)
             .signed()
-            .radians
-            .approx_eq(&FRAC_PI_2)
+            .approx_eq(&Angle::frac_pi_2())
     );
-    assert!(Angle::radians(2.0 * PI).signed().radians.approx_eq(&0.0));
-    assert!(Angle::radians(-2.0 * PI).signed().radians.approx_eq(&0.0));
-    assert!(Angle::radians(-PI).signed().radians.approx_eq(&PI));
-    assert!(Angle::radians(PI).signed().radians.approx_eq(&PI));
+    assert!(Angle::radians(2.0 * PI).signed().approx_eq(&Angle::zero()));
+    assert!(Angle::radians(-2.0 * PI).signed().approx_eq(&Angle::zero()));
+    assert!(Angle::radians(-PI).signed().approx_eq(&Angle::pi()));
+    assert!(Angle::radians(PI).signed().approx_eq(&Angle::pi()));
 }
