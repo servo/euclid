@@ -10,6 +10,7 @@
 
 use scale::Scale;
 use num::Zero;
+use approxeq::ApproxEq;
 
 use num_traits::{NumCast, Saturating};
 use num::One;
@@ -284,6 +285,18 @@ where
     pub fn lerp(&self, other: Self, t: T) -> Self {
         let one_t = T::one() - t;
         Length::new(one_t * self.get() + t * other.get())
+    }
+}
+
+impl<U, T: ApproxEq<T>> ApproxEq<T> for Length<T, U> {
+    #[inline]
+    fn approx_epsilon() -> T {
+        T::approx_epsilon()
+    }
+
+    #[inline]
+    fn approx_eq_eps(&self, other: &Length<T, U>, approx_epsilon: &T) -> bool {
+        self.0.approx_eq_eps(&other.0, approx_epsilon)
     }
 }
 
