@@ -103,13 +103,25 @@ impl<T: Zero, U> Zero for Vector2D<T, U> {
 
 impl<T: fmt::Debug, U> fmt::Debug for Vector2D<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "({:?},{:?})", self.x, self.y)
+        write!(f, "(")?;
+        fmt::Debug::fmt(&self.x, f)?;
+        write!(f, ",")?;
+        fmt::Debug::fmt(&self.y, f)?;
+        write!(f, ")")?;
+
+        Ok(())
     }
 }
 
 impl<T: fmt::Display, U> fmt::Display for Vector2D<T, U> {
-    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        write!(formatter, "({},{})", self.x, self.y)
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "(")?;
+        fmt::Display::fmt(&self.x, f)?;
+        write!(f, ",")?;
+        fmt::Display::fmt(&self.y, f)?;
+        write!(f, ")")?;
+
+        Ok(())
     }
 }
 
@@ -879,13 +891,29 @@ impl<T: Zero, U> Zero for Vector3D<T, U> {
 
 impl<T: fmt::Debug, U> fmt::Debug for Vector3D<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "({:?},{:?},{:?})", self.x, self.y, self.z)
+        write!(f, "(")?;
+        fmt::Debug::fmt(&self.x, f)?;
+        write!(f, ",")?;
+        fmt::Debug::fmt(&self.y, f)?;
+        write!(f, ",")?;
+        fmt::Debug::fmt(&self.z, f)?;
+        write!(f, ")")?;
+
+        Ok(())
     }
 }
 
 impl<T: fmt::Display, U> fmt::Display for Vector3D<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "({},{},{})", self.x, self.y, self.z)
+        write!(f, "(")?;
+        fmt::Display::fmt(&self.x, f)?;
+        write!(f, ",")?;
+        fmt::Display::fmt(&self.y, f)?;
+        write!(f, ",")?;
+        fmt::Display::fmt(&self.z, f)?;
+        write!(f, ")")?;
+
+        Ok(())
     }
 }
 
