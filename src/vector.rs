@@ -33,9 +33,9 @@ use serde;
 /// A 2d Vector tagged with a unit.
 #[repr(C)]
 pub struct Vector2D<T, U> {
-    /// The `x` (traditionally, horizontal) coordinate
+    /// The `x` (traditionally, horizontal) coordinate.
     pub x: T,
-    /// The `y` (traditionally, vertical) coordinate
+    /// The `y` (traditionally, vertical) coordinate.
     pub y: T,
     #[doc(hidden)]
     pub _unit: PhantomData<U>,
@@ -234,7 +234,7 @@ impl<T: Copy, U> Vector2D<T, U> {
         vec2(self.x, self.y)
     }
 
-    /// Cast the unit
+    /// Cast the unit.
     #[inline]
     pub fn cast_unit<V>(&self) -> Vector2D<T, V> {
         vec2(self.x, self.y)
@@ -343,7 +343,7 @@ where
         + One
         + Zero
 {
-    /// Creates translation by this vector in vector units
+    /// Creates translation by this vector in vector units.
     #[inline]
     pub fn to_transform(&self) -> Transform2D<T, U, U> {
         Transform2D::create_translation(self.x, self.y)
@@ -355,7 +355,7 @@ where
     T: Copy + Mul<T, Output = T> + Add<T, Output = T>,
 {
 
-    /// Returns length square.
+    /// Returns the vector's length squared.
     #[inline]
     pub fn square_length(&self) -> T {
         self.x * self.x + self.y * self.y
@@ -390,7 +390,7 @@ impl<T: Float, U> Vector2D<T, U> {
         self.square_length().sqrt()
     }
 
-    /// Returns the vector with length of one unit
+    /// Returns the vector with length of one unit.
     #[inline]
     #[must_use]
     pub fn normalize(self) -> Self {
@@ -562,7 +562,7 @@ impl<T: NumCast + Copy, U> Vector2D<T, U> {
         }
     }
 
-    // Convenience functions for common casts
+    // Convenience functions for common casts.
 
     /// Cast into an `f32` vector.
     #[inline]
@@ -802,11 +802,11 @@ impl<T, U> From<Size2D<T, U>> for Vector2D<T, U> {
 /// A 3d Vector tagged with a unit.
 #[repr(C)]
 pub struct Vector3D<T, U> {
-    /// The `x` (traditionally, horizontal) coordinate
+    /// The `x` (traditionally, horizontal) coordinate.
     pub x: T,
-    /// The `y` (traditionally, vertical) coordinate
+    /// The `y` (traditionally, vertical) coordinate.
     pub y: T,
-    /// The `z` (traditionally, depth) coordinate
+    /// The `z` (traditionally, depth) coordinate.
     pub z: T,
     #[doc(hidden)]
     pub _unit: PhantomData<U>,
@@ -1039,7 +1039,7 @@ impl<T: Copy, U> Vector3D<T, U> {
         vec3(self.x, self.y, self.z)
     }
 
-    /// Cast the unit
+    /// Cast the unit.
     #[inline]
     pub fn cast_unit<V>(&self) -> Vector3D<T, V> {
         vec3(self.x, self.y, self.z)
@@ -1133,7 +1133,7 @@ impl<T, U> Vector3D<T, U>
 where
     T: Copy + Mul<T, Output = T> + Add<T, Output = T>
 {
-    /// Returns length square.
+    /// Returns the vector's length squared.
     #[inline]
     pub fn square_length(&self) -> T {
         self.x * self.x + self.y * self.y + self.z * self.z
@@ -1356,7 +1356,7 @@ impl<T: NumCast + Copy, U> Vector3D<T, U> {
         }
     }
 
-    // Convenience functions for common casts
+    // Convenience functions for common casts.
 
     /// Cast into an `f32` vector.
     #[inline]
@@ -1601,29 +1601,18 @@ impl<T, U> From<(T, T, T)> for Vector3D<T, U> {
 }
 
 
-/// Result of boolean operations on [`Size2D`] or [`Vector2D`].
-///
-/// [`Size2D`]: struct.Size2D.html
-/// [`Vector2D`]: struct.Vector2D.html
+/// A 2d vector of booleans, useful for component-wise logic operations.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct BoolVector2D {
-    /// Result of boolean operation on `x` vector coordinates or `width` component of size
     pub x: bool,
-    /// Result of boolean operation on `y` vector coordinates or `height` component of size
     pub y: bool,
 }
 
-/// Result of boolean operations on [`Size3D`] or [`Vector3D`].
-///
-/// [`Size3D`]: struct.Size3D.html
-/// [`Vector3D`]: struct.Vector3D.html
+/// A 3d vector of booleans, useful for component-wise logic operations.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct BoolVector3D {
-    /// Result of boolean operation on `x` vector coordinates or `width` component of size
     pub x: bool,
-    /// Result of boolean operation on `y` vector coordinates or `height` component of size
     pub y: bool,
-    /// Result of boolean operation on `z` vector coordinates or `depth` component of size
     pub z: bool,
 }
 
@@ -1788,7 +1777,7 @@ impl BoolVector3D {
         )
     }
 
-    /// Returns a 2d vector using this vector's x and y coordinates
+    /// Returns a 2d vector using this vector's x and y coordinates.
     #[inline]
     pub fn xy(&self) -> BoolVector2D {
         BoolVector2D {
@@ -1797,7 +1786,7 @@ impl BoolVector3D {
         }
     }
 
-    /// Returns a 2d vector using this vector's x and z coordinates
+    /// Returns a 2d vector using this vector's x and z coordinates.
     #[inline]
     pub fn xz(&self) -> BoolVector2D {
         BoolVector2D {
@@ -1806,7 +1795,7 @@ impl BoolVector3D {
         }
     }
 
-    /// Returns a 2d vector using this vector's y and z coordinates
+    /// Returns a 2d vector using this vector's y and z coordinates.
     #[inline]
     pub fn yz(&self) -> BoolVector2D {
         BoolVector2D {
