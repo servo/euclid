@@ -395,7 +395,7 @@ where
 
     #[inline]
     pub fn square_norm(&self) -> T {
-        (self.i * self.i + self.j * self.j + self.k * self.k + self.r * self.r)
+        self.i * self.i + self.j * self.j + self.k * self.k + self.r * self.r
     }
 
     /// Returns a unit quaternion from this one.
