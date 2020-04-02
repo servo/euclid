@@ -97,9 +97,7 @@ impl<T: fmt::Debug, U> fmt::Debug for Size2D<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt::Debug::fmt(&self.width, f)?;
         write!(f, "x")?;
-        fmt::Debug::fmt(&self.height, f)?;
-
-        Ok(())
+        fmt::Debug::fmt(&self.height, f)
     }
 }
 
@@ -109,9 +107,7 @@ impl<T: fmt::Display, U> fmt::Display for Size2D<T, U> {
         fmt::Display::fmt(&self.width, f)?;
         write!(f, "x")?;
         fmt::Display::fmt(&self.height, f)?;
-        write!(f, ")")?;
-
-        Ok(())
+        write!(f, ")")
     }
 }
 
@@ -944,9 +940,7 @@ impl<T: fmt::Debug, U> fmt::Debug for Size3D<T, U> {
         write!(f, "x")?;
         fmt::Debug::fmt(&self.height, f)?;
         write!(f, "x")?;
-        fmt::Debug::fmt(&self.depth, f)?;
-
-        Ok(())
+        fmt::Debug::fmt(&self.depth, f)
     }
 }
 
@@ -958,9 +952,7 @@ impl<T: fmt::Display, U> fmt::Display for Size3D<T, U> {
         fmt::Display::fmt(&self.height, f)?;
         write!(f, "x")?;
         fmt::Display::fmt(&self.depth, f)?;
-        write!(f, ")")?;
-
-        Ok(())
+        write!(f, ")")
     }
 }
 

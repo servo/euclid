@@ -103,13 +103,10 @@ impl<T: Zero, U> Zero for Vector2D<T, U> {
 
 impl<T: fmt::Debug, U> fmt::Debug for Vector2D<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "(")?;
-        fmt::Debug::fmt(&self.x, f)?;
-        write!(f, ",")?;
-        fmt::Debug::fmt(&self.y, f)?;
-        write!(f, ")")?;
-
-        Ok(())
+        f.debug_tuple("")
+            .field(&self.x)
+            .field(&self.y)
+            .finish()
     }
 }
 
@@ -891,15 +888,11 @@ impl<T: Zero, U> Zero for Vector3D<T, U> {
 
 impl<T: fmt::Debug, U> fmt::Debug for Vector3D<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "(")?;
-        fmt::Debug::fmt(&self.x, f)?;
-        write!(f, ",")?;
-        fmt::Debug::fmt(&self.y, f)?;
-        write!(f, ",")?;
-        fmt::Debug::fmt(&self.z, f)?;
-        write!(f, ")")?;
-
-        Ok(())
+        f.debug_tuple("")
+            .field(&self.x)
+            .field(&self.y)
+            .field(&self.z)
+            .finish()
     }
 }
 
@@ -911,9 +904,7 @@ impl<T: fmt::Display, U> fmt::Display for Vector3D<T, U> {
         fmt::Display::fmt(&self.y, f)?;
         write!(f, ",")?;
         fmt::Display::fmt(&self.z, f)?;
-        write!(f, ")")?;
-
-        Ok(())
+        write!(f, ")")
     }
 }
 

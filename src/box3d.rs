@@ -61,13 +61,10 @@ impl<T: Eq, U> Eq for Box3D<T, U> {}
 
 impl<T: fmt::Debug, U> fmt::Debug for Box3D<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Box3D(")?;
-        fmt::Debug::fmt(&self.min, f)?;
-        write!(f, ", ")?;
-        fmt::Debug::fmt(&self.max, f)?;
-        write!(f, ")")?;
-
-        Ok(())
+        f.debug_tuple("Box3D")
+            .field(&self.min)
+            .field(&self.max)
+            .finish()
     }
 }
 
@@ -77,9 +74,7 @@ impl<T: fmt::Display, U> fmt::Display for Box3D<T, U> {
         fmt::Display::fmt(&self.min, f)?;
         write!(f, ", ")?;
         fmt::Display::fmt(&self.max, f)?;
-        write!(f, ")")?;
-
-        Ok(())
+        write!(f, ")")
     }
 }
 

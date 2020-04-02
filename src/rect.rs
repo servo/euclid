@@ -67,9 +67,7 @@ impl<T: fmt::Debug, U> fmt::Debug for Rect<T, U> {
         fmt::Debug::fmt(&self.size, f)?;
         write!(f, " at ")?;
         fmt::Debug::fmt(&self.origin, f)?;
-        write!(f, ")")?;
-
-        Ok(())
+        write!(f, ")")
     }
 }
 
@@ -79,9 +77,7 @@ impl<T: fmt::Display, U> fmt::Display for Rect<T, U> {
         fmt::Display::fmt(&self.size, f)?;
         write!(f, " at ")?;
         fmt::Display::fmt(&self.origin, f)?;
-        write!(f, ")")?;
-
-        Ok(())
+        write!(f, ")")
     }
 }
 

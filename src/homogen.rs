@@ -155,17 +155,12 @@ impl<T: One, U> From<Point3D<T, U>> for HomogeneousVector<T, U> {
 
 impl<T: fmt::Debug, U> fmt::Debug for HomogeneousVector<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "(")?;
-        fmt::Debug::fmt(&self.x, f)?;
-        write!(f, ",")?;
-        fmt::Debug::fmt(&self.y, f)?;
-        write!(f, ",")?;
-        fmt::Debug::fmt(&self.z, f)?;
-        write!(f, ",")?;
-        fmt::Debug::fmt(&self.w, f)?;
-        write!(f, ")")?;
-
-        Ok(())
+        f.debug_tuple("")
+            .field(&self.x)
+            .field(&self.y)
+            .field(&self.z)
+            .field(&self.w)
+            .finish()
     }
 }
 
@@ -179,9 +174,7 @@ impl<T: fmt::Display, U> fmt::Display for HomogeneousVector<T, U> {
         fmt::Display::fmt(&self.z, f)?;
         write!(f, ",")?;
         fmt::Display::fmt(&self.w, f)?;
-        write!(f, ")")?;
-
-        Ok(())
+        write!(f, ")")
     }
 }
 
