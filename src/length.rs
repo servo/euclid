@@ -77,7 +77,7 @@ where
 }
 
 impl<T, U> Length<T, U> {
-    /// Associates a number with a unit of measure, creating type-safe wrapper
+    /// Associate a value with a unit of measure.
     #[inline]
     pub const fn new(x: T) -> Self {
         Length(x, PhantomData)
@@ -85,7 +85,7 @@ impl<T, U> Length<T, U> {
 }
 
 impl<T: Clone, U> Length<T, U> {
-    /// Unpacks this type-safe wrapper into underlying value, cloning its
+    /// Unpack the underlying value from the wrapper, cloning it.
     pub fn get(&self) -> T {
         self.0.clone()
     }
