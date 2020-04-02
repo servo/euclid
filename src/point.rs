@@ -339,23 +339,20 @@ impl<T: Copy, U> Point2D<T, U> {
 
     /// Linearly interpolate between this point and another point.
     ///
-    /// When `t` is `One::one()`, returned value equals to `other`,
-    /// otherwise equals to `self`.
-    ///
     /// # Example
     ///
     /// ```rust
     /// use euclid::point2;
     /// use euclid::default::Point2D;
     ///
-    /// let first: Point2D<_> = point2(0.0, 10.0);
-    /// let last:  Point2D<_> = point2(8.0, -4.0);
+    /// let from: Point2D<_> = point2(0.0, 10.0);
+    /// let to:  Point2D<_> = point2(8.0, -4.0);
     ///
-    /// assert_eq!(first.lerp(last, -1.0), point2(-8.0,  24.0));
-    /// assert_eq!(first.lerp(last,  0.0), point2( 0.0,  10.0));
-    /// assert_eq!(first.lerp(last,  0.5), point2( 4.0,   3.0));
-    /// assert_eq!(first.lerp(last,  1.0), point2( 8.0,  -4.0));
-    /// assert_eq!(first.lerp(last,  2.0), point2(16.0, -18.0));
+    /// assert_eq!(from.lerp(to, -1.0), point2(-8.0,  24.0));
+    /// assert_eq!(from.lerp(to,  0.0), point2( 0.0,  10.0));
+    /// assert_eq!(from.lerp(to,  0.5), point2( 4.0,   3.0));
+    /// assert_eq!(from.lerp(to,  1.0), point2( 8.0,  -4.0));
+    /// assert_eq!(from.lerp(to,  2.0), point2(16.0, -18.0));
     /// ```
     #[inline]
     pub fn lerp(&self, other: Self, t: T) -> Self
@@ -1037,23 +1034,20 @@ impl<T: Copy, U> Point3D<T, U> {
 
     /// Linearly interpolate between this point and another point.
     ///
-    /// When `t` is `One::one()`, returned value equals to `other`,
-    /// otherwise equals to `self`.
-    ///
     /// # Example
     ///
     /// ```rust
     /// use euclid::point3;
     /// use euclid::default::Point3D;
     ///
-    /// let first: Point3D<_> = point3(0.0, 10.0, -1.0);
-    /// let last:  Point3D<_> = point3(8.0, -4.0,  0.0);
+    /// let from: Point3D<_> = point3(0.0, 10.0, -1.0);
+    /// let to:  Point3D<_> = point3(8.0, -4.0,  0.0);
     ///
-    /// assert_eq!(first.lerp(last, -1.0), point3(-8.0,  24.0, -2.0));
-    /// assert_eq!(first.lerp(last,  0.0), point3( 0.0,  10.0, -1.0));
-    /// assert_eq!(first.lerp(last,  0.5), point3( 4.0,   3.0, -0.5));
-    /// assert_eq!(first.lerp(last,  1.0), point3( 8.0,  -4.0,  0.0));
-    /// assert_eq!(first.lerp(last,  2.0), point3(16.0, -18.0,  1.0));
+    /// assert_eq!(from.lerp(to, -1.0), point3(-8.0,  24.0, -2.0));
+    /// assert_eq!(from.lerp(to,  0.0), point3( 0.0,  10.0, -1.0));
+    /// assert_eq!(from.lerp(to,  0.5), point3( 4.0,   3.0, -0.5));
+    /// assert_eq!(from.lerp(to,  1.0), point3( 8.0,  -4.0,  0.0));
+    /// assert_eq!(from.lerp(to,  2.0), point3(16.0, -18.0,  1.0));
     /// ```
     #[inline]
     pub fn lerp(&self, other: Self, t: T) -> Self

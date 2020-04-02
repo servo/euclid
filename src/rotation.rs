@@ -456,9 +456,6 @@ where
     }
 
     /// Basic Linear interpolation between this rotation and another rotation.
-    ///
-    /// When `t` is `One::one()`, returned value equals to `other`,
-    /// otherwise equals to `self`.
     #[inline]
     pub fn lerp(&self, other: &Self, t: T) -> Self {
         let one_t = T::one() - t;
