@@ -155,13 +155,33 @@ impl<T: One, U> From<Point3D<T, U>> for HomogeneousVector<T, U> {
 
 impl<T: fmt::Debug, U> fmt::Debug for HomogeneousVector<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "({:?},{:?},{:?},{:?})", self.x, self.y, self.z, self.w)
+        write!(f, "(")?;
+        fmt::Debug::fmt(&self.x, f)?;
+        write!(f, ",")?;
+        fmt::Debug::fmt(&self.y, f)?;
+        write!(f, ",")?;
+        fmt::Debug::fmt(&self.z, f)?;
+        write!(f, ",")?;
+        fmt::Debug::fmt(&self.w, f)?;
+        write!(f, ")")?;
+
+        Ok(())
     }
 }
 
 impl<T: fmt::Display, U> fmt::Display for HomogeneousVector<T, U> {
-    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        write!(formatter, "({},{},{},{})", self.x, self.y, self.z, self.w)
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "(")?;
+        fmt::Display::fmt(&self.x, f)?;
+        write!(f, ",")?;
+        fmt::Display::fmt(&self.y, f)?;
+        write!(f, ",")?;
+        fmt::Display::fmt(&self.z, f)?;
+        write!(f, ",")?;
+        fmt::Display::fmt(&self.w, f)?;
+        write!(f, ")")?;
+
+        Ok(())
     }
 }
 
