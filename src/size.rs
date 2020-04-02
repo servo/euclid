@@ -450,7 +450,7 @@ impl<T: PartialEq, U> Size2D<T, U> {
 
 
 impl<T: Round, U> Round for Size2D<T, U> {
-    /// See [`Size2D::round()`](#method.round)
+    /// See [`Size2D::round()`](#method.round).
     #[inline]
     fn round(self) -> Self {
         (&self).round()
@@ -458,7 +458,7 @@ impl<T: Round, U> Round for Size2D<T, U> {
 }
 
 impl<T: Ceil, U> Ceil for Size2D<T, U> {
-    /// See [`Size2D::ceil()`](#method.ceil)
+    /// See [`Size2D::ceil()`](#method.ceil).
     #[inline]
     fn ceil(self) -> Self {
         (&self).ceil()
@@ -466,7 +466,7 @@ impl<T: Ceil, U> Ceil for Size2D<T, U> {
 }
 
 impl<T: Floor, U> Floor for Size2D<T, U> {
-    /// See [`Size2D::floor()`](#method.floor)
+    /// See [`Size2D::floor()`](#method.floor).
     #[inline]
     fn floor(self) -> Self {
         (&self).floor()
@@ -1279,7 +1279,7 @@ impl<T: PartialEq, U> Size3D<T, U> {
 
 
 impl<T: Round, U> Round for Size3D<T, U> {
-    /// See [`Size3D::round()`](#method.round)
+    /// See [`Size3D::round()`](#method.round).
     #[inline]
     fn round(self) -> Self {
         (&self).round()
@@ -1287,7 +1287,7 @@ impl<T: Round, U> Round for Size3D<T, U> {
 }
 
 impl<T: Ceil, U> Ceil for Size3D<T, U> {
-    /// See [`Size3D::ceil()`](#method.ceil)
+    /// See [`Size3D::ceil()`](#method.ceil).
     #[inline]
     fn ceil(self) -> Self {
         (&self).ceil()
@@ -1295,7 +1295,7 @@ impl<T: Ceil, U> Ceil for Size3D<T, U> {
 }
 
 impl<T: Floor, U> Floor for Size3D<T, U> {
-    /// See [`Size3D::floor()`](#method.floor)
+    /// See [`Size3D::floor()`](#method.floor).
     #[inline]
     fn floor(self) -> Self {
         (&self).floor()
