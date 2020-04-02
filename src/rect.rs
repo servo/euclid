@@ -63,13 +63,25 @@ impl<T: Eq, U> Eq for Rect<T, U> {}
 
 impl<T: fmt::Debug, U> fmt::Debug for Rect<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Rect({:?} at {:?})", self.size, self.origin)
+        write!(f, "Rect(")?;
+        fmt::Debug::fmt(&self.size, f)?;
+        write!(f, " at ")?;
+        fmt::Debug::fmt(&self.origin, f)?;
+        write!(f, ")")?;
+
+        Ok(())
     }
 }
 
 impl<T: fmt::Display, U> fmt::Display for Rect<T, U> {
-    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        write!(formatter, "Rect({} at {})", self.size, self.origin)
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Rect(")?;
+        fmt::Display::fmt(&self.size, f)?;
+        write!(f, " at ")?;
+        fmt::Display::fmt(&self.origin, f)?;
+        write!(f, ")")?;
+
+        Ok(())
     }
 }
 
