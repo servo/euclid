@@ -63,13 +63,20 @@ impl<T: Eq, U> Eq for Box2D<T, U> {}
 
 impl<T: fmt::Debug, U> fmt::Debug for Box2D<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Box2D({:?}, {:?})", self.min, self.max)
+        f.debug_tuple("Box2D")
+            .field(&self.min)
+            .field(&self.max)
+            .finish()
     }
 }
 
 impl<T: fmt::Display, U> fmt::Display for Box2D<T, U> {
-    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        write!(formatter, "Box2D({}, {})", self.min, self.max)
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Box2D(")?;
+        fmt::Display::fmt(&self.min, f)?;
+        write!(f, ", ")?;
+        fmt::Display::fmt(&self.max, f)?;
+        write!(f, ")")
     }
 }
 

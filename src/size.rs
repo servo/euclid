@@ -95,13 +95,19 @@ impl<T, U> Hash for Size2D<T, U>
 
 impl<T: fmt::Debug, U> fmt::Debug for Size2D<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}×{:?}", self.width, self.height)
+        fmt::Debug::fmt(&self.width, f)?;
+        write!(f, "x")?;
+        fmt::Debug::fmt(&self.height, f)
     }
 }
 
 impl<T: fmt::Display, U> fmt::Display for Size2D<T, U> {
-    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        write!(formatter, "({}x{})", self.width, self.height)
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "(")?;
+        fmt::Display::fmt(&self.width, f)?;
+        write!(f, "x")?;
+        fmt::Display::fmt(&self.height, f)?;
+        write!(f, ")")
     }
 }
 
@@ -927,13 +933,23 @@ impl<T, U> Hash for Size3D<T, U>
 
 impl<T: fmt::Debug, U> fmt::Debug for Size3D<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}×{:?}×{:?}", self.width, self.height, self.depth)
+        fmt::Debug::fmt(&self.width, f)?;
+        write!(f, "x")?;
+        fmt::Debug::fmt(&self.height, f)?;
+        write!(f, "x")?;
+        fmt::Debug::fmt(&self.depth, f)
     }
 }
 
 impl<T: fmt::Display, U> fmt::Display for Size3D<T, U> {
-    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        write!(formatter, "({}x{}x{})", self.width, self.height, self.depth)
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "(")?;
+        fmt::Display::fmt(&self.width, f)?;
+        write!(f, "x")?;
+        fmt::Display::fmt(&self.height, f)?;
+        write!(f, "x")?;
+        fmt::Display::fmt(&self.depth, f)?;
+        write!(f, ")")
     }
 }
 

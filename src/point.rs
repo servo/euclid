@@ -93,13 +93,10 @@ mint_vec!(Point2D[x, y] = Point2);
 
 impl<T: fmt::Debug, U> fmt::Debug for Point2D<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "(")?;
-        fmt::Debug::fmt(&self.x, f)?;
-        write!(f, ",")?;
-        fmt::Debug::fmt(&self.y, f)?;
-        write!(f, ")")?;
-
-        Ok(())
+        f.debug_tuple("")
+            .field(&self.x)
+            .field(&self.y)
+            .finish()
     }
 }
 
@@ -109,9 +106,7 @@ impl<T: fmt::Display, U> fmt::Display for Point2D<T, U> {
         fmt::Display::fmt(&self.x, formatter)?;
         write!(formatter, ",")?;
         fmt::Display::fmt(&self.y, formatter)?;
-        write!(formatter, ")")?;
-
-        Ok(())
+        write!(formatter, ")")
     }
 }
 
@@ -772,15 +767,11 @@ impl<T, U> Hash for Point3D<T, U>
 
 impl<T: fmt::Debug, U> fmt::Debug for Point3D<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "(")?;
-        fmt::Debug::fmt(&self.x, f)?;
-        write!(f, ",")?;
-        fmt::Debug::fmt(&self.y, f)?;
-        write!(f, ",")?;
-        fmt::Debug::fmt(&self.z, f)?;
-        write!(f, ")")?;
-
-        Ok(())
+        f.debug_tuple("")
+            .field(&self.x)
+            .field(&self.y)
+            .field(&self.z)
+            .finish()
     }
 }
 
@@ -792,9 +783,7 @@ impl<T: fmt::Display, U> fmt::Display for Point3D<T, U> {
         fmt::Display::fmt(&self.y, f)?;
         write!(f, ",")?;
         fmt::Display::fmt(&self.z, f)?;
-        write!(f, ")")?;
-
-        Ok(())
+        write!(f, ")")
     }
 }
 
@@ -1698,7 +1687,7 @@ mod point2d {
         pub fn test_point_debug_formatting() {
             let n = 1.23456789;
             let p1 = Point2D::new(n, -n);
-            let should_be = format!("({:.4},{:.4})", n, -n);
+            let should_be = format!("({:.4}, {:.4})", n, -n);
 
             let got = format!("{:.4?}", p1);
 
