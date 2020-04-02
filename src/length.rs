@@ -77,7 +77,7 @@ where
 }
 
 impl<T, U> Length<T, U> {
-    /// Associates a number with a unit of measure, creating type-safe wrapper
+    /// Associate a value with a unit of measure.
     #[inline]
     pub const fn new(x: T) -> Self {
         Length(x, PhantomData)
@@ -85,7 +85,7 @@ impl<T, U> Length<T, U> {
 }
 
 impl<T: Clone, U> Length<T, U> {
-    /// Unpacks this type-safe wrapper into underlying value, cloning its
+    /// Unpack the underlying value from the wrapper, cloning it.
     pub fn get(&self) -> T {
         self.0.clone()
     }
@@ -98,22 +98,19 @@ impl<T: Clone, U> Length<T, U> {
 
     /// Linearly interpolate between this length and another length.
     ///
-    /// When `t` is `One::one()`, returned value equals to `other`,
-    /// otherwise equals to `self`.
-    ///
     /// # Example
     ///
     /// ```rust
     /// use euclid::default::Length;
     ///
-    /// let first = Length::new(0.0);
-    /// let last  = Length::new(8.0);
+    /// let from = Length::new(0.0);
+    /// let to = Length::new(8.0);
     ///
-    /// assert_eq!(first.lerp(last, -1.0), Length::new(-8.0));
-    /// assert_eq!(first.lerp(last,  0.0), Length::new( 0.0));
-    /// assert_eq!(first.lerp(last,  0.5), Length::new( 4.0));
-    /// assert_eq!(first.lerp(last,  1.0), Length::new( 8.0));
-    /// assert_eq!(first.lerp(last,  2.0), Length::new(16.0));
+    /// assert_eq!(from.lerp(to, -1.0), Length::new(-8.0));
+    /// assert_eq!(from.lerp(to,  0.0), Length::new( 0.0));
+    /// assert_eq!(from.lerp(to,  0.5), Length::new( 4.0));
+    /// assert_eq!(from.lerp(to,  1.0), Length::new( 8.0));
+    /// assert_eq!(from.lerp(to,  2.0), Length::new(16.0));
     /// ```
     #[inline]
     pub fn lerp(&self, other: Self, t: T) -> Self

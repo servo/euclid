@@ -244,23 +244,20 @@ impl<T: Copy, U> Size2D<T, U> {
 
     /// Linearly interpolate each component between this size and another size.
     ///
-    /// When `t` is `One::one()`, returned value equals to `other`,
-    /// otherwise equals to `self`.
-    ///
     /// # Example
     ///
     /// ```rust
     /// use euclid::size2;
     /// use euclid::default::Size2D;
     ///
-    /// let first: Size2D<_> = size2(0.0, 10.0);
-    /// let last:  Size2D<_> = size2(8.0, -4.0);
+    /// let from: Size2D<_> = size2(0.0, 10.0);
+    /// let to:  Size2D<_> = size2(8.0, -4.0);
     ///
-    /// assert_eq!(first.lerp(last, -1.0), size2(-8.0,  24.0));
-    /// assert_eq!(first.lerp(last,  0.0), size2( 0.0,  10.0));
-    /// assert_eq!(first.lerp(last,  0.5), size2( 4.0,   3.0));
-    /// assert_eq!(first.lerp(last,  1.0), size2( 8.0,  -4.0));
-    /// assert_eq!(first.lerp(last,  2.0), size2(16.0, -18.0));
+    /// assert_eq!(from.lerp(to, -1.0), size2(-8.0,  24.0));
+    /// assert_eq!(from.lerp(to,  0.0), size2( 0.0,  10.0));
+    /// assert_eq!(from.lerp(to,  0.5), size2( 4.0,   3.0));
+    /// assert_eq!(from.lerp(to,  1.0), size2( 8.0,  -4.0));
+    /// assert_eq!(from.lerp(to,  2.0), size2(16.0, -18.0));
     /// ```
     #[inline]
     pub fn lerp(&self, other: Self, t: T) -> Self
@@ -453,7 +450,7 @@ impl<T: PartialEq, U> Size2D<T, U> {
 
 
 impl<T: Round, U> Round for Size2D<T, U> {
-    /// See [`Size2D::round()`](#method.round)
+    /// See [`Size2D::round()`](#method.round).
     #[inline]
     fn round(self) -> Self {
         (&self).round()
@@ -461,7 +458,7 @@ impl<T: Round, U> Round for Size2D<T, U> {
 }
 
 impl<T: Ceil, U> Ceil for Size2D<T, U> {
-    /// See [`Size2D::ceil()`](#method.ceil)
+    /// See [`Size2D::ceil()`](#method.ceil).
     #[inline]
     fn ceil(self) -> Self {
         (&self).ceil()
@@ -469,7 +466,7 @@ impl<T: Ceil, U> Ceil for Size2D<T, U> {
 }
 
 impl<T: Floor, U> Floor for Size2D<T, U> {
-    /// See [`Size2D::floor()`](#method.floor)
+    /// See [`Size2D::floor()`](#method.floor).
     #[inline]
     fn floor(self) -> Self {
         (&self).floor()
@@ -1080,23 +1077,20 @@ impl<T: Copy, U> Size3D<T, U> {
 
     /// Linearly interpolate between this size and another size.
     ///
-    /// When `t` is `One::one()`, returned value equals to `other`,
-    /// otherwise equals to `self`.
-    ///
     /// # Example
     ///
     /// ```rust
     /// use euclid::size3;
     /// use euclid::default::Size3D;
     ///
-    /// let first: Size3D<_> = size3(0.0, 10.0, -1.0);
-    /// let last:  Size3D<_> = size3(8.0, -4.0,  0.0);
+    /// let from: Size3D<_> = size3(0.0, 10.0, -1.0);
+    /// let to:  Size3D<_> = size3(8.0, -4.0,  0.0);
     ///
-    /// assert_eq!(first.lerp(last, -1.0), size3(-8.0,  24.0, -2.0));
-    /// assert_eq!(first.lerp(last,  0.0), size3( 0.0,  10.0, -1.0));
-    /// assert_eq!(first.lerp(last,  0.5), size3( 4.0,   3.0, -0.5));
-    /// assert_eq!(first.lerp(last,  1.0), size3( 8.0,  -4.0,  0.0));
-    /// assert_eq!(first.lerp(last,  2.0), size3(16.0, -18.0,  1.0));
+    /// assert_eq!(from.lerp(to, -1.0), size3(-8.0,  24.0, -2.0));
+    /// assert_eq!(from.lerp(to,  0.0), size3( 0.0,  10.0, -1.0));
+    /// assert_eq!(from.lerp(to,  0.5), size3( 4.0,   3.0, -0.5));
+    /// assert_eq!(from.lerp(to,  1.0), size3( 8.0,  -4.0,  0.0));
+    /// assert_eq!(from.lerp(to,  2.0), size3(16.0, -18.0,  1.0));
     /// ```
     #[inline]
     pub fn lerp(&self, other: Self, t: T) -> Self
@@ -1285,7 +1279,7 @@ impl<T: PartialEq, U> Size3D<T, U> {
 
 
 impl<T: Round, U> Round for Size3D<T, U> {
-    /// See [`Size3D::round()`](#method.round)
+    /// See [`Size3D::round()`](#method.round).
     #[inline]
     fn round(self) -> Self {
         (&self).round()
@@ -1293,7 +1287,7 @@ impl<T: Round, U> Round for Size3D<T, U> {
 }
 
 impl<T: Ceil, U> Ceil for Size3D<T, U> {
-    /// See [`Size3D::ceil()`](#method.ceil)
+    /// See [`Size3D::ceil()`](#method.ceil).
     #[inline]
     fn ceil(self) -> Self {
         (&self).ceil()
@@ -1301,7 +1295,7 @@ impl<T: Ceil, U> Ceil for Size3D<T, U> {
 }
 
 impl<T: Floor, U> Floor for Size3D<T, U> {
-    /// See [`Size3D::floor()`](#method.floor)
+    /// See [`Size3D::floor()`](#method.floor).
     #[inline]
     fn floor(self) -> Self {
         (&self).floor()

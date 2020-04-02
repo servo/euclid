@@ -395,7 +395,7 @@ where
 
     #[inline]
     pub fn square_norm(&self) -> T {
-        (self.i * self.i + self.j * self.j + self.k * self.k + self.r * self.r)
+        self.i * self.i + self.j * self.j + self.k * self.k + self.r * self.r
     }
 
     /// Returns a unit quaternion from this one.
@@ -456,9 +456,6 @@ where
     }
 
     /// Basic Linear interpolation between this rotation and another rotation.
-    ///
-    /// When `t` is `One::one()`, returned value equals to `other`,
-    /// otherwise equals to `self`.
     #[inline]
     pub fn lerp(&self, other: &Self, t: T) -> Self {
         let one_t = T::one() - t;

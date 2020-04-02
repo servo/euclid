@@ -329,9 +329,6 @@ where
     T: Copy + One + Add<Output = T> + Sub<Output = T> + Mul<Output = T>,
 {
     /// Linearly interpolate between this rectangle and another rectangle.
-    ///
-    /// When `t` is `One::one()`, returned value equals to `other`,
-    /// otherwise equals to `self`.
     #[inline]
     pub fn lerp(&self, other: Self, t: T) -> Self {
         Self::new(
