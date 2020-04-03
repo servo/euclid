@@ -8,7 +8,7 @@
 // except according to those terms.
 
 use {Vector2D, Point2D, Vector3D, Point3D, Transform2D, Transform3D};
-use {Size2D, Rect, vec2, point2, vec3, point3};
+use {Box2D, Box3D, Size2D, Rect, vec2, point2, vec3, point3};
 use UnknownUnit;
 use num::*;
 use trig::Trig;
@@ -183,6 +183,18 @@ impl<T: Copy, Src, Dst> Translation2D<T, Src, Dst> {
         Rect {
             origin: self.transform_point(r.origin),
             size: self.transform_size(r.size),
+        }
+    }
+
+    /// Translate a 2D box and cast its unit.
+    #[inline]
+    pub fn transform_box(&self, r: &Box2D<T, Src>) -> Box2D<T::Output, Dst>
+    where
+        T: Add,
+    {
+        Box2D {
+            min: self.transform_point(r.min),
+            max: self.transform_point(r.max),
         }
     }
 
@@ -480,6 +492,30 @@ impl<T: Copy, Src, Dst> Translation3D<T, Src, Dst> {
         T: Add,
     {
         point2(p.x + self.x, p.y + self.y)
+    }
+
+    /// Translate a 2D box and cast its unit.
+    #[inline]
+    pub fn transform_box2d(&self, b: &Box2D<T, Src>) -> Box2D<T::Output, Dst>
+    where
+        T: Add,
+    {
+        Box2D {
+            min: self.transform_point2d(&b.min),
+            max: self.transform_point2d(&b.max),
+        }
+    }
+
+    /// Translate a 3D box and cast its unit.
+    #[inline]
+    pub fn transform_box3d(&self, b: &Box3D<T, Src>) -> Box3D<T::Output, Dst>
+    where
+        T: Add,
+    {
+        Box3D {
+            min: self.transform_point3d(&b.min),
+            max: self.transform_point3d(&b.max),
+        }
     }
 
     /// Translate a rectangle and cast its unit.
