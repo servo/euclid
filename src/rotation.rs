@@ -91,6 +91,18 @@ impl<T: Copy, Src, Dst> Rotation2D<T, Src, Dst> {
             _unit: PhantomData
         }
     }
+
+    /// Drop the units, preserving only the numeric value.
+    #[inline]
+    pub fn to_untyped(&self) -> Rotation2D<T, UnknownUnit, UnknownUnit> {
+        self.cast_unit()
+    }
+
+    /// Tag a unitless value with units.
+    #[inline]
+    pub fn from_untyped(r: &Rotation2D<T, UnknownUnit, UnknownUnit>) -> Self {
+        r.cast_unit()
+    }
 }
 
 impl<T, Src, Dst> Rotation2D<T, Src, Dst>
@@ -160,24 +172,6 @@ where
     #[inline]
     pub fn transform_vector(&self, vector: Vector2D<T, Src>) -> Vector2D<T, Dst> {
         self.transform_point(vector.to_point()).to_vector()
-    }
-
-    /// Drop the units, preserving only the numeric value.
-    #[inline]
-    pub fn to_untyped(&self) -> Rotation2D<T, UnknownUnit, UnknownUnit> {
-        Rotation2D {
-            angle: self.angle,
-            _unit: PhantomData,
-        }
-    }
-
-    /// Tag a unitless value with units.
-    #[inline]
-    pub fn from_untyped(r: &Rotation2D<T, UnknownUnit, UnknownUnit>) -> Self {
-        Rotation2D {
-            angle: r.angle,
-            _unit: PhantomData,
-        }
     }
 }
 
@@ -281,6 +275,15 @@ impl<T, Src, Dst> Rotation3D<T, Src, Dst> {
             _unit: PhantomData,
         }
     }
+
+    /// Creates the identity rotation.
+    #[inline]
+    pub fn identity() -> Self
+    where
+        T: Zero + One,
+    {
+        Self::quaternion(T::zero(), T::zero(), T::zero(), T::one())
+    }
 }
 
 impl<T, Src, Dst> Rotation3D<T, Src, Dst>
@@ -303,20 +306,24 @@ where
             _unit: PhantomData
         }
     }
+
+    /// Drop the units, preserving only the numeric value.
+    #[inline]
+    pub fn to_untyped(&self) -> Rotation3D<T, UnknownUnit, UnknownUnit> {
+        self.cast_unit()
+    }
+
+    /// Tag a unitless value with units.
+    #[inline]
+    pub fn from_untyped(r: &Rotation3D<T, UnknownUnit, UnknownUnit>) -> Self {
+        r.cast_unit()
+    }
 }
 
 impl<T, Src, Dst> Rotation3D<T, Src, Dst>
 where
     T: Float,
 {
-    /// Creates the identity rotation.
-    #[inline]
-    pub fn identity() -> Self {
-        let zero = T::zero();
-        let one = T::one();
-        Self::quaternion(zero, zero, zero, one)
-    }
-
     /// Creates a rotation around from a quaternion representation and normalizes it.
     ///
     /// The parameters are a, b, c and r compose the quaternion `a*i + b*j + c*k + r`
@@ -630,30 +637,6 @@ where
             self.k * factor,
             self.r * factor,
         )
-    }
-
-    /// Drop the units, preserving only the numeric value.
-    #[inline]
-    pub fn to_untyped(&self) -> Rotation3D<T, UnknownUnit, UnknownUnit> {
-        Rotation3D {
-            i: self.i,
-            j: self.j,
-            k: self.k,
-            r: self.r,
-            _unit: PhantomData,
-        }
-    }
-
-    /// Tag a unitless value with units.
-    #[inline]
-    pub fn from_untyped(r: &Rotation3D<T, UnknownUnit, UnknownUnit>) -> Self {
-        Rotation3D {
-            i: r.i,
-            j: r.j,
-            k: r.k,
-            r: r.r,
-            _unit: PhantomData,
-        }
     }
 }
 
