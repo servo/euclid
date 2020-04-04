@@ -115,18 +115,7 @@ where
     }
 }
 
-impl<T, Src, Dst> Rotation2D<T, Src, Dst>
-where
-    T:    Add<T, Output = T>
-        + Sub<T, Output = T>
-        + Mul<T, Output = T>
-        + Div<T, Output = T>
-        + Neg<Output = T>
-        + PartialOrd
-        + Float
-        + One
-        + Zero,
-{
+impl<T: Float, Src, Dst> Rotation2D<T, Src, Dst> {
     /// Creates a 3d rotation (around the z axis) from this 2d rotation.
     #[inline]
     pub fn to_3d(&self) -> Rotation3D<T, Src, Dst> {
