@@ -25,7 +25,8 @@ use serde;
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(bound(serialize = "T: serde::Serialize", deserialize = "T: serde::Deserialize<'de>")))]
 pub struct Rotation2D<T, Src, Dst> {
-    pub angle : T,
+    /// Angle in radians
+    pub angle: T,
     #[doc(hidden)]
     pub _unit: PhantomData<(Src, Dst)>,
 }
@@ -60,8 +61,8 @@ impl<T, Src, Dst> Hash for Rotation2D<T, Src, Dst>
 }
 
 impl<T, Src, Dst> Rotation2D<T, Src, Dst> {
-    #[inline]
     /// Creates a rotation from an angle in radians.
+    #[inline]
     pub fn new(angle: Angle<T>) -> Self {
         Rotation2D {
             angle: angle.radians,
@@ -69,6 +70,7 @@ impl<T, Src, Dst> Rotation2D<T, Src, Dst> {
         }
     }
 
+    /// Creates a rotation from an angle in radians.
     pub fn radians(angle: T) -> Self {
         Self::new(Angle::radians(angle))
     }
@@ -84,12 +86,65 @@ impl<T, Src, Dst> Rotation2D<T, Src, Dst> {
 }
 
 impl<T: Copy, Src, Dst> Rotation2D<T, Src, Dst> {
+    /// Cast the unit, preserving the numeric value.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use euclid::Rotation2D;
+    /// enum Local {}
+    /// enum World {}
+    ///
+    /// enum Local2 {}
+    /// enum World2 {}
+    ///
+    /// let to_world: Rotation2D<_, Local, World> = Rotation2D::radians(42);
+    ///
+    /// assert_eq!(to_world.angle, to_world.cast_unit::<Local2, World2>().angle);
+    /// ```
     #[inline]
     pub fn cast_unit<Src2, Dst2>(&self) -> Rotation2D<T, Src2, Dst2> {
         Rotation2D {
             angle: self.angle,
             _unit: PhantomData
         }
+    }
+
+    /// Drop the units, preserving only the numeric value.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use euclid::Rotation2D;
+    /// enum Local {}
+    /// enum World {}
+    ///
+    /// let to_world: Rotation2D<_, Local, World> = Rotation2D::radians(42);
+    ///
+    /// assert_eq!(to_world.angle, to_world.to_untyped().angle);
+    /// ```
+    #[inline]
+    pub fn to_untyped(&self) -> Rotation2D<T, UnknownUnit, UnknownUnit> {
+        self.cast_unit()
+    }
+
+    /// Tag a unitless value with units.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use euclid::Rotation2D;
+    /// use euclid::UnknownUnit;
+    /// enum Local {}
+    /// enum World {}
+    ///
+    /// let rot: Rotation2D<_, UnknownUnit, UnknownUnit> = Rotation2D::radians(42);
+    ///
+    /// assert_eq!(rot.angle, Rotation2D::<_, Local, World>::from_untyped(&rot).angle);
+    /// ```
+    #[inline]
+    pub fn from_untyped(r: &Rotation2D<T, UnknownUnit, UnknownUnit>) -> Self {
+        r.cast_unit()
     }
 }
 
@@ -103,18 +158,7 @@ where
     }
 }
 
-impl<T, Src, Dst> Rotation2D<T, Src, Dst>
-where
-    T:    Add<T, Output = T>
-        + Sub<T, Output = T>
-        + Mul<T, Output = T>
-        + Div<T, Output = T>
-        + Neg<Output = T>
-        + PartialOrd
-        + Float
-        + One
-        + Zero,
-{
+impl<T: Float, Src, Dst> Rotation2D<T, Src, Dst> {
     /// Creates a 3d rotation (around the z axis) from this 2d rotation.
     #[inline]
     pub fn to_3d(&self) -> Rotation3D<T, Src, Dst> {
@@ -160,24 +204,6 @@ where
     #[inline]
     pub fn transform_vector(&self, vector: Vector2D<T, Src>) -> Vector2D<T, Dst> {
         self.transform_point(vector.to_point()).to_vector()
-    }
-
-    /// Drop the units, preserving only the numeric value.
-    #[inline]
-    pub fn to_untyped(&self) -> Rotation2D<T, UnknownUnit, UnknownUnit> {
-        Rotation2D {
-            angle: self.angle,
-            _unit: PhantomData,
-        }
-    }
-
-    /// Tag a unitless value with units.
-    #[inline]
-    pub fn from_untyped(r: &Rotation2D<T, UnknownUnit, UnknownUnit>) -> Self {
-        Rotation2D {
-            angle: r.angle,
-            _unit: PhantomData,
-        }
     }
 }
 
@@ -270,7 +296,9 @@ impl<T, Src, Dst> Rotation3D<T, Src, Dst> {
     /// where `a`, `b` and `c` describe the vector part and the last parameter `r` is
     /// the real part.
     ///
-    /// The resulting quaternion is not necessarily normalized. See `unit_quaternion`.
+    /// The resulting quaternion is not necessarily normalized. See [`unit_quaternion`].
+    ///
+    /// [`unit_quaternion`]: #method.unit_quaternion
     #[inline]
     pub fn quaternion(a: T, b: T, c: T, r: T) -> Self {
         Rotation3D {
@@ -280,6 +308,15 @@ impl<T, Src, Dst> Rotation3D<T, Src, Dst> {
             r,
             _unit: PhantomData,
         }
+    }
+
+    /// Creates the identity rotation.
+    #[inline]
+    pub fn identity() -> Self
+    where
+        T: Zero + One,
+    {
+        Self::quaternion(T::zero(), T::zero(), T::zero(), T::one())
     }
 }
 
@@ -293,6 +330,25 @@ where
         vec3(self.i, self.j, self.k)
     }
 
+    /// Cast the unit, preserving the numeric value.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use euclid::Rotation3D;
+    /// enum Local {}
+    /// enum World {}
+    ///
+    /// enum Local2 {}
+    /// enum World2 {}
+    ///
+    /// let to_world: Rotation3D<_, Local, World> = Rotation3D::quaternion(1, 2, 3, 4);
+    ///
+    /// assert_eq!(to_world.i, to_world.cast_unit::<Local2, World2>().i);
+    /// assert_eq!(to_world.j, to_world.cast_unit::<Local2, World2>().j);
+    /// assert_eq!(to_world.k, to_world.cast_unit::<Local2, World2>().k);
+    /// assert_eq!(to_world.r, to_world.cast_unit::<Local2, World2>().r);
+    /// ```
     #[inline]
     pub fn cast_unit<Src2, Dst2>(&self) -> Rotation3D<T, Src2, Dst2> {
         Rotation3D {
@@ -303,20 +359,55 @@ where
             _unit: PhantomData
         }
     }
+
+    /// Drop the units, preserving only the numeric value.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use euclid::Rotation3D;
+    /// enum Local {}
+    /// enum World {}
+    ///
+    /// let to_world: Rotation3D<_, Local, World> = Rotation3D::quaternion(1, 2, 3, 4);
+    ///
+    /// assert_eq!(to_world.i, to_world.to_untyped().i);
+    /// assert_eq!(to_world.j, to_world.to_untyped().j);
+    /// assert_eq!(to_world.k, to_world.to_untyped().k);
+    /// assert_eq!(to_world.r, to_world.to_untyped().r);
+    /// ```
+    #[inline]
+    pub fn to_untyped(&self) -> Rotation3D<T, UnknownUnit, UnknownUnit> {
+        self.cast_unit()
+    }
+
+    /// Tag a unitless value with units.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use euclid::Rotation3D;
+    /// use euclid::UnknownUnit;
+    /// enum Local {}
+    /// enum World {}
+    ///
+    /// let rot: Rotation3D<_, UnknownUnit, UnknownUnit> = Rotation3D::quaternion(1, 2, 3, 4);
+    ///
+    /// assert_eq!(rot.i, Rotation3D::<_, Local, World>::from_untyped(&rot).i);
+    /// assert_eq!(rot.j, Rotation3D::<_, Local, World>::from_untyped(&rot).j);
+    /// assert_eq!(rot.k, Rotation3D::<_, Local, World>::from_untyped(&rot).k);
+    /// assert_eq!(rot.r, Rotation3D::<_, Local, World>::from_untyped(&rot).r);
+    /// ```
+    #[inline]
+    pub fn from_untyped(r: &Rotation3D<T, UnknownUnit, UnknownUnit>) -> Self {
+        r.cast_unit()
+    }
 }
 
 impl<T, Src, Dst> Rotation3D<T, Src, Dst>
 where
     T: Float,
 {
-    /// Creates the identity rotation.
-    #[inline]
-    pub fn identity() -> Self {
-        let zero = T::zero();
-        let one = T::one();
-        Self::quaternion(zero, zero, zero, one)
-    }
-
     /// Creates a rotation around from a quaternion representation and normalizes it.
     ///
     /// The parameters are a, b, c and r compose the quaternion `a*i + b*j + c*k + r`
@@ -387,23 +478,29 @@ where
         Rotation3D::quaternion(-self.i, -self.j, -self.k, self.r)
     }
 
-    /// Computes the norm of this quaternion
+    /// Computes the norm of this quaternion.
     #[inline]
     pub fn norm(&self) -> T {
         self.square_norm().sqrt()
     }
 
+    /// Computes the squared norm of this quaternion.
     #[inline]
     pub fn square_norm(&self) -> T {
         self.i * self.i + self.j * self.j + self.k * self.k + self.r * self.r
     }
 
-    /// Returns a unit quaternion from this one.
+    /// Returns a [unit quaternion] from this one.
+    ///
+    /// [unit quaternion]: https://en.wikipedia.org/wiki/Quaternion#Unit_quaternion
     #[inline]
     pub fn normalize(&self) -> Self {
         self.mul(T::one() / self.norm())
     }
 
+    /// Returns `true` if [norm] of this quaternion is (approximately) one.
+    ///
+    /// [norm]: #method.norm
     #[inline]
     pub fn is_normalized(&self) -> bool
     where
@@ -630,30 +727,6 @@ where
             self.k * factor,
             self.r * factor,
         )
-    }
-
-    /// Drop the units, preserving only the numeric value.
-    #[inline]
-    pub fn to_untyped(&self) -> Rotation3D<T, UnknownUnit, UnknownUnit> {
-        Rotation3D {
-            i: self.i,
-            j: self.j,
-            k: self.k,
-            r: self.r,
-            _unit: PhantomData,
-        }
-    }
-
-    /// Tag a unitless value with units.
-    #[inline]
-    pub fn from_untyped(r: &Rotation3D<T, UnknownUnit, UnknownUnit>) -> Self {
-        Rotation3D {
-            i: r.i,
-            j: r.j,
-            k: r.k,
-            r: r.r,
-            _unit: PhantomData,
-        }
     }
 }
 
