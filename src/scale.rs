@@ -12,7 +12,7 @@ use crate::num::One;
 
 use num_traits::NumCast;
 #[cfg(feature = "serde")]
-use serde;
+use serde::{Deserialize, Serialize};
 use crate::core::fmt;
 use crate::core::ops::{Add, Div, Mul, Neg, Sub};
 use crate::core::hash::{Hash, Hasher};

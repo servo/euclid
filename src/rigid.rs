@@ -6,6 +6,8 @@ use crate::approxeq::ApproxEq;
 use num_traits::Float;
 use crate::trig::Trig;
 use crate::{Rotation3D, Transform3D, Vector3D, UnknownUnit};
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
 /// A rigid transformation. All lengths are preserved under such a transformation.
 ///

@@ -18,7 +18,7 @@ use crate::core::fmt;
 use crate::core::cmp::{Eq, PartialEq};
 use crate::core::hash::{Hash};
 #[cfg(feature = "serde")]
-use serde;
+use serde::{Deserialize, Serialize};
 
 /// A 2d transformation from a space to another that can only express translations.
 ///

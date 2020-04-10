@@ -3,6 +3,8 @@ use crate::approxord::{min, max};
 use crate::core::ops::Deref;
 use crate::core::ops::{Add, Sub};
 use crate::core::cmp::{PartialEq};
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
 
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]

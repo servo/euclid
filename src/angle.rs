@@ -14,7 +14,7 @@ use crate::core::hash::{Hash};
 use crate::trig::Trig;
 use crate::approxeq::ApproxEq;
 #[cfg(feature = "serde")]
-use serde;
+use serde::{Deserialize, Serialize};
 
 /// An angle in radians
 #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Hash)]

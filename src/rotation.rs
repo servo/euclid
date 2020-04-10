@@ -18,7 +18,7 @@ use crate::trig::Trig;
 use crate::{Angle, Point2D, Point3D, Vector2D, Vector3D, point2, point3, vec3};
 use crate::{Transform2D, Transform3D, UnknownUnit};
 #[cfg(feature = "serde")]
-use serde;
+use serde::{Deserialize, Serialize};
 
 /// A transform that can represent rotations in 2d, represented as an angle in radians.
 #[repr(C)]
