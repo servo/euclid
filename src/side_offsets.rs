@@ -10,8 +10,8 @@
 //! A group of side offsets, which correspond to top/left/bottom/right for borders, padding,
 //! and margins in CSS.
 
-use length::Length;
-use num::Zero;
+use crate::length::Length;
+use crate::num::Zero;
 use core::fmt;
 use core::ops::{Add, Neg};
 use core::marker::PhantomData;
@@ -65,7 +65,7 @@ impl<T, U> PartialEq for SideOffsets2D<T, U>
 impl<T, U> Hash for SideOffsets2D<T, U>
     where T: Hash
 {
-    fn hash<H: ::core::hash::Hasher>(&self, h: &mut H) {
+    fn hash<H: core::hash::Hasher>(&self, h: &mut H) {
         self.top.hash(h);
         self.right.hash(h);
         self.bottom.hash(h);

@@ -11,10 +11,10 @@ use num_traits::{Float, FloatConst, Zero};
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, Sub, SubAssign};
 use core::cmp::{Eq, PartialEq};
 use core::hash::{Hash};
-use trig::Trig;
-use approxeq::ApproxEq;
+use crate::trig::Trig;
+use crate::approxeq::ApproxEq;
 #[cfg(feature = "serde")]
-use serde;
+use serde::{Deserialize, Serialize};
 
 /// An angle in radians
 #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Hash)]

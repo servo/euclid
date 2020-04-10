@@ -7,18 +7,18 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use approxeq::ApproxEq;
+use crate::approxeq::ApproxEq;
 use num_traits::{Float, One, Zero, NumCast};
 use core::fmt;
 use core::ops::{Add, Div, Mul, Neg, Sub};
 use core::marker::PhantomData;
 use core::cmp::{Eq, PartialEq};
 use core::hash::{Hash};
-use trig::Trig;
-use {Angle, Point2D, Point3D, Vector2D, Vector3D, point2, point3, vec3};
-use {Transform2D, Transform3D, UnknownUnit};
+use crate::trig::Trig;
+use crate::{Angle, Point2D, Point3D, Vector2D, Vector3D, point2, point3, vec3};
+use crate::{Transform2D, Transform3D, UnknownUnit};
 #[cfg(feature = "serde")]
-use serde;
+use serde::{Deserialize, Serialize};
 
 /// A transform that can represent rotations in 2d, represented as an angle in radians.
 #[repr(C)]
@@ -55,7 +55,7 @@ impl<T, Src, Dst> PartialEq for Rotation2D<T, Src, Dst>
 impl<T, Src, Dst> Hash for Rotation2D<T, Src, Dst>
     where T: Hash
 {
-    fn hash<H: ::core::hash::Hasher>(&self, h: &mut H) {
+    fn hash<H: core::hash::Hasher>(&self, h: &mut H) {
         self.angle.hash(h);
     }
 }
@@ -281,7 +281,7 @@ impl<T, Src, Dst> PartialEq for Rotation3D<T, Src, Dst>
 impl<T, Src, Dst> Hash for Rotation3D<T, Src, Dst>
     where T: Hash
 {
-    fn hash<H: ::core::hash::Hasher>(&self, h: &mut H) {
+    fn hash<H: core::hash::Hasher>(&self, h: &mut H) {
         self.i.hash(h);
         self.j.hash(h);
         self.k.hash(h);
@@ -770,7 +770,7 @@ where
 #[test]
 fn simple_rotation_2d() {
     use core::f32::consts::{FRAC_PI_2, PI};
-    use default::Rotation2D;
+    use crate::default::Rotation2D;
 
     let ri = Rotation2D::identity();
     let r90 = Rotation2D::radians(FRAC_PI_2);
@@ -805,7 +805,7 @@ fn simple_rotation_2d() {
 #[test]
 fn simple_rotation_3d_in_2d() {
     use core::f32::consts::{FRAC_PI_2, PI};
-    use default::Rotation3D;
+    use crate::default::Rotation3D;
 
     let ri = Rotation3D::identity();
     let r90 = Rotation3D::around_z(Angle::radians(FRAC_PI_2));
@@ -840,7 +840,7 @@ fn simple_rotation_3d_in_2d() {
 #[test]
 fn pre_post() {
     use core::f32::consts::FRAC_PI_2;
-    use default::Rotation3D;
+    use crate::default::Rotation3D;
 
     let r1 = Rotation3D::around_x(Angle::radians(FRAC_PI_2));
     let r2 = Rotation3D::around_y(Angle::radians(FRAC_PI_2));
@@ -866,7 +866,7 @@ fn pre_post() {
 
 #[test]
 fn to_transform3d() {
-    use default::Rotation3D;
+    use crate::default::Rotation3D;
 
     use core::f32::consts::{FRAC_PI_2, PI};
     let rotations = [
@@ -900,7 +900,7 @@ fn to_transform3d() {
 
 #[test]
 fn slerp() {
-    use default::Rotation3D;
+    use crate::default::Rotation3D;
 
     let q1 = Rotation3D::quaternion(1.0, 0.0, 0.0, 0.0);
     let q2 = Rotation3D::quaternion(0.0, 1.0, 0.0, 0.0);
@@ -971,7 +971,7 @@ fn slerp() {
 #[test]
 fn around_axis() {
     use core::f32::consts::{FRAC_PI_2, PI};
-    use default::Rotation3D;
+    use crate::default::Rotation3D;
 
     // Two sort of trivial cases:
     let r1 = Rotation3D::around_axis(vec3(1.0, 1.0, 0.0), Angle::radians(PI));
@@ -997,7 +997,7 @@ fn around_axis() {
 #[test]
 fn from_euler() {
     use core::f32::consts::FRAC_PI_2;
-    use default::Rotation3D;
+    use crate::default::Rotation3D;
 
     // First test simple separate yaw pitch and roll rotations, because it is easy to come
     // up with the corresponding quaternion.

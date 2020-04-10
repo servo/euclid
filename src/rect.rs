@@ -8,15 +8,15 @@
 // except according to those terms.
 
 use super::UnknownUnit;
-use scale::Scale;
-use num::*;
-use box2d::Box2D;
-use point::Point2D;
-use vector::Vector2D;
-use side_offsets::SideOffsets2D;
-use size::Size2D;
-use approxord::{min, max};
-use nonempty::NonEmpty;
+use crate::scale::Scale;
+use crate::num::*;
+use crate::box2d::Box2D;
+use crate::point::Point2D;
+use crate::vector::Vector2D;
+use crate::side_offsets::SideOffsets2D;
+use crate::size::Size2D;
+use crate::approxord::{min, max};
+use crate::nonempty::NonEmpty;
 
 use num_traits::NumCast;
 #[cfg(feature = "serde")]
@@ -628,9 +628,9 @@ pub const fn rect<T, U>(x: T, y: T, w: T, h: T) -> Rect<T, U> {
 
 #[cfg(test)]
 mod tests {
-    use default::{Point2D, Rect, Size2D};
-    use {point2, vec2, rect, size2};
-    use side_offsets::SideOffsets2D;
+    use crate::default::{Point2D, Rect, Size2D};
+    use crate::{point2, vec2, rect, size2};
+    use crate::side_offsets::SideOffsets2D;
 
     #[test]
     fn test_translate() {

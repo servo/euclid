@@ -8,14 +8,14 @@
 // except according to those terms.
 
 use super::UnknownUnit;
-use approxord::{max, min};
+use crate::approxord::{max, min};
 #[cfg(feature = "mint")]
 use mint;
-use length::Length;
-use scale::Scale;
-use vector::{Vector2D, vec2, BoolVector2D};
-use vector::{Vector3D, vec3, BoolVector3D};
-use num::*;
+use crate::length::Length;
+use crate::scale::Scale;
+use crate::vector::{Vector2D, vec2, BoolVector2D};
+use crate::vector::{Vector3D, vec3, BoolVector3D};
+use crate::num::*;
 
 use num_traits::{NumCast, Signed};
 use core::fmt;
@@ -87,7 +87,7 @@ impl<T, U> PartialEq for Size2D<T, U>
 impl<T, U> Hash for Size2D<T, U>
     where T: Hash
 {
-    fn hash<H: ::core::hash::Hasher>(&self, h: &mut H) {
+    fn hash<H: core::hash::Hasher>(&self, h: &mut H) {
         self.width.hash(h);
         self.height.hash(h);
     }
@@ -666,7 +666,7 @@ impl<T, U> From<(T, T)> for Size2D<T, U> {
 
 #[cfg(test)]
 mod size2d {
-    use default::Size2D;
+    use crate::default::Size2D;
     #[cfg(feature = "mint")]
     use mint;
 
@@ -687,8 +687,8 @@ mod size2d {
     }
 
     mod ops {
-        use default::Size2D;
-        use scale::Scale;
+        use crate::default::Size2D;
+        use crate::scale::Scale;
 
         pub enum Mm {}
         pub enum Cm {}
@@ -924,7 +924,7 @@ impl<T, U> PartialEq for Size3D<T, U>
 impl<T, U> Hash for Size3D<T, U>
     where T: Hash
 {
-    fn hash<H: ::core::hash::Hasher>(&self, h: &mut H) {
+    fn hash<H: core::hash::Hasher>(&self, h: &mut H) {
         self.width.hash(h);
         self.height.hash(h);
         self.depth.hash(h);
@@ -1524,8 +1524,8 @@ pub const fn size3<T, U>(w: T, h: T, d: T) -> Size3D<T, U> {
 #[cfg(test)]
 mod size3d {
     mod ops {
-        use default::Size3D;
-        use scale::Scale;
+        use crate::default::Size3D;
+        use crate::scale::Scale;
 
         pub enum Mm {}
         pub enum Cm {}

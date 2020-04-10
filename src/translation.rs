@@ -7,18 +7,18 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use {Vector2D, Point2D, Vector3D, Point3D, Transform2D, Transform3D};
-use {Box2D, Box3D, Size2D, Rect, vec2, point2, vec3, point3};
-use UnknownUnit;
-use num::*;
-use trig::Trig;
+use crate::{Vector2D, Point2D, Vector3D, Point3D, Transform2D, Transform3D};
+use crate::{Box2D, Box3D, Size2D, Rect, vec2, point2, vec3, point3};
+use crate::UnknownUnit;
+use crate::num::*;
+use crate::trig::Trig;
 use core::ops::{Add, AddAssign, Sub, SubAssign, Neg, Mul, Div};
 use core::marker::PhantomData;
 use core::fmt;
 use core::cmp::{Eq, PartialEq};
 use core::hash::{Hash};
 #[cfg(feature = "serde")]
-use serde;
+use serde::{Deserialize, Serialize};
 
 /// A 2d transformation from a space to another that can only express translations.
 ///
@@ -75,7 +75,7 @@ impl<T, Src, Dst> PartialEq for Translation2D<T, Src, Dst>
 impl<T, Src, Dst> Hash for Translation2D<T, Src, Dst>
     where T: Hash
 {
-    fn hash<H: ::core::hash::Hasher>(&self, h: &mut H) {
+    fn hash<H: core::hash::Hasher>(&self, h: &mut H) {
         self.x.hash(h);
         self.y.hash(h);
     }
@@ -380,7 +380,7 @@ impl<T, Src, Dst> PartialEq for Translation3D<T, Src, Dst>
 impl<T, Src, Dst> Hash for Translation3D<T, Src, Dst>
     where T: Hash
 {
-    fn hash<H: ::core::hash::Hasher>(&self, h: &mut H) {
+    fn hash<H: core::hash::Hasher>(&self, h: &mut H) {
         self.x.hash(h);
         self.y.hash(h);
         self.z.hash(h);
@@ -658,7 +658,7 @@ impl<T: fmt::Display, Src, Dst> fmt::Display for Translation3D<T, Src, Dst> {
 mod _2d {
     #[test]
     fn simple() {
-        use {Rect, Translation2D, rect};
+        use crate::{Rect, Translation2D, rect};
 
         struct A;
         struct B;
@@ -764,7 +764,7 @@ mod _2d {
 mod _3d {
     #[test]
     fn simple() {
-        use {Point3D, Translation3D, point3};
+        use crate::{Point3D, Translation3D, point3};
 
         struct A;
         struct B;
@@ -786,7 +786,7 @@ mod _3d {
 
     /// Operation tests
     mod ops {
-        use default::Translation3D;
+        use crate::default::Translation3D;
 
         #[test]
         pub fn test_add() {

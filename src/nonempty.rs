@@ -1,8 +1,10 @@
-use {Rect, Box2D, Box3D, Vector2D, Vector3D, size2, point2, point3};
-use approxord::{min, max};
+use crate::{Rect, Box2D, Box3D, Vector2D, Vector3D, size2, point2, point3};
+use crate::approxord::{min, max};
 use core::ops::Deref;
 use core::ops::{Add, Sub};
 use core::cmp::{PartialEq};
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
 
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -143,7 +145,7 @@ where
 
 #[test]
 fn empty_nonempty() {
-    use default;
+    use crate::default;
 
     // zero-width
     let box1: default::Box2D<i32> = Box2D {
@@ -174,7 +176,7 @@ fn empty_nonempty() {
 
 #[test]
 fn nonempty_union() {
-    use default;
+    use crate::default;
 
     let box1: default::Box2D<i32> = Box2D {
         min: point2(-10, 2),
@@ -212,8 +214,8 @@ fn nonempty_union() {
 
 #[test]
 fn nonempty_contains() {
-    use default;
-    use {vec2, vec3};
+    use crate::default;
+    use crate::{vec2, vec3};
 
     let r: NonEmpty<default::Rect<i32>> = Rect {
         origin: point2(-20, 15),

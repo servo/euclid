@@ -8,15 +8,15 @@
 // except according to those terms.
 
 use super::UnknownUnit;
-use scale::Scale;
-use num::*;
-use rect::Rect;
-use point::{point2, Point2D};
-use vector::{vec2, Vector2D};
-use side_offsets::SideOffsets2D;
-use size::Size2D;
-use nonempty::NonEmpty;
-use approxord::{min, max};
+use crate::scale::Scale;
+use crate::num::*;
+use crate::rect::Rect;
+use crate::point::{point2, Point2D};
+use crate::vector::{vec2, Vector2D};
+use crate::side_offsets::SideOffsets2D;
+use crate::size::Size2D;
+use crate::nonempty::NonEmpty;
+use crate::approxord::{min, max};
 
 use num_traits::NumCast;
 #[cfg(feature = "serde")]
@@ -618,9 +618,9 @@ where
 
 #[cfg(test)]
 mod tests {
-    use side_offsets::SideOffsets2D;
-    use {Point2D, point2, vec2, size2};
-    use default::Box2D;
+    use crate::side_offsets::SideOffsets2D;
+    use crate::{Point2D, point2, vec2, size2};
+    use crate::default::Box2D;
     //use super::*;
 
     #[test]

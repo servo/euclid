@@ -8,13 +8,13 @@
 // except according to those terms.
 
 use super::UnknownUnit;
-use scale::Scale;
-use num::*;
-use point::{Point3D, point3};
-use vector::Vector3D;
-use size::Size3D;
-use approxord::{min, max};
-use nonempty::NonEmpty;
+use crate::scale::Scale;
+use crate::num::*;
+use crate::point::{Point3D, point3};
+use crate::vector::Vector3D;
+use crate::size::Size3D;
+use crate::approxord::{min, max};
+use crate::nonempty::NonEmpty;
 
 use num_traits::NumCast;
 #[cfg(feature = "serde")]
@@ -630,8 +630,8 @@ pub fn box3d<T: Copy, U>(min_x: T, min_y: T, min_z: T, max_x: T, max_y: T, max_z
 
 #[cfg(test)]
 mod tests {
-    use {point3, size3, vec3};
-    use default::{Box3D, Point3D};
+    use crate::{point3, size3, vec3};
+    use crate::default::{Box3D, Point3D};
 
     #[test]
     fn test_new() {

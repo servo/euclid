@@ -8,19 +8,19 @@
 // except according to those terms.
 
 use super::UnknownUnit;
-use approxeq::ApproxEq;
-use approxord::{min, max};
-use length::Length;
+use crate::approxeq::ApproxEq;
+use crate::approxord::{min, max};
+use crate::length::Length;
 #[cfg(feature = "mint")]
 use mint;
-use point::{Point2D, Point3D, point2, point3};
-use size::{Size2D, Size3D, size2, size3};
-use scale::Scale;
-use transform2d::Transform2D;
-use transform3d::Transform3D;
-use trig::Trig;
-use Angle;
-use num::*;
+use crate::point::{Point2D, Point3D, point2, point3};
+use crate::size::{Size2D, Size3D, size2, size3};
+use crate::scale::Scale;
+use crate::transform2d::Transform2D;
+use crate::transform3d::Transform3D;
+use crate::trig::Trig;
+use crate::Angle;
+use crate::num::*;
 use num_traits::{Float, NumCast, Signed};
 use core::fmt;
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
@@ -87,7 +87,7 @@ impl<T: PartialEq, U> PartialEq for Vector2D<T, U> {
 }
 
 impl<T: Hash, U> Hash for Vector2D<T, U> {
-    fn hash<H: ::core::hash::Hasher>(&self, h: &mut H) {
+    fn hash<H: core::hash::Hasher>(&self, h: &mut H) {
         self.x.hash(h);
         self.y.hash(h);
     }
@@ -868,7 +868,7 @@ impl<T: PartialEq, U> PartialEq for Vector3D<T, U> {
 }
 
 impl<T: Hash, U> Hash for Vector3D<T, U> {
-    fn hash<H: ::core::hash::Hasher>(&self, h: &mut H) {
+    fn hash<H: core::hash::Hasher>(&self, h: &mut H) {
         self.x.hash(h);
         self.y.hash(h);
         self.z.hash(h);
@@ -1861,8 +1861,8 @@ pub fn bvec3(x: bool, y: bool, z: bool) -> BoolVector3D {
 
 #[cfg(test)]
 mod vector2d {
-    use {default, vec2};
-    use scale::Scale;
+    use crate::{default, vec2};
+    use crate::scale::Scale;
 
     #[cfg(feature = "mint")]
     use mint;
@@ -1929,7 +1929,7 @@ mod vector2d {
     #[test]
     pub fn test_angle_from_x_axis() {
         use core::f32::consts::FRAC_PI_2;
-        use approxeq::ApproxEq;
+        use crate::approxeq::ApproxEq;
 
         let right: Vec2 = vec2(10.0, 0.0);
         let down: Vec2 = vec2(0.0, 4.0);
@@ -1943,7 +1943,7 @@ mod vector2d {
     #[test]
     pub fn test_angle_to() {
         use core::f32::consts::FRAC_PI_2;
-        use approxeq::ApproxEq;
+        use crate::approxeq::ApproxEq;
 
         let right: Vec2 = vec2(10.0, 0.0);
         let right2: Vec2 = vec2(1.0, 0.0);
@@ -1958,7 +1958,7 @@ mod vector2d {
 
     #[test]
     pub fn test_with_max_length() {
-        use approxeq::ApproxEq;
+        use crate::approxeq::ApproxEq;
 
         let v1: Vec2 = vec2(0.5, 0.5);
         let v2: Vec2 = vec2(1.0, 0.0);
@@ -1989,7 +1989,7 @@ mod vector2d {
 
     #[test]
     pub fn test_project_onto_vector() {
-        use approxeq::ApproxEq;
+        use crate::approxeq::ApproxEq;
 
         let v1: Vec2 = vec2(1.0, 2.0);
         let x: Vec2 = vec2(1.0, 0.0);
@@ -2055,7 +2055,7 @@ mod vector2d {
 
     #[test]
     pub fn test_reflect() {
-        use approxeq::ApproxEq;
+        use crate::approxeq::ApproxEq;
         let a: Vec2 = vec2(1.0, 3.0);
         let n1: Vec2 = vec2(0.0, -1.0);
         let n2: Vec2 = vec2(1.0, -1.0).normalize();
@@ -2069,8 +2069,8 @@ mod vector2d {
 mod vector3d {
     #[cfg(feature = "mint")]
     use mint;
-    use {default, vec2, vec3};
-    use scale::Scale;
+    use crate::{default, vec2, vec3};
+    use crate::scale::Scale;
 
     type Vec3 = default::Vector3D<f32>;
 
@@ -2169,7 +2169,7 @@ mod vector3d {
 
     #[test]
     pub fn test_reflect() {
-        use approxeq::ApproxEq;
+        use crate::approxeq::ApproxEq;
         let a: Vec3 = vec3(1.0, 3.0, 2.0);
         let n1: Vec3 = vec3(0.0, -1.0, 0.0);
         let n2: Vec3 = vec3(0.0, 1.0, 1.0).normalize();
@@ -2181,7 +2181,7 @@ mod vector3d {
     #[test]
     pub fn test_angle_to() {
         use core::f32::consts::FRAC_PI_2;
-        use approxeq::ApproxEq;
+        use crate::approxeq::ApproxEq;
 
         let right: Vec3 = vec3(10.0, 0.0, 0.0);
         let right2: Vec3 = vec3(1.0, 0.0, 0.0);
@@ -2196,7 +2196,7 @@ mod vector3d {
 
     #[test]
     pub fn test_with_max_length() {
-        use approxeq::ApproxEq;
+        use crate::approxeq::ApproxEq;
 
         let v1: Vec3 = vec3(0.5, 0.5, 0.0);
         let v2: Vec3 = vec3(1.0, 0.0, 0.0);
@@ -2227,7 +2227,7 @@ mod vector3d {
 
     #[test]
     pub fn test_project_onto_vector() {
-        use approxeq::ApproxEq;
+        use crate::approxeq::ApproxEq;
 
         let v1: Vec3 = vec3(1.0, 2.0, 3.0);
         let x: Vec3 = vec3(1.0, 0.0, 0.0);
@@ -2246,7 +2246,7 @@ mod vector3d {
 
 #[cfg(test)]
 mod bool_vector {
-    use default;
+    use crate::default;
     use super::*;
     type Vec2 = default::Vector2D<f32>;
     type Vec3 = default::Vector3D<f32>;

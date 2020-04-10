@@ -8,17 +8,17 @@
 // except according to those terms.
 //! A type-checked scaling factor between units.
 
-use num::One;
+use crate::num::One;
 
 use num_traits::NumCast;
 #[cfg(feature = "serde")]
-use serde;
+use serde::{Deserialize, Serialize};
 use core::fmt;
 use core::ops::{Add, Div, Mul, Neg, Sub};
 use core::hash::{Hash, Hasher};
 use core::marker::PhantomData;
 use core::cmp::Ordering;
-use {Point2D, Rect, Size2D, Vector2D};
+use crate::{Point2D, Rect, Size2D, Vector2D};
 
 /// A scaling factor between two different units of measurement.
 ///

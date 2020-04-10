@@ -8,16 +8,16 @@
 // except according to those terms.
 
 use super::UnknownUnit;
-use approxeq::ApproxEq;
-use approxord::{min, max};
-use length::Length;
-use scale::Scale;
-use size::{Size2D, Size3D};
+use crate::approxeq::ApproxEq;
+use crate::approxord::{min, max};
+use crate::length::Length;
+use crate::scale::Scale;
+use crate::size::{Size2D, Size3D};
 #[cfg(feature = "mint")]
 use mint;
-use num::*;
+use crate::num::*;
 use num_traits::NumCast;
-use vector::{Vector2D, Vector3D, vec2, vec3};
+use crate::vector::{Vector2D, Vector3D, vec2, vec3};
 use core::fmt;
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 use core::marker::PhantomData;
@@ -83,7 +83,7 @@ impl<T, U> PartialEq for Point2D<T, U>
 impl<T, U> Hash for Point2D<T, U>
     where T: Hash
 {
-    fn hash<H: ::core::hash::Hasher>(&self, h: &mut H) {
+    fn hash<H: core::hash::Hasher>(&self, h: &mut H) {
         self.x.hash(h);
         self.y.hash(h);
     }
@@ -758,7 +758,7 @@ impl<T, U> PartialEq for Point3D<T, U>
 impl<T, U> Hash for Point3D<T, U>
     where T: Hash
 {
-    fn hash<H: ::core::hash::Hasher>(&self, h: &mut H) {
+    fn hash<H: core::hash::Hasher>(&self, h: &mut H) {
         self.x.hash(h);
         self.y.hash(h);
         self.z.hash(h);
@@ -1446,8 +1446,8 @@ pub const fn point3<T, U>(x: T, y: T, z: T) -> Point3D<T, U> {
 
 #[cfg(test)]
 mod point2d {
-    use default::Point2D;
-    use point2;
+    use crate::default::Point2D;
+    use crate::point2;
 
     #[cfg(feature = "mint")]
     use mint;
@@ -1500,9 +1500,9 @@ mod point2d {
     }
 
     mod ops {
-        use default::Point2D;
-        use {size2, vec2, Vector2D};
-        use scale::Scale;
+        use crate::default::Point2D;
+        use crate::{size2, vec2, Vector2D};
+        use crate::scale::Scale;
 
         pub enum Mm {}
         pub enum Cm {}
@@ -1698,9 +1698,9 @@ mod point2d {
 
 #[cfg(test)]
 mod point3d {
-    use default;
-    use default::Point3D;
-    use {point2, point3};
+    use crate::default;
+    use crate::default::Point3D;
+    use crate::{point2, point3};
     #[cfg(feature = "mint")]
     use mint;
 
@@ -1726,7 +1726,7 @@ mod point3d {
 
     #[test]
     pub fn test_conv_vector() {
-        use point3;
+        use crate::point3;
         for i in 0..100 {
             // We don't care about these values as long as they are not the same.
             let x = i as f32 * 0.012345;
@@ -1756,9 +1756,9 @@ mod point3d {
     }
 
     mod ops {
-        use default::Point3D;
-        use {size3, vec3, Vector3D};
-        use scale::Scale;
+        use crate::default::Point3D;
+        use crate::{size3, vec3, Vector3D};
+        use crate::scale::Scale;
 
         pub enum Mm {}
         pub enum Cm {}
