@@ -10,22 +10,22 @@
 #![cfg_attr(feature = "cargo-clippy", allow(just_underscores_and_digits))]
 
 use super::{UnknownUnit, Angle};
-use approxeq::ApproxEq;
-use homogen::HomogeneousVector;
+use crate::approxeq::ApproxEq;
+use crate::homogen::HomogeneousVector;
 #[cfg(feature = "mint")]
 use mint;
-use trig::Trig;
-use point::{Point2D, point2, Point3D};
-use vector::{Vector2D, Vector3D, vec2, vec3};
-use rect::Rect;
-use transform2d::Transform2D;
-use scale::Scale;
-use num::{One, Zero};
-use core::ops::{Add, Mul, Sub, Div, Neg};
-use core::marker::PhantomData;
-use core::fmt;
-use core::cmp::{Eq, PartialEq};
-use core::hash::{Hash};
+use crate::trig::Trig;
+use crate::point::{Point2D, point2, Point3D};
+use crate::vector::{Vector2D, Vector3D, vec2, vec3};
+use crate::rect::Rect;
+use crate::transform2d::Transform2D;
+use crate::scale::Scale;
+use crate::num::{One, Zero};
+use crate::core::ops::{Add, Mul, Sub, Div, Neg};
+use crate::core::marker::PhantomData;
+use crate::core::fmt;
+use crate::core::cmp::{Eq, PartialEq};
+use crate::core::hash::{Hash};
 use num_traits::NumCast;
 #[cfg(feature = "serde")]
 use serde;
@@ -148,7 +148,7 @@ impl<T, Src, Dst> PartialEq for Transform3D<T, Src, Dst>
 impl<T, Src, Dst> Hash for Transform3D<T, Src, Dst>
     where T: Hash
 {
-    fn hash<H: ::core::hash::Hasher>(&self, h: &mut H) {
+    fn hash<H: crate::core::hash::Hasher>(&self, h: &mut H) {
         self.m11.hash(h);
         self.m12.hash(h);
         self.m13.hash(h);
@@ -1018,12 +1018,12 @@ impl<T, Src, Dst> Into<mint::RowMatrix4<T>> for Transform3D<T, Src, Dst> {
 
 #[cfg(test)]
 mod tests {
-    use approxeq::ApproxEq;
+    use crate::approxeq::ApproxEq;
     use super::*;
-    use {point2, point3};
-    use default;
+    use crate::{point2, point3};
+    use crate::default;
 
-    use core::f32::consts::{FRAC_PI_2, PI};
+    use crate::core::f32::consts::{FRAC_PI_2, PI};
 
     type Mf32 = default::Transform3D<f32>;
 
@@ -1212,7 +1212,7 @@ mod tests {
 
     #[test]
     fn test_size_of() {
-        use core::mem::size_of;
+        use crate::core::mem::size_of;
         assert_eq!(size_of::<default::Transform3D<f32>>(), 16*size_of::<f32>());
         assert_eq!(size_of::<default::Transform3D<f64>>(), 16*size_of::<f64>());
     }

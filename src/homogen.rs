@@ -7,16 +7,16 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use point::{Point2D, Point3D};
-use vector::{Vector2D, Vector3D};
+use crate::point::{Point2D, Point3D};
+use crate::vector::{Vector2D, Vector3D};
 
-use num::{One, Zero};
+use crate::num::{One, Zero};
 
-use core::fmt;
-use core::marker::PhantomData;
-use core::ops::Div;
-use core::cmp::{Eq, PartialEq};
-use core::hash::{Hash};
+use crate::core::fmt;
+use crate::core::marker::PhantomData;
+use crate::core::ops::Div;
+use crate::core::cmp::{Eq, PartialEq};
+use crate::core::hash::{Hash};
 #[cfg(feature = "serde")]
 use serde;
 
@@ -82,7 +82,7 @@ impl<T, U> PartialEq for HomogeneousVector<T, U>
 impl<T, U> Hash for HomogeneousVector<T, U>
     where T: Hash
 {
-    fn hash<H: ::core::hash::Hasher>(&self, h: &mut H) {
+    fn hash<H: crate::core::hash::Hasher>(&self, h: &mut H) {
         self.x.hash(h);
         self.y.hash(h);
         self.z.hash(h);
@@ -182,7 +182,7 @@ impl<T: fmt::Display, U> fmt::Display for HomogeneousVector<T, U> {
 #[cfg(test)]
 mod homogeneous {
     use super::HomogeneousVector;
-    use default::{Point2D, Point3D};
+    use crate::default::{Point2D, Point3D};
 
     #[test]
     fn roundtrip() {

@@ -2,10 +2,10 @@
 //! i.e. a vector `v` is transformed with `v * T`, and if you want to apply `T1`
 //! before `T2` you use `T1 * T2`
 
-use approxeq::ApproxEq;
+use crate::approxeq::ApproxEq;
 use num_traits::Float;
-use trig::Trig;
-use {Rotation3D, Transform3D, Vector3D, UnknownUnit};
+use crate::trig::Trig;
+use crate::{Rotation3D, Transform3D, Vector3D, UnknownUnit};
 
 /// A rigid transformation. All lengths are preserved under such a transformation.
 ///
@@ -219,7 +219,7 @@ impl<T: Float + ApproxEq<T>, Src, Dst> From<Vector3D<T, Dst>>
 #[cfg(test)]
 mod test {
     use super::RigidTransform3D;
-    use default::{Rotation3D, Transform3D, Vector3D};
+    use crate::default::{Rotation3D, Transform3D, Vector3D};
 
     #[test]
     fn test_rigid_construction() {

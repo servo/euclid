@@ -8,25 +8,25 @@
 // except according to those terms.
 
 use super::UnknownUnit;
-use scale::Scale;
-use num::*;
-use box2d::Box2D;
-use point::Point2D;
-use vector::Vector2D;
-use side_offsets::SideOffsets2D;
-use size::Size2D;
-use approxord::{min, max};
-use nonempty::NonEmpty;
+use crate::scale::Scale;
+use crate::num::*;
+use crate::box2d::Box2D;
+use crate::point::Point2D;
+use crate::vector::Vector2D;
+use crate::side_offsets::SideOffsets2D;
+use crate::size::Size2D;
+use crate::approxord::{min, max};
+use crate::nonempty::NonEmpty;
 
 use num_traits::NumCast;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-use core::borrow::Borrow;
-use core::cmp::PartialOrd;
-use core::fmt;
-use core::hash::{Hash, Hasher};
-use core::ops::{Add, Div, Mul, Sub, Range};
+use crate::core::borrow::Borrow;
+use crate::core::cmp::PartialOrd;
+use crate::core::fmt;
+use crate::core::hash::{Hash, Hasher};
+use crate::core::ops::{Add, Div, Mul, Sub, Range};
 
 
 /// A 2d Rectangle optionally tagged with a unit.
@@ -628,9 +628,9 @@ pub const fn rect<T, U>(x: T, y: T, w: T, h: T) -> Rect<T, U> {
 
 #[cfg(test)]
 mod tests {
-    use default::{Point2D, Rect, Size2D};
-    use {point2, vec2, rect, size2};
-    use side_offsets::SideOffsets2D;
+    use crate::default::{Point2D, Rect, Size2D};
+    use crate::{point2, vec2, rect, size2};
+    use crate::side_offsets::SideOffsets2D;
 
     #[test]
     fn test_translate() {

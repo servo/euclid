@@ -8,20 +8,20 @@
 // except according to those terms.
 //! A one-dimensional length, tagged with its units.
 
-use scale::Scale;
-use num::Zero;
-use approxeq::ApproxEq;
+use crate::scale::Scale;
+use crate::num::Zero;
+use crate::approxeq::ApproxEq;
 
 use num_traits::{NumCast, Saturating};
-use num::One;
+use crate::num::One;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use core::cmp::Ordering;
-use core::ops::{Add, Div, Mul, Neg, Sub};
-use core::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
-use core::hash::{Hash, Hasher};
-use core::marker::PhantomData;
-use core::fmt;
+use crate::core::cmp::Ordering;
+use crate::core::ops::{Add, Div, Mul, Neg, Sub};
+use crate::core::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
+use crate::core::hash::{Hash, Hasher};
+use crate::core::marker::PhantomData;
+use crate::core::fmt;
 
 /// A one-dimensional distance, with value represented by `T` and unit of measurement `Unit`.
 ///
@@ -324,11 +324,11 @@ impl<U, T: ApproxEq<T>> ApproxEq<T> for Length<T, U> {
 #[cfg(test)]
 mod tests {
     use super::Length;
-    use num::Zero;
+    use crate::num::Zero;
 
     use num_traits::Saturating;
-    use scale::Scale;
-    use core::f32::INFINITY;
+    use crate::scale::Scale;
+    use crate::core::f32::INFINITY;
 
     enum Inch {}
     enum Mm {}
