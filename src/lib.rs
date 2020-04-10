@@ -47,6 +47,9 @@ extern crate serde;
 #[cfg(feature = "mint")]
 pub extern crate mint;
 extern crate num_traits;
+
+#[cfg(not(test))]
+pub use core;
 #[cfg(test)]
 use std as core;
 
