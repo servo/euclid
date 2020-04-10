@@ -40,9 +40,6 @@
 //!
 #![deny(unconditional_recursion)]
 
-#[cfg(test)]
-use std as core;
-
 pub use crate::angle::Angle;
 pub use crate::box2d::Box2D;
 pub use crate::length::Length;
