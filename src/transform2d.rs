@@ -17,13 +17,13 @@ use crate::point::{Point2D, point2};
 use crate::vector::{Vector2D, vec2};
 use crate::rect::Rect;
 use crate::transform3d::Transform3D;
-use crate::core::ops::{Add, Mul, Div, Sub, Neg};
-use crate::core::marker::PhantomData;
-use crate::core::cmp::{Eq, PartialEq};
-use crate::core::hash::{Hash};
+use core::ops::{Add, Mul, Div, Sub, Neg};
+use core::marker::PhantomData;
+use core::cmp::{Eq, PartialEq};
+use core::hash::{Hash};
 use crate::approxeq::ApproxEq;
 use crate::trig::Trig;
-use crate::core::fmt;
+use core::fmt;
 use num_traits::NumCast;
 #[cfg(feature = "serde")]
 use serde;
@@ -122,7 +122,7 @@ impl<T, Src, Dst> PartialEq for Transform2D<T, Src, Dst>
 impl<T, Src, Dst> Hash for Transform2D<T, Src, Dst>
     where T: Hash
 {
-    fn hash<H: crate::core::hash::Hasher>(&self, h: &mut H) {
+    fn hash<H: core::hash::Hasher>(&self, h: &mut H) {
         self.m11.hash(h);
         self.m12.hash(h);
         self.m21.hash(h);
@@ -628,7 +628,7 @@ mod test {
     #[cfg(feature = "mint")]
     use mint;
 
-    use crate::core::f32::consts::FRAC_PI_2;
+    use core::f32::consts::FRAC_PI_2;
 
     type Mat = default::Transform2D<f32>;
 
@@ -744,7 +744,7 @@ mod test {
 
     #[test]
     fn test_size_of() {
-        use crate::core::mem::size_of;
+        use core::mem::size_of;
         assert_eq!(size_of::<default::Transform2D<f32>>(), 6*size_of::<f32>());
         assert_eq!(size_of::<default::Transform2D<f64>>(), 6*size_of::<f64>());
     }

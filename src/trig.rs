@@ -43,7 +43,7 @@ macro_rules! trig {
                 #![cfg_attr(feature = "cargo-clippy", allow(excessive_precision))]
 
                 // See https://math.stackexchange.com/questions/1098487/atan2-faster-approximation#1105038
-                use crate::core::$ty::consts;
+                use core::$ty::consts;
                 let x_abs = num_traits::Float::abs(x);
                 let y_abs = num_traits::Float::abs(y);
                 let a = x_abs.min(y_abs) / x_abs.max(y_abs);

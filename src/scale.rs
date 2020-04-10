@@ -13,11 +13,11 @@ use crate::num::One;
 use num_traits::NumCast;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-use crate::core::fmt;
-use crate::core::ops::{Add, Div, Mul, Neg, Sub};
-use crate::core::hash::{Hash, Hasher};
-use crate::core::marker::PhantomData;
-use crate::core::cmp::Ordering;
+use core::fmt;
+use core::ops::{Add, Div, Mul, Neg, Sub};
+use core::hash::{Hash, Hasher};
+use core::marker::PhantomData;
+use core::cmp::Ordering;
 use crate::{Point2D, Rect, Size2D, Vector2D};
 
 /// A scaling factor between two different units of measurement.

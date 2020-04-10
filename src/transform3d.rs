@@ -21,11 +21,11 @@ use crate::rect::Rect;
 use crate::transform2d::Transform2D;
 use crate::scale::Scale;
 use crate::num::{One, Zero};
-use crate::core::ops::{Add, Mul, Sub, Div, Neg};
-use crate::core::marker::PhantomData;
-use crate::core::fmt;
-use crate::core::cmp::{Eq, PartialEq};
-use crate::core::hash::{Hash};
+use core::ops::{Add, Mul, Sub, Div, Neg};
+use core::marker::PhantomData;
+use core::fmt;
+use core::cmp::{Eq, PartialEq};
+use core::hash::{Hash};
 use num_traits::NumCast;
 #[cfg(feature = "serde")]
 use serde;
@@ -148,7 +148,7 @@ impl<T, Src, Dst> PartialEq for Transform3D<T, Src, Dst>
 impl<T, Src, Dst> Hash for Transform3D<T, Src, Dst>
     where T: Hash
 {
-    fn hash<H: crate::core::hash::Hasher>(&self, h: &mut H) {
+    fn hash<H: core::hash::Hasher>(&self, h: &mut H) {
         self.m11.hash(h);
         self.m12.hash(h);
         self.m13.hash(h);
@@ -1023,7 +1023,7 @@ mod tests {
     use crate::{point2, point3};
     use crate::default;
 
-    use crate::core::f32::consts::{FRAC_PI_2, PI};
+    use core::f32::consts::{FRAC_PI_2, PI};
 
     type Mf32 = default::Transform3D<f32>;
 
@@ -1212,7 +1212,7 @@ mod tests {
 
     #[test]
     fn test_size_of() {
-        use crate::core::mem::size_of;
+        use core::mem::size_of;
         assert_eq!(size_of::<default::Transform3D<f32>>(), 16*size_of::<f32>());
         assert_eq!(size_of::<default::Transform3D<f64>>(), 16*size_of::<f64>());
     }

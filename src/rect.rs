@@ -22,11 +22,11 @@ use num_traits::NumCast;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-use crate::core::borrow::Borrow;
-use crate::core::cmp::PartialOrd;
-use crate::core::fmt;
-use crate::core::hash::{Hash, Hasher};
-use crate::core::ops::{Add, Div, Mul, Sub, Range};
+use core::borrow::Borrow;
+use core::cmp::PartialOrd;
+use core::fmt;
+use core::hash::{Hash, Hasher};
+use core::ops::{Add, Div, Mul, Sub, Range};
 
 
 /// A 2d Rectangle optionally tagged with a unit.

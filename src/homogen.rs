@@ -12,11 +12,11 @@ use crate::vector::{Vector2D, Vector3D};
 
 use crate::num::{One, Zero};
 
-use crate::core::fmt;
-use crate::core::marker::PhantomData;
-use crate::core::ops::Div;
-use crate::core::cmp::{Eq, PartialEq};
-use crate::core::hash::{Hash};
+use core::fmt;
+use core::marker::PhantomData;
+use core::ops::Div;
+use core::cmp::{Eq, PartialEq};
+use core::hash::{Hash};
 #[cfg(feature = "serde")]
 use serde;
 
@@ -82,7 +82,7 @@ impl<T, U> PartialEq for HomogeneousVector<T, U>
 impl<T, U> Hash for HomogeneousVector<T, U>
     where T: Hash
 {
-    fn hash<H: crate::core::hash::Hasher>(&self, h: &mut H) {
+    fn hash<H: core::hash::Hasher>(&self, h: &mut H) {
         self.x.hash(h);
         self.y.hash(h);
         self.z.hash(h);

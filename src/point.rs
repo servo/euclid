@@ -18,11 +18,11 @@ use mint;
 use crate::num::*;
 use num_traits::NumCast;
 use crate::vector::{Vector2D, Vector3D, vec2, vec3};
-use crate::core::fmt;
-use crate::core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
-use crate::core::marker::PhantomData;
-use crate::core::cmp::{Eq, PartialEq};
-use crate::core::hash::{Hash};
+use core::fmt;
+use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+use core::marker::PhantomData;
+use core::cmp::{Eq, PartialEq};
+use core::hash::{Hash};
 #[cfg(feature = "serde")]
 use serde;
 
@@ -83,7 +83,7 @@ impl<T, U> PartialEq for Point2D<T, U>
 impl<T, U> Hash for Point2D<T, U>
     where T: Hash
 {
-    fn hash<H: crate::core::hash::Hasher>(&self, h: &mut H) {
+    fn hash<H: core::hash::Hasher>(&self, h: &mut H) {
         self.x.hash(h);
         self.y.hash(h);
     }
@@ -758,7 +758,7 @@ impl<T, U> PartialEq for Point3D<T, U>
 impl<T, U> Hash for Point3D<T, U>
     where T: Hash
 {
-    fn hash<H: crate::core::hash::Hasher>(&self, h: &mut H) {
+    fn hash<H: core::hash::Hasher>(&self, h: &mut H) {
         self.x.hash(h);
         self.y.hash(h);
         self.z.hash(h);

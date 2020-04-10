@@ -18,11 +18,11 @@ use crate::vector::{Vector3D, vec3, BoolVector3D};
 use crate::num::*;
 
 use num_traits::{NumCast, Signed};
-use crate::core::fmt;
-use crate::core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
-use crate::core::marker::PhantomData;
-use crate::core::cmp::{Eq, PartialEq};
-use crate::core::hash::{Hash};
+use core::fmt;
+use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+use core::marker::PhantomData;
+use core::cmp::{Eq, PartialEq};
+use core::hash::{Hash};
 #[cfg(feature = "serde")]
 use serde;
 
@@ -87,7 +87,7 @@ impl<T, U> PartialEq for Size2D<T, U>
 impl<T, U> Hash for Size2D<T, U>
     where T: Hash
 {
-    fn hash<H: crate::core::hash::Hasher>(&self, h: &mut H) {
+    fn hash<H: core::hash::Hasher>(&self, h: &mut H) {
         self.width.hash(h);
         self.height.hash(h);
     }
@@ -924,7 +924,7 @@ impl<T, U> PartialEq for Size3D<T, U>
 impl<T, U> Hash for Size3D<T, U>
     where T: Hash
 {
-    fn hash<H: crate::core::hash::Hasher>(&self, h: &mut H) {
+    fn hash<H: core::hash::Hasher>(&self, h: &mut H) {
         self.width.hash(h);
         self.height.hash(h);
         self.depth.hash(h);

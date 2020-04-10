@@ -12,11 +12,11 @@ use crate::{Box2D, Box3D, Size2D, Rect, vec2, point2, vec3, point3};
 use crate::UnknownUnit;
 use crate::num::*;
 use crate::trig::Trig;
-use crate::core::ops::{Add, AddAssign, Sub, SubAssign, Neg, Mul, Div};
-use crate::core::marker::PhantomData;
-use crate::core::fmt;
-use crate::core::cmp::{Eq, PartialEq};
-use crate::core::hash::{Hash};
+use core::ops::{Add, AddAssign, Sub, SubAssign, Neg, Mul, Div};
+use core::marker::PhantomData;
+use core::fmt;
+use core::cmp::{Eq, PartialEq};
+use core::hash::{Hash};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -75,7 +75,7 @@ impl<T, Src, Dst> PartialEq for Translation2D<T, Src, Dst>
 impl<T, Src, Dst> Hash for Translation2D<T, Src, Dst>
     where T: Hash
 {
-    fn hash<H: crate::core::hash::Hasher>(&self, h: &mut H) {
+    fn hash<H: core::hash::Hasher>(&self, h: &mut H) {
         self.x.hash(h);
         self.y.hash(h);
     }
@@ -380,7 +380,7 @@ impl<T, Src, Dst> PartialEq for Translation3D<T, Src, Dst>
 impl<T, Src, Dst> Hash for Translation3D<T, Src, Dst>
     where T: Hash
 {
-    fn hash<H: crate::core::hash::Hasher>(&self, h: &mut H) {
+    fn hash<H: core::hash::Hasher>(&self, h: &mut H) {
         self.x.hash(h);
         self.y.hash(h);
         self.z.hash(h);

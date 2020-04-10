@@ -1,8 +1,8 @@
 use crate::{Rect, Box2D, Box3D, Vector2D, Vector3D, size2, point2, point3};
 use crate::approxord::{min, max};
-use crate::core::ops::Deref;
-use crate::core::ops::{Add, Sub};
-use crate::core::cmp::{PartialEq};
+use core::ops::Deref;
+use core::ops::{Add, Sub};
+use core::cmp::{PartialEq};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 

@@ -16,12 +16,12 @@ use num_traits::{NumCast, Saturating};
 use crate::num::One;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use crate::core::cmp::Ordering;
-use crate::core::ops::{Add, Div, Mul, Neg, Sub};
-use crate::core::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
-use crate::core::hash::{Hash, Hasher};
-use crate::core::marker::PhantomData;
-use crate::core::fmt;
+use core::cmp::Ordering;
+use core::ops::{Add, Div, Mul, Neg, Sub};
+use core::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
+use core::hash::{Hash, Hasher};
+use core::marker::PhantomData;
+use core::fmt;
 
 /// A one-dimensional distance, with value represented by `T` and unit of measurement `Unit`.
 ///
@@ -328,7 +328,7 @@ mod tests {
 
     use num_traits::Saturating;
     use crate::scale::Scale;
-    use crate::core::f32::INFINITY;
+    use core::f32::INFINITY;
 
     enum Inch {}
     enum Mm {}

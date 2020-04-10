@@ -40,8 +40,6 @@
 //!
 #![deny(unconditional_recursion)]
 
-#[cfg(not(test))]
-pub use core;
 #[cfg(test)]
 use std as core;
 

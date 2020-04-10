@@ -8,9 +8,9 @@
 // except according to those terms.
 
 use num_traits::{Float, FloatConst, Zero};
-use crate::core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, Sub, SubAssign};
-use crate::core::cmp::{Eq, PartialEq};
-use crate::core::hash::{Hash};
+use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, Sub, SubAssign};
+use core::cmp::{Eq, PartialEq};
+use core::hash::{Hash};
 use crate::trig::Trig;
 use crate::approxeq::ApproxEq;
 #[cfg(feature = "serde")]
@@ -199,7 +199,7 @@ impl<T: ApproxEq<T>> ApproxEq<T> for Angle<T> {
 
 #[test]
 fn wrap_angles() {
-    use crate::core::f32::consts::{FRAC_PI_2, PI};
+    use core::f32::consts::{FRAC_PI_2, PI};
 
     assert!(Angle::radians(0.0).positive().approx_eq(&Angle::zero()));
     assert!(

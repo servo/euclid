@@ -22,11 +22,11 @@ use crate::trig::Trig;
 use crate::Angle;
 use crate::num::*;
 use num_traits::{Float, NumCast, Signed};
-use crate::core::fmt;
-use crate::core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
-use crate::core::marker::PhantomData;
-use crate::core::cmp::{Eq, PartialEq};
-use crate::core::hash::{Hash};
+use core::fmt;
+use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+use core::marker::PhantomData;
+use core::cmp::{Eq, PartialEq};
+use core::hash::{Hash};
 #[cfg(feature = "serde")]
 use serde;
 
@@ -87,7 +87,7 @@ impl<T: PartialEq, U> PartialEq for Vector2D<T, U> {
 }
 
 impl<T: Hash, U> Hash for Vector2D<T, U> {
-    fn hash<H: crate::core::hash::Hasher>(&self, h: &mut H) {
+    fn hash<H: core::hash::Hasher>(&self, h: &mut H) {
         self.x.hash(h);
         self.y.hash(h);
     }
@@ -868,7 +868,7 @@ impl<T: PartialEq, U> PartialEq for Vector3D<T, U> {
 }
 
 impl<T: Hash, U> Hash for Vector3D<T, U> {
-    fn hash<H: crate::core::hash::Hasher>(&self, h: &mut H) {
+    fn hash<H: core::hash::Hasher>(&self, h: &mut H) {
         self.x.hash(h);
         self.y.hash(h);
         self.z.hash(h);
@@ -1928,7 +1928,7 @@ mod vector2d {
 
     #[test]
     pub fn test_angle_from_x_axis() {
-        use crate::core::f32::consts::FRAC_PI_2;
+        use core::f32::consts::FRAC_PI_2;
         use crate::approxeq::ApproxEq;
 
         let right: Vec2 = vec2(10.0, 0.0);
@@ -1942,7 +1942,7 @@ mod vector2d {
 
     #[test]
     pub fn test_angle_to() {
-        use crate::core::f32::consts::FRAC_PI_2;
+        use core::f32::consts::FRAC_PI_2;
         use crate::approxeq::ApproxEq;
 
         let right: Vec2 = vec2(10.0, 0.0);
@@ -2180,7 +2180,7 @@ mod vector3d {
 
     #[test]
     pub fn test_angle_to() {
-        use crate::core::f32::consts::FRAC_PI_2;
+        use core::f32::consts::FRAC_PI_2;
         use crate::approxeq::ApproxEq;
 
         let right: Vec3 = vec3(10.0, 0.0, 0.0);
