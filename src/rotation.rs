@@ -10,7 +10,7 @@
 use crate::approxeq::ApproxEq;
 use num_traits::{Float, One, Zero, NumCast};
 use core::fmt;
-use core::ops::{Add, Div, Mul, Neg, Sub};
+use core::ops::{Add, Mul, Neg, Sub};
 use core::marker::PhantomData;
 use core::cmp::{Eq, PartialEq};
 use core::hash::{Hash};
@@ -209,15 +209,7 @@ impl<T: Float, Src, Dst> Rotation2D<T, Src, Dst> {
 
 impl<T, Src, Dst> Rotation2D<T, Src, Dst>
 where
-    T: Copy
-        + Add<T, Output = T>
-        + Mul<T, Output = T>
-        + Div<T, Output = T>
-        + Sub<T, Output = T>
-        + Trig
-        + PartialOrd
-        + One
-        + Zero,
+    T: Copy + Add<Output = T> + Sub<Output = T> + Mul<Output = T> + Zero + Trig,
 {
     /// Returns the matrix representation of this rotation.
     #[inline]

@@ -11,8 +11,7 @@ use crate::{Vector2D, Point2D, Vector3D, Point3D, Transform2D, Transform3D};
 use crate::{Box2D, Box3D, Size2D, Rect, vec2, point2, vec3, point3};
 use crate::UnknownUnit;
 use crate::num::*;
-use crate::trig::Trig;
-use core::ops::{Add, AddAssign, Sub, SubAssign, Neg, Mul, Div};
+use core::ops::{Add, AddAssign, Sub, SubAssign, Neg};
 use core::marker::PhantomData;
 use core::fmt;
 use core::cmp::{Eq, PartialEq};
@@ -165,6 +164,15 @@ impl<T: Copy, Src, Dst> Translation2D<T, Src, Dst> {
         }
     }
 
+    /// Returns the matrix representation of this translation.
+    #[inline]
+    pub fn to_transform(&self) -> Transform2D<T, Src, Dst>
+    where
+        T: Zero + One,
+    {
+        (*self).into()
+    }
+
     /// Translate a point and cast its unit.
     #[inline]
     pub fn transform_point(&self, p: Point2D<T, Src>) -> Point2D<T::Output, Dst>
@@ -247,25 +255,6 @@ impl<T: SubAssign, Src, Dst> SubAssign<Translation2D<T, Dst, Dst>> for Translati
 }
 
 
-impl<T, Src, Dst> Translation2D<T, Src, Dst>
-where
-    T: Copy
-        + Add<T, Output = T>
-        + Mul<T, Output = T>
-        + Div<T, Output = T>
-        + Sub<T, Output = T>
-        + Trig
-        + PartialOrd
-        + One
-        + Zero,
-{
-    /// Returns the matrix representation of this translation.
-    #[inline]
-    pub fn to_transform(&self) -> Transform2D<T, Src, Dst> {
-        Transform2D::create_translation(self.x, self.y)
-    }
-}
-
 impl<T, Src, Dst> From<Vector2D<T, Src>> for Translation2D<T, Src, Dst>
 {
     fn from(v: Vector2D<T, Src>) -> Self {
@@ -282,18 +271,10 @@ impl<T, Src, Dst> Into<Vector2D<T, Src>> for Translation2D<T, Src, Dst>
 
 impl<T, Src, Dst> Into<Transform2D<T, Src, Dst>> for Translation2D<T, Src, Dst>
 where
-    T: Copy
-        + Add<T, Output = T>
-        + Mul<T, Output = T>
-        + Div<T, Output = T>
-        + Sub<T, Output = T>
-        + Trig
-        + PartialOrd
-        + One
-        + Zero,
+    T: Zero + One,
 {
     fn into(self) -> Transform2D<T, Src, Dst> {
-        self.to_transform()
+        Transform2D::create_translation(self.x, self.y)
     }
 }
 
@@ -476,6 +457,15 @@ impl<T: Copy, Src, Dst> Translation3D<T, Src, Dst> {
         }
     }
 
+    /// Returns the matrix representation of this translation.
+    #[inline]
+    pub fn to_transform(&self) -> Transform3D<T, Src, Dst>
+    where
+        T: Zero + One,
+    {
+        (*self).into()
+    }
+
     /// Translate a point and cast its unit.
     #[inline]
     pub fn transform_point3d(&self, p: &Point3D<T, Src>) -> Point3D<T::Output, Dst>
@@ -583,25 +573,6 @@ impl<T: SubAssign, Src, Dst> SubAssign<Translation3D<T, Dst, Dst>> for Translati
 }
 
 
-impl<T, Src, Dst> Translation3D<T, Src, Dst>
-where
-    T: Copy +
-        Add<T, Output=T> +
-        Sub<T, Output=T> +
-        Mul<T, Output=T> +
-        Div<T, Output=T> +
-        Neg<Output=T> +
-        PartialOrd +
-        Trig +
-        One + Zero,
-{
-    /// Returns the matrix representation of this translation.
-    #[inline]
-    pub fn to_transform(&self) -> Transform3D<T, Src, Dst> {
-        Transform3D::create_translation(self.x, self.y, self.z)
-    }
-}
-
 impl<T, Src, Dst> From<Vector3D<T, Src>> for Translation3D<T, Src, Dst>
 {
     fn from(v: Vector3D<T, Src>) -> Self {
@@ -618,18 +589,10 @@ impl<T, Src, Dst> Into<Vector3D<T, Src>> for Translation3D<T, Src, Dst>
 
 impl<T, Src, Dst> Into<Transform3D<T, Src, Dst>> for Translation3D<T, Src, Dst>
 where
-    T: Copy +
-        Add<T, Output=T> +
-        Sub<T, Output=T> +
-        Mul<T, Output=T> +
-        Div<T, Output=T> +
-        Neg<Output=T> +
-        PartialOrd +
-        Trig +
-        One + Zero,
+    T: Zero + One,
 {
     fn into(self) -> Transform3D<T, Src, Dst> {
-        self.to_transform()
+        Transform3D::create_translation(self.x, self.y, self.z)
     }
 }
 
