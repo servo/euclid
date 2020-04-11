@@ -16,7 +16,7 @@ use crate::size::{Size2D, Size3D};
 #[cfg(feature = "mint")]
 use mint;
 use crate::num::*;
-use num_traits::NumCast;
+use num_traits::{Float, NumCast};
 use crate::vector::{Vector2D, Vector3D, vec2, vec3};
 use core::fmt;
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
@@ -468,6 +468,13 @@ impl<T: Copy + Add<T, Output = T>, U> Point2D<T, U> {
     #[inline]
     pub fn add_size(&self, other: &Size2D<T, U>) -> Self {
         point2(self.x + other.width, self.y + other.height)
+    }
+}
+
+impl<T: Float + Sub<T, Output = T>, U> Point2D<T, U> {
+    #[inline]
+    pub fn distance_to(self, other: Self) -> T {
+        (self - other).length()
     }
 }
 
@@ -1173,6 +1180,13 @@ impl<T: Copy + Add<T, Output = T>, U> Point3D<T, U> {
     }
 }
 
+impl<T: Float + Sub<T, Output = T>, U> Point3D<T, U> {
+    #[inline]
+    pub fn distance_to(self, other: Self) -> T {
+        (self - other).length()
+    }
+}
+
 
 impl<T: Neg, U> Neg for Point3D<T, U> {
     type Output = Point3D<T::Output, U>;
@@ -1499,6 +1513,19 @@ mod point2d {
         assert_eq!(p.yx(), point2(2, 1));
     }
 
+    #[test]
+    pub fn test_distance_to() {
+        let p1 = Point2D::new(1.0, 2.0);
+        let p2 = Point2D::new(2.0, 2.0);
+
+        assert_eq!(p1.distance_to(p2), 1.0);
+
+        let p1 = Point2D::new(1.0, 2.0);
+        let p2 = Point2D::new(1.0, 4.0);
+
+        assert_eq!(p1.distance_to(p2), 2.0);
+    }
+
     mod ops {
         use crate::default::Point2D;
         use crate::{size2, vec2, Vector2D};
@@ -1743,6 +1770,24 @@ mod point3d {
         assert_eq!(p.xy(), point2(1, 2));
         assert_eq!(p.xz(), point2(1, 3));
         assert_eq!(p.yz(), point2(2, 3));
+    }
+
+    #[test]
+    pub fn test_distance_to() {
+        let p1 = Point3D::new(1.0, 2.0, 3.0);
+        let p2 = Point3D::new(2.0, 2.0, 3.0);
+
+        assert_eq!(p1.distance_to(p2), 1.0);
+
+        let p1 = Point3D::new(1.0, 2.0, 3.0);
+        let p2 = Point3D::new(1.0, 4.0, 3.0);
+
+        assert_eq!(p1.distance_to(p2), 2.0);
+
+        let p1 = Point3D::new(1.0, 2.0, 3.0);
+        let p2 = Point3D::new(1.0, 2.0, 6.0);
+
+        assert_eq!(p1.distance_to(p2), 3.0);
     }
 
     #[cfg(feature = "mint")]
