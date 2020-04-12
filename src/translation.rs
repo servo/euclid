@@ -296,18 +296,18 @@ impl<T, Src, Dst> From<Vector2D<T, Src>> for Translation2D<T, Src, Dst> {
     }
 }
 
-impl<T, Src, Dst> Into<Vector2D<T, Src>> for Translation2D<T, Src, Dst> {
-    fn into(self) -> Vector2D<T, Src> {
-        vec2(self.x, self.y)
+impl<T, Src, Dst> From<Translation2D<T, Src, Dst>> for Vector2D<T, Src> {
+    fn from(t: Translation2D<T, Src, Dst>) -> Self {
+        vec2(t.x, t.y)
     }
 }
 
-impl<T, Src, Dst> Into<Transform2D<T, Src, Dst>> for Translation2D<T, Src, Dst>
+impl<T, Src, Dst> From<Translation2D<T, Src, Dst>> for Transform2D<T, Src, Dst>
 where
     T: Zero + One,
 {
-    fn into(self) -> Transform2D<T, Src, Dst> {
-        Transform2D::translation(self.x, self.y)
+    fn from(t: Translation2D<T, Src, Dst>) -> Self {
+        Transform2D::translation(t.x, t.y)
     }
 }
 
@@ -624,18 +624,18 @@ impl<T, Src, Dst> From<Vector3D<T, Src>> for Translation3D<T, Src, Dst> {
     }
 }
 
-impl<T, Src, Dst> Into<Vector3D<T, Src>> for Translation3D<T, Src, Dst> {
-    fn into(self) -> Vector3D<T, Src> {
-        vec3(self.x, self.y, self.z)
+impl<T, Src, Dst> From<Translation3D<T, Src, Dst>> for Vector3D<T, Src> {
+    fn from(t: Translation3D<T, Src, Dst>) -> Self {
+        vec3(t.x, t.y, t.z)
     }
 }
 
-impl<T, Src, Dst> Into<Transform3D<T, Src, Dst>> for Translation3D<T, Src, Dst>
+impl<T, Src, Dst> From<Translation3D<T, Src, Dst>> for Transform3D<T, Src, Dst>
 where
     T: Zero + One,
 {
-    fn into(self) -> Transform3D<T, Src, Dst> {
-        Transform3D::translation(self.x, self.y, self.z)
+    fn from(t: Translation3D<T, Src, Dst>) -> Self {
+        Transform3D::translation(t.x, t.y, t.z)
     }
 }
 

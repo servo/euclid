@@ -678,12 +678,12 @@ impl<T, U> From<mint::Vector2<T>> for Size2D<T, U> {
     }
 }
 #[cfg(feature = "mint")]
-impl<T, U> Into<mint::Vector2<T>> for Size2D<T, U> {
+impl<T, U> From<Size2D<T, U>> for mint::Vector2<T> {
     #[inline]
-    fn into(self) -> mint::Vector2<T> {
+    fn from(s: Size2D<T, U>) -> Self {
         mint::Vector2 {
-            x: self.width,
-            y: self.height,
+            x: s.width,
+            y: s.height,
         }
     }
 }
@@ -695,10 +695,10 @@ impl<T, U> From<Vector2D<T, U>> for Size2D<T, U> {
     }
 }
 
-impl<T, U> Into<[T; 2]> for Size2D<T, U> {
+impl<T, U> From<Size2D<T, U>> for [T; 2] {
     #[inline]
-    fn into(self) -> [T; 2] {
-        [self.width, self.height]
+    fn from(s: Size2D<T, U>) -> Self {
+        [s.width, s.height]
     }
 }
 
@@ -709,10 +709,10 @@ impl<T, U> From<[T; 2]> for Size2D<T, U> {
     }
 }
 
-impl<T, U> Into<(T, T)> for Size2D<T, U> {
+impl<T, U> From<Size2D<T, U>> for (T, T) {
     #[inline]
-    fn into(self) -> (T, T) {
-        (self.width, self.height)
+    fn from(s: Size2D<T, U>) -> Self {
+        (s.width, s.height)
     }
 }
 
@@ -1605,13 +1605,13 @@ impl<T, U> From<mint::Vector3<T>> for Size3D<T, U> {
     }
 }
 #[cfg(feature = "mint")]
-impl<T, U> Into<mint::Vector3<T>> for Size3D<T, U> {
+impl<T, U> From<Size3D<T, U>> for mint::Vector3<T> {
     #[inline]
-    fn into(self) -> mint::Vector3<T> {
+    fn from(s: Size3D<T, U>) -> Self {
         mint::Vector3 {
-            x: self.width,
-            y: self.height,
-            z: self.depth,
+            x: s.width,
+            y: s.height,
+            z: s.depth,
         }
     }
 }
@@ -1623,10 +1623,10 @@ impl<T, U> From<Vector3D<T, U>> for Size3D<T, U> {
     }
 }
 
-impl<T, U> Into<[T; 3]> for Size3D<T, U> {
+impl<T, U> From<Size3D<T, U>> for [T; 3] {
     #[inline]
-    fn into(self) -> [T; 3] {
-        [self.width, self.height, self.depth]
+    fn from(s: Size3D<T, U>) -> Self {
+        [s.width, s.height, s.depth]
     }
 }
 
@@ -1637,10 +1637,10 @@ impl<T, U> From<[T; 3]> for Size3D<T, U> {
     }
 }
 
-impl<T, U> Into<(T, T, T)> for Size3D<T, U> {
+impl<T, U> From<Size3D<T, U>> for (T, T, T) {
     #[inline]
-    fn into(self) -> (T, T, T) {
-        (self.width, self.height, self.depth)
+    fn from(s: Size3D<T, U>) -> Self {
+        (s.width, s.height, s.depth)
     }
 }
 

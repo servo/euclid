@@ -1141,13 +1141,13 @@ impl<T, Src, Dst> From<mint::RowMatrix4<T>> for Transform3D<T, Src, Dst> {
     }
 }
 #[cfg(feature = "mint")]
-impl<T, Src, Dst> Into<mint::RowMatrix4<T>> for Transform3D<T, Src, Dst> {
-    fn into(self) -> mint::RowMatrix4<T> {
+impl<T, Src, Dst> From<Transform3D<T, Src, Dst>> for mint::RowMatrix4<T> {
+    fn from(t: Transform3D<T, Src, Dst>) -> Self {
         mint::RowMatrix4 {
-            x: mint::Vector4 { x: self.m11, y: self.m12, z: self.m13, w: self.m14 },
-            y: mint::Vector4 { x: self.m21, y: self.m22, z: self.m23, w: self.m24 },
-            z: mint::Vector4 { x: self.m31, y: self.m32, z: self.m33, w: self.m34 },
-            w: mint::Vector4 { x: self.m41, y: self.m42, z: self.m43, w: self.m44 },
+            x: mint::Vector4 { x: t.m11, y: t.m12, z: t.m13, w: t.m14 },
+            y: mint::Vector4 { x: t.m21, y: t.m22, z: t.m23, w: t.m24 },
+            z: mint::Vector4 { x: t.m31, y: t.m32, z: t.m33, w: t.m34 },
+            w: mint::Vector4 { x: t.m41, y: t.m42, z: t.m43, w: t.m44 },
         }
     }
 }
