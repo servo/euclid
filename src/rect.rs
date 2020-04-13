@@ -120,19 +120,6 @@ where
 
 impl<T, U> Rect<T, U>
 where
-    T: Copy + PartialOrd + Add<T, Output = T>,
-{
-    #[inline]
-    pub fn intersects(&self, other: &Self) -> bool {
-        self.origin.x < other.origin.x + other.size.width
-            && other.origin.x < self.origin.x + self.size.width
-            && self.origin.y < other.origin.y + other.size.height
-            && other.origin.y < self.origin.y + self.size.height
-    }
-}
-
-impl<T, U> Rect<T, U>
-where
     T: Copy + Add<T, Output = T>,
 {
     #[inline]
@@ -184,6 +171,43 @@ where
     pub fn y_range(&self) -> Range<T> {
         self.min_y()..self.max_y()
     }
+
+    /// Returns the same rectangle, translated by a vector.
+    #[inline]
+    #[must_use]
+    pub fn translate(&self, by: Vector2D<T, U>) -> Self {
+        Self::new(self.origin + by, self.size)
+    }
+
+    #[inline]
+    pub fn to_box2d(&self) -> Box2D<T, U> {
+        Box2D {
+            min: self.min(),
+            max: self.max(),
+        }
+    }
+}
+
+impl<T, U> Rect<T, U>
+where
+    T: Copy + PartialOrd + Add<T, Output = T>,
+{
+    /// Returns true if this rectangle contains the point. Points are considered
+    /// in the rectangle if they are on the left or top edge, but outside if they
+    /// are on the right or bottom edge.
+    #[inline]
+    pub fn contains(&self, other: Point2D<T, U>) -> bool {
+        self.origin.x <= other.x && other.x < self.origin.x + self.size.width
+            && self.origin.y <= other.y && other.y < self.origin.y + self.size.height
+    }
+
+    #[inline]
+    pub fn intersects(&self, other: &Self) -> bool {
+        self.origin.x < other.origin.x + other.size.width
+            && other.origin.x < self.origin.x + self.size.width
+            && self.origin.y < other.origin.y + other.size.height
+            && other.origin.y < self.origin.y + self.size.height
+    }
 }
 
 impl<T, U> Rect<T, U>
@@ -209,21 +233,6 @@ where
         ))
     }
 
-    /// Returns the same rectangle, translated by a vector.
-    #[inline]
-    #[must_use]
-    pub fn translate(&self, by: Vector2D<T, U>) -> Self {
-        Self::new(self.origin + by, self.size)
-    }
-
-    /// Returns true if this rectangle contains the point. Points are considered
-    /// in the rectangle if they are on the left or top edge, but outside if they
-    /// are on the right or bottom edge.
-    #[inline]
-    pub fn contains(&self, other: Point2D<T, U>) -> bool {
-        self.origin.x <= other.x && other.x < self.origin.x + self.size.width
-            && self.origin.y <= other.y && other.y < self.origin.y + self.size.height
-    }
 }
 
 impl<T, U> Rect<T, U>
@@ -240,14 +249,6 @@ where
                 self.size.height + height + height,
             ),
         )
-    }
-
-    #[inline]
-    pub fn to_box2d(&self) -> Box2D<T, U> {
-        Box2D {
-            min: self.min(),
-            max: self.max(),
-        }
     }
 }
 
