@@ -510,46 +510,9 @@ impl<T: NumCast + Copy, U> Rect<T, U> {
             _ => None,
         }
     }
-}
 
-impl<T: Floor + Ceil + Round + Add<T, Output = T> + Sub<T, Output = T>, U> Rect<T, U> {
-    /// Return a rectangle with edges rounded to integer coordinates, such that
-    /// the returned rectangle has the same set of pixel centers as the original
-    /// one.
-    /// Edges at offset 0.5 round up.
-    /// Suitable for most places where integral device coordinates
-    /// are needed, but note that any translation should be applied first to
-    /// avoid pixel rounding errors.
-    /// Note that this is *not* rounding to nearest integer if the values are negative.
-    /// They are always rounding as floor(n + 0.5).
-    #[must_use]
-    pub fn round(&self) -> Self {
-        let origin = self.origin.round();
-        let size = (self.origin + self.size).round() - origin;
-        Rect::new(origin, Size2D::new(size.x, size.y))
-    }
+    // Convenience functions for common casts
 
-    /// Return a rectangle with edges rounded to integer coordinates, such that
-    /// the original rectangle contains the resulting rectangle.
-    #[must_use]
-    pub fn round_in(&self) -> Self {
-        let origin = self.origin.ceil();
-        let size = (self.origin + self.size).floor() - origin;
-        Rect::new(origin, Size2D::new(size.x, size.y))
-    }
-
-    /// Return a rectangle with edges rounded to integer coordinates, such that
-    /// the original rectangle is contained in the resulting rectangle.
-    #[must_use]
-    pub fn round_out(&self) -> Self {
-        let origin = self.origin.floor();
-        let size = (self.origin + self.size).ceil() - origin;
-        Rect::new(origin, Size2D::new(size.x, size.y))
-    }
-}
-
-// Convenience functions for common casts
-impl<T: NumCast + Copy, U> Rect<T, U> {
     /// Cast into an `f32` rectangle.
     #[inline]
     pub fn to_f32(&self) -> Rect<f32, U> {
@@ -610,6 +573,42 @@ impl<T: NumCast + Copy, U> Rect<T, U> {
     #[inline]
     pub fn to_i64(&self) -> Rect<i64, U> {
         self.cast()
+    }
+}
+
+impl<T: Floor + Ceil + Round + Add<T, Output = T> + Sub<T, Output = T>, U> Rect<T, U> {
+    /// Return a rectangle with edges rounded to integer coordinates, such that
+    /// the returned rectangle has the same set of pixel centers as the original
+    /// one.
+    /// Edges at offset 0.5 round up.
+    /// Suitable for most places where integral device coordinates
+    /// are needed, but note that any translation should be applied first to
+    /// avoid pixel rounding errors.
+    /// Note that this is *not* rounding to nearest integer if the values are negative.
+    /// They are always rounding as floor(n + 0.5).
+    #[must_use]
+    pub fn round(&self) -> Self {
+        let origin = self.origin.round();
+        let size = (self.origin + self.size).round() - origin;
+        Rect::new(origin, Size2D::new(size.x, size.y))
+    }
+
+    /// Return a rectangle with edges rounded to integer coordinates, such that
+    /// the original rectangle contains the resulting rectangle.
+    #[must_use]
+    pub fn round_in(&self) -> Self {
+        let origin = self.origin.ceil();
+        let size = (self.origin + self.size).floor() - origin;
+        Rect::new(origin, Size2D::new(size.x, size.y))
+    }
+
+    /// Return a rectangle with edges rounded to integer coordinates, such that
+    /// the original rectangle is contained in the resulting rectangle.
+    #[must_use]
+    pub fn round_out(&self) -> Self {
+        let origin = self.origin.floor();
+        let size = (self.origin + self.size).ceil() - origin;
+        Rect::new(origin, Size2D::new(size.x, size.y))
     }
 }
 

@@ -215,7 +215,7 @@ where
     T: Copy + Sub<T, Output = T>,
 {
     #[inline]
-    pub fn size(&self)-> Size3D<T, U> {
+    pub fn size(&self) -> Size3D<T, U> {
         Size3D::new(
             self.max.x - self.min.x,
             self.max.y - self.min.y,
@@ -485,10 +485,7 @@ where
     }
 }
 
-impl<T, U> Box3D<T, U>
-where
-    T: NumCast + Copy,
-{
+impl<T: NumCast + Copy, U> Box3D<T, U> {
     /// Cast from one numeric representation to another, preserving the units.
     ///
     /// When casting from floating point to integer coordinates, the decimals are truncated
@@ -513,54 +510,9 @@ where
             _ => None,
         }
     }
-}
 
-impl<T, U> Box3D<T, U>
-where
-    T: Round,
-{
-    /// Return a box3d with edges rounded to integer coordinates, such that
-    /// the returned box3d has the same set of pixel centers as the original
-    /// one.
-    /// Values equal to 0.5 round up.
-    /// Suitable for most places where integral device coordinates
-    /// are needed, but note that any translation should be applied first to
-    /// avoid pixel rounding errors.
-    /// Note that this is *not* rounding to nearest integer if the values are negative.
-    /// They are always rounding as floor(n + 0.5).
-    #[must_use]
-    pub fn round(&self) -> Self {
-        Box3D::new(self.min.round(), self.max.round())
-    }
-}
+    // Convenience functions for common casts
 
-impl<T, U> Box3D<T, U>
-where
-    T: Floor + Ceil,
-{
-    /// Return a box3d with faces/edges rounded to integer coordinates, such that
-    /// the original box3d contains the resulting box3d.
-    #[must_use]
-    pub fn round_in(&self) -> Self {
-        Box3D {
-            min: self.min.ceil(),
-            max: self.max.floor(),
-        }
-    }
-
-    /// Return a box3d with faces/edges rounded to integer coordinates, such that
-    /// the original box3d is contained in the resulting box3d.
-    #[must_use]
-    pub fn round_out(&self) -> Self {
-        Box3D {
-            min: self.min.floor(),
-            max: self.max.ceil(),
-        }
-    }
-}
-
-// Convenience functions for common casts
-impl<T: NumCast + Copy, U> Box3D<T, U> {
     /// Cast into an `f32` box3d.
     #[inline]
     pub fn to_f32(&self) -> Box3D<f32, U> {
@@ -611,6 +563,50 @@ impl<T: NumCast + Copy, U> Box3D<T, U> {
     #[inline]
     pub fn to_i64(&self) -> Box3D<i64, U> {
         self.cast()
+    }
+}
+
+impl<T, U> Box3D<T, U>
+where
+    T: Round,
+{
+    /// Return a box3d with edges rounded to integer coordinates, such that
+    /// the returned box3d has the same set of pixel centers as the original
+    /// one.
+    /// Values equal to 0.5 round up.
+    /// Suitable for most places where integral device coordinates
+    /// are needed, but note that any translation should be applied first to
+    /// avoid pixel rounding errors.
+    /// Note that this is *not* rounding to nearest integer if the values are negative.
+    /// They are always rounding as floor(n + 0.5).
+    #[must_use]
+    pub fn round(&self) -> Self {
+        Box3D::new(self.min.round(), self.max.round())
+    }
+}
+
+impl<T, U> Box3D<T, U>
+where
+    T: Floor + Ceil,
+{
+    /// Return a box3d with faces/edges rounded to integer coordinates, such that
+    /// the original box3d contains the resulting box3d.
+    #[must_use]
+    pub fn round_in(&self) -> Self {
+        Box3D {
+            min: self.min.ceil(),
+            max: self.max.floor(),
+        }
+    }
+
+    /// Return a box3d with faces/edges rounded to integer coordinates, such that
+    /// the original box3d is contained in the resulting box3d.
+    #[must_use]
+    pub fn round_out(&self) -> Self {
+        Box3D {
+            min: self.min.floor(),
+            max: self.max.ceil(),
+        }
     }
 }
 
