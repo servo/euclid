@@ -15,7 +15,6 @@ use crate::point::Point2D;
 use crate::vector::Vector2D;
 use crate::side_offsets::SideOffsets2D;
 use crate::size::Size2D;
-use crate::approxord::{min, max};
 use crate::nonempty::NonEmpty;
 
 use num_traits::NumCast;
@@ -196,17 +195,13 @@ where
     /// in the rectangle if they are on the left or top edge, but outside if they
     /// are on the right or bottom edge.
     #[inline]
-    pub fn contains(&self, other: Point2D<T, U>) -> bool {
-        self.origin.x <= other.x && other.x < self.origin.x + self.size.width
-            && self.origin.y <= other.y && other.y < self.origin.y + self.size.height
+    pub fn contains(&self, p: Point2D<T, U>) -> bool {
+        self.to_box2d().contains(p)
     }
 
     #[inline]
     pub fn intersects(&self, other: &Self) -> bool {
-        self.origin.x < other.origin.x + other.size.width
-            && other.origin.x < self.origin.x + self.size.width
-            && self.origin.y < other.origin.y + other.size.height
-            && other.origin.y < self.origin.y + self.size.height
+        self.to_box2d().intersects(&other.to_box2d())
     }
 }
 
@@ -216,21 +211,12 @@ where
 {
     #[inline]
     pub fn intersection(&self, other: &Self) -> Option<Self> {
-        if !self.intersects(other) {
+        let box2d = self.to_box2d().intersection(&other.to_box2d());
+        if box2d.is_empty_or_negative() {
             return None;
         }
 
-        let upper_left = Point2D::new(
-            max(self.min_x(), other.min_x()),
-            max(self.min_y(), other.min_y()),
-        );
-        let lower_right_x = min(self.max_x(), other.max_x());
-        let lower_right_y = min(self.max_y(), other.max_y());
-
-        Some(Rect::new(
-            upper_left,
-            Size2D::new(lower_right_x - upper_left.x, lower_right_y - upper_left.y),
-        ))
+        Some(box2d.to_rect())
     }
 
 }
@@ -333,33 +319,7 @@ where
         I: IntoIterator,
         I::Item: Borrow<Point2D<T, U>>,
     {
-        let mut points = points.into_iter();
-
-        let (mut min_x, mut min_y) = match points.next() {
-            Some(first) => (first.borrow().x, first.borrow().y),
-            None => return Rect::zero(),
-        };
-
-        let (mut max_x, mut max_y) = (min_x, min_y);
-        for point in points {
-            let p = point.borrow();
-            if p.x < min_x {
-                min_x = p.x
-            }
-            if p.x > max_x {
-                max_x = p.x
-            }
-            if p.y < min_y {
-                min_y = p.y
-            }
-            if p.y > max_y {
-                max_y = p.y
-            }
-        }
-        Rect::new(
-            Point2D::new(min_x, min_y),
-            Size2D::new(max_x - min_x, max_y - min_y),
-        )
+        Box2D::from_points(points).to_rect()
     }
 }
 
@@ -400,18 +360,7 @@ where
             return *self;
         }
 
-        let upper_left = Point2D::new(
-            min(self.min_x(), other.min_x()),
-            min(self.min_y(), other.min_y()),
-        );
-
-        let lower_right_x = max(self.max_x(), other.max_x());
-        let lower_right_y = max(self.max_y(), other.max_y());
-
-        Rect::new(
-            upper_left,
-            Size2D::new(lower_right_x - upper_left.x, lower_right_y - upper_left.y),
-        )
+        self.to_box2d().union(&other.to_box2d()).to_rect()
     }
 }
 
@@ -617,29 +566,44 @@ impl<T: Floor + Ceil + Round + Add<T, Output = T> + Sub<T, Output = T>, U> Rect<
     /// avoid pixel rounding errors.
     /// Note that this is *not* rounding to nearest integer if the values are negative.
     /// They are always rounding as floor(n + 0.5).
+    ///
+    /// # Usage notes
+    /// Note, that when using with floating-point `T` types that method can significantly
+    /// loose precision for large values, so if you need to call this method very often it
+    /// is better to use [`Box2D`].
+    ///
+    /// [`Box2D`]: struct.Box2D.html
     #[must_use]
     pub fn round(&self) -> Self {
-        let origin = self.origin.round();
-        let size = (self.origin + self.size).round() - origin;
-        Rect::new(origin, Size2D::new(size.x, size.y))
+        self.to_box2d().round().to_rect()
     }
 
     /// Return a rectangle with edges rounded to integer coordinates, such that
     /// the original rectangle contains the resulting rectangle.
+    ///
+    /// # Usage notes
+    /// Note, that when using with floating-point `T` types that method can significantly
+    /// loose precision for large values, so if you need to call this method very often it
+    /// is better to use [`Box2D`].
+    ///
+    /// [`Box2D`]: struct.Box2D.html
     #[must_use]
     pub fn round_in(&self) -> Self {
-        let origin = self.origin.ceil();
-        let size = (self.origin + self.size).floor() - origin;
-        Rect::new(origin, Size2D::new(size.x, size.y))
+        self.to_box2d().round_in().to_rect()
     }
 
     /// Return a rectangle with edges rounded to integer coordinates, such that
     /// the original rectangle is contained in the resulting rectangle.
+    ///
+    /// # Usage notes
+    /// Note, that when using with floating-point `T` types that method can significantly
+    /// loose precision for large values, so if you need to call this method very often it
+    /// is better to use [`Box2D`].
+    ///
+    /// [`Box2D`]: struct.Box2D.html
     #[must_use]
     pub fn round_out(&self) -> Self {
-        let origin = self.origin.floor();
-        let size = (self.origin + self.size).ceil() - origin;
-        Rect::new(origin, Size2D::new(size.x, size.y))
+        self.to_box2d().round_out().to_rect()
     }
 }
 
