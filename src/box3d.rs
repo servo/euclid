@@ -91,19 +91,6 @@ impl<T, U> Box3D<T, U> {
 
 impl<T, U> Box3D<T, U>
 where
-    T: Copy + Zero + PartialOrd,
-{
-    /// Creates a Box3D of the given size, at offset zero.
-    #[inline]
-    pub fn from_size(size: Size3D<T, U>) -> Self {
-        let zero = Point3D::zero();
-        let point = size.to_vector().to_point();
-        Box3D::from_points(&[zero, point])
-    }
-}
-
-impl<T, U> Box3D<T, U>
-where
     T: PartialOrd,
 {
     /// Returns true if the box has a negative volume.
@@ -193,6 +180,23 @@ where
             intersection_max,
         )
     }
+
+    /// Returns the smallest box containing both of the provided boxes.
+    #[inline]
+    pub fn union(&self, other: &Self) -> Self {
+        Box3D::new(
+            Point3D::new(
+                min(self.min.x, other.min.x),
+                min(self.min.y, other.min.y),
+                min(self.min.z, other.min.z),
+            ),
+            Point3D::new(
+                max(self.max.x, other.max.x),
+                max(self.max.y, other.max.y),
+                max(self.max.z, other.max.z),
+            ),
+        )
+    }
 }
 
 impl<T, U> Box3D<T, U>
@@ -258,6 +262,14 @@ impl<T, U> Box3D<T, U>
 where
     T: Copy + Zero + PartialOrd,
 {
+    /// Creates a Box3D of the given size, at offset zero.
+    #[inline]
+    pub fn from_size(size: Size3D<T, U>) -> Self {
+        let zero = Point3D::zero();
+        let point = size.to_vector().to_point();
+        Box3D::from_points(&[zero, point])
+    }
+
     /// Returns the smallest box containing all of the provided points.
     pub fn from_points<I>(points: I) -> Self
     where
@@ -267,7 +279,7 @@ where
         let mut points = points.into_iter();
 
         let (mut min_x, mut min_y, mut min_z) = match points.next() {
-            Some(first) => (first.borrow().x, first.borrow().y, first.borrow().z),
+            Some(first) => first.borrow().to_tuple(),
             None => return Box3D::zero(),
         };
         let (mut max_x, mut max_y, mut max_z) = (min_x, min_y, min_z);
@@ -322,43 +334,6 @@ where
     pub fn center(&self) -> Point3D<T, U> {
         let two = T::one() + T::one();
         (self.min + self.max.to_vector()) / two
-    }
-}
-
-impl<T, U> Box3D<T, U>
-where
-    T: Copy + PartialOrd,
-{
-    #[inline]
-    pub fn union(&self, other: &Self) -> Self {
-        Box3D::new(
-            Point3D::new(
-                min(self.min.x, other.min.x),
-                min(self.min.y, other.min.y),
-                min(self.min.z, other.min.z),
-            ),
-            Point3D::new(
-                max(self.max.x, other.max.x),
-                max(self.max.y, other.max.y),
-                max(self.max.z, other.max.z),
-            ),
-        )
-    }
-}
-
-impl<T, U> Box3D<T, U>
-where
-    T: Copy,
-{
-    #[inline]
-    pub fn scale<S: Copy>(&self, x: S, y: S, z: S) -> Self
-    where
-        T: Mul<S, Output = T>
-    {
-        Box3D::new(
-            Point3D::new(self.min.x * x, self.min.y * y, self.min.z * z),
-            Point3D::new(self.max.x * x, self.max.y * y, self.max.z * z),
-        )
     }
 }
 
@@ -482,6 +457,17 @@ where
     #[inline]
     pub fn cast_unit<V>(&self) -> Box3D<T, V> {
         Box3D::new(self.min.cast_unit(), self.max.cast_unit())
+    }
+
+    #[inline]
+    pub fn scale<S: Copy>(&self, x: S, y: S, z: S) -> Self
+    where
+        T: Mul<S, Output = T>
+    {
+        Box3D::new(
+            Point3D::new(self.min.x * x, self.min.y * y, self.min.z * z),
+            Point3D::new(self.max.x * x, self.max.y * y, self.max.z * z),
+        )
     }
 }
 

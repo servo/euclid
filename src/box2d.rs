@@ -113,19 +113,6 @@ impl<T, U> Box2D<T, U> {
 
 impl<T, U> Box2D<T, U>
 where
-    T: Copy + Zero + PartialOrd,
-{
-    /// Creates a Box2D of the given size, at offset zero.
-    #[inline]
-    pub fn from_size(size: Size2D<T, U>) -> Self {
-        let zero = Point2D::zero();
-        let point = size.to_vector().to_point();
-        Box2D::from_points(&[zero, point])
-    }
-}
-
-impl<T, U> Box2D<T, U>
-where
     T: PartialOrd,
 {
     /// Returns true if the box has a negative area.
@@ -212,6 +199,20 @@ where
 
         Some(NonEmpty(intersection))
     }
+
+    #[inline]
+    pub fn union(&self, other: &Self) -> Self {
+        Box2D {
+            min: point2(
+                min(self.min.x, other.min.x),
+                min(self.min.y, other.min.y),
+            ),
+            max: point2(
+                max(self.max.x, other.max.x),
+                max(self.max.y, other.max.y),
+            ),
+        }
+    }
 }
 
 impl<T, U> Box2D<T, U>
@@ -297,6 +298,14 @@ impl<T, U> Box2D<T, U>
 where
     T: Copy + Zero + PartialOrd,
 {
+    /// Creates a Box2D of the given size, at offset zero.
+    #[inline]
+    pub fn from_size(size: Size2D<T, U>) -> Self {
+        let zero = Point2D::zero();
+        let point = size.to_vector().to_point();
+        Box2D::from_points(&[zero, point])
+    }
+
     /// Returns the smallest box containing all of the provided points.
     pub fn from_points<I>(points: I) -> Self
     where
@@ -306,7 +315,7 @@ where
         let mut points = points.into_iter();
 
         let (mut min_x, mut min_y) = match points.next() {
-            Some(first) => (first.borrow().x, first.borrow().y),
+            Some(first) => first.borrow().to_tuple(),
             None => return Box2D::zero(),
         };
 
@@ -355,41 +364,6 @@ where
     pub fn center(&self) -> Point2D<T, U> {
         let two = T::one() + T::one();
         (self.min + self.max.to_vector()) / two
-    }
-}
-
-impl<T, U> Box2D<T, U>
-where
-    T: Copy + PartialOrd,
-{
-    #[inline]
-    pub fn union(&self, other: &Self) -> Self {
-        Box2D {
-            min: point2(
-                min(self.min.x, other.min.x),
-                min(self.min.y, other.min.y),
-            ),
-            max: point2(
-                max(self.max.x, other.max.x),
-                max(self.max.y, other.max.y),
-            ),
-        }
-    }
-}
-
-impl<T, U> Box2D<T, U>
-where
-    T: Copy,
-{
-    #[inline]
-    pub fn scale<S: Copy>(&self, x: S, y: S) -> Self
-    where
-        T: Mul<S, Output = T>
-    {
-        Box2D {
-            min: point2(self.min.x * x, self.min.y * y),
-            max: point2(self.max.x * x, self.max.y * y),
-        }
     }
 }
 
@@ -492,6 +466,17 @@ where
     #[inline]
     pub fn cast_unit<V>(&self) -> Box2D<T, V> {
         Box2D::new(self.min.cast_unit(), self.max.cast_unit())
+    }
+
+    #[inline]
+    pub fn scale<S: Copy>(&self, x: S, y: S) -> Self
+    where
+        T: Mul<S, Output = T>
+    {
+        Box2D {
+            min: point2(self.min.x * x, self.min.y * y),
+            max: point2(self.max.x * x, self.max.y * y),
+        }
     }
 }
 
