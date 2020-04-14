@@ -30,6 +30,26 @@ use core::ops::{Add, Div, Mul, Sub};
 
 
 /// An axis aligned rectangle represented by its minimum and maximum coordinates.
+///
+/// That struct is similar to the [`Rect`] struct, but stores rectangle as two corners
+/// instead of origin point and size. Such representation has several advantages over
+/// [`Rect`] representation:
+/// - Several operations are more efficient with `Box2D`, including [`intersection`],
+///   [`union`], and point-in-rect.
+/// - The representation is more symmetric, since it stores two quantities of the
+///   same kind (two points) rather than a point and a dimension (width/height).
+/// - The representation is less susceptible to overflow. With [`Rect`], computation
+///   of second point can overflow for a large range of values of origin and size.
+///   However, with `Box2D`, computation of [`size`] cannot overflow if the coordinates
+///   are signed and the resulting size is unsigned.
+///
+/// A known disadvantage of `Box2D` is that translating the rectangle requires translating
+/// both points, whereas translating [`Rect`] only requires translating one point.
+///
+/// [`Rect`]: struct.Rect.html
+/// [`intersection`]: #method.intersection
+/// [`union`]: #method.union
+/// [`size`]: #method.size
 #[repr(C)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(bound(serialize = "T: Serialize", deserialize = "T: Deserialize<'de>")))]
