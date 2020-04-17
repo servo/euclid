@@ -24,7 +24,7 @@ use core::borrow::Borrow;
 use core::cmp::PartialOrd;
 use core::fmt;
 use core::hash::{Hash, Hasher};
-use core::ops::{Add, Div, Mul, Sub};
+use core::ops::{Add, Div, DivAssign, Mul, MulAssign, Sub};
 
 
 /// An axis aligned 3D box represented by its minimum and maximum coordinates.
@@ -397,12 +397,28 @@ impl<T: Copy + Mul, U> Mul<T> for Box3D<T, U> {
     }
 }
 
+impl<T: Clone + MulAssign, U> MulAssign<T> for Box3D<T, U> {
+    #[inline]
+    fn mul_assign(&mut self, scale: T) {
+        self.min *= scale.clone();
+        self.max *= scale;
+    }
+}
+
 impl<T: Copy + Div, U> Div<T> for Box3D<T, U> {
     type Output = Box3D<T::Output, U>;
 
     #[inline]
     fn div(self, scale: T) -> Self::Output {
         Box3D::new(self.min / scale, self.max / scale)
+    }
+}
+
+impl<T: Clone + DivAssign, U> DivAssign<T> for Box3D<T, U> {
+    #[inline]
+    fn div_assign(&mut self, scale: T) {
+        self.min /= scale.clone();
+        self.max /= scale;
     }
 }
 
@@ -415,12 +431,28 @@ impl<T: Copy + Mul, U1, U2> Mul<Scale<T, U1, U2>> for Box3D<T, U1> {
     }
 }
 
+impl<T: Clone + MulAssign, U> MulAssign<Scale<T, U, U>> for Box3D<T, U> {
+    #[inline]
+    fn mul_assign(&mut self, scale: Scale<T, U, U>) {
+        self.min *= scale.clone();
+        self.max *= scale;
+    }
+}
+
 impl<T: Copy + Div, U1, U2> Div<Scale<T, U1, U2>> for Box3D<T, U2> {
     type Output = Box3D<T::Output, U1>;
 
     #[inline]
     fn div(self, scale: Scale<T, U1, U2>) -> Self::Output {
         Box3D::new(self.min / scale, self.max / scale)
+    }
+}
+
+impl<T: Clone + DivAssign, U> DivAssign<Scale<T, U, U>> for Box3D<T, U> {
+    #[inline]
+    fn div_assign(&mut self, scale: Scale<T, U, U>) {
+        self.min /= scale.clone();
+        self.max /= scale;
     }
 }
 

@@ -25,7 +25,7 @@ use core::borrow::Borrow;
 use core::cmp::PartialOrd;
 use core::fmt;
 use core::hash::{Hash, Hasher};
-use core::ops::{Add, Div, Mul, Sub, Range};
+use core::ops::{Add, Div, DivAssign, Mul, MulAssign, Sub, Range};
 
 
 /// A 2d Rectangle optionally tagged with a unit.
@@ -420,12 +420,26 @@ impl<T: Copy + Mul, U> Mul<T> for Rect<T, U> {
     }
 }
 
+impl<T: Clone + MulAssign, U> MulAssign<T> for Rect<T, U> {
+    #[inline]
+    fn mul_assign(&mut self, scale: T) {
+        *self *= Scale::new(scale);
+    }
+}
+
 impl<T: Copy + Div, U> Div<T> for Rect<T, U> {
     type Output = Rect<T::Output, U>;
 
     #[inline]
     fn div(self, scale: T) -> Self::Output {
         Rect::new(self.origin / scale, self.size / scale)
+    }
+}
+
+impl<T: Clone + DivAssign, U> DivAssign<T> for Rect<T, U> {
+    #[inline]
+    fn div_assign(&mut self, scale: T) {
+        *self /= Scale::new(scale);
     }
 }
 
@@ -438,12 +452,28 @@ impl<T: Copy + Mul, U1, U2> Mul<Scale<T, U1, U2>> for Rect<T, U1> {
     }
 }
 
+impl<T: Clone + MulAssign, U> MulAssign<Scale<T, U, U>> for Rect<T, U> {
+    #[inline]
+    fn mul_assign(&mut self, scale: Scale<T, U, U>) {
+        self.origin *= scale.clone();
+        self.size   *= scale;
+    }
+}
+
 impl<T: Copy + Div, U1, U2> Div<Scale<T, U1, U2>> for Rect<T, U2> {
     type Output = Rect<T::Output, U1>;
 
     #[inline]
     fn div(self, scale: Scale<T, U1, U2>) -> Self::Output {
         Rect::new(self.origin / scale, self.size / scale)
+    }
+}
+
+impl<T: Clone + DivAssign, U> DivAssign<Scale<T, U, U>> for Rect<T, U> {
+    #[inline]
+    fn div_assign(&mut self, scale: Scale<T, U, U>) {
+        self.origin /= scale.clone();
+        self.size   /= scale;
     }
 }
 
