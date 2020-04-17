@@ -73,7 +73,7 @@ impl<T: Clone, U> Clone for Box2D<T, U> {
     }
 }
 
-impl<T: PartialEq, U> PartialEq<Box2D<T, U>> for Box2D<T, U> {
+impl<T: PartialEq, U> PartialEq for Box2D<T, U> {
     fn eq(&self, other: &Self) -> bool {
         self.min.eq(&other.min) && self.max.eq(&other.max)
     }
@@ -399,49 +399,43 @@ where
     }
 }
 
-impl<T, U> Mul<T> for Box2D<T, U>
-where
-    T: Copy + Mul<T, Output = T>,
-{
-    type Output = Self;
+
+impl<T: Copy + Mul, U> Mul<T> for Box2D<T, U> {
+    type Output = Box2D<T::Output, U>;
+
     #[inline]
-    fn mul(self, scale: T) -> Self {
+    fn mul(self, scale: T) -> Self::Output {
         Box2D::new(self.min * scale, self.max * scale)
     }
 }
 
-impl<T, U> Div<T> for Box2D<T, U>
-where
-    T: Copy + Div<T, Output = T>,
-{
-    type Output = Self;
+impl<T: Copy + Div, U> Div<T> for Box2D<T, U> {
+    type Output = Box2D<T::Output, U>;
+
     #[inline]
-    fn div(self, scale: T) -> Self {
+    fn div(self, scale: T) -> Self::Output {
         Box2D::new(self.min / scale, self.max / scale)
     }
 }
 
-impl<T, U1, U2> Mul<Scale<T, U1, U2>> for Box2D<T, U1>
-where
-    T: Copy + Mul<T, Output = T>,
-{
-    type Output = Box2D<T, U2>;
+impl<T: Copy + Mul, U1, U2> Mul<Scale<T, U1, U2>> for Box2D<T, U1> {
+    type Output = Box2D<T::Output, U2>;
+
     #[inline]
-    fn mul(self, scale: Scale<T, U1, U2>) -> Box2D<T, U2> {
+    fn mul(self, scale: Scale<T, U1, U2>) -> Self::Output {
         Box2D::new(self.min * scale, self.max * scale)
     }
 }
 
-impl<T, U1, U2> Div<Scale<T, U1, U2>> for Box2D<T, U2>
-where
-    T: Copy + Div<T, Output = T>,
-{
-    type Output = Box2D<T, U1>;
+impl<T: Copy + Div, U1, U2> Div<Scale<T, U1, U2>> for Box2D<T, U2> {
+    type Output = Box2D<T::Output, U1>;
+
     #[inline]
-    fn div(self, scale: Scale<T, U1, U2>) -> Box2D<T, U1> {
+    fn div(self, scale: Scale<T, U1, U2>) -> Self::Output {
         Box2D::new(self.min / scale, self.max / scale)
     }
 }
+
 
 impl<T, U> Box2D<T, U>
 where

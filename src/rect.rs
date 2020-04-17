@@ -52,7 +52,7 @@ impl<T: Clone, U> Clone for Rect<T, U> {
     }
 }
 
-impl<T: PartialEq, U> PartialEq<Rect<T, U>> for Rect<T, U> {
+impl<T: PartialEq, U> PartialEq for Rect<T, U> {
     fn eq(&self, other: &Self) -> bool {
         self.origin.eq(&other.origin) && self.size.eq(&other.size)
     }
@@ -410,37 +410,43 @@ impl<T: Copy + Zero + PartialOrd, U> Rect<T, U> {
     }
 }
 
-impl<T: Copy + Mul<T, Output = T>, U> Mul<T> for Rect<T, U> {
-    type Output = Self;
+
+impl<T: Copy + Mul, U> Mul<T> for Rect<T, U> {
+    type Output = Rect<T::Output, U>;
+
     #[inline]
-    fn mul(self, scale: T) -> Self {
+    fn mul(self, scale: T) -> Self::Output {
         Rect::new(self.origin * scale, self.size * scale)
     }
 }
 
-impl<T: Copy + Div<T, Output = T>, U> Div<T> for Rect<T, U> {
-    type Output = Self;
+impl<T: Copy + Div, U> Div<T> for Rect<T, U> {
+    type Output = Rect<T::Output, U>;
+
     #[inline]
-    fn div(self, scale: T) -> Self {
+    fn div(self, scale: T) -> Self::Output {
         Rect::new(self.origin / scale, self.size / scale)
     }
 }
 
-impl<T: Copy + Mul<T, Output = T>, U1, U2> Mul<Scale<T, U1, U2>> for Rect<T, U1> {
-    type Output = Rect<T, U2>;
+impl<T: Copy + Mul, U1, U2> Mul<Scale<T, U1, U2>> for Rect<T, U1> {
+    type Output = Rect<T::Output, U2>;
+
     #[inline]
-    fn mul(self, scale: Scale<T, U1, U2>) -> Rect<T, U2> {
+    fn mul(self, scale: Scale<T, U1, U2>) -> Self::Output {
         Rect::new(self.origin * scale, self.size * scale)
     }
 }
 
-impl<T: Copy + Div<T, Output = T>, U1, U2> Div<Scale<T, U1, U2>> for Rect<T, U2> {
-    type Output = Rect<T, U1>;
+impl<T: Copy + Div, U1, U2> Div<Scale<T, U1, U2>> for Rect<T, U2> {
+    type Output = Rect<T::Output, U1>;
+
     #[inline]
-    fn div(self, scale: Scale<T, U1, U2>) -> Rect<T, U1> {
+    fn div(self, scale: Scale<T, U1, U2>) -> Self::Output {
         Rect::new(self.origin / scale, self.size / scale)
     }
 }
+
 
 impl<T: Copy, U> Rect<T, U> {
     /// Drop the units, preserving only the numeric value.
