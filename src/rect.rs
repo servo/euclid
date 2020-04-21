@@ -15,7 +15,6 @@ use crate::point::Point2D;
 use crate::vector::Vector2D;
 use crate::side_offsets::SideOffsets2D;
 use crate::size::Size2D;
-use crate::approxord::{min, max};
 use crate::nonempty::NonEmpty;
 
 use num_traits::NumCast;
@@ -26,7 +25,7 @@ use core::borrow::Borrow;
 use core::cmp::PartialOrd;
 use core::fmt;
 use core::hash::{Hash, Hasher};
-use core::ops::{Add, Div, Mul, Sub, Range};
+use core::ops::{Add, Div, DivAssign, Mul, MulAssign, Sub, Range};
 
 
 /// A 2d Rectangle optionally tagged with a unit.
@@ -53,7 +52,7 @@ impl<T: Clone, U> Clone for Rect<T, U> {
     }
 }
 
-impl<T: PartialEq, U> PartialEq<Rect<T, U>> for Rect<T, U> {
+impl<T: PartialEq, U> PartialEq for Rect<T, U> {
     fn eq(&self, other: &Self) -> bool {
         self.origin.eq(&other.origin) && self.size.eq(&other.size)
     }
@@ -120,16 +119,8 @@ where
 
 impl<T, U> Rect<T, U>
 where
-    T: Copy + PartialOrd + Add<T, Output = T> + Sub<T, Output = T>,
+    T: Copy + Add<T, Output = T>,
 {
-    #[inline]
-    pub fn intersects(&self, other: &Self) -> bool {
-        self.origin.x < other.origin.x + other.size.width
-            && other.origin.x < self.origin.x + self.size.width
-            && self.origin.y < other.origin.y + other.size.height
-            && other.origin.y < self.origin.y + self.size.height
-    }
-
     #[inline]
     pub fn min(&self) -> Point2D<T, U> {
         self.origin
@@ -180,51 +171,11 @@ where
         self.min_y()..self.max_y()
     }
 
-    #[inline]
-    pub fn intersection(&self, other: &Self) -> Option<Self> {
-        if !self.intersects(other) {
-            return None;
-        }
-
-        let upper_left = Point2D::new(
-            max(self.min_x(), other.min_x()),
-            max(self.min_y(), other.min_y()),
-        );
-        let lower_right_x = min(self.max_x(), other.max_x());
-        let lower_right_y = min(self.max_y(), other.max_y());
-
-        Some(Rect::new(
-            upper_left,
-            Size2D::new(lower_right_x - upper_left.x, lower_right_y - upper_left.y),
-        ))
-    }
-
     /// Returns the same rectangle, translated by a vector.
     #[inline]
     #[must_use]
     pub fn translate(&self, by: Vector2D<T, U>) -> Self {
         Self::new(self.origin + by, self.size)
-    }
-
-    /// Returns true if this rectangle contains the point. Points are considered
-    /// in the rectangle if they are on the left or top edge, but outside if they
-    /// are on the right or bottom edge.
-    #[inline]
-    pub fn contains(&self, other: Point2D<T, U>) -> bool {
-        self.origin.x <= other.x && other.x < self.origin.x + self.size.width
-            && self.origin.y <= other.y && other.y < self.origin.y + self.size.height
-    }
-
-    #[inline]
-    #[must_use]
-    pub fn inflate(&self, width: T, height: T) -> Self {
-        Rect::new(
-            Point2D::new(self.origin.x - width, self.origin.y - height),
-            Size2D::new(
-                self.size.width + width + width,
-                self.size.height + height + height,
-            ),
-        )
     }
 
     #[inline]
@@ -238,7 +189,58 @@ where
 
 impl<T, U> Rect<T, U>
 where
-    T: Copy + Zero + PartialOrd + Add<T, Output = T> + Sub<T, Output = T>,
+    T: Copy + PartialOrd + Add<T, Output = T>,
+{
+    /// Returns true if this rectangle contains the point. Points are considered
+    /// in the rectangle if they are on the left or top edge, but outside if they
+    /// are on the right or bottom edge.
+    #[inline]
+    pub fn contains(&self, p: Point2D<T, U>) -> bool {
+        self.to_box2d().contains(p)
+    }
+
+    #[inline]
+    pub fn intersects(&self, other: &Self) -> bool {
+        self.to_box2d().intersects(&other.to_box2d())
+    }
+}
+
+impl<T, U> Rect<T, U>
+where
+    T: Copy + PartialOrd + Add<T, Output = T> + Sub<T, Output = T>,
+{
+    #[inline]
+    pub fn intersection(&self, other: &Self) -> Option<Self> {
+        let box2d = self.to_box2d().intersection(&other.to_box2d());
+        if box2d.is_empty_or_negative() {
+            return None;
+        }
+
+        Some(box2d.to_rect())
+    }
+
+}
+
+impl<T, U> Rect<T, U>
+where
+    T: Copy + Add<T, Output = T> + Sub<T, Output = T>,
+{
+    #[inline]
+    #[must_use]
+    pub fn inflate(&self, width: T, height: T) -> Self {
+        Rect::new(
+            Point2D::new(self.origin.x - width, self.origin.y - height),
+            Size2D::new(
+                self.size.width + width + width,
+                self.size.height + height + height,
+            ),
+        )
+    }
+}
+
+impl<T, U> Rect<T, U>
+where
+    T: Copy + Zero + PartialOrd + Add<T, Output = T>,
 {
     /// Returns true if this rectangle contains the interior of rect. Always
     /// returns true if rect is empty, and always returns false if rect is
@@ -249,7 +251,12 @@ where
             || (self.min_x() <= rect.min_x() && rect.max_x() <= self.max_x()
                 && self.min_y() <= rect.min_y() && rect.max_y() <= self.max_y())
     }
+}
 
+impl<T, U> Rect<T, U>
+where
+    T: Copy + Zero + PartialOrd + Add<T, Output = T> + Sub<T, Output = T>,
+{
     /// Calculate the size and position of an inner rectangle.
     ///
     /// Subtracts the side offsets from all sides. The horizontal and vertical
@@ -270,7 +277,12 @@ where
         debug_assert!(rect.size.height >= Zero::zero());
         rect
     }
+}
 
+impl<T, U> Rect<T, U>
+where
+    T: Copy + Add<T, Output = T> + Sub<T, Output = T>,
+{
     /// Calculate the size and position of an outer rectangle.
     ///
     /// Add the offsets to all sides. The expanded rectangle is returned.
@@ -287,7 +299,12 @@ where
             )
         )
     }
+}
 
+impl<T, U> Rect<T, U>
+where
+    T: Copy + Zero + PartialOrd + Sub<T, Output = T>,
+{
     /// Returns the smallest rectangle defined by the top/bottom/left/right-most
     /// points provided as parameter.
     ///
@@ -302,33 +319,7 @@ where
         I: IntoIterator,
         I::Item: Borrow<Point2D<T, U>>,
     {
-        let mut points = points.into_iter();
-
-        let (mut min_x, mut min_y) = match points.next() {
-            Some(first) => (first.borrow().x, first.borrow().y),
-            None => return Rect::zero(),
-        };
-
-        let (mut max_x, mut max_y) = (min_x, min_y);
-        for point in points {
-            let p = point.borrow();
-            if p.x < min_x {
-                min_x = p.x
-            }
-            if p.x > max_x {
-                max_x = p.x
-            }
-            if p.y < min_y {
-                min_y = p.y
-            }
-            if p.y > max_y {
-                max_y = p.y
-            }
-        }
-        Rect::new(
-            Point2D::new(min_x, min_y),
-            Size2D::new(max_x - min_x, max_y - min_y),
-        )
+        Box2D::from_points(points).to_rect()
     }
 }
 
@@ -369,18 +360,7 @@ where
             return *self;
         }
 
-        let upper_left = Point2D::new(
-            min(self.min_x(), other.min_x()),
-            min(self.min_y(), other.min_y()),
-        );
-
-        let lower_right_x = max(self.max_x(), other.max_x());
-        let lower_right_y = max(self.max_y(), other.max_y());
-
-        Rect::new(
-            upper_left,
-            Size2D::new(lower_right_x - upper_left.x, lower_right_y - upper_left.y),
-        )
+        self.to_box2d().union(&other.to_box2d()).to_rect()
     }
 }
 
@@ -430,37 +410,73 @@ impl<T: Copy + Zero + PartialOrd, U> Rect<T, U> {
     }
 }
 
-impl<T: Copy + Mul<T, Output = T>, U> Mul<T> for Rect<T, U> {
-    type Output = Self;
+
+impl<T: Clone + Mul, U> Mul<T> for Rect<T, U> {
+    type Output = Rect<T::Output, U>;
+
     #[inline]
-    fn mul(self, scale: T) -> Self {
-        Rect::new(self.origin * scale, self.size * scale)
+    fn mul(self, scale: T) -> Self::Output {
+        Rect::new(self.origin * scale.clone(), self.size * scale)
     }
 }
 
-impl<T: Copy + Div<T, Output = T>, U> Div<T> for Rect<T, U> {
-    type Output = Self;
+impl<T: Clone + MulAssign, U> MulAssign<T> for Rect<T, U> {
     #[inline]
-    fn div(self, scale: T) -> Self {
-        Rect::new(self.origin / scale, self.size / scale)
+    fn mul_assign(&mut self, scale: T) {
+        *self *= Scale::new(scale);
     }
 }
 
-impl<T: Copy + Mul<T, Output = T>, U1, U2> Mul<Scale<T, U1, U2>> for Rect<T, U1> {
-    type Output = Rect<T, U2>;
+impl<T: Clone + Div, U> Div<T> for Rect<T, U> {
+    type Output = Rect<T::Output, U>;
+
     #[inline]
-    fn mul(self, scale: Scale<T, U1, U2>) -> Rect<T, U2> {
-        Rect::new(self.origin * scale, self.size * scale)
+    fn div(self, scale: T) -> Self::Output {
+        Rect::new(self.origin / scale.clone(), self.size / scale)
     }
 }
 
-impl<T: Copy + Div<T, Output = T>, U1, U2> Div<Scale<T, U1, U2>> for Rect<T, U2> {
-    type Output = Rect<T, U1>;
+impl<T: Clone + DivAssign, U> DivAssign<T> for Rect<T, U> {
     #[inline]
-    fn div(self, scale: Scale<T, U1, U2>) -> Rect<T, U1> {
-        Rect::new(self.origin / scale, self.size / scale)
+    fn div_assign(&mut self, scale: T) {
+        *self /= Scale::new(scale);
     }
 }
+
+impl<T: Clone + Mul, U1, U2> Mul<Scale<T, U1, U2>> for Rect<T, U1> {
+    type Output = Rect<T::Output, U2>;
+
+    #[inline]
+    fn mul(self, scale: Scale<T, U1, U2>) -> Self::Output {
+        Rect::new(self.origin * scale.clone(), self.size * scale)
+    }
+}
+
+impl<T: Clone + MulAssign, U> MulAssign<Scale<T, U, U>> for Rect<T, U> {
+    #[inline]
+    fn mul_assign(&mut self, scale: Scale<T, U, U>) {
+        self.origin *= scale.clone();
+        self.size   *= scale;
+    }
+}
+
+impl<T: Clone + Div, U1, U2> Div<Scale<T, U1, U2>> for Rect<T, U2> {
+    type Output = Rect<T::Output, U1>;
+
+    #[inline]
+    fn div(self, scale: Scale<T, U1, U2>) -> Self::Output {
+        Rect::new(self.origin / scale.clone(), self.size / scale)
+    }
+}
+
+impl<T: Clone + DivAssign, U> DivAssign<Scale<T, U, U>> for Rect<T, U> {
+    #[inline]
+    fn div_assign(&mut self, scale: Scale<T, U, U>) {
+        self.origin /= scale.clone();
+        self.size   /= scale;
+    }
+}
+
 
 impl<T: Copy, U> Rect<T, U> {
     /// Drop the units, preserving only the numeric value.
@@ -510,46 +526,9 @@ impl<T: NumCast + Copy, U> Rect<T, U> {
             _ => None,
         }
     }
-}
 
-impl<T: Floor + Ceil + Round + Add<T, Output = T> + Sub<T, Output = T>, U> Rect<T, U> {
-    /// Return a rectangle with edges rounded to integer coordinates, such that
-    /// the returned rectangle has the same set of pixel centers as the original
-    /// one.
-    /// Edges at offset 0.5 round up.
-    /// Suitable for most places where integral device coordinates
-    /// are needed, but note that any translation should be applied first to
-    /// avoid pixel rounding errors.
-    /// Note that this is *not* rounding to nearest integer if the values are negative.
-    /// They are always rounding as floor(n + 0.5).
-    #[must_use]
-    pub fn round(&self) -> Self {
-        let origin = self.origin.round();
-        let size = (self.origin + self.size).round() - origin;
-        Rect::new(origin, Size2D::new(size.x, size.y))
-    }
+    // Convenience functions for common casts
 
-    /// Return a rectangle with edges rounded to integer coordinates, such that
-    /// the original rectangle contains the resulting rectangle.
-    #[must_use]
-    pub fn round_in(&self) -> Self {
-        let origin = self.origin.ceil();
-        let size = (self.origin + self.size).floor() - origin;
-        Rect::new(origin, Size2D::new(size.x, size.y))
-    }
-
-    /// Return a rectangle with edges rounded to integer coordinates, such that
-    /// the original rectangle is contained in the resulting rectangle.
-    #[must_use]
-    pub fn round_out(&self) -> Self {
-        let origin = self.origin.floor();
-        let size = (self.origin + self.size).ceil() - origin;
-        Rect::new(origin, Size2D::new(size.x, size.y))
-    }
-}
-
-// Convenience functions for common casts
-impl<T: NumCast + Copy, U> Rect<T, U> {
     /// Cast into an `f32` rectangle.
     #[inline]
     pub fn to_f32(&self) -> Rect<f32, U> {
@@ -610,6 +589,57 @@ impl<T: NumCast + Copy, U> Rect<T, U> {
     #[inline]
     pub fn to_i64(&self) -> Rect<i64, U> {
         self.cast()
+    }
+}
+
+impl<T: Floor + Ceil + Round + Add<T, Output = T> + Sub<T, Output = T>, U> Rect<T, U> {
+    /// Return a rectangle with edges rounded to integer coordinates, such that
+    /// the returned rectangle has the same set of pixel centers as the original
+    /// one.
+    /// Edges at offset 0.5 round up.
+    /// Suitable for most places where integral device coordinates
+    /// are needed, but note that any translation should be applied first to
+    /// avoid pixel rounding errors.
+    /// Note that this is *not* rounding to nearest integer if the values are negative.
+    /// They are always rounding as floor(n + 0.5).
+    ///
+    /// # Usage notes
+    /// Note, that when using with floating-point `T` types that method can significantly
+    /// loose precision for large values, so if you need to call this method very often it
+    /// is better to use [`Box2D`].
+    ///
+    /// [`Box2D`]: struct.Box2D.html
+    #[must_use]
+    pub fn round(&self) -> Self {
+        self.to_box2d().round().to_rect()
+    }
+
+    /// Return a rectangle with edges rounded to integer coordinates, such that
+    /// the original rectangle contains the resulting rectangle.
+    ///
+    /// # Usage notes
+    /// Note, that when using with floating-point `T` types that method can significantly
+    /// loose precision for large values, so if you need to call this method very often it
+    /// is better to use [`Box2D`].
+    ///
+    /// [`Box2D`]: struct.Box2D.html
+    #[must_use]
+    pub fn round_in(&self) -> Self {
+        self.to_box2d().round_in().to_rect()
+    }
+
+    /// Return a rectangle with edges rounded to integer coordinates, such that
+    /// the original rectangle is contained in the resulting rectangle.
+    ///
+    /// # Usage notes
+    /// Note, that when using with floating-point `T` types that method can significantly
+    /// loose precision for large values, so if you need to call this method very often it
+    /// is better to use [`Box2D`].
+    ///
+    /// [`Box2D`]: struct.Box2D.html
+    #[must_use]
+    pub fn round_out(&self) -> Self {
+        self.to_box2d().round_out().to_rect()
     }
 }
 

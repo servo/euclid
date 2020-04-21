@@ -1,5 +1,4 @@
-use crate::{Rect, Box2D, Box3D, Vector2D, Vector3D, size2, point2, point3};
-use crate::approxord::{min, max};
+use crate::{Rect, Box2D, Box3D, Vector2D, Vector3D};
 use core::ops::Deref;
 use core::ops::{Add, Sub};
 use core::cmp::{PartialEq};
@@ -31,22 +30,8 @@ where
     T: Copy + PartialOrd + Add<T, Output = T> + Sub<T, Output = T>,
 {
     #[inline]
-    pub fn union(&self, other: &NonEmpty<Rect<T, U>>) -> NonEmpty<Rect<T, U>> {
-        let origin = point2(
-            min(self.min_x(), other.min_x()),
-            min(self.min_y(), other.min_y()),
-        );
-
-        let lower_right_x = max(self.max_x(), other.max_x());
-        let lower_right_y = max(self.max_y(), other.max_y());
-
-        NonEmpty(Rect {
-            origin,
-            size: size2(
-                lower_right_x - origin.x,
-                lower_right_y - origin.y,
-            ),
-        })
+    pub fn union(&self, other: &Self) -> Self {
+        NonEmpty(self.0.to_box2d().union(&other.0.to_box2d()).to_rect())
     }
 
     #[inline]
@@ -68,17 +53,8 @@ where
     T: Copy + PartialOrd,
 {
     #[inline]
-    pub fn union(&self, other: &NonEmpty<Box2D<T, U>>) -> NonEmpty<Box2D<T, U>> {
-        NonEmpty(Box2D {
-            min: point2(
-                min(self.min.x, other.min.x),
-                min(self.min.y, other.min.y),
-            ),
-            max: point2(
-                max(self.max.x, other.max.x),
-                max(self.max.y, other.max.y),
-            ),
-        })
+    pub fn union(&self, other: &Self) -> Self {
+        NonEmpty(self.0.union(&other.0))
     }
 
     /// Returns true if this box contains the interior of the other box.
@@ -106,19 +82,8 @@ where
     T: Copy + PartialOrd,
 {
     #[inline]
-    pub fn union(&self, other: &NonEmpty<Box3D<T, U>>) -> NonEmpty<Box3D<T, U>> {
-        NonEmpty(Box3D {
-            min: point3(
-                min(self.min.x, other.min.x),
-                min(self.min.y, other.min.y),
-                min(self.min.z, other.min.z),
-            ),
-            max: point3(
-                max(self.max.x, other.max.x),
-                max(self.max.y, other.max.y),
-                max(self.max.z, other.max.z),
-            ),
-        })
+    pub fn union(&self, other: &Self) -> Self {
+        NonEmpty(self.0.union(&other.0))
     }
 
     /// Returns true if this box contains the interior of the other box.
@@ -146,6 +111,7 @@ where
 #[test]
 fn empty_nonempty() {
     use crate::default;
+    use crate::point2;
 
     // zero-width
     let box1: default::Box2D<i32> = Box2D {
@@ -177,6 +143,7 @@ fn empty_nonempty() {
 #[test]
 fn nonempty_union() {
     use crate::default;
+    use crate::{point2, point3, size2};
 
     let box1: default::Box2D<i32> = Box2D {
         min: point2(-10, 2),
@@ -215,7 +182,7 @@ fn nonempty_union() {
 #[test]
 fn nonempty_contains() {
     use crate::default;
-    use crate::{vec2, vec3};
+    use crate::{point2, point3, size2, vec2, vec3};
 
     let r: NonEmpty<default::Rect<i32>> = Rect {
         origin: point2(-20, 15),
