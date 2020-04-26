@@ -396,6 +396,21 @@ impl<T: Float, U> Vector2D<T, U> {
         self / self.length()
     }
 
+    /// Returns the vector with length of one unit.
+    ///
+    /// Unlike [`Vector2D::normalize`](#method.normalize), this returns None in the case that the
+    /// length of the vector is zero.
+    #[inline]
+    #[must_use]
+    pub fn try_normalize(self) -> Option<Self> {
+        let len = self.length();
+        if len == T::zero() {
+            None
+        } else {
+            Some(self / len)
+        }
+    }
+
     /// Return the normalized vector even if the length is larger than the max value of Float.
     #[inline]
     #[must_use]
@@ -1173,6 +1188,21 @@ impl<T: Float, U> Vector3D<T, U> {
         self / self.length()
     }
 
+    /// Returns the vector with length of one unit.
+    ///
+    /// Unlike [`Vector2D::normalize`](#method.normalize), this returns None in the case that the
+    /// length of the vector is zero.
+    #[inline]
+    #[must_use]
+    pub fn try_normalize(self) -> Option<Self> {
+        let len = self.length();
+        if len == T::zero() {
+            None
+        } else {
+            Some(self / len)
+        }
+    }
+
     /// Return the normalized vector even if the length is larger than the max value of Float.
     #[inline]
     #[must_use]
@@ -1873,6 +1903,8 @@ mod vector2d {
 
     #[test]
     pub fn test_normalize() {
+        use std::f32;
+
         let p0: Vec2 = Vec2::zero();
         let p1: Vec2 = vec2(4.0, 0.0);
         let p2: Vec2 = vec2(3.0, -4.0);
@@ -1883,6 +1915,16 @@ mod vector2d {
         let p3: Vec2 = vec2(::std::f32::MAX, ::std::f32::MAX);
         assert_ne!(p3.normalize(), vec2(1.0 / 2.0f32.sqrt(), 1.0 / 2.0f32.sqrt()));
         assert_eq!(p3.robust_normalize(), vec2(1.0 / 2.0f32.sqrt(), 1.0 / 2.0f32.sqrt()));
+
+        let p4: Vec2 = Vec2::zero();
+        assert!(p4.try_normalize().is_none());
+        let p5: Vec2 = Vec2::new(f32::MIN_POSITIVE, f32::MIN_POSITIVE);
+        assert!(p5.try_normalize().is_none());
+
+        let p6: Vec2 = vec2(4.0, 0.0);
+        let p7: Vec2 = vec2(3.0, -4.0);
+        assert_eq!(p6.try_normalize().unwrap(), vec2(1.0, 0.0));
+        assert_eq!(p7.try_normalize().unwrap(), vec2(0.6, -0.8));
     }
 
     #[test]
@@ -2070,6 +2112,8 @@ mod vector3d {
 
     #[test]
     pub fn test_normalize() {
+        use std::f32;
+
         let p0: Vec3 = Vec3::zero();
         let p1: Vec3 = vec3(0.0, -6.0, 0.0);
         let p2: Vec3 = vec3(1.0, 2.0, -2.0);
@@ -2082,6 +2126,16 @@ mod vector3d {
         let p3: Vec3 = vec3(::std::f32::MAX, ::std::f32::MAX, 0.0);
         assert_ne!(p3.normalize(), vec3(1.0 / 2.0f32.sqrt(), 1.0 / 2.0f32.sqrt(), 0.0));
         assert_eq!(p3.robust_normalize(), vec3(1.0 / 2.0f32.sqrt(), 1.0 / 2.0f32.sqrt(), 0.0));
+
+        let p4: Vec3 = Vec3::zero();
+        assert!(p4.try_normalize().is_none());
+        let p5: Vec3 = Vec3::new(f32::MIN_POSITIVE, f32::MIN_POSITIVE, f32::MIN_POSITIVE);
+        assert!(p5.try_normalize().is_none());
+
+        let p6: Vec3 = vec3(4.0, 0.0, 3.0);
+        let p7: Vec3 = vec3(3.0, -4.0, 0.0);
+        assert_eq!(p6.try_normalize().unwrap(), vec3(0.8, 0.0, 0.6));
+        assert_eq!(p7.try_normalize().unwrap(), vec3(0.6, -0.8, 0.0));
     }
 
     #[test]
