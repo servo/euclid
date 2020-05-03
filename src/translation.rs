@@ -274,7 +274,7 @@ where
     T: Zero + One,
 {
     fn into(self) -> Transform2D<T, Src, Dst> {
-        Transform2D::create_translation(self.x, self.y)
+        Transform2D::translation(self.x, self.y)
     }
 }
 
@@ -592,7 +592,7 @@ where
     T: Zero + One,
 {
     fn into(self) -> Transform3D<T, Src, Dst> {
-        Transform3D::create_translation(self.x, self.y, self.z)
+        Transform3D::translation(self.x, self.y, self.z)
     }
 }
 

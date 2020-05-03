@@ -345,7 +345,7 @@ impl<T: Copy, U> Vector2D<T, U> {
     where
         T: Zero + One,
     {
-        Transform2D::create_translation(self.x, self.y)
+        Transform2D::translation(self.x, self.y)
     }
 }
 
@@ -1138,7 +1138,7 @@ impl<T: Copy, U> Vector3D<T, U> {
     where
         T: Zero + One,
     {
-        Transform3D::create_translation(self.x, self.y, self.z)
+        Transform3D::translation(self.x, self.y, self.z)
     }
 }
 

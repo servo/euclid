@@ -433,7 +433,7 @@ where
     /// ```
     #[inline]
     pub fn identity() -> Self {
-        Self::create_translation(T::zero(), T::zero(), T::zero())
+        Self::translation(T::zero(), T::zero(), T::zero())
     }
 
     /// Intentional not public, because it checks for exact equivalence
@@ -450,7 +450,7 @@ where
     /// Create a 2d skew transform.
     ///
     /// See <https://drafts.csswg.org/css-transforms/#funcdef-skew>
-    pub fn create_skew(alpha: Angle<T>, beta: Angle<T>) -> Self
+    pub fn skew(alpha: Angle<T>, beta: Angle<T>) -> Self
     where
         T: Trig,
     {
@@ -474,7 +474,7 @@ where
     /// 0   0   1 -1/d
     /// 0   0   0   1
     /// ```
-    pub fn create_perspective(d: T) -> Self
+    pub fn perspective(d: T) -> Self
     where
         T: Neg<Output = T> + Div<Output = T>,
     {
@@ -550,7 +550,7 @@ where
     /// x y z 1
     /// ```
     #[inline]
-    pub fn create_translation(x: T, y: T, z: T) -> Self {
+    pub fn translation(x: T, y: T, z: T) -> Self {
         let _0 = || T::zero();
         let _1 = || T::one();
 
@@ -568,7 +568,7 @@ where
     where
         T: Copy + Add<Output = T> + Mul<Output = T>,
     {
-        self.pre_transform(&Transform3D::create_translation(v.x, v.y, v.z))
+        self.pre_transform(&Transform3D::translation(v.x, v.y, v.z))
     }
 
     /// Returns a transform with a translation applied after self's transformation.
@@ -577,7 +577,7 @@ where
     where
         T: Copy + Add<Output = T> + Mul<Output = T>,
     {
-        self.post_transform(&Transform3D::create_translation(v.x, v.y, v.z))
+        self.post_transform(&Transform3D::translation(v.x, v.y, v.z))
     }
 }
 
@@ -588,7 +588,7 @@ where
 {
     /// Create a 3d rotation transform from an angle / axis.
     /// The supplied axis must be normalized.
-    pub fn create_rotation(x: T, y: T, z: T, theta: Angle<T>) -> Self {
+    pub fn rotation(x: T, y: T, z: T, theta: Angle<T>) -> Self {
         let (_0, _1): (T, T) = (Zero::zero(), One::one());
         let _2 = _1 + _1;
 
@@ -627,13 +627,13 @@ where
     /// Returns a transform with a rotation applied after self's transformation.
     #[must_use]
     pub fn post_rotate(&self, x: T, y: T, z: T, theta: Angle<T>) -> Self {
-        self.post_transform(&Transform3D::create_rotation(x, y, z, theta))
+        self.post_transform(&Transform3D::rotation(x, y, z, theta))
     }
 
     /// Returns a transform with a rotation applied before self's transformation.
     #[must_use]
     pub fn pre_rotate(&self, x: T, y: T, z: T, theta: Angle<T>) -> Self {
-        self.pre_transform(&Transform3D::create_rotation(x, y, z, theta))
+        self.pre_transform(&Transform3D::rotation(x, y, z, theta))
     }
 }
 
@@ -651,7 +651,7 @@ where
     /// 0 0 0 1
     /// ```
     #[inline]
-    pub fn create_scale(x: T, y: T, z: T) -> Self {
+    pub fn scale(x: T, y: T, z: T) -> Self {
         let _0 = || T::zero();
         let _1 = || T::one();
 
@@ -683,7 +683,7 @@ where
     where
         T: Copy + Add<Output = T> + Mul<Output = T>,
     {
-        self.post_transform(&Transform3D::create_scale(x, y, z))
+        self.post_transform(&Transform3D::scale(x, y, z))
     }
 }
 
@@ -975,7 +975,7 @@ where T: Copy +
 
     /// Convenience function to create a scale transform from a `Scale`.
     pub fn from_scale(scale: Scale<T, Src, Dst>) -> Self {
-        Transform3D::create_scale(scale.get(), scale.get(), scale.get())
+        Transform3D::scale(scale.get(), scale.get(), scale.get())
     }
 }
 
@@ -1155,7 +1155,7 @@ mod tests {
 
     #[test]
     pub fn test_translation() {
-        let t1 = Mf32::create_translation(1.0, 2.0, 3.0);
+        let t1 = Mf32::translation(1.0, 2.0, 3.0);
         let t2 = Mf32::identity().pre_translate(vec3(1.0, 2.0, 3.0));
         let t3 = Mf32::identity().post_translate(vec3(1.0, 2.0, 3.0));
         assert_eq!(t1, t2);
@@ -1164,15 +1164,15 @@ mod tests {
         assert_eq!(t1.transform_point3d(point3(1.0, 1.0, 1.0)), Some(point3(2.0, 3.0, 4.0)));
         assert_eq!(t1.transform_point2d(point2(1.0, 1.0)), Some(point2(2.0, 3.0)));
 
-        assert_eq!(t1.post_transform(&t1), Mf32::create_translation(2.0, 4.0, 6.0));
+        assert_eq!(t1.post_transform(&t1), Mf32::translation(2.0, 4.0, 6.0));
 
         assert!(!t1.is_2d());
-        assert_eq!(Mf32::create_translation(1.0, 2.0, 3.0).to_2d(), Transform2D::create_translation(1.0, 2.0));
+        assert_eq!(Mf32::translation(1.0, 2.0, 3.0).to_2d(), Transform2D::translation(1.0, 2.0));
     }
 
     #[test]
     pub fn test_rotation() {
-        let r1 = Mf32::create_rotation(0.0, 0.0, 1.0, rad(FRAC_PI_2));
+        let r1 = Mf32::rotation(0.0, 0.0, 1.0, rad(FRAC_PI_2));
         let r2 = Mf32::identity().pre_rotate(0.0, 0.0, 1.0, rad(FRAC_PI_2));
         let r3 = Mf32::identity().post_rotate(0.0, 0.0, 1.0, rad(FRAC_PI_2));
         assert_eq!(r1, r2);
@@ -1181,15 +1181,15 @@ mod tests {
         assert!(r1.transform_point3d(point3(1.0, 2.0, 3.0)).unwrap().approx_eq(&point3(-2.0, 1.0, 3.0)));
         assert!(r1.transform_point2d(point2(1.0, 2.0)).unwrap().approx_eq(&point2(-2.0, 1.0)));
 
-        assert!(r1.post_transform(&r1).approx_eq(&Mf32::create_rotation(0.0, 0.0, 1.0, rad(FRAC_PI_2*2.0))));
+        assert!(r1.post_transform(&r1).approx_eq(&Mf32::rotation(0.0, 0.0, 1.0, rad(FRAC_PI_2*2.0))));
 
         assert!(r1.is_2d());
-        assert!(r1.to_2d().approx_eq(&Transform2D::create_rotation(rad(FRAC_PI_2))));
+        assert!(r1.to_2d().approx_eq(&Transform2D::rotation(rad(FRAC_PI_2))));
     }
 
     #[test]
     pub fn test_scale() {
-        let s1 = Mf32::create_scale(2.0, 3.0, 4.0);
+        let s1 = Mf32::scale(2.0, 3.0, 4.0);
         let s2 = Mf32::identity().pre_scale(2.0, 3.0, 4.0);
         let s3 = Mf32::identity().post_scale(2.0, 3.0, 4.0);
         assert_eq!(s1, s2);
@@ -1198,17 +1198,17 @@ mod tests {
         assert!(s1.transform_point3d(point3(2.0, 2.0, 2.0)).unwrap().approx_eq(&point3(4.0, 6.0, 8.0)));
         assert!(s1.transform_point2d(point2(2.0, 2.0)).unwrap().approx_eq(&point2(4.0, 6.0)));
 
-        assert_eq!(s1.post_transform(&s1), Mf32::create_scale(4.0, 9.0, 16.0));
+        assert_eq!(s1.post_transform(&s1), Mf32::scale(4.0, 9.0, 16.0));
 
         assert!(!s1.is_2d());
-        assert_eq!(Mf32::create_scale(2.0, 3.0, 0.0).to_2d(), Transform2D::create_scale(2.0, 3.0));
+        assert_eq!(Mf32::scale(2.0, 3.0, 0.0).to_2d(), Transform2D::scale(2.0, 3.0));
     }
 
 
     #[test]
     pub fn test_pre_post_scale() {
-        let m = Mf32::create_rotation(0.0, 0.0, 1.0, rad(FRAC_PI_2)).post_translate(vec3(6.0, 7.0, 8.0));
-        let s = Mf32::create_scale(2.0, 3.0, 4.0);
+        let m = Mf32::rotation(0.0, 0.0, 1.0, rad(FRAC_PI_2)).post_translate(vec3(6.0, 7.0, 8.0));
+        let s = Mf32::scale(2.0, 3.0, 4.0);
         assert_eq!(m.post_transform(&s), m.post_scale(2.0, 3.0, 4.0));
         assert_eq!(m.pre_transform(&s), m.pre_scale(2.0, 3.0, 4.0));
     }
@@ -1231,8 +1231,8 @@ mod tests {
     #[test]
     pub fn test_is_2d() {
         assert!(Mf32::identity().is_2d());
-        assert!(Mf32::create_rotation(0.0, 0.0, 1.0, rad(0.7854)).is_2d());
-        assert!(!Mf32::create_rotation(0.0, 1.0, 0.0, rad(0.7854)).is_2d());
+        assert!(Mf32::rotation(0.0, 0.0, 1.0, rad(0.7854)).is_2d());
+        assert!(!Mf32::rotation(0.0, 1.0, 0.0, rad(0.7854)).is_2d());
     }
 
     #[test]
@@ -1274,28 +1274,28 @@ mod tests {
 
     #[test]
     pub fn test_inverse_scale() {
-        let m1 = Mf32::create_scale(1.5, 0.3, 2.1);
+        let m1 = Mf32::scale(1.5, 0.3, 2.1);
         let m2 = m1.inverse().unwrap();
         assert!(m1.pre_transform(&m2).approx_eq(&Mf32::identity()));
     }
 
     #[test]
     pub fn test_inverse_translate() {
-        let m1 = Mf32::create_translation(-132.0, 0.3, 493.0);
+        let m1 = Mf32::translation(-132.0, 0.3, 493.0);
         let m2 = m1.inverse().unwrap();
         assert!(m1.pre_transform(&m2).approx_eq(&Mf32::identity()));
     }
 
     #[test]
     pub fn test_inverse_rotate() {
-        let m1 = Mf32::create_rotation(0.0, 1.0, 0.0, rad(1.57));
+        let m1 = Mf32::rotation(0.0, 1.0, 0.0, rad(1.57));
         let m2 = m1.inverse().unwrap();
         assert!(m1.pre_transform(&m2).approx_eq(&Mf32::identity()));
     }
 
     #[test]
     pub fn test_inverse_transform_point_2d() {
-        let m1 = Mf32::create_translation(100.0, 200.0, 0.0);
+        let m1 = Mf32::translation(100.0, 200.0, 0.0);
         let m2 = m1.inverse().unwrap();
         assert!(m1.pre_transform(&m2).approx_eq(&Mf32::identity()));
 
@@ -1309,8 +1309,8 @@ mod tests {
 
     #[test]
     fn test_inverse_none() {
-        assert!(Mf32::create_scale(2.0, 0.0, 2.0).inverse().is_none());
-        assert!(Mf32::create_scale(2.0, 2.0, 2.0).inverse().is_some());
+        assert!(Mf32::scale(2.0, 0.0, 2.0).inverse().is_none());
+        assert!(Mf32::scale(2.0, 2.0, 2.0).inverse().is_some());
     }
 
     #[test]
@@ -1319,8 +1319,8 @@ mod tests {
         let m2 = default::Transform3D::identity().pre_translate(vec3(1.0, 2.0, 3.0)).pre_scale(1.0, 2.0, 3.0);
         assert!(m1.approx_eq(&m2));
 
-        let r = Mf32::create_rotation(0.0, 0.0, 1.0, rad(FRAC_PI_2));
-        let t = Mf32::create_translation(2.0, 3.0, 0.0);
+        let r = Mf32::rotation(0.0, 0.0, 1.0, rad(FRAC_PI_2));
+        let t = Mf32::translation(2.0, 3.0, 0.0);
 
         let a = point3(1.0, 1.0, 1.0);
 
@@ -1368,7 +1368,7 @@ mod tests {
     #[test]
     pub fn test_transform_vector() {
         // Translation does not apply to vectors.
-        let m = Mf32::create_translation(1.0, 2.0, 3.0);
+        let m = Mf32::translation(1.0, 2.0, 3.0);
         let v1 = vec3(10.0, -10.0, 3.0);
         assert_eq!(v1, m.transform_vector3d(v1));
         // While it does apply to points.
@@ -1383,19 +1383,19 @@ mod tests {
     #[test]
     pub fn test_is_backface_visible() {
         // backface is not visible for rotate-x 0 degree.
-        let r1 = Mf32::create_rotation(1.0, 0.0, 0.0, rad(0.0));
+        let r1 = Mf32::rotation(1.0, 0.0, 0.0, rad(0.0));
         assert!(!r1.is_backface_visible());
         // backface is not visible for rotate-x 45 degree.
-        let r1 = Mf32::create_rotation(1.0, 0.0, 0.0, rad(PI * 0.25));
+        let r1 = Mf32::rotation(1.0, 0.0, 0.0, rad(PI * 0.25));
         assert!(!r1.is_backface_visible());
         // backface is visible for rotate-x 180 degree.
-        let r1 = Mf32::create_rotation(1.0, 0.0, 0.0, rad(PI));
+        let r1 = Mf32::rotation(1.0, 0.0, 0.0, rad(PI));
         assert!(r1.is_backface_visible());
         // backface is visible for rotate-x 225 degree.
-        let r1 = Mf32::create_rotation(1.0, 0.0, 0.0, rad(PI * 1.25));
+        let r1 = Mf32::rotation(1.0, 0.0, 0.0, rad(PI * 1.25));
         assert!(r1.is_backface_visible());
         // backface is not visible for non-inverseable matrix
-        let r1 = Mf32::create_scale(2.0, 0.0, 2.0);
+        let r1 = Mf32::scale(2.0, 0.0, 2.0);
         assert!(!r1.is_backface_visible());
     }
 
@@ -1432,7 +1432,7 @@ mod tests {
     #[cfg(feature = "mint")]
     #[test]
     pub fn test_mint() {
-        let m1 = Mf32::create_rotation(0.0, 0.0, 1.0, rad(FRAC_PI_2));
+        let m1 = Mf32::rotation(0.0, 0.0, 1.0, rad(FRAC_PI_2));
         let mm: mint::RowMatrix4<_> = m1.into();
         let m2 = Mf32::from(mm);
 

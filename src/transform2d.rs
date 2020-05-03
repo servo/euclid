@@ -350,7 +350,7 @@ where
     /// ```
     #[inline]
     pub fn identity() -> Self {
-        Self::create_translation(T::zero(), T::zero())
+        Self::translation(T::zero(), T::zero())
     }
 
     /// Intentional not public, because it checks for exact equivalence
@@ -412,7 +412,7 @@ where
     /// x y
     /// ```
     #[inline]
-    pub fn create_translation(x: T, y: T) -> Self {
+    pub fn translation(x: T, y: T) -> Self {
         let _0 = || T::zero();
         let _1 = || T::one();
 
@@ -430,7 +430,7 @@ where
     where
         T: Copy + Add<Output = T> + Mul<Output = T>,
     {
-        self.post_transform(&Transform2D::create_translation(v.x, v.y))
+        self.post_transform(&Transform2D::translation(v.x, v.y))
     }
 
     /// Applies a translation before self's transformation and returns the resulting transform.
@@ -440,7 +440,7 @@ where
     where
         T: Copy + Add<Output = T> + Mul<Output = T>,
     {
-        self.pre_transform(&Transform2D::create_translation(v.x, v.y))
+        self.pre_transform(&Transform2D::translation(v.x, v.y))
     }
 }
 
@@ -451,7 +451,7 @@ where
 {
     /// Returns a rotation transform.
     #[inline]
-    pub fn create_rotation(theta: Angle<T>) -> Self {
+    pub fn rotation(theta: Angle<T>) -> Self {
         let _0 = Zero::zero();
         let cos = theta.get().cos();
         let sin = theta.get().sin();
@@ -466,14 +466,14 @@ where
     #[inline]
     #[must_use]
     pub fn post_rotate(&self, theta: Angle<T>) -> Self {
-        self.post_transform(&Transform2D::create_rotation(theta))
+        self.post_transform(&Transform2D::rotation(theta))
     }
 
     /// Applies a rotation before self's transformation and returns the resulting transform.
     #[inline]
     #[must_use]
     pub fn pre_rotate(&self, theta: Angle<T>) -> Self {
-        self.pre_transform(&Transform2D::create_rotation(theta))
+        self.pre_transform(&Transform2D::rotation(theta))
     }
 }
 
@@ -487,7 +487,7 @@ impl<T, Src, Dst> Transform2D<T, Src, Dst> {
     /// 0 0
     /// ```
     #[inline]
-    pub fn create_scale(x: T, y: T) -> Self
+    pub fn scale(x: T, y: T) -> Self
     where
         T: Zero,
     {
@@ -507,7 +507,7 @@ impl<T, Src, Dst> Transform2D<T, Src, Dst> {
     where
         T: Copy + Add<Output = T> + Mul<Output = T> + Zero,
     {
-        self.post_transform(&Transform2D::create_scale(x, y))
+        self.post_transform(&Transform2D::scale(x, y))
     }
 
     /// Applies a scale before self's transformation and returns the resulting transform.
@@ -685,7 +685,7 @@ mod test {
 
     #[test]
     pub fn test_translation() {
-        let t1 = Mat::create_translation(1.0, 2.0);
+        let t1 = Mat::translation(1.0, 2.0);
         let t2 = Mat::identity().pre_translate(vec2(1.0, 2.0));
         let t3 = Mat::identity().post_translate(vec2(1.0, 2.0));
         assert_eq!(t1, t2);
@@ -693,12 +693,12 @@ mod test {
 
         assert_eq!(t1.transform_point(Point2D::new(1.0, 1.0)), Point2D::new(2.0, 3.0));
 
-        assert_eq!(t1.post_transform(&t1), Mat::create_translation(2.0, 4.0));
+        assert_eq!(t1.post_transform(&t1), Mat::translation(2.0, 4.0));
     }
 
     #[test]
     pub fn test_rotation() {
-        let r1 = Mat::create_rotation(rad(FRAC_PI_2));
+        let r1 = Mat::rotation(rad(FRAC_PI_2));
         let r2 = Mat::identity().pre_rotate(rad(FRAC_PI_2));
         let r3 = Mat::identity().post_rotate(rad(FRAC_PI_2));
         assert_eq!(r1, r2);
@@ -706,12 +706,12 @@ mod test {
 
         assert!(r1.transform_point(Point2D::new(1.0, 2.0)).approx_eq(&Point2D::new(-2.0, 1.0)));
 
-        assert!(r1.post_transform(&r1).approx_eq(&Mat::create_rotation(rad(FRAC_PI_2*2.0))));
+        assert!(r1.post_transform(&r1).approx_eq(&Mat::rotation(rad(FRAC_PI_2*2.0))));
     }
 
     #[test]
     pub fn test_scale() {
-        let s1 = Mat::create_scale(2.0, 3.0);
+        let s1 = Mat::scale(2.0, 3.0);
         let s2 = Mat::identity().pre_scale(2.0, 3.0);
         let s3 = Mat::identity().post_scale(2.0, 3.0);
         assert_eq!(s1, s2);
@@ -723,8 +723,8 @@ mod test {
 
     #[test]
     pub fn test_pre_post_scale() {
-        let m = Mat::create_rotation(rad(FRAC_PI_2)).post_translate(vec2(6.0, 7.0));
-        let s = Mat::create_scale(2.0, 3.0);
+        let m = Mat::rotation(rad(FRAC_PI_2)).post_translate(vec2(6.0, 7.0));
+        let s = Mat::scale(2.0, 3.0);
         assert_eq!(m.post_transform(&s), m.post_scale(2.0, 3.0));
         assert_eq!(m.pre_transform(&s), m.pre_scale(2.0, 3.0));
     }
@@ -753,22 +753,22 @@ mod test {
 
     #[test]
     pub fn test_inverse_scale() {
-        let m1 = Mat::create_scale(1.5, 0.3);
+        let m1 = Mat::scale(1.5, 0.3);
         let m2 = m1.inverse().unwrap();
         assert!(m1.pre_transform(&m2).approx_eq(&Mat::identity()));
     }
 
     #[test]
     pub fn test_inverse_translate() {
-        let m1 = Mat::create_translation(-132.0, 0.3);
+        let m1 = Mat::translation(-132.0, 0.3);
         let m2 = m1.inverse().unwrap();
         assert!(m1.pre_transform(&m2).approx_eq(&Mat::identity()));
     }
 
     #[test]
     fn test_inverse_none() {
-        assert!(Mat::create_scale(2.0, 0.0).inverse().is_none());
-        assert!(Mat::create_scale(2.0, 2.0).inverse().is_some());
+        assert!(Mat::scale(2.0, 0.0).inverse().is_none());
+        assert!(Mat::scale(2.0, 2.0).inverse().is_some());
     }
 
     #[test]
@@ -777,8 +777,8 @@ mod test {
         let m2 = default::Transform2D::identity().pre_translate(vec2(1.0, 2.0)).pre_scale(1.0, 2.0);
         assert!(m1.approx_eq(&m2));
 
-        let r = Mat::create_rotation(rad(FRAC_PI_2));
-        let t = Mat::create_translation(2.0, 3.0);
+        let r = Mat::rotation(rad(FRAC_PI_2));
+        let t = Mat::translation(2.0, 3.0);
 
         let a = Point2D::new(1.0, 1.0);
 
@@ -809,7 +809,7 @@ mod test {
     #[test]
     pub fn test_transform_vector() {
         // Translation does not apply to vectors.
-        let m1 = Mat::create_translation(1.0, 1.0);
+        let m1 = Mat::translation(1.0, 1.0);
         let v1 = vec2(10.0, -10.0);
         assert_eq!(v1, m1.transform_vector(v1));
     }
@@ -817,7 +817,7 @@ mod test {
     #[cfg(feature = "mint")]
     #[test]
     pub fn test_mint() {
-        let m1 = Mat::create_rotation(rad(FRAC_PI_2));
+        let m1 = Mat::rotation(rad(FRAC_PI_2));
         let mm: mint::RowMatrix3x2<_> = m1.into();
         let m2 = Mat::from(mm);
 
