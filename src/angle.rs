@@ -7,7 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use num_traits::{Float, FloatConst, Zero};
+use num_traits::{Float, FloatConst, Zero, One};
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, Sub, SubAssign};
 use core::cmp::{Eq, PartialEq};
 use core::hash::{Hash};
@@ -69,6 +69,28 @@ where
     /// Returns this angle in the ]-PI..PI] range.
     pub fn signed(&self) -> Self {
         Angle::pi() - (Angle::pi() - *self).positive()
+    }
+
+}
+
+impl<T> Angle<T>
+where
+    T: Rem<Output = T> + Mul<Output = T> + Sub<Output = T> + Add<Output = T> + One + FloatConst + Copy,
+{
+    /// Returns the shortest signed angle between two angles.
+    ///
+    /// Takes wrapping and signs into account.
+    pub fn angle_to(&self, to: Self) -> Self {
+        let two = T::one() + T::one();
+        let max = T::PI() * two;
+        let d = (to.radians - self.radians) % max;
+
+        Angle::radians(two * d % max - d)
+    }
+
+    /// Linear interpolation between two angles, using the shortest path.
+    pub fn lerp(&self, other: Self, t: T) -> Self {
+        *self + self.angle_to(other) * t
     }
 }
 
@@ -246,4 +268,18 @@ fn wrap_angles() {
     assert!(Angle::radians(-2.0 * PI).signed().approx_eq(&Angle::zero()));
     assert!(Angle::radians(-PI).signed().approx_eq(&Angle::pi()));
     assert!(Angle::radians(PI).signed().approx_eq(&Angle::pi()));
+}
+
+#[test]
+fn lerp() {
+    type A = Angle<f32>;
+
+    let a = A::radians(1.0);
+    let b = A::radians(2.0);
+    assert!(a.lerp(b, 0.25).approx_eq(&Angle::radians(1.25)));
+    assert!(a.lerp(b, 0.5).approx_eq(&Angle::radians(1.5)));
+    assert!(a.lerp(b, 0.75).approx_eq(&Angle::radians(1.75)));
+    assert!(a.lerp(b + A::two_pi(), 0.75).approx_eq(&Angle::radians(1.75)));
+    assert!(a.lerp(b - A::two_pi(), 0.75).approx_eq(&Angle::radians(1.75)));
+    assert!(a.lerp(b + A::two_pi() * 5.0, 0.75).approx_eq(&Angle::radians(1.75)));
 }
