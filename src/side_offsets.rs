@@ -12,8 +12,9 @@
 
 use crate::length::Length;
 use crate::num::Zero;
+use crate::scale::Scale;
 use core::fmt;
-use core::ops::{Add, Neg};
+use core::ops::{Add, Div, DivAssign, Mul, MulAssign, Neg};
 use core::marker::PhantomData;
 use core::cmp::{Eq, PartialEq};
 use core::hash::{Hash};
@@ -207,6 +208,95 @@ impl<T: Zero, U> SideOffsets2D<T, U> {
     }
 }
 
+impl<T: Clone + Mul, U> Mul<T> for SideOffsets2D<T, U> {
+    type Output = SideOffsets2D<T::Output, U>;
+
+    #[inline]
+    fn mul(self, scale: T) -> Self::Output {
+        SideOffsets2D::new(
+            self.top * scale.clone(), 
+            self.right * scale.clone(), 
+            self.bottom * scale.clone(),
+            self.left * scale,
+        )
+    }
+}
+
+impl<T: Clone + MulAssign, U> MulAssign<T> for SideOffsets2D<T, U> {
+    #[inline]
+    fn mul_assign(&mut self, other: T) {
+        self.top *= other.clone(); 
+        self.right *= other.clone(); 
+        self.bottom *= other.clone(); 
+        self.left *= other; 
+    }
+}
+
+impl<T: Clone + Mul, U1, U2> Mul<Scale<T, U1, U2>> for SideOffsets2D<T, U1> {
+    type Output = SideOffsets2D<T::Output, U2>;
+
+    #[inline]
+    fn mul(self, scale: Scale<T, U1, U2>) -> Self::Output {
+        SideOffsets2D::new(
+            self.top * scale.0.clone(),
+            self.right * scale.0.clone(),
+            self.bottom * scale.0.clone(),
+            self.left * scale.0
+        )
+    }
+}
+
+impl<T: Clone + MulAssign, U> MulAssign<Scale<T, U, U>> for SideOffsets2D<T, U> {
+    #[inline]
+    fn mul_assign(&mut self, other: Scale<T, U, U>) {
+        *self *= other.0;
+    }
+}
+
+impl <T: Clone + Div, U> Div<T> for SideOffsets2D<T, U> {
+    type Output = SideOffsets2D<T::Output, U>;
+
+    #[inline]
+    fn div(self, scale: T) -> Self::Output {
+        SideOffsets2D::new(
+            self.top / scale.clone(),
+            self.right / scale.clone(),
+            self.bottom / scale.clone(),
+            self.left / scale,
+        )
+    }
+}
+
+impl <T: Clone + DivAssign, U> DivAssign<T> for SideOffsets2D<T, U> {
+    #[inline]
+    fn div_assign(&mut self, other: T) {
+        self.top /= other.clone();
+        self.right /= other.clone();
+        self.bottom /= other.clone();
+        self.left /= other;
+    }
+}
+
+impl <T: Clone + Div, U1, U2> Div<Scale<T, U1, U2>> for SideOffsets2D<T, U2> {
+    type Output = SideOffsets2D<T::Output, U1>;
+
+    #[inline]
+    fn div(self, scale: Scale<T, U1, U2>) -> Self::Output {
+        SideOffsets2D::new(
+            self.top / scale.0.clone(),
+            self.right / scale.0.clone(),
+            self.bottom / scale.0.clone(),
+            self.left / scale.0,
+        )
+    }
+}
+
+impl<T: Clone + DivAssign, U> DivAssign<Scale<T, U, U>> for SideOffsets2D<T, U> {
+    fn div_assign(&mut self, other: Scale<T, U, U>) {
+        *self /= other.0;
+    }
+}
+
 #[test]
 fn from_vectors() {
     use crate::{vec2, point2};
@@ -222,4 +312,92 @@ fn from_vectors() {
 
     assert_eq!(outer, Box2D { min: point2(9, 8), max: point2(23, 24) });
     assert_eq!(inner, Box2D { min: point2(11, 12), max: point2(17, 16) });
+}
+
+#[cfg(test)]
+mod ops {
+    use crate::Scale;
+
+    pub enum Mm {}
+    pub enum Cm {}
+
+    type SideOffsets2D<T> = crate::default::SideOffsets2D<T>;
+    type SideOffsets2DMm<T> = crate::SideOffsets2D<T, Mm>;
+    type SideOffsets2DCm<T> = crate::SideOffsets2D<T, Cm>;
+
+    #[test]
+    fn test_mul_scalar() {
+        let s = SideOffsets2D::new(1.0, 2.0, 3.0, 4.0);
+
+        let result = s * 3.0;
+
+        assert_eq!(result, SideOffsets2D::new(3.0, 6.0, 9.0, 12.0));
+    }
+
+    #[test]
+    fn test_mul_assign_scalar() {
+        let mut s = SideOffsets2D::new(1.0, 2.0, 3.0, 4.0);
+
+        s *= 2.0;
+
+        assert_eq!(s, SideOffsets2D::new(2.0, 4.0, 6.0, 8.0));
+    }
+
+    #[test] 
+    fn test_mul_scale() {
+        let s = SideOffsets2DMm::new(0.0, 1.0, 3.0, 2.0);
+        let cm_per_mm: Scale<f32, Mm, Cm> = Scale::new(0.1);
+        
+        let result = s * cm_per_mm;
+
+        assert_eq!(result, SideOffsets2DCm::new(0.0, 0.1, 0.3, 0.2));
+    }
+
+    #[test]
+    fn test_mul_assign_scale() {
+        let mut s = SideOffsets2DMm::new(2.0, 4.0, 6.0, 8.0);
+        let scale: Scale<f32, Mm, Mm> = Scale::new(0.1);
+
+        s *= scale;
+
+        assert_eq!(s, SideOffsets2DMm::new(0.2, 0.4, 0.6, 0.8));
+    }
+
+    #[test]
+    fn test_div_scalar() {
+        let s = SideOffsets2D::new(10.0, 20.0, 30.0, 40.0);
+        
+        let result = s / 10.0;
+
+        assert_eq!(result, SideOffsets2D::new(1.0, 2.0, 3.0, 4.0));
+    }
+
+    #[test]
+    fn test_div_assign_scalar() {
+        let mut s = SideOffsets2D::new(10.0, 20.0, 30.0, 40.0);
+    
+        s /= 10.0;
+
+        assert_eq!(s, SideOffsets2D::new(1.0, 2.0, 3.0, 4.0));
+    }
+
+    #[test]
+    fn test_div_scale() {
+        let s = SideOffsets2DCm::new(0.1, 0.2, 0.3, 0.4);
+        let cm_per_mm: Scale<f32, Mm, Cm> = Scale::new(0.1);
+
+        let result = s / cm_per_mm;
+
+        assert_eq!(result, SideOffsets2DMm::new(1.0, 2.0, 3.0, 4.0));
+    }
+
+    #[test]
+    fn test_div_assign_scale() {
+        let mut s = SideOffsets2DMm::new(0.1, 0.2, 0.3, 0.4);
+        let scale: Scale<f32, Mm, Mm> = Scale::new(0.1);
+
+        s /= scale;
+
+        assert_eq!(s, SideOffsets2DMm::new(1.0, 2.0, 3.0, 4.0));
+    }
 }
