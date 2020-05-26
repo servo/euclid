@@ -159,6 +159,15 @@ impl<T, U> SideOffsets2D<T, U> {
             _unit: PhantomData,
         }
     }
+
+    /// Returns `true` if all side offsets are zero.
+    pub fn is_zero(&self) -> bool
+    where
+        T: Zero + PartialEq
+    {
+        let zero = T::zero();
+        self.top == zero && self.right == zero && self.bottom == zero && self.left == zero
+    }
 }
 
 impl<T: Copy, U> SideOffsets2D<T, U> {
@@ -312,6 +321,15 @@ fn from_vectors() {
 
     assert_eq!(outer, Box2D { min: point2(9, 8), max: point2(23, 24) });
     assert_eq!(inner, Box2D { min: point2(11, 12), max: point2(17, 16) });
+}
+
+#[test]
+fn test_is_zero() {
+    let s1: SideOffsets2D<f32, ()> = SideOffsets2D::new_all_same(0.0);
+    assert!(s1.is_zero());
+
+    let s2: SideOffsets2D<f32, ()> = SideOffsets2D::new(1.0, 2.0, 3.0, 4.0);
+    assert!(!s2.is_zero());
 }
 
 #[cfg(test)]
