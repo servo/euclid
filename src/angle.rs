@@ -17,7 +17,7 @@ use crate::approxeq::ApproxEq;
 use serde::{Deserialize, Serialize};
 
 /// An angle in radians
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Hash)]
+#[derive(Copy, Clone, Default, Debug, PartialEq, Eq, PartialOrd, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Angle<T> {
     pub radians: T,
