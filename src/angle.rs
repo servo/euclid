@@ -7,7 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use num_traits::{Float, FloatConst, Zero, One};
+use num_traits::{Float, FloatConst, NumCast, Zero, One};
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, Sub, SubAssign};
 use core::cmp::{Eq, PartialEq};
 use core::hash::{Hash};
@@ -135,6 +135,37 @@ where
 
     pub fn frac_pi_4() -> Self {
         Angle::radians(T::FRAC_PI_4())
+    }
+}
+
+impl<T> Angle<T>
+where
+    T: NumCast + Copy,
+{
+    /// Cast from one numeric representation to another.
+    #[inline]
+    pub fn cast<NewT: NumCast>(&self) -> Angle<NewT> {
+        self.try_cast().unwrap()
+    }
+
+    /// Fallible cast from one numeric representation to another.
+    pub fn try_cast<NewT: NumCast>(&self) -> Option<Angle<NewT>> {
+        NumCast::from(self.radians)
+            .map(|radians| Angle { radians })
+    }
+
+    // Convenience functions for common casts.
+
+    /// Cast angle to `f32`.
+    #[inline]
+    pub fn to_f32(&self) -> Angle<f32> {
+        self.cast()
+    }
+
+    /// Cast angle `f64`.
+    #[inline]
+    pub fn to_f64(&self) -> Angle<f64> {
+        self.cast()
     }
 }
 
