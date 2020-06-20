@@ -8,15 +8,15 @@
 // except according to those terms.
 
 use super::UnknownUnit;
-use crate::scale::Scale;
+use crate::approxord::{max, min};
+use crate::nonempty::NonEmpty;
 use crate::num::*;
-use crate::rect::Rect;
 use crate::point::{point2, Point2D};
-use crate::vector::{vec2, Vector2D};
+use crate::rect::Rect;
+use crate::scale::Scale;
 use crate::side_offsets::SideOffsets2D;
 use crate::size::Size2D;
-use crate::nonempty::NonEmpty;
-use crate::approxord::{min, max};
+use crate::vector::{vec2, Vector2D};
 
 use num_traits::NumCast;
 #[cfg(feature = "serde")]
@@ -27,7 +27,6 @@ use core::cmp::PartialOrd;
 use core::fmt;
 use core::hash::{Hash, Hasher};
 use core::ops::{Add, Div, DivAssign, Mul, MulAssign, Sub};
-
 
 /// An axis aligned rectangle represented by its minimum and maximum coordinates.
 ///
@@ -52,7 +51,10 @@ use core::ops::{Add, Div, DivAssign, Mul, MulAssign, Sub};
 /// [`size`]: #method.size
 #[repr(C)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "serde", serde(bound(serialize = "T: Serialize", deserialize = "T: Deserialize<'de>")))]
+#[cfg_attr(
+    feature = "serde",
+    serde(bound(serialize = "T: Serialize", deserialize = "T: Deserialize<'de>"))
+)]
 pub struct Box2D<T, U> {
     pub min: Point2D<T, U>,
     pub max: Point2D<T, U>,
@@ -104,10 +106,7 @@ impl<T, U> Box2D<T, U> {
     /// Constructor.
     #[inline]
     pub const fn new(min: Point2D<T, U>, max: Point2D<T, U>) -> Self {
-        Box2D {
-            min,
-            max,
-        }
+        Box2D { min, max }
     }
 }
 
@@ -144,8 +143,7 @@ where
     /// are on the back, right or bottom faces.
     #[inline]
     pub fn contains(&self, p: Point2D<T, U>) -> bool {
-        self.min.x <= p.x && p.x < self.max.x
-            && self.min.y <= p.y && p.y < self.max.y
+        self.min.x <= p.x && p.x < self.max.x && self.min.y <= p.y && p.y < self.max.y
     }
 
     /// Returns `true` if this box contains the interior of the other box. Always
@@ -154,8 +152,10 @@ where
     #[inline]
     pub fn contains_box(&self, other: &Self) -> bool {
         other.is_empty_or_negative()
-            || (self.min.x <= other.min.x && other.max.x <= self.max.x
-                && self.min.y <= other.min.y && other.max.y <= self.max.y)
+            || (self.min.x <= other.min.x
+                && other.max.x <= self.max.x
+                && self.min.y <= other.min.y
+                && other.max.y <= self.max.y)
     }
 }
 
@@ -177,14 +177,8 @@ where
     #[inline]
     pub fn intersection(&self, other: &Self) -> Self {
         Box2D {
-            min: point2(
-                max(self.min.x, other.min.x),
-                max(self.min.y, other.min.y),
-            ),
-            max: point2(
-                min(self.max.x, other.max.x),
-                min(self.max.y, other.max.y),
-            )
+            min: point2(max(self.min.x, other.min.x), max(self.min.y, other.min.y)),
+            max: point2(min(self.max.x, other.max.x), min(self.max.y, other.max.y)),
         }
     }
 
@@ -203,14 +197,8 @@ where
     #[inline]
     pub fn union(&self, other: &Self) -> Self {
         Box2D {
-            min: point2(
-                min(self.min.x, other.min.x),
-                min(self.min.y, other.min.y),
-            ),
-            max: point2(
-                max(self.max.x, other.max.x),
-                max(self.max.y, other.max.y),
-            ),
+            min: point2(min(self.min.x, other.min.x), min(self.min.y, other.min.y)),
+            max: point2(max(self.max.x, other.max.x), max(self.max.y, other.max.y)),
         }
     }
 }
@@ -293,7 +281,6 @@ where
     }
 }
 
-
 impl<T, U> Box2D<T, U>
 where
     T: Copy + Zero + PartialOrd,
@@ -350,10 +337,7 @@ where
     /// Linearly interpolate between this box and another box.
     #[inline]
     pub fn lerp(&self, other: Self, t: T) -> Self {
-        Self::new(
-            self.min.lerp(other.min, t),
-            self.max.lerp(other.max, t),
-        )
+        Self::new(self.min.lerp(other.min, t), self.max.lerp(other.max, t))
     }
 }
 
@@ -398,7 +382,6 @@ where
         self.min.x == self.max.x || self.min.y == self.max.y
     }
 }
-
 
 impl<T: Clone + Mul, U> Mul<T> for Box2D<T, U> {
     type Output = Box2D<T::Output, U>;
@@ -466,7 +449,6 @@ impl<T: Clone + DivAssign, U> DivAssign<Scale<T, U, U>> for Box2D<T, U> {
     }
 }
 
-
 impl<T, U> Box2D<T, U>
 where
     T: Copy,
@@ -480,10 +462,7 @@ where
     /// Tag a unitless value with units.
     #[inline]
     pub fn from_untyped(c: &Box2D<T, UnknownUnit>) -> Box2D<T, U> {
-        Box2D::new(
-            Point2D::from_untyped(c.min),
-            Point2D::from_untyped(c.max),
-        )
+        Box2D::new(Point2D::from_untyped(c.min), Point2D::from_untyped(c.max))
     }
 
     /// Cast the unit
@@ -495,7 +474,7 @@ where
     #[inline]
     pub fn scale<S: Copy>(&self, x: S, y: S) -> Self
     where
-        T: Mul<S, Output = T>
+        T: Mul<S, Output = T>,
     {
         Box2D {
             min: point2(self.min.x * x, self.min.y * y),
@@ -512,10 +491,7 @@ impl<T: NumCast + Copy, U> Box2D<T, U> {
     /// geometrically. Consider using round(), round_in or round_out() before casting.
     #[inline]
     pub fn cast<NewT: NumCast>(&self) -> Box2D<NewT, U> {
-        Box2D::new(
-            self.min.cast(),
-            self.max.cast(),
-        )
+        Box2D::new(self.min.cast(), self.max.cast())
     }
 
     /// Fallible cast from one numeric representation to another, preserving the units.
@@ -638,9 +614,9 @@ where
 
 #[cfg(test)]
 mod tests {
-    use crate::side_offsets::SideOffsets2D;
-    use crate::{Point2D, point2, vec2, size2};
     use crate::default::Box2D;
+    use crate::side_offsets::SideOffsets2D;
+    use crate::{point2, size2, vec2, Point2D};
     //use super::*;
 
     #[test]
@@ -688,7 +664,7 @@ mod tests {
     #[test]
     fn test_round_out() {
         let b = Box2D::from_points(&[point2(-25.5, -40.4), point2(60.3, 36.5)]).round_out();
-        assert_eq!(b.min.x,-26.0);
+        assert_eq!(b.min.x, -26.0);
         assert_eq!(b.min.y, -41.0);
         assert_eq!(b.max.x, 61.0);
         assert_eq!(b.max.y, 37.0);
@@ -697,7 +673,7 @@ mod tests {
     #[test]
     fn test_round() {
         let b = Box2D::from_points(&[point2(-25.5, -40.4), point2(60.3, 36.5)]).round();
-        assert_eq!(b.min.x,-26.0);
+        assert_eq!(b.min.x, -26.0);
         assert_eq!(b.min.y, -40.0);
         assert_eq!(b.max.x, 60.0);
         assert_eq!(b.max.y, 37.0);

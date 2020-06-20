@@ -42,23 +42,23 @@
 
 pub use crate::angle::Angle;
 pub use crate::box2d::Box2D;
+pub use crate::homogen::HomogeneousVector;
 pub use crate::length::Length;
+pub use crate::nonempty::NonEmpty;
+pub use crate::point::{point2, point3, Point2D, Point3D};
 pub use crate::scale::Scale;
 pub use crate::transform2d::Transform2D;
 pub use crate::transform3d::Transform3D;
-pub use crate::point::{Point2D, Point3D, point2, point3};
-pub use crate::vector::{Vector2D, Vector3D, vec2, vec3};
-pub use crate::vector::{BoolVector2D, BoolVector3D, bvec2, bvec3};
-pub use crate::homogen::HomogeneousVector;
-pub use crate::nonempty::NonEmpty;
+pub use crate::vector::{bvec2, bvec3, BoolVector2D, BoolVector3D};
+pub use crate::vector::{vec2, vec3, Vector2D, Vector3D};
 
-pub use crate::rect::{rect, Rect};
-pub use crate::rigid::{RigidTransform3D};
 pub use crate::box3d::{box3d, Box3D};
-pub use crate::translation::{Translation2D, Translation3D};
+pub use crate::rect::{rect, Rect};
+pub use crate::rigid::RigidTransform3D;
 pub use crate::rotation::{Rotation2D, Rotation3D};
 pub use crate::side_offsets::SideOffsets2D;
-pub use crate::size::{Size2D, Size3D, size2, size3};
+pub use crate::size::{size2, size3, Size2D, Size3D};
+pub use crate::translation::{Translation2D, Translation3D};
 pub use crate::trig::Trig;
 
 #[macro_use]
@@ -68,9 +68,11 @@ mod angle;
 pub mod approxeq;
 pub mod approxord;
 mod box2d;
+mod box3d;
 mod homogen;
-pub mod num;
 mod length;
+mod nonempty;
+pub mod num;
 mod point;
 mod rect;
 mod rigid;
@@ -83,8 +85,6 @@ mod transform3d;
 mod translation;
 mod trig;
 mod vector;
-mod box3d;
-mod nonempty;
 
 /// The default unit.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]

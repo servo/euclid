@@ -13,20 +13,23 @@
 use crate::length::Length;
 use crate::num::Zero;
 use crate::scale::Scale;
-use core::fmt;
-use core::ops::{Add, Div, DivAssign, Mul, MulAssign, Neg};
-use core::marker::PhantomData;
+use crate::Vector2D;
 use core::cmp::{Eq, PartialEq};
-use core::hash::{Hash};
+use core::fmt;
+use core::hash::Hash;
+use core::marker::PhantomData;
+use core::ops::{Add, Div, DivAssign, Mul, MulAssign, Neg};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-use crate::Vector2D;
 
 /// A group of 2D side offsets, which correspond to top/right/bottom/left for borders, padding,
 /// and margins in CSS, optionally tagged with a unit.
 #[repr(C)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "serde", serde(bound(serialize = "T: Serialize", deserialize = "T: Deserialize<'de>")))]
+#[cfg_attr(
+    feature = "serde",
+    serde(bound(serialize = "T: Serialize", deserialize = "T: Deserialize<'de>"))
+)]
 pub struct SideOffsets2D<T, U> {
     pub top: T,
     pub right: T,
@@ -53,18 +56,20 @@ impl<T: Clone, U> Clone for SideOffsets2D<T, U> {
 impl<T, U> Eq for SideOffsets2D<T, U> where T: Eq {}
 
 impl<T, U> PartialEq for SideOffsets2D<T, U>
-    where T: PartialEq
+where
+    T: PartialEq,
 {
     fn eq(&self, other: &Self) -> bool {
-        self.top == other.top &&
-            self.right == other.right &&
-            self.bottom == other.bottom &&
-            self.left == other.left
+        self.top == other.top
+            && self.right == other.right
+            && self.bottom == other.bottom
+            && self.left == other.left
     }
 }
 
 impl<T, U> Hash for SideOffsets2D<T, U>
-    where T: Hash
+where
+    T: Hash,
 {
     fn hash<H: core::hash::Hasher>(&self, h: &mut H) {
         self.top.hash(h);
@@ -129,9 +134,9 @@ impl<T, U> SideOffsets2D<T, U> {
     /// The outer rect of the resulting side offsets is equivalent to translating
     /// a rectangle's upper-left corner with the min vector and translating the
     /// bottom-right corner with the max vector.
-    pub fn from_vectors_outer(min: Vector2D<T, U>, max: Vector2D<T,U>) -> Self
+    pub fn from_vectors_outer(min: Vector2D<T, U>, max: Vector2D<T, U>) -> Self
     where
-        T: Neg<Output = T>
+        T: Neg<Output = T>,
     {
         SideOffsets2D {
             left: -min.x,
@@ -147,9 +152,9 @@ impl<T, U> SideOffsets2D<T, U> {
     /// The inner rect of the resulting side offsets is equivalent to translating
     /// a rectangle's upper-left corner with the min vector and translating the
     /// bottom-right corner with the max vector.
-    pub fn from_vectors_inner(min: Vector2D<T, U>, max: Vector2D<T,U>) -> Self
+    pub fn from_vectors_inner(min: Vector2D<T, U>, max: Vector2D<T, U>) -> Self
     where
-        T: Neg<Output = T>
+        T: Neg<Output = T>,
     {
         SideOffsets2D {
             left: min.x,
@@ -163,7 +168,7 @@ impl<T, U> SideOffsets2D<T, U> {
     /// Returns `true` if all side offsets are zero.
     pub fn is_zero(&self) -> bool
     where
-        T: Zero + PartialEq
+        T: Zero + PartialEq,
     {
         let zero = T::zero();
         self.top == zero && self.right == zero && self.bottom == zero && self.left == zero
@@ -223,8 +228,8 @@ impl<T: Clone + Mul, U> Mul<T> for SideOffsets2D<T, U> {
     #[inline]
     fn mul(self, scale: T) -> Self::Output {
         SideOffsets2D::new(
-            self.top * scale.clone(), 
-            self.right * scale.clone(), 
+            self.top * scale.clone(),
+            self.right * scale.clone(),
             self.bottom * scale.clone(),
             self.left * scale,
         )
@@ -234,10 +239,10 @@ impl<T: Clone + Mul, U> Mul<T> for SideOffsets2D<T, U> {
 impl<T: Clone + MulAssign, U> MulAssign<T> for SideOffsets2D<T, U> {
     #[inline]
     fn mul_assign(&mut self, other: T) {
-        self.top *= other.clone(); 
-        self.right *= other.clone(); 
-        self.bottom *= other.clone(); 
-        self.left *= other; 
+        self.top *= other.clone();
+        self.right *= other.clone();
+        self.bottom *= other.clone();
+        self.left *= other;
     }
 }
 
@@ -250,7 +255,7 @@ impl<T: Clone + Mul, U1, U2> Mul<Scale<T, U1, U2>> for SideOffsets2D<T, U1> {
             self.top * scale.0.clone(),
             self.right * scale.0.clone(),
             self.bottom * scale.0.clone(),
-            self.left * scale.0
+            self.left * scale.0,
         )
     }
 }
@@ -262,7 +267,7 @@ impl<T: Clone + MulAssign, U> MulAssign<Scale<T, U, U>> for SideOffsets2D<T, U> 
     }
 }
 
-impl <T: Clone + Div, U> Div<T> for SideOffsets2D<T, U> {
+impl<T: Clone + Div, U> Div<T> for SideOffsets2D<T, U> {
     type Output = SideOffsets2D<T::Output, U>;
 
     #[inline]
@@ -276,7 +281,7 @@ impl <T: Clone + Div, U> Div<T> for SideOffsets2D<T, U> {
     }
 }
 
-impl <T: Clone + DivAssign, U> DivAssign<T> for SideOffsets2D<T, U> {
+impl<T: Clone + DivAssign, U> DivAssign<T> for SideOffsets2D<T, U> {
     #[inline]
     fn div_assign(&mut self, other: T) {
         self.top /= other.clone();
@@ -286,7 +291,7 @@ impl <T: Clone + DivAssign, U> DivAssign<T> for SideOffsets2D<T, U> {
     }
 }
 
-impl <T: Clone + Div, U1, U2> Div<Scale<T, U1, U2>> for SideOffsets2D<T, U2> {
+impl<T: Clone + Div, U1, U2> Div<Scale<T, U1, U2>> for SideOffsets2D<T, U2> {
     type Output = SideOffsets2D<T::Output, U1>;
 
     #[inline]
@@ -308,7 +313,7 @@ impl<T: Clone + DivAssign, U> DivAssign<Scale<T, U, U>> for SideOffsets2D<T, U> 
 
 #[test]
 fn from_vectors() {
-    use crate::{vec2, point2};
+    use crate::{point2, vec2};
     type Box2D = crate::default::Box2D<i32>;
 
     let b = Box2D {
@@ -319,8 +324,20 @@ fn from_vectors() {
     let outer = b.outer_box(SideOffsets2D::from_vectors_outer(vec2(-1, -2), vec2(3, 4)));
     let inner = b.inner_box(SideOffsets2D::from_vectors_inner(vec2(1, 2), vec2(-3, -4)));
 
-    assert_eq!(outer, Box2D { min: point2(9, 8), max: point2(23, 24) });
-    assert_eq!(inner, Box2D { min: point2(11, 12), max: point2(17, 16) });
+    assert_eq!(
+        outer,
+        Box2D {
+            min: point2(9, 8),
+            max: point2(23, 24)
+        }
+    );
+    assert_eq!(
+        inner,
+        Box2D {
+            min: point2(11, 12),
+            max: point2(17, 16)
+        }
+    );
 }
 
 #[test]
@@ -361,11 +378,11 @@ mod ops {
         assert_eq!(s, SideOffsets2D::new(2.0, 4.0, 6.0, 8.0));
     }
 
-    #[test] 
+    #[test]
     fn test_mul_scale() {
         let s = SideOffsets2DMm::new(0.0, 1.0, 3.0, 2.0);
         let cm_per_mm: Scale<f32, Mm, Cm> = Scale::new(0.1);
-        
+
         let result = s * cm_per_mm;
 
         assert_eq!(result, SideOffsets2DCm::new(0.0, 0.1, 0.3, 0.2));
@@ -384,7 +401,7 @@ mod ops {
     #[test]
     fn test_div_scalar() {
         let s = SideOffsets2D::new(10.0, 20.0, 30.0, 40.0);
-        
+
         let result = s / 10.0;
 
         assert_eq!(result, SideOffsets2D::new(1.0, 2.0, 3.0, 4.0));
@@ -393,7 +410,7 @@ mod ops {
     #[test]
     fn test_div_assign_scalar() {
         let mut s = SideOffsets2D::new(10.0, 20.0, 30.0, 40.0);
-    
+
         s /= 10.0;
 
         assert_eq!(s, SideOffsets2D::new(1.0, 2.0, 3.0, 4.0));

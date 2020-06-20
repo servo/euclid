@@ -9,24 +9,24 @@
 
 use super::UnknownUnit;
 use crate::approxeq::ApproxEq;
-use crate::approxord::{min, max};
+use crate::approxord::{max, min};
 use crate::length::Length;
-#[cfg(feature = "mint")]
-use mint;
-use crate::point::{Point2D, Point3D, point2, point3};
-use crate::size::{Size2D, Size3D, size2, size3};
+use crate::num::*;
+use crate::point::{point2, point3, Point2D, Point3D};
 use crate::scale::Scale;
+use crate::size::{size2, size3, Size2D, Size3D};
 use crate::transform2d::Transform2D;
 use crate::transform3d::Transform3D;
 use crate::trig::Trig;
 use crate::Angle;
-use crate::num::*;
-use num_traits::{Float, NumCast, Signed};
-use core::fmt;
-use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
-use core::marker::PhantomData;
 use core::cmp::{Eq, PartialEq};
-use core::hash::{Hash};
+use core::fmt;
+use core::hash::Hash;
+use core::marker::PhantomData;
+use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+#[cfg(feature = "mint")]
+use mint;
+use num_traits::{Float, NumCast, Signed};
 #[cfg(feature = "serde")]
 use serde;
 
@@ -57,22 +57,30 @@ impl<T: Clone, U> Clone for Vector2D<T, U> {
 
 #[cfg(feature = "serde")]
 impl<'de, T, U> serde::Deserialize<'de> for Vector2D<T, U>
-    where T: serde::Deserialize<'de>
+where
+    T: serde::Deserialize<'de>,
 {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-        where D: serde::Deserializer<'de>
+    where
+        D: serde::Deserializer<'de>,
     {
         let (x, y) = serde::Deserialize::deserialize(deserializer)?;
-        Ok(Vector2D { x, y, _unit: PhantomData })
+        Ok(Vector2D {
+            x,
+            y,
+            _unit: PhantomData,
+        })
     }
 }
 
 #[cfg(feature = "serde")]
 impl<T, U> serde::Serialize for Vector2D<T, U>
-    where T: serde::Serialize
+where
+    T: serde::Serialize,
 {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where S: serde::Serializer
+    where
+        S: serde::Serializer,
     {
         (&self.x, &self.y).serialize(serializer)
     }
@@ -103,10 +111,7 @@ impl<T: Zero, U> Zero for Vector2D<T, U> {
 
 impl<T: fmt::Debug, U> fmt::Debug for Vector2D<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        f.debug_tuple("")
-            .field(&self.x)
-            .field(&self.y)
-            .finish()
+        f.debug_tuple("").field(&self.x).field(&self.y).finish()
     }
 }
 
@@ -353,7 +358,6 @@ impl<T, U> Vector2D<T, U>
 where
     T: Copy + Mul<T, Output = T> + Add<T, Output = T>,
 {
-
     /// Returns the vector's length squared.
     #[inline]
     pub fn square_length(&self) -> T {
@@ -366,7 +370,7 @@ where
     #[inline]
     pub fn project_onto_vector(&self, onto: Self) -> Self
     where
-        T: Sub<T, Output = T> + Div<T, Output = T>
+        T: Sub<T, Output = T> + Div<T, Output = T>,
     {
         onto * (self.dot(onto) / onto.square_length())
     }
@@ -631,7 +635,6 @@ impl<T: NumCast + Copy, U> Vector2D<T, U> {
     }
 }
 
-
 impl<T: Neg, U> Neg for Vector2D<T, U> {
     type Output = Vector2D<T::Output, U>;
 
@@ -640,7 +643,6 @@ impl<T: Neg, U> Neg for Vector2D<T, U> {
         vec2(-self.x, -self.y)
     }
 }
-
 
 impl<T: Add, U> Add for Vector2D<T, U> {
     type Output = Vector2D<T::Output, U>;
@@ -658,7 +660,6 @@ impl<T: Copy + Add<T, Output = T>, U> AddAssign for Vector2D<T, U> {
     }
 }
 
-
 impl<T: Sub, U> Sub for Vector2D<T, U> {
     type Output = Vector2D<T::Output, U>;
 
@@ -674,7 +675,6 @@ impl<T: Copy + Sub<T, Output = T>, U> SubAssign<Vector2D<T, U>> for Vector2D<T, 
         *self = *self - other
     }
 }
-
 
 impl<T: Clone + Mul, U> Mul<T> for Vector2D<T, U> {
     type Output = Vector2D<T::Output, U>;
@@ -709,7 +709,6 @@ impl<T: Clone + MulAssign, U> MulAssign<Scale<T, U, U>> for Vector2D<T, U> {
     }
 }
 
-
 impl<T: Clone + Div, U> Div<T> for Vector2D<T, U> {
     type Output = Vector2D<T::Output, U>;
 
@@ -742,7 +741,6 @@ impl<T: Clone + DivAssign, U> DivAssign<Scale<T, U, U>> for Vector2D<T, U> {
         self.y /= scale.0;
     }
 }
-
 
 impl<T: Round, U> Round for Vector2D<T, U> {
     /// See [`Vector2D::round()`](#method.round)
@@ -780,7 +778,6 @@ impl<T: ApproxEq<T>, U> ApproxEq<Vector2D<T, U>> for Vector2D<T, U> {
     }
 }
 
-
 impl<T, U> Into<[T; 2]> for Vector2D<T, U> {
     fn into(self) -> [T; 2] {
         [self.x, self.y]
@@ -810,8 +807,6 @@ impl<T, U> From<Size2D<T, U>> for Vector2D<T, U> {
         vec2(size.width, size.height)
     }
 }
-
-
 
 /// A 3d Vector tagged with a unit.
 #[repr(C)]
@@ -843,22 +838,31 @@ impl<T: Clone, U> Clone for Vector3D<T, U> {
 
 #[cfg(feature = "serde")]
 impl<'de, T, U> serde::Deserialize<'de> for Vector3D<T, U>
-    where T: serde::Deserialize<'de>
+where
+    T: serde::Deserialize<'de>,
 {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-        where D: serde::Deserializer<'de>
+    where
+        D: serde::Deserializer<'de>,
     {
         let (x, y, z) = serde::Deserialize::deserialize(deserializer)?;
-        Ok(Vector3D { x, y, z, _unit: PhantomData })
+        Ok(Vector3D {
+            x,
+            y,
+            z,
+            _unit: PhantomData,
+        })
     }
 }
 
 #[cfg(feature = "serde")]
 impl<T, U> serde::Serialize for Vector3D<T, U>
-    where T: serde::Serialize
+where
+    T: serde::Serialize,
 {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where S: serde::Serializer
+    where
+        S: serde::Serializer,
     {
         (&self.x, &self.y, &self.z).serialize(serializer)
     }
@@ -1144,7 +1148,7 @@ impl<T: Copy, U> Vector3D<T, U> {
 
 impl<T, U> Vector3D<T, U>
 where
-    T: Copy + Mul<T, Output = T> + Add<T, Output = T>
+    T: Copy + Mul<T, Output = T> + Add<T, Output = T>,
 {
     /// Returns the vector's length squared.
     #[inline]
@@ -1158,7 +1162,7 @@ where
     #[inline]
     pub fn project_onto_vector(&self, onto: Self) -> Self
     where
-        T: Sub<T, Output = T> + Div<T, Output = T>
+        T: Sub<T, Output = T> + Div<T, Output = T>,
     {
         onto * (self.dot(onto) / onto.square_length())
     }
@@ -1172,7 +1176,10 @@ impl<T: Float, U> Vector3D<T, U> {
     where
         T: Trig,
     {
-        Angle::radians(Trig::fast_atan2(self.cross(other).length(), self.dot(other)))
+        Angle::radians(Trig::fast_atan2(
+            self.cross(other).length(),
+            self.dot(other),
+        ))
     }
 
     /// Returns the vector length.
@@ -1439,7 +1446,6 @@ impl<T: NumCast + Copy, U> Vector3D<T, U> {
     }
 }
 
-
 impl<T: Neg, U> Neg for Vector3D<T, U> {
     type Output = Vector3D<T::Output, U>;
 
@@ -1448,7 +1454,6 @@ impl<T: Neg, U> Neg for Vector3D<T, U> {
         vec3(-self.x, -self.y, -self.z)
     }
 }
-
 
 impl<T: Add, U> Add for Vector3D<T, U> {
     type Output = Vector3D<T::Output, U>;
@@ -1466,7 +1471,6 @@ impl<T: Copy + Add<T, Output = T>, U> AddAssign for Vector3D<T, U> {
     }
 }
 
-
 impl<T: Sub, U> Sub for Vector3D<T, U> {
     type Output = Vector3D<T::Output, U>;
 
@@ -1483,7 +1487,6 @@ impl<T: Copy + Sub<T, Output = T>, U> SubAssign<Vector3D<T, U>> for Vector3D<T, 
     }
 }
 
-
 impl<T: Clone + Mul, U> Mul<T> for Vector3D<T, U> {
     type Output = Vector3D<T::Output, U>;
 
@@ -1492,7 +1495,7 @@ impl<T: Clone + Mul, U> Mul<T> for Vector3D<T, U> {
         vec3(
             self.x * scale.clone(),
             self.y * scale.clone(),
-            self.z * scale
+            self.z * scale,
         )
     }
 }
@@ -1509,7 +1512,11 @@ impl<T: Clone + Mul, U1, U2> Mul<Scale<T, U1, U2>> for Vector3D<T, U1> {
 
     #[inline]
     fn mul(self, scale: Scale<T, U1, U2>) -> Self::Output {
-        vec3(self.x * scale.0.clone(), self.y * scale.0.clone(), self.z * scale.0)
+        vec3(
+            self.x * scale.0.clone(),
+            self.y * scale.0.clone(),
+            self.z * scale.0,
+        )
     }
 }
 
@@ -1522,7 +1529,6 @@ impl<T: Clone + MulAssign, U> MulAssign<Scale<T, U, U>> for Vector3D<T, U> {
     }
 }
 
-
 impl<T: Clone + Div, U> Div<T> for Vector3D<T, U> {
     type Output = Vector3D<T::Output, U>;
 
@@ -1531,7 +1537,7 @@ impl<T: Clone + Div, U> Div<T> for Vector3D<T, U> {
         vec3(
             self.x / scale.clone(),
             self.y / scale.clone(),
-            self.z / scale
+            self.z / scale,
         )
     }
 }
@@ -1548,7 +1554,11 @@ impl<T: Clone + Div, U1, U2> Div<Scale<T, U1, U2>> for Vector3D<T, U2> {
 
     #[inline]
     fn div(self, scale: Scale<T, U1, U2>) -> Self::Output {
-        vec3(self.x / scale.0.clone(), self.y / scale.0.clone(), self.z / scale.0)
+        vec3(
+            self.x / scale.0.clone(),
+            self.y / scale.0.clone(),
+            self.z / scale.0,
+        )
     }
 }
 
@@ -1560,7 +1570,6 @@ impl<T: Clone + DivAssign, U> DivAssign<Scale<T, U, U>> for Vector3D<T, U> {
         self.z /= scale.0;
     }
 }
-
 
 impl<T: Round, U> Round for Vector3D<T, U> {
     /// See [`Vector3D::round()`](#method.round)
@@ -1598,11 +1607,11 @@ impl<T: ApproxEq<T>, U> ApproxEq<Vector3D<T, U>> for Vector3D<T, U> {
 
     #[inline]
     fn approx_eq_eps(&self, other: &Self, eps: &Self) -> bool {
-        self.x.approx_eq_eps(&other.x, &eps.x) && self.y.approx_eq_eps(&other.y, &eps.y)
+        self.x.approx_eq_eps(&other.x, &eps.x)
+            && self.y.approx_eq_eps(&other.y, &eps.y)
             && self.z.approx_eq_eps(&other.z, &eps.z)
     }
 }
-
 
 impl<T, U> Into<[T; 3]> for Vector3D<T, U> {
     fn into(self) -> [T; 3] {
@@ -1627,7 +1636,6 @@ impl<T, U> From<(T, T, T)> for Vector3D<T, U> {
         vec3(tuple.0, tuple.1, tuple.2)
     }
 }
-
 
 /// A 2d vector of booleans, useful for component-wise logic operations.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
@@ -1770,7 +1778,6 @@ impl BoolVector3D {
         }
     }
 
-
     /// Returns point, each component of which or from `a`, or from `b` depending on truly value
     /// of corresponding vector component. `true` selects value from `a` and `false` from `b`.
     #[inline]
@@ -1833,7 +1840,6 @@ impl BoolVector3D {
     }
 }
 
-
 /// Convenience constructor.
 #[inline]
 pub fn vec2<T, U>(x: T, y: T) -> Vector2D<T, U> {
@@ -1867,11 +1873,10 @@ pub fn bvec3(x: bool, y: bool, z: bool) -> BoolVector3D {
     BoolVector3D { x, y, z }
 }
 
-
 #[cfg(test)]
 mod vector2d {
-    use crate::{default, vec2};
     use crate::scale::Scale;
+    use crate::{default, vec2};
 
     #[cfg(feature = "mint")]
     use mint;
@@ -1913,8 +1918,14 @@ mod vector2d {
         assert_eq!(p2.normalize(), vec2(0.6, -0.8));
 
         let p3: Vec2 = vec2(::std::f32::MAX, ::std::f32::MAX);
-        assert_ne!(p3.normalize(), vec2(1.0 / 2.0f32.sqrt(), 1.0 / 2.0f32.sqrt()));
-        assert_eq!(p3.robust_normalize(), vec2(1.0 / 2.0f32.sqrt(), 1.0 / 2.0f32.sqrt()));
+        assert_ne!(
+            p3.normalize(),
+            vec2(1.0 / 2.0f32.sqrt(), 1.0 / 2.0f32.sqrt())
+        );
+        assert_eq!(
+            p3.robust_normalize(),
+            vec2(1.0 / 2.0f32.sqrt(), 1.0 / 2.0f32.sqrt())
+        );
 
         let p4: Vec2 = Vec2::zero();
         assert!(p4.try_normalize().is_none());
@@ -1949,8 +1960,8 @@ mod vector2d {
 
     #[test]
     pub fn test_angle_from_x_axis() {
-        use core::f32::consts::FRAC_PI_2;
         use crate::approxeq::ApproxEq;
+        use core::f32::consts::FRAC_PI_2;
 
         let right: Vec2 = vec2(10.0, 0.0);
         let down: Vec2 = vec2(0.0, 4.0);
@@ -1963,8 +1974,8 @@ mod vector2d {
 
     #[test]
     pub fn test_angle_to() {
-        use core::f32::consts::FRAC_PI_2;
         use crate::approxeq::ApproxEq;
+        use core::f32::consts::FRAC_PI_2;
 
         let right: Vec2 = vec2(10.0, 0.0);
         let right2: Vec2 = vec2(1.0, 0.0);
@@ -1974,7 +1985,10 @@ mod vector2d {
         assert!(right.angle_to(right2).get().approx_eq(&0.0));
         assert!(right.angle_to(up).get().approx_eq(&-FRAC_PI_2));
         assert!(up.angle_to(right).get().approx_eq(&FRAC_PI_2));
-        assert!(up_left.angle_to(up).get().approx_eq_eps(&(0.5 * FRAC_PI_2), &0.0005));
+        assert!(up_left
+            .angle_to(up)
+            .get()
+            .approx_eq_eps(&(0.5 * FRAC_PI_2), &0.0005));
     }
 
     #[test]
@@ -2088,10 +2102,10 @@ mod vector2d {
 
 #[cfg(test)]
 mod vector3d {
+    use crate::scale::Scale;
+    use crate::{default, vec2, vec3};
     #[cfg(feature = "mint")]
     use mint;
-    use crate::{default, vec2, vec3};
-    use crate::scale::Scale;
 
     type Vec3 = default::Vector3D<f32>;
 
@@ -2124,8 +2138,14 @@ mod vector3d {
         assert_eq!(p2.normalize(), vec3(1.0 / 3.0, 2.0 / 3.0, -2.0 / 3.0));
 
         let p3: Vec3 = vec3(::std::f32::MAX, ::std::f32::MAX, 0.0);
-        assert_ne!(p3.normalize(), vec3(1.0 / 2.0f32.sqrt(), 1.0 / 2.0f32.sqrt(), 0.0));
-        assert_eq!(p3.robust_normalize(), vec3(1.0 / 2.0f32.sqrt(), 1.0 / 2.0f32.sqrt(), 0.0));
+        assert_ne!(
+            p3.normalize(),
+            vec3(1.0 / 2.0f32.sqrt(), 1.0 / 2.0f32.sqrt(), 0.0)
+        );
+        assert_eq!(
+            p3.robust_normalize(),
+            vec3(1.0 / 2.0f32.sqrt(), 1.0 / 2.0f32.sqrt(), 0.0)
+        );
 
         let p4: Vec3 = Vec3::zero();
         assert!(p4.try_normalize().is_none());
@@ -2213,8 +2233,8 @@ mod vector3d {
 
     #[test]
     pub fn test_angle_to() {
-        use core::f32::consts::FRAC_PI_2;
         use crate::approxeq::ApproxEq;
+        use core::f32::consts::FRAC_PI_2;
 
         let right: Vec3 = vec3(10.0, 0.0, 0.0);
         let right2: Vec3 = vec3(1.0, 0.0, 0.0);
@@ -2224,7 +2244,10 @@ mod vector3d {
         assert!(right.angle_to(right2).get().approx_eq(&0.0));
         assert!(right.angle_to(up).get().approx_eq(&FRAC_PI_2));
         assert!(up.angle_to(right).get().approx_eq(&FRAC_PI_2));
-        assert!(up_left.angle_to(up).get().approx_eq_eps(&(0.5 * FRAC_PI_2), &0.0005));
+        assert!(up_left
+            .angle_to(up)
+            .get()
+            .approx_eq_eps(&(0.5 * FRAC_PI_2), &0.0005));
     }
 
     #[test]
@@ -2271,7 +2294,9 @@ mod vector3d {
         assert!(v1.project_onto_vector(y).approx_eq(&vec3(0.0, 2.0, 0.0)));
         assert!(v1.project_onto_vector(z).approx_eq(&vec3(0.0, 0.0, 3.0)));
         assert!(v1.project_onto_vector(-x).approx_eq(&vec3(1.0, 0.0, 0.0)));
-        assert!(v1.project_onto_vector(x * 10.0).approx_eq(&vec3(1.0, 0.0, 0.0)));
+        assert!(v1
+            .project_onto_vector(x * 10.0)
+            .approx_eq(&vec3(1.0, 0.0, 0.0)));
         assert!(v1.project_onto_vector(v1 * 2.0).approx_eq(&v1));
         assert!(v1.project_onto_vector(-v1).approx_eq(&v1));
     }
@@ -2279,14 +2304,13 @@ mod vector3d {
 
 #[cfg(test)]
 mod bool_vector {
-    use crate::default;
     use super::*;
+    use crate::default;
     type Vec2 = default::Vector2D<f32>;
     type Vec3 = default::Vector3D<f32>;
 
     #[test]
     fn test_bvec2() {
-
         assert_eq!(
             Vec2::new(1.0, 2.0).greater_than(Vec2::new(2.0, 1.0)),
             bvec2(false, true),
@@ -2318,7 +2342,10 @@ mod bool_vector {
         assert!(!bvec2(false, false).all());
 
         assert_eq!(bvec2(true, false).not(), bvec2(false, true));
-        assert_eq!(bvec2(true, false).and(bvec2(true, true)), bvec2(true, false));
+        assert_eq!(
+            bvec2(true, false).and(bvec2(true, true)),
+            bvec2(true, false)
+        );
         assert_eq!(bvec2(true, false).or(bvec2(true, true)), bvec2(true, true));
 
         assert_eq!(
@@ -2329,7 +2356,6 @@ mod bool_vector {
 
     #[test]
     fn test_bvec3() {
-
         assert_eq!(
             Vec3::new(1.0, 2.0, 3.0).greater_than(Vec3::new(3.0, 2.0, 1.0)),
             bvec3(false, false, true),
@@ -2361,11 +2387,18 @@ mod bool_vector {
         assert!(!bvec3(false, false, false).all());
 
         assert_eq!(bvec3(true, false, true).not(), bvec3(false, true, false));
-        assert_eq!(bvec3(true, false, true).and(bvec3(true, true, false)), bvec3(true, false, false));
-        assert_eq!(bvec3(true, false, false).or(bvec3(true, true, false)), bvec3(true, true, false));
+        assert_eq!(
+            bvec3(true, false, true).and(bvec3(true, true, false)),
+            bvec3(true, false, false)
+        );
+        assert_eq!(
+            bvec3(true, false, false).or(bvec3(true, true, false)),
+            bvec3(true, true, false)
+        );
 
         assert_eq!(
-            bvec3(true, false, true).select_vector(Vec3::new(1.0, 2.0, 3.0), Vec3::new(4.0, 5.0, 6.0)),
+            bvec3(true, false, true)
+                .select_vector(Vec3::new(1.0, 2.0, 3.0), Vec3::new(4.0, 5.0, 6.0)),
             Vec3::new(1.0, 5.0, 3.0),
         );
     }

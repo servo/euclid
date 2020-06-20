@@ -8,22 +8,28 @@
 // except according to those terms.
 
 use crate::approxeq::ApproxEq;
-use num_traits::{Float, One, Zero, NumCast};
-use core::fmt;
-use core::ops::{Add, Mul, Neg, Sub};
-use core::marker::PhantomData;
-use core::cmp::{Eq, PartialEq};
-use core::hash::{Hash};
 use crate::trig::Trig;
-use crate::{Angle, Point2D, Point3D, Vector2D, Vector3D, point2, point3, vec3};
+use crate::{point2, point3, vec3, Angle, Point2D, Point3D, Vector2D, Vector3D};
 use crate::{Transform2D, Transform3D, UnknownUnit};
+use core::cmp::{Eq, PartialEq};
+use core::fmt;
+use core::hash::Hash;
+use core::marker::PhantomData;
+use core::ops::{Add, Mul, Neg, Sub};
+use num_traits::{Float, NumCast, One, Zero};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
 /// A transform that can represent rotations in 2d, represented as an angle in radians.
 #[repr(C)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "serde", serde(bound(serialize = "T: serde::Serialize", deserialize = "T: serde::Deserialize<'de>")))]
+#[cfg_attr(
+    feature = "serde",
+    serde(bound(
+        serialize = "T: serde::Serialize",
+        deserialize = "T: serde::Deserialize<'de>"
+    ))
+)]
 pub struct Rotation2D<T, Src, Dst> {
     /// Angle in radians
     pub angle: T,
@@ -45,7 +51,8 @@ impl<T: Clone, Src, Dst> Clone for Rotation2D<T, Src, Dst> {
 impl<T, Src, Dst> Eq for Rotation2D<T, Src, Dst> where T: Eq {}
 
 impl<T, Src, Dst> PartialEq for Rotation2D<T, Src, Dst>
-    where T: PartialEq
+where
+    T: PartialEq,
 {
     fn eq(&self, other: &Self) -> bool {
         self.angle == other.angle
@@ -53,7 +60,8 @@ impl<T, Src, Dst> PartialEq for Rotation2D<T, Src, Dst>
 }
 
 impl<T, Src, Dst> Hash for Rotation2D<T, Src, Dst>
-    where T: Hash
+where
+    T: Hash,
 {
     fn hash<H: core::hash::Hasher>(&self, h: &mut H) {
         self.angle.hash(h);
@@ -106,7 +114,7 @@ impl<T: Copy, Src, Dst> Rotation2D<T, Src, Dst> {
     pub fn cast_unit<Src2, Dst2>(&self) -> Rotation2D<T, Src2, Dst2> {
         Rotation2D {
             angle: self.angle,
-            _unit: PhantomData
+            _unit: PhantomData,
         }
     }
 
@@ -229,7 +237,13 @@ where
 /// The memory layout of this type corresponds to the `x, y, z, w` notation
 #[repr(C)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "serde", serde(bound(serialize = "T: serde::Serialize", deserialize = "T: serde::Deserialize<'de>")))]
+#[cfg_attr(
+    feature = "serde",
+    serde(bound(
+        serialize = "T: serde::Serialize",
+        deserialize = "T: serde::Deserialize<'de>"
+    ))
+)]
 pub struct Rotation3D<T, Src, Dst> {
     /// Component multiplied by the imaginary number `i`.
     pub i: T,
@@ -260,18 +274,17 @@ impl<T: Clone, Src, Dst> Clone for Rotation3D<T, Src, Dst> {
 impl<T, Src, Dst> Eq for Rotation3D<T, Src, Dst> where T: Eq {}
 
 impl<T, Src, Dst> PartialEq for Rotation3D<T, Src, Dst>
-    where T: PartialEq
+where
+    T: PartialEq,
 {
     fn eq(&self, other: &Self) -> bool {
-        self.i == other.i &&
-            self.j == other.j &&
-            self.k == other.k &&
-            self.r == other.r
+        self.i == other.i && self.j == other.j && self.k == other.k && self.r == other.r
     }
 }
 
 impl<T, Src, Dst> Hash for Rotation3D<T, Src, Dst>
-    where T: Hash
+where
+    T: Hash,
 {
     fn hash<H: core::hash::Hasher>(&self, h: &mut H) {
         self.i.hash(h);
@@ -348,7 +361,7 @@ where
             j: self.j,
             k: self.k,
             r: self.r,
-            _unit: PhantomData
+            _unit: PhantomData,
         }
     }
 
@@ -640,22 +653,7 @@ where
         let m33 = one - (ii + jj);
 
         Transform3D::row_major(
-            m11,
-            m12,
-            m13,
-            zero,
-            m21,
-            m22,
-            m23,
-            zero,
-            m31,
-            m32,
-            m33,
-            zero,
-            zero,
-            zero,
-            zero,
-            one,
+            m11, m12, m13, zero, m21, m22, m23, zero, m31, m32, m33, zero, zero, zero, zero, one,
         )
     }
 
@@ -751,9 +749,12 @@ where
     }
 
     fn approx_eq_eps(&self, other: &Self, eps: &T) -> bool {
-        (self.i.approx_eq_eps(&other.i, eps) && self.j.approx_eq_eps(&other.j, eps)
-            && self.k.approx_eq_eps(&other.k, eps) && self.r.approx_eq_eps(&other.r, eps))
-            || (self.i.approx_eq_eps(&-other.i, eps) && self.j.approx_eq_eps(&-other.j, eps)
+        (self.i.approx_eq_eps(&other.i, eps)
+            && self.j.approx_eq_eps(&other.j, eps)
+            && self.k.approx_eq_eps(&other.k, eps)
+            && self.r.approx_eq_eps(&other.r, eps))
+            || (self.i.approx_eq_eps(&-other.i, eps)
+                && self.j.approx_eq_eps(&-other.j, eps)
                 && self.k.approx_eq_eps(&-other.k, eps)
                 && self.r.approx_eq_eps(&-other.r, eps))
     }
@@ -761,78 +762,68 @@ where
 
 #[test]
 fn simple_rotation_2d() {
-    use core::f32::consts::{FRAC_PI_2, PI};
     use crate::default::Rotation2D;
+    use core::f32::consts::{FRAC_PI_2, PI};
 
     let ri = Rotation2D::identity();
     let r90 = Rotation2D::radians(FRAC_PI_2);
     let rm90 = Rotation2D::radians(-FRAC_PI_2);
     let r180 = Rotation2D::radians(PI);
 
-    assert!(
-        ri.transform_point(point2(1.0, 2.0))
-            .approx_eq(&point2(1.0, 2.0))
-    );
-    assert!(
-        r90.transform_point(point2(1.0, 2.0))
-            .approx_eq(&point2(-2.0, 1.0))
-    );
-    assert!(
-        rm90.transform_point(point2(1.0, 2.0))
-            .approx_eq(&point2(2.0, -1.0))
-    );
-    assert!(
-        r180.transform_point(point2(1.0, 2.0))
-            .approx_eq(&point2(-1.0, -2.0))
-    );
+    assert!(ri
+        .transform_point(point2(1.0, 2.0))
+        .approx_eq(&point2(1.0, 2.0)));
+    assert!(r90
+        .transform_point(point2(1.0, 2.0))
+        .approx_eq(&point2(-2.0, 1.0)));
+    assert!(rm90
+        .transform_point(point2(1.0, 2.0))
+        .approx_eq(&point2(2.0, -1.0)));
+    assert!(r180
+        .transform_point(point2(1.0, 2.0))
+        .approx_eq(&point2(-1.0, -2.0)));
 
-    assert!(
-        r90.inverse()
-            .inverse()
-            .transform_point(point2(1.0, 2.0))
-            .approx_eq(&r90.transform_point(point2(1.0, 2.0)))
-    );
+    assert!(r90
+        .inverse()
+        .inverse()
+        .transform_point(point2(1.0, 2.0))
+        .approx_eq(&r90.transform_point(point2(1.0, 2.0))));
 }
 
 #[test]
 fn simple_rotation_3d_in_2d() {
-    use core::f32::consts::{FRAC_PI_2, PI};
     use crate::default::Rotation3D;
+    use core::f32::consts::{FRAC_PI_2, PI};
 
     let ri = Rotation3D::identity();
     let r90 = Rotation3D::around_z(Angle::radians(FRAC_PI_2));
     let rm90 = Rotation3D::around_z(Angle::radians(-FRAC_PI_2));
     let r180 = Rotation3D::around_z(Angle::radians(PI));
 
-    assert!(
-        ri.transform_point2d(point2(1.0, 2.0))
-            .approx_eq(&point2(1.0, 2.0))
-    );
-    assert!(
-        r90.transform_point2d(point2(1.0, 2.0))
-            .approx_eq(&point2(-2.0, 1.0))
-    );
-    assert!(
-        rm90.transform_point2d(point2(1.0, 2.0))
-            .approx_eq(&point2(2.0, -1.0))
-    );
-    assert!(
-        r180.transform_point2d(point2(1.0, 2.0))
-            .approx_eq(&point2(-1.0, -2.0))
-    );
+    assert!(ri
+        .transform_point2d(point2(1.0, 2.0))
+        .approx_eq(&point2(1.0, 2.0)));
+    assert!(r90
+        .transform_point2d(point2(1.0, 2.0))
+        .approx_eq(&point2(-2.0, 1.0)));
+    assert!(rm90
+        .transform_point2d(point2(1.0, 2.0))
+        .approx_eq(&point2(2.0, -1.0)));
+    assert!(r180
+        .transform_point2d(point2(1.0, 2.0))
+        .approx_eq(&point2(-1.0, -2.0)));
 
-    assert!(
-        r90.inverse()
-            .inverse()
-            .transform_point2d(point2(1.0, 2.0))
-            .approx_eq(&r90.transform_point2d(point2(1.0, 2.0)))
-    );
+    assert!(r90
+        .inverse()
+        .inverse()
+        .transform_point2d(point2(1.0, 2.0))
+        .approx_eq(&r90.transform_point2d(point2(1.0, 2.0))));
 }
 
 #[test]
 fn pre_post() {
-    use core::f32::consts::FRAC_PI_2;
     use crate::default::Rotation3D;
+    use core::f32::consts::FRAC_PI_2;
 
     let r1 = Rotation3D::around_x(Angle::radians(FRAC_PI_2));
     let r2 = Rotation3D::around_y(Angle::radians(FRAC_PI_2));
@@ -847,12 +838,18 @@ fn pre_post() {
     // Check that the order of transformations is correct (corresponds to what
     // we do in Transform3D).
     let p1 = r1.post_rotate(&r2).post_rotate(&r3).transform_point3d(p);
-    let p2 = t1.post_transform(&t2).post_transform(&t3).transform_point3d(p);
+    let p2 = t1
+        .post_transform(&t2)
+        .post_transform(&t3)
+        .transform_point3d(p);
 
     assert!(p1.approx_eq(&p2.unwrap()));
 
     // Check that changing the order indeed matters.
-    let p3 = t3.post_transform(&t1).post_transform(&t2).transform_point3d(p);
+    let p3 = t3
+        .post_transform(&t1)
+        .post_transform(&t2)
+        .transform_point3d(p);
     assert!(!p1.approx_eq(&p3.unwrap()));
 }
 
@@ -962,34 +959,30 @@ fn slerp() {
 
 #[test]
 fn around_axis() {
-    use core::f32::consts::{FRAC_PI_2, PI};
     use crate::default::Rotation3D;
+    use core::f32::consts::{FRAC_PI_2, PI};
 
     // Two sort of trivial cases:
     let r1 = Rotation3D::around_axis(vec3(1.0, 1.0, 0.0), Angle::radians(PI));
     let r2 = Rotation3D::around_axis(vec3(1.0, 1.0, 0.0), Angle::radians(FRAC_PI_2));
-    assert!(
-        r1.transform_point3d(point3(1.0, 2.0, 0.0))
-            .approx_eq(&point3(2.0, 1.0, 0.0))
-    );
-    assert!(
-        r2.transform_point3d(point3(1.0, 0.0, 0.0))
-            .approx_eq(&point3(0.5, 0.5, -0.5.sqrt()))
-    );
+    assert!(r1
+        .transform_point3d(point3(1.0, 2.0, 0.0))
+        .approx_eq(&point3(2.0, 1.0, 0.0)));
+    assert!(r2
+        .transform_point3d(point3(1.0, 0.0, 0.0))
+        .approx_eq(&point3(0.5, 0.5, -0.5.sqrt())));
 
     // A more arbitrary test (made up with numpy):
     let r3 = Rotation3D::around_axis(vec3(0.5, 1.0, 2.0), Angle::radians(2.291288));
-    assert!(r3.transform_point3d(point3(1.0, 0.0, 0.0)).approx_eq(&point3(
-        -0.58071821,
-        0.81401868,
-        -0.01182979
-    )));
+    assert!(r3
+        .transform_point3d(point3(1.0, 0.0, 0.0))
+        .approx_eq(&point3(-0.58071821, 0.81401868, -0.01182979)));
 }
 
 #[test]
 fn from_euler() {
-    use core::f32::consts::FRAC_PI_2;
     use crate::default::Rotation3D;
+    use core::f32::consts::FRAC_PI_2;
 
     // First test simple separate yaw pitch and roll rotations, because it is easy to come
     // up with the corresponding quaternion.

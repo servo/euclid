@@ -9,20 +9,20 @@
 
 use super::UnknownUnit;
 use crate::approxord::{max, min};
+use crate::length::Length;
+use crate::num::*;
+use crate::scale::Scale;
+use crate::vector::{vec2, BoolVector2D, Vector2D};
+use crate::vector::{vec3, BoolVector3D, Vector3D};
 #[cfg(feature = "mint")]
 use mint;
-use crate::length::Length;
-use crate::scale::Scale;
-use crate::vector::{Vector2D, vec2, BoolVector2D};
-use crate::vector::{Vector3D, vec3, BoolVector3D};
-use crate::num::*;
 
-use num_traits::{NumCast, Signed};
-use core::fmt;
-use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
-use core::marker::PhantomData;
 use core::cmp::{Eq, PartialEq};
-use core::hash::{Hash};
+use core::fmt;
+use core::hash::Hash;
+use core::marker::PhantomData;
+use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+use num_traits::{NumCast, Signed};
 #[cfg(feature = "serde")]
 use serde;
 
@@ -51,24 +51,32 @@ impl<T: Clone, U> Clone for Size2D<T, U> {
 
 #[cfg(feature = "serde")]
 impl<'de, T, U> serde::Deserialize<'de> for Size2D<T, U>
-    where T: serde::Deserialize<'de>
+where
+    T: serde::Deserialize<'de>,
 {
     /// Deserializes 2d size from tuple of width and height.
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-        where D: serde::Deserializer<'de>
+    where
+        D: serde::Deserializer<'de>,
     {
         let (width, height) = serde::Deserialize::deserialize(deserializer)?;
-        Ok(Size2D { width, height, _unit: PhantomData })
+        Ok(Size2D {
+            width,
+            height,
+            _unit: PhantomData,
+        })
     }
 }
 
 #[cfg(feature = "serde")]
 impl<T, U> serde::Serialize for Size2D<T, U>
-    where T: serde::Serialize
+where
+    T: serde::Serialize,
 {
     /// Serializes 2d size to tuple of width and height.
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where S: serde::Serializer
+    where
+        S: serde::Serializer,
     {
         (&self.width, &self.height).serialize(serializer)
     }
@@ -77,7 +85,8 @@ impl<T, U> serde::Serialize for Size2D<T, U>
 impl<T, U> Eq for Size2D<T, U> where T: Eq {}
 
 impl<T, U> PartialEq for Size2D<T, U>
-    where T: PartialEq
+where
+    T: PartialEq,
 {
     fn eq(&self, other: &Self) -> bool {
         self.width == other.width && self.height == other.height
@@ -85,7 +94,8 @@ impl<T, U> PartialEq for Size2D<T, U>
 }
 
 impl<T, U> Hash for Size2D<T, U>
-    where T: Hash
+where
+    T: Hash,
 {
     fn hash<H: core::hash::Hasher>(&self, h: &mut H) {
         self.width.hash(h);
@@ -116,7 +126,6 @@ impl<T: Default, U> Default for Size2D<T, U> {
         Size2D::new(Default::default(), Default::default())
     }
 }
-
 
 impl<T, U> Size2D<T, U> {
     /// The same as [`Zero::zero()`] but available without importing trait.
@@ -383,19 +392,13 @@ impl<T: PartialOrd, U> Size2D<T, U> {
     /// Returns the size each component of which are minimum of this size and another.
     #[inline]
     pub fn min(self, other: Self) -> Self {
-        size2(
-            min(self.width,  other.width),
-            min(self.height, other.height),
-        )
+        size2(min(self.width, other.width), min(self.height, other.height))
     }
 
     /// Returns the size each component of which are maximum of this size and another.
     #[inline]
     pub fn max(self, other: Self) -> Self {
-        size2(
-            max(self.width,  other.width),
-            max(self.height, other.height),
-        )
+        size2(max(self.width, other.width), max(self.height, other.height))
     }
 
     /// Returns the size each component of which clamped by corresponding
@@ -454,7 +457,6 @@ impl<T: PartialEq, U> Size2D<T, U> {
     }
 }
 
-
 impl<T: Round, U> Round for Size2D<T, U> {
     /// See [`Size2D::round()`](#method.round).
     #[inline]
@@ -486,7 +488,6 @@ impl<T: Zero, U> Zero for Size2D<T, U> {
     }
 }
 
-
 impl<T: Neg, U> Neg for Size2D<T, U> {
     type Output = Size2D<T::Output, U>;
 
@@ -495,7 +496,6 @@ impl<T: Neg, U> Neg for Size2D<T, U> {
         Size2D::new(-self.width, -self.height)
     }
 }
-
 
 impl<T: Add, U> Add for Size2D<T, U> {
     type Output = Size2D<T::Output, U>;
@@ -509,11 +509,10 @@ impl<T: Add, U> Add for Size2D<T, U> {
 impl<T: AddAssign, U> AddAssign for Size2D<T, U> {
     #[inline]
     fn add_assign(&mut self, other: Self) {
-        self.width  += other.width;
+        self.width += other.width;
         self.height += other.height;
     }
 }
-
 
 impl<T: Sub, U> Sub for Size2D<T, U> {
     type Output = Size2D<T::Output, U>;
@@ -527,11 +526,10 @@ impl<T: Sub, U> Sub for Size2D<T, U> {
 impl<T: SubAssign, U> SubAssign for Size2D<T, U> {
     #[inline]
     fn sub_assign(&mut self, other: Self) {
-        self.width  -= other.width;
+        self.width -= other.width;
         self.height -= other.height;
     }
 }
-
 
 impl<T: Clone + Mul, U> Mul<T> for Size2D<T, U> {
     type Output = Size2D<T::Output, U>;
@@ -545,7 +543,7 @@ impl<T: Clone + Mul, U> Mul<T> for Size2D<T, U> {
 impl<T: Clone + MulAssign, U> MulAssign<T> for Size2D<T, U> {
     #[inline]
     fn mul_assign(&mut self, other: T) {
-        self.width  *= other.clone();
+        self.width *= other.clone();
         self.height *= other;
     }
 }
@@ -566,7 +564,6 @@ impl<T: Clone + MulAssign, U> MulAssign<Scale<T, U, U>> for Size2D<T, U> {
     }
 }
 
-
 impl<T: Clone + Div, U> Div<T> for Size2D<T, U> {
     type Output = Size2D<T::Output, U>;
 
@@ -579,7 +576,7 @@ impl<T: Clone + Div, U> Div<T> for Size2D<T, U> {
 impl<T: Clone + DivAssign, U> DivAssign<T> for Size2D<T, U> {
     #[inline]
     fn div_assign(&mut self, other: T) {
-        self.width  /= other.clone();
+        self.width /= other.clone();
         self.height /= other;
     }
 }
@@ -599,7 +596,6 @@ impl<T: Clone + DivAssign, U> DivAssign<Scale<T, U, U>> for Size2D<T, U> {
         *self /= other.0;
     }
 }
-
 
 /// Shorthand for `Size2D::new(w, h)`.
 #[inline]
@@ -698,11 +694,10 @@ mod size2d {
 
         #[test]
         pub fn test_neg() {
-            assert_eq!(-Size2D::new( 1.0,  2.0), Size2D::new(-1.0, -2.0));
-            assert_eq!(-Size2D::new( 0.0,  0.0), Size2D::new(-0.0, -0.0));
-            assert_eq!(-Size2D::new(-1.0, -2.0), Size2D::new( 1.0,  2.0));
+            assert_eq!(-Size2D::new(1.0, 2.0), Size2D::new(-1.0, -2.0));
+            assert_eq!(-Size2D::new(0.0, 0.0), Size2D::new(-0.0, -0.0));
+            assert_eq!(-Size2D::new(-1.0, -2.0), Size2D::new(1.0, 2.0));
         }
-
 
         #[test]
         pub fn test_add() {
@@ -780,7 +775,6 @@ mod size2d {
             assert_eq!(s, Size2D::new(0.0, 0.0));
         }
 
-
         #[test]
         pub fn test_mul_scalar() {
             let s1: Size2D<f32> = Size2D::new(3.0, 5.0);
@@ -818,7 +812,6 @@ mod size2d {
 
             assert_eq!(s1, Size2DMm::new(0.1, 0.2));
         }
-
 
         #[test]
         pub fn test_div_scalar() {
@@ -860,8 +853,6 @@ mod size2d {
     }
 }
 
-
-
 /// A 3d size tagged with a unit.
 #[repr(C)]
 pub struct Size3D<T, U> {
@@ -890,22 +881,31 @@ impl<T: Clone, U> Clone for Size3D<T, U> {
 
 #[cfg(feature = "serde")]
 impl<'de, T, U> serde::Deserialize<'de> for Size3D<T, U>
-    where T: serde::Deserialize<'de>
+where
+    T: serde::Deserialize<'de>,
 {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-        where D: serde::Deserializer<'de>
+    where
+        D: serde::Deserializer<'de>,
     {
         let (width, height, depth) = serde::Deserialize::deserialize(deserializer)?;
-        Ok(Size3D { width, height, depth, _unit: PhantomData })
+        Ok(Size3D {
+            width,
+            height,
+            depth,
+            _unit: PhantomData,
+        })
     }
 }
 
 #[cfg(feature = "serde")]
 impl<T, U> serde::Serialize for Size3D<T, U>
-    where T: serde::Serialize
+where
+    T: serde::Serialize,
 {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where S: serde::Serializer
+    where
+        S: serde::Serializer,
     {
         (&self.width, &self.height, &self.depth).serialize(serializer)
     }
@@ -914,7 +914,8 @@ impl<T, U> serde::Serialize for Size3D<T, U>
 impl<T, U> Eq for Size3D<T, U> where T: Eq {}
 
 impl<T, U> PartialEq for Size3D<T, U>
-    where T: PartialEq
+where
+    T: PartialEq,
 {
     fn eq(&self, other: &Self) -> bool {
         self.width == other.width && self.height == other.height && self.depth == other.depth
@@ -922,7 +923,8 @@ impl<T, U> PartialEq for Size3D<T, U>
 }
 
 impl<T, U> Hash for Size3D<T, U>
-    where T: Hash
+where
+    T: Hash,
 {
     fn hash<H: core::hash::Hasher>(&self, h: &mut H) {
         self.width.hash(h);
@@ -958,7 +960,6 @@ impl<T: Default, U> Default for Size3D<T, U> {
         Size3D::new(Default::default(), Default::default(), Default::default())
     }
 }
-
 
 impl<T, U> Size3D<T, U> {
     /// The same as [`Zero::zero()`] but available without importing trait.
@@ -1086,7 +1087,7 @@ impl<T: Copy, U> Size3D<T, U> {
     /// Returns result of multiplication of all components
     pub fn volume(&self) -> T
     where
-        T: Mul<Output = T>
+        T: Mul<Output = T>,
     {
         self.width * self.height * self.depth
     }
@@ -1135,7 +1136,11 @@ impl<T: NumCast + Copy, U> Size3D<T, U> {
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
     pub fn try_cast<NewT: NumCast>(&self) -> Option<Size3D<NewT, U>> {
-        match (NumCast::from(self.width), NumCast::from(self.height), NumCast::from(self.depth)) {
+        match (
+            NumCast::from(self.width),
+            NumCast::from(self.height),
+            NumCast::from(self.depth),
+        ) {
             (Some(w), Some(h), Some(d)) => Some(Size3D::new(w, h, d)),
             _ => None,
         }
@@ -1217,9 +1222,9 @@ impl<T: PartialOrd, U> Size3D<T, U> {
     #[inline]
     pub fn min(self, other: Self) -> Self {
         size3(
-            min(self.width,  other.width),
+            min(self.width, other.width),
             min(self.height, other.height),
-            min(self.depth,  other.depth),
+            min(self.depth, other.depth),
         )
     }
 
@@ -1227,9 +1232,9 @@ impl<T: PartialOrd, U> Size3D<T, U> {
     #[inline]
     pub fn max(self, other: Self) -> Self {
         size3(
-            max(self.width,  other.width),
+            max(self.width, other.width),
             max(self.height, other.height),
-            max(self.depth,  other.depth),
+            max(self.depth, other.depth),
         )
     }
 
@@ -1293,7 +1298,6 @@ impl<T: PartialEq, U> Size3D<T, U> {
     }
 }
 
-
 impl<T: Round, U> Round for Size3D<T, U> {
     /// See [`Size3D::round()`](#method.round).
     #[inline]
@@ -1325,7 +1329,6 @@ impl<T: Zero, U> Zero for Size3D<T, U> {
     }
 }
 
-
 impl<T: Neg, U> Neg for Size3D<T, U> {
     type Output = Size3D<T::Output, U>;
 
@@ -1335,44 +1338,49 @@ impl<T: Neg, U> Neg for Size3D<T, U> {
     }
 }
 
-
 impl<T: Add, U> Add for Size3D<T, U> {
     type Output = Size3D<T::Output, U>;
 
     #[inline]
     fn add(self, other: Self) -> Self::Output {
-        Size3D::new(self.width + other.width, self.height + other.height, self.depth + other.depth)
+        Size3D::new(
+            self.width + other.width,
+            self.height + other.height,
+            self.depth + other.depth,
+        )
     }
 }
 
 impl<T: AddAssign, U> AddAssign for Size3D<T, U> {
     #[inline]
     fn add_assign(&mut self, other: Self) {
-        self.width  += other.width;
+        self.width += other.width;
         self.height += other.height;
-        self.depth  += other.depth;
+        self.depth += other.depth;
     }
 }
-
 
 impl<T: Sub, U> Sub for Size3D<T, U> {
     type Output = Size3D<T::Output, U>;
 
     #[inline]
     fn sub(self, other: Self) -> Self::Output {
-        Size3D::new(self.width - other.width, self.height - other.height, self.depth - other.depth)
+        Size3D::new(
+            self.width - other.width,
+            self.height - other.height,
+            self.depth - other.depth,
+        )
     }
 }
 
 impl<T: SubAssign, U> SubAssign for Size3D<T, U> {
     #[inline]
     fn sub_assign(&mut self, other: Self) {
-        self.width  -= other.width;
+        self.width -= other.width;
         self.height -= other.height;
-        self.depth  -= other.depth;
+        self.depth -= other.depth;
     }
 }
-
 
 impl<T: Clone + Mul, U> Mul<T> for Size3D<T, U> {
     type Output = Size3D<T::Output, U>;
@@ -1380,9 +1388,9 @@ impl<T: Clone + Mul, U> Mul<T> for Size3D<T, U> {
     #[inline]
     fn mul(self, scale: T) -> Self::Output {
         Size3D::new(
-            self.width  * scale.clone(),
+            self.width * scale.clone(),
             self.height * scale.clone(),
-            self.depth  * scale
+            self.depth * scale,
         )
     }
 }
@@ -1390,9 +1398,9 @@ impl<T: Clone + Mul, U> Mul<T> for Size3D<T, U> {
 impl<T: Clone + MulAssign, U> MulAssign<T> for Size3D<T, U> {
     #[inline]
     fn mul_assign(&mut self, other: T) {
-        self.width  *= other.clone();
+        self.width *= other.clone();
         self.height *= other.clone();
-        self.depth  *= other;
+        self.depth *= other;
     }
 }
 
@@ -1402,9 +1410,9 @@ impl<T: Clone + Mul, U1, U2> Mul<Scale<T, U1, U2>> for Size3D<T, U1> {
     #[inline]
     fn mul(self, scale: Scale<T, U1, U2>) -> Self::Output {
         Size3D::new(
-            self.width  * scale.0.clone(),
+            self.width * scale.0.clone(),
             self.height * scale.0.clone(),
-            self.depth  * scale.0
+            self.depth * scale.0,
         )
     }
 }
@@ -1416,16 +1424,15 @@ impl<T: Clone + MulAssign, U> MulAssign<Scale<T, U, U>> for Size3D<T, U> {
     }
 }
 
-
 impl<T: Clone + Div, U> Div<T> for Size3D<T, U> {
     type Output = Size3D<T::Output, U>;
 
     #[inline]
     fn div(self, scale: T) -> Self::Output {
         Size3D::new(
-            self.width  / scale.clone(),
+            self.width / scale.clone(),
             self.height / scale.clone(),
-            self.depth  / scale
+            self.depth / scale,
         )
     }
 }
@@ -1433,9 +1440,9 @@ impl<T: Clone + Div, U> Div<T> for Size3D<T, U> {
 impl<T: Clone + DivAssign, U> DivAssign<T> for Size3D<T, U> {
     #[inline]
     fn div_assign(&mut self, other: T) {
-        self.width  /= other.clone();
+        self.width /= other.clone();
         self.height /= other.clone();
-        self.depth  /= other;
+        self.depth /= other;
     }
 }
 
@@ -1445,9 +1452,9 @@ impl<T: Clone + Div, U1, U2> Div<Scale<T, U1, U2>> for Size3D<T, U2> {
     #[inline]
     fn div(self, scale: Scale<T, U1, U2>) -> Self::Output {
         Size3D::new(
-            self.width  / scale.0.clone(),
+            self.width / scale.0.clone(),
             self.height / scale.0.clone(),
-            self.depth  / scale.0
+            self.depth / scale.0,
         )
     }
 }
@@ -1458,7 +1465,6 @@ impl<T: Clone + DivAssign, U> DivAssign<Scale<T, U, U>> for Size3D<T, U> {
         *self /= other.0;
     }
 }
-
 
 #[cfg(feature = "mint")]
 impl<T, U> From<mint::Vector3<T>> for Size3D<T, U> {
@@ -1514,7 +1520,6 @@ impl<T, U> From<(T, T, T)> for Size3D<T, U> {
     }
 }
 
-
 /// Shorthand for `Size3D::new(w, h, d)`.
 #[inline]
 pub const fn size3<T, U>(w: T, h: T, d: T) -> Size3D<T, U> {
@@ -1535,11 +1540,10 @@ mod size3d {
 
         #[test]
         pub fn test_neg() {
-            assert_eq!(-Size3D::new( 1.0,  2.0,  3.0), Size3D::new(-1.0, -2.0, -3.0));
-            assert_eq!(-Size3D::new( 0.0,  0.0,  0.0), Size3D::new(-0.0, -0.0, -0.0));
-            assert_eq!(-Size3D::new(-1.0, -2.0, -3.0), Size3D::new( 1.0,  2.0,  3.0));
+            assert_eq!(-Size3D::new(1.0, 2.0, 3.0), Size3D::new(-1.0, -2.0, -3.0));
+            assert_eq!(-Size3D::new(0.0, 0.0, 0.0), Size3D::new(-0.0, -0.0, -0.0));
+            assert_eq!(-Size3D::new(-1.0, -2.0, -3.0), Size3D::new(1.0, 2.0, 3.0));
         }
-
 
         #[test]
         pub fn test_add() {
@@ -1551,7 +1555,7 @@ mod size3d {
             let s2 = Size3D::new(0.0, 0.0, 0.0);
             assert_eq!(s1 + s2, Size3D::new(1.0, 2.0, 3.0));
 
-            let s1 = Size3D::new( 1.0,  2.0,  3.0);
+            let s1 = Size3D::new(1.0, 2.0, 3.0);
             let s2 = Size3D::new(-4.0, -5.0, -6.0);
             assert_eq!(s1 + s2, Size3D::new(-3.0, -3.0, -3.0));
 
@@ -1570,7 +1574,7 @@ mod size3d {
             s += Size3D::new(0.0, 0.0, 0.0);
             assert_eq!(s, Size3D::new(1.0, 2.0, 3.0));
 
-            let mut s = Size3D::new( 1.0,  2.0,  3.0);
+            let mut s = Size3D::new(1.0, 2.0, 3.0);
             s += Size3D::new(-4.0, -5.0, -6.0);
             assert_eq!(s, Size3D::new(-3.0, -3.0, -3.0));
 
@@ -1589,7 +1593,7 @@ mod size3d {
             let s2 = Size3D::new(0.0, 0.0, 0.0);
             assert_eq!(s1 - s2, Size3D::new(1.0, 2.0, 3.0));
 
-            let s1 = Size3D::new( 1.0,  2.0,  3.0);
+            let s1 = Size3D::new(1.0, 2.0, 3.0);
             let s2 = Size3D::new(-4.0, -5.0, -6.0);
             assert_eq!(s1 - s2, Size3D::new(5.0, 7.0, 9.0));
 
@@ -1608,7 +1612,7 @@ mod size3d {
             s -= Size3D::new(0.0, 0.0, 0.0);
             assert_eq!(s, Size3D::new(1.0, 2.0, 3.0));
 
-            let mut s = Size3D::new( 1.0,  2.0,  3.0);
+            let mut s = Size3D::new(1.0, 2.0, 3.0);
             s -= Size3D::new(-4.0, -5.0, -6.0);
             assert_eq!(s, Size3D::new(5.0, 7.0, 9.0));
 
@@ -1616,7 +1620,6 @@ mod size3d {
             s -= Size3D::new(0.0, 0.0, 0.0);
             assert_eq!(s, Size3D::new(0.0, 0.0, 0.0));
         }
-
 
         #[test]
         pub fn test_mul_scalar() {
@@ -1655,7 +1658,6 @@ mod size3d {
 
             assert_eq!(s1, Size3DMm::new(0.1, 0.2, 0.3));
         }
-
 
         #[test]
         pub fn test_div_scalar() {
