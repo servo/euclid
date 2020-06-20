@@ -148,6 +148,14 @@ impl<T, U> Vector2D<T, U> {
         }
     }
 
+    /// Constructor taking angle and length
+    pub fn from_angle_and_length(angle: Angle<T>, length: T) -> Self
+    where
+        T: Trig + Mul<Output = T> + Copy,
+    {
+        vec2(length * angle.radians.cos(), length * angle.radians.sin())
+    }
+
     /// Constructor taking properly  Lengths instead of scalar values.
     #[inline]
     pub fn from_lengths(x: Length<T, U>, y: Length<T, U>) -> Self {
