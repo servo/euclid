@@ -8,20 +8,20 @@
 // except according to those terms.
 //! A one-dimensional length, tagged with its units.
 
-use crate::scale::Scale;
-use crate::num::Zero;
 use crate::approxeq::ApproxEq;
+use crate::num::Zero;
+use crate::scale::Scale;
 
-use num_traits::{NumCast, Saturating};
 use crate::num::One;
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use core::cmp::Ordering;
-use core::ops::{Add, Div, Mul, Neg, Sub};
-use core::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
+use core::fmt;
 use core::hash::{Hash, Hasher};
 use core::marker::PhantomData;
-use core::fmt;
+use core::ops::{Add, Div, Mul, Neg, Sub};
+use core::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
+use num_traits::{NumCast, Saturating};
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 /// A one-dimensional distance, with value represented by `T` and unit of measurement `Unit`.
 ///
@@ -56,10 +56,7 @@ where
     where
         D: Deserializer<'de>,
     {
-        Ok(Length(
-            Deserialize::deserialize(deserializer)?,
-            PhantomData,
-        ))
+        Ok(Length(Deserialize::deserialize(deserializer)?, PhantomData))
     }
 }
 
@@ -135,7 +132,6 @@ impl<T: NumCast + Clone, U> Length<T, U> {
     }
 }
 
-
 impl<T: fmt::Debug, U> fmt::Debug for Length<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         self.0.fmt(f)
@@ -160,7 +156,6 @@ impl<T: Hash, U> Hash for Length<T, U> {
         self.0.hash(h);
     }
 }
-
 
 // length + length
 impl<T: Add, U> Add for Length<T, U> {
@@ -281,7 +276,6 @@ impl<U, T: Neg> Neg for Length<T, U> {
     }
 }
 
-
 impl<T: PartialEq, U> PartialEq for Length<T, U> {
     fn eq(&self, other: &Self) -> bool {
         self.0.eq(&other.0)
@@ -326,9 +320,9 @@ mod tests {
     use super::Length;
     use crate::num::Zero;
 
-    use num_traits::Saturating;
     use crate::scale::Scale;
     use core::f32::INFINITY;
+    use num_traits::Saturating;
 
     enum Inch {}
     enum Mm {}
@@ -340,8 +334,8 @@ mod tests {
         use super::*;
 
         extern crate serde_test;
-        use self::serde_test::Token;
         use self::serde_test::assert_tokens;
+        use self::serde_test::Token;
 
         #[test]
         fn test_length_serde() {

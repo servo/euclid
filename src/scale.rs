@@ -10,15 +10,15 @@
 
 use crate::num::One;
 
+use crate::{Point2D, Rect, Size2D, Vector2D};
+use core::cmp::Ordering;
+use core::fmt;
+use core::hash::{Hash, Hasher};
+use core::marker::PhantomData;
+use core::ops::{Add, Div, Mul, Neg, Sub};
 use num_traits::NumCast;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-use core::fmt;
-use core::ops::{Add, Div, Mul, Neg, Sub};
-use core::hash::{Hash, Hasher};
-use core::marker::PhantomData;
-use core::cmp::Ordering;
-use crate::{Point2D, Rect, Size2D, Vector2D};
 
 /// A scaling factor between two different units of measurement.
 ///
@@ -41,7 +41,13 @@ use crate::{Point2D, Rect, Size2D, Vector2D};
 /// ```
 #[repr(C)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "serde", serde(bound(serialize = "T: serde::Serialize", deserialize = "T: serde::Deserialize<'de>")))]
+#[cfg_attr(
+    feature = "serde",
+    serde(bound(
+        serialize = "T: serde::Serialize",
+        deserialize = "T: serde::Deserialize<'de>"
+    ))
+)]
 pub struct Scale<T, Src, Dst>(pub T, #[doc(hidden)] pub PhantomData<(Src, Dst)>);
 
 impl<T, Src, Dst> Scale<T, Src, Dst> {
@@ -65,7 +71,8 @@ impl<T, Src, Dst> Scale<T, Src, Dst> {
     /// ```
     #[inline]
     pub fn transform_point(&self, point: Point2D<T, Src>) -> Point2D<T::Output, Dst>
-        where T: Clone + Mul
+    where
+        T: Clone + Mul,
     {
         Point2D::new(point.x * self.get(), point.y * self.get())
     }
@@ -85,7 +92,8 @@ impl<T, Src, Dst> Scale<T, Src, Dst> {
     /// ```
     #[inline]
     pub fn transform_vector(&self, vec: Vector2D<T, Src>) -> Vector2D<T::Output, Dst>
-        where T: Clone + Mul
+    where
+        T: Clone + Mul,
     {
         Vector2D::new(vec.x * self.get(), vec.y * self.get())
     }
@@ -105,7 +113,8 @@ impl<T, Src, Dst> Scale<T, Src, Dst> {
     /// ```
     #[inline]
     pub fn transform_size(&self, size: Size2D<T, Src>) -> Size2D<T::Output, Dst>
-        where T: Clone + Mul
+    where
+        T: Clone + Mul,
     {
         Size2D::new(size.width * self.get(), size.height * self.get())
     }
@@ -125,7 +134,8 @@ impl<T, Src, Dst> Scale<T, Src, Dst> {
     /// ```
     #[inline]
     pub fn transform_rect(&self, rect: &Rect<T, Src>) -> Rect<T::Output, Dst>
-        where T: Copy + Mul
+    where
+        T: Copy + Mul,
     {
         Rect::new(
             self.transform_point(rect.origin),
@@ -136,7 +146,8 @@ impl<T, Src, Dst> Scale<T, Src, Dst> {
     /// Returns the inverse of this scale.
     #[inline]
     pub fn inverse(&self) -> Scale<T::Output, Dst, Src>
-        where T: Clone + Neg
+    where
+        T: Clone + Neg,
     {
         Scale::new(-self.get())
     }
@@ -160,7 +171,8 @@ impl<T, Src, Dst> Scale<T, Src, Dst> {
     /// ```
     #[inline]
     pub fn is_identity(&self) -> bool
-        where T: PartialEq + One
+    where
+        T: PartialEq + One,
     {
         self.0 == T::one()
     }
@@ -187,7 +199,7 @@ impl<T: Clone, Src, Dst> Scale<T, Src, Dst> {
     /// ```
     pub fn inv(&self) -> Scale<T::Output, Dst, Src>
     where
-        T: One + Div
+        T: One + Div,
     {
         let one: T = One::one();
         Scale::new(one / self.0.clone())
@@ -256,7 +268,6 @@ impl<Src, Dst> Scale<f32, Src, Dst> {
     pub const ONE: Self = Scale(1.0, PhantomData);
 }
 
-
 // scale0 * scale1
 // (A,B) * (B,C) = (A,C)
 impl<T: Mul, A, B, C> Mul<Scale<T, B, C>> for Scale<T, A, B> {
@@ -287,7 +298,6 @@ impl<T: Sub, Src, Dst> Sub for Scale<T, Src, Dst> {
         Scale::new(self.0 - other.0)
     }
 }
-
 
 // FIXME: Switch to `derive(PartialEq, Clone)` after this Rust issue is fixed:
 // https://github.com/rust-lang/rust/issues/26925

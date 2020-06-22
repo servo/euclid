@@ -7,15 +7,15 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use crate::{Vector2D, Point2D, Vector3D, Point3D, Transform2D, Transform3D};
-use crate::{Box2D, Box3D, Size2D, Rect, vec2, point2, vec3, point3};
-use crate::UnknownUnit;
 use crate::num::*;
-use core::ops::{Add, AddAssign, Sub, SubAssign, Neg};
-use core::marker::PhantomData;
-use core::fmt;
+use crate::UnknownUnit;
+use crate::{point2, point3, vec2, vec3, Box2D, Box3D, Rect, Size2D};
+use crate::{Point2D, Point3D, Transform2D, Transform3D, Vector2D, Vector3D};
 use core::cmp::{Eq, PartialEq};
-use core::hash::{Hash};
+use core::fmt;
+use core::hash::Hash;
+use core::marker::PhantomData;
+use core::ops::{Add, AddAssign, Neg, Sub, SubAssign};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -41,7 +41,13 @@ use serde::{Deserialize, Serialize};
 ///
 #[repr(C)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "serde", serde(bound(serialize = "T: serde::Serialize", deserialize = "T: serde::Deserialize<'de>")))]
+#[cfg_attr(
+    feature = "serde",
+    serde(bound(
+        serialize = "T: serde::Serialize",
+        deserialize = "T: serde::Deserialize<'de>"
+    ))
+)]
 pub struct Translation2D<T, Src, Dst> {
     pub x: T,
     pub y: T,
@@ -64,7 +70,8 @@ impl<T: Clone, Src, Dst> Clone for Translation2D<T, Src, Dst> {
 impl<T, Src, Dst> Eq for Translation2D<T, Src, Dst> where T: Eq {}
 
 impl<T, Src, Dst> PartialEq for Translation2D<T, Src, Dst>
-    where T: PartialEq
+where
+    T: PartialEq,
 {
     fn eq(&self, other: &Self) -> bool {
         self.x == other.x && self.y == other.y
@@ -72,7 +79,8 @@ impl<T, Src, Dst> PartialEq for Translation2D<T, Src, Dst>
 }
 
 impl<T, Src, Dst> Hash for Translation2D<T, Src, Dst>
-    where T: Hash
+where
+    T: Hash,
 {
     fn hash<H: core::hash::Hasher>(&self, h: &mut H) {
         self.x.hash(h);
@@ -112,7 +120,7 @@ impl<T, Src, Dst> Translation2D<T, Src, Dst> {
     #[inline]
     pub fn is_identity(&self) -> bool
     where
-        T: Zero + PartialEq
+        T: Zero + PartialEq,
     {
         let _0 = T::zero();
         self.x == _0 && self.y == _0
@@ -216,15 +224,11 @@ impl<T: Copy, Src, Dst> Translation2D<T, Src, Dst> {
     }
 }
 
-
 impl<T: Add, Src, Dst1, Dst2> Add<Translation2D<T, Dst1, Dst2>> for Translation2D<T, Src, Dst1> {
     type Output = Translation2D<T::Output, Src, Dst2>;
 
     fn add(self, other: Translation2D<T, Dst1, Dst2>) -> Self::Output {
-        Translation2D::new(
-            self.x + other.x,
-            self.y + other.y,
-        )
+        Translation2D::new(self.x + other.x, self.y + other.y)
     }
 }
 
@@ -235,15 +239,11 @@ impl<T: AddAssign, Src, Dst> AddAssign<Translation2D<T, Dst, Dst>> for Translati
     }
 }
 
-
 impl<T: Sub, Src, Dst1, Dst2> Sub<Translation2D<T, Dst1, Dst2>> for Translation2D<T, Src, Dst2> {
     type Output = Translation2D<T::Output, Src, Dst1>;
 
     fn sub(self, other: Translation2D<T, Dst1, Dst2>) -> Self::Output {
-        Translation2D::new(
-            self.x - other.x,
-            self.y - other.y,
-        )
+        Translation2D::new(self.x - other.x, self.y - other.y)
     }
 }
 
@@ -254,16 +254,13 @@ impl<T: SubAssign, Src, Dst> SubAssign<Translation2D<T, Dst, Dst>> for Translati
     }
 }
 
-
-impl<T, Src, Dst> From<Vector2D<T, Src>> for Translation2D<T, Src, Dst>
-{
+impl<T, Src, Dst> From<Vector2D<T, Src>> for Translation2D<T, Src, Dst> {
     fn from(v: Vector2D<T, Src>) -> Self {
         Translation2D::new(v.x, v.y)
     }
 }
 
-impl<T, Src, Dst> Into<Vector2D<T, Src>> for Translation2D<T, Src, Dst>
-{
+impl<T, Src, Dst> Into<Vector2D<T, Src>> for Translation2D<T, Src, Dst> {
     fn into(self) -> Vector2D<T, Src> {
         vec2(self.x, self.y)
     }
@@ -278,8 +275,9 @@ where
     }
 }
 
-impl <T, Src, Dst> Default for Translation2D<T, Src, Dst>
-    where T: Zero
+impl<T, Src, Dst> Default for Translation2D<T, Src, Dst>
+where
+    T: Zero,
 {
     fn default() -> Self {
         Self::identity()
@@ -297,7 +295,6 @@ impl<T: fmt::Display, Src, Dst> fmt::Display for Translation2D<T, Src, Dst> {
         write!(f, "({},{})", self.x, self.y)
     }
 }
-
 
 /// A 3d transformation from a space to another that can only express translations.
 ///
@@ -327,22 +324,31 @@ impl<T: Clone, Src, Dst> Clone for Translation3D<T, Src, Dst> {
 
 #[cfg(feature = "serde")]
 impl<'de, T, Src, Dst> serde::Deserialize<'de> for Translation3D<T, Src, Dst>
-    where T: serde::Deserialize<'de>
+where
+    T: serde::Deserialize<'de>,
 {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-        where D: serde::Deserializer<'de>
+    where
+        D: serde::Deserializer<'de>,
     {
         let (x, y, z) = serde::Deserialize::deserialize(deserializer)?;
-        Ok(Translation3D { x, y, z, _unit: PhantomData })
+        Ok(Translation3D {
+            x,
+            y,
+            z,
+            _unit: PhantomData,
+        })
     }
 }
 
 #[cfg(feature = "serde")]
 impl<T, Src, Dst> serde::Serialize for Translation3D<T, Src, Dst>
-    where T: serde::Serialize
+where
+    T: serde::Serialize,
 {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where S: serde::Serializer
+    where
+        S: serde::Serializer,
     {
         (&self.x, &self.y, &self.z).serialize(serializer)
     }
@@ -351,7 +357,8 @@ impl<T, Src, Dst> serde::Serialize for Translation3D<T, Src, Dst>
 impl<T, Src, Dst> Eq for Translation3D<T, Src, Dst> where T: Eq {}
 
 impl<T, Src, Dst> PartialEq for Translation3D<T, Src, Dst>
-    where T: PartialEq
+where
+    T: PartialEq,
 {
     fn eq(&self, other: &Self) -> bool {
         self.x == other.x && self.y == other.y && self.z == other.z
@@ -359,7 +366,8 @@ impl<T, Src, Dst> PartialEq for Translation3D<T, Src, Dst>
 }
 
 impl<T, Src, Dst> Hash for Translation3D<T, Src, Dst>
-    where T: Hash
+where
+    T: Hash,
 {
     fn hash<H: core::hash::Hasher>(&self, h: &mut H) {
         self.x.hash(h);
@@ -367,7 +375,6 @@ impl<T, Src, Dst> Hash for Translation3D<T, Src, Dst>
         self.z.hash(h);
     }
 }
-
 
 impl<T, Src, Dst> Translation3D<T, Src, Dst> {
     #[inline]
@@ -403,7 +410,7 @@ impl<T, Src, Dst> Translation3D<T, Src, Dst> {
     #[inline]
     pub fn is_identity(&self) -> bool
     where
-        T: Zero + PartialEq
+        T: Zero + PartialEq,
     {
         let _0 = T::zero();
         self.x == _0 && self.y == _0 && self.z == _0
@@ -530,16 +537,11 @@ impl<T: Copy, Src, Dst> Translation3D<T, Src, Dst> {
     }
 }
 
-
 impl<T: Add, Src, Dst1, Dst2> Add<Translation3D<T, Dst1, Dst2>> for Translation3D<T, Src, Dst1> {
     type Output = Translation3D<T::Output, Src, Dst2>;
 
     fn add(self, other: Translation3D<T, Dst1, Dst2>) -> Self::Output {
-        Translation3D::new(
-            self.x + other.x,
-            self.y + other.y,
-            self.z + other.z,
-        )
+        Translation3D::new(self.x + other.x, self.y + other.y, self.z + other.z)
     }
 }
 
@@ -551,16 +553,11 @@ impl<T: AddAssign, Src, Dst> AddAssign<Translation3D<T, Dst, Dst>> for Translati
     }
 }
 
-
 impl<T: Sub, Src, Dst1, Dst2> Sub<Translation3D<T, Dst1, Dst2>> for Translation3D<T, Src, Dst2> {
     type Output = Translation3D<T::Output, Src, Dst1>;
 
     fn sub(self, other: Translation3D<T, Dst1, Dst2>) -> Self::Output {
-        Translation3D::new(
-            self.x - other.x,
-            self.y - other.y,
-            self.z - other.z,
-        )
+        Translation3D::new(self.x - other.x, self.y - other.y, self.z - other.z)
     }
 }
 
@@ -572,16 +569,13 @@ impl<T: SubAssign, Src, Dst> SubAssign<Translation3D<T, Dst, Dst>> for Translati
     }
 }
 
-
-impl<T, Src, Dst> From<Vector3D<T, Src>> for Translation3D<T, Src, Dst>
-{
+impl<T, Src, Dst> From<Vector3D<T, Src>> for Translation3D<T, Src, Dst> {
     fn from(v: Vector3D<T, Src>) -> Self {
         Translation3D::new(v.x, v.y, v.z)
     }
 }
 
-impl<T, Src, Dst> Into<Vector3D<T, Src>> for Translation3D<T, Src, Dst>
-{
+impl<T, Src, Dst> Into<Vector3D<T, Src>> for Translation3D<T, Src, Dst> {
     fn into(self) -> Vector3D<T, Src> {
         vec3(self.x, self.y, self.z)
     }
@@ -596,8 +590,9 @@ where
     }
 }
 
-impl <T, Src, Dst> Default for Translation3D<T, Src, Dst>
-    where T: Zero
+impl<T, Src, Dst> Default for Translation3D<T, Src, Dst>
+where
+    T: Zero,
 {
     fn default() -> Self {
         Self::identity()
@@ -616,12 +611,11 @@ impl<T: fmt::Display, Src, Dst> fmt::Display for Translation3D<T, Src, Dst> {
     }
 }
 
-
 #[cfg(test)]
 mod _2d {
     #[test]
     fn simple() {
-        use crate::{Rect, Translation2D, rect};
+        use crate::{rect, Rect, Translation2D};
 
         struct A;
         struct B;
@@ -727,7 +721,7 @@ mod _2d {
 mod _3d {
     #[test]
     fn simple() {
-        use crate::{Point3D, Translation3D, point3};
+        use crate::{point3, Point3D, Translation3D};
 
         struct A;
         struct B;
@@ -761,7 +755,7 @@ mod _3d {
             let t2 = Translation3D::new(0.0, 0.0, 0.0);
             assert_eq!(t1 + t2, Translation3D::new(1.0, 2.0, 3.0));
 
-            let t1 = Translation3D::new( 1.0,  2.0,  3.0);
+            let t1 = Translation3D::new(1.0, 2.0, 3.0);
             let t2 = Translation3D::new(-4.0, -5.0, -6.0);
             assert_eq!(t1 + t2, Translation3D::new(-3.0, -3.0, -3.0));
 
@@ -780,7 +774,7 @@ mod _3d {
             t += Translation3D::new(0.0, 0.0, 0.0);
             assert_eq!(t, Translation3D::new(1.0, 2.0, 3.0));
 
-            let mut t = Translation3D::new( 1.0,  2.0,  3.0);
+            let mut t = Translation3D::new(1.0, 2.0, 3.0);
             t += Translation3D::new(-4.0, -5.0, -6.0);
             assert_eq!(t, Translation3D::new(-3.0, -3.0, -3.0));
 
@@ -799,7 +793,7 @@ mod _3d {
             let t2 = Translation3D::new(0.0, 0.0, 0.0);
             assert_eq!(t1 - t2, Translation3D::new(1.0, 2.0, 3.0));
 
-            let t1 = Translation3D::new( 1.0,  2.0,  3.0);
+            let t1 = Translation3D::new(1.0, 2.0, 3.0);
             let t2 = Translation3D::new(-4.0, -5.0, -6.0);
             assert_eq!(t1 - t2, Translation3D::new(5.0, 7.0, 9.0));
 
@@ -818,7 +812,7 @@ mod _3d {
             t -= Translation3D::new(0.0, 0.0, 0.0);
             assert_eq!(t, Translation3D::new(1.0, 2.0, 3.0));
 
-            let mut t = Translation3D::new( 1.0,  2.0,  3.0);
+            let mut t = Translation3D::new(1.0, 2.0, 3.0);
             t -= Translation3D::new(-4.0, -5.0, -6.0);
             assert_eq!(t, Translation3D::new(5.0, 7.0, 9.0));
 

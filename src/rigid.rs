@@ -3,9 +3,9 @@
 //! before `T2` you use `T1 * T2`
 
 use crate::approxeq::ApproxEq;
-use num_traits::Float;
 use crate::trig::Trig;
-use crate::{Rotation3D, Transform3D, Vector3D, UnknownUnit};
+use crate::{Rotation3D, Transform3D, UnknownUnit, Vector3D};
+use num_traits::Float;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -130,9 +130,7 @@ impl<T: Float + ApproxEq<T>, Src, Dst> RigidTransform3D<T, Src, Dst> {
         // R1 * R2  = R'
         // T' * T2 = T'' = vector addition of translations T2 and T'
 
-        let t_prime = other
-            .rotation
-            .transform_vector3d(self.translation);
+        let t_prime = other.rotation.transform_vector3d(self.translation);
         let r_prime = self.rotation.post_rotate(&other.rotation);
         let t_prime2 = t_prime + other.translation;
         RigidTransform3D {
@@ -168,10 +166,7 @@ impl<T: Float + ApproxEq<T>, Src, Dst> RigidTransform3D<T, Src, Dst> {
         //
         // An easier way of writing this is to use new_from_reversed() with R^-1 and T^-1
 
-        RigidTransform3D::new_from_reversed(
-            -self.translation,
-            self.rotation.inverse(),
-        )
+        RigidTransform3D::new_from_reversed(-self.translation, self.rotation.inverse())
     }
 
     pub fn to_transform(&self) -> Transform3D<T, Src, Dst>
@@ -210,9 +205,7 @@ impl<T: Float + ApproxEq<T>, Src, Dst> From<Rotation3D<T, Src, Dst>>
     }
 }
 
-impl<T: Float + ApproxEq<T>, Src, Dst> From<Vector3D<T, Dst>>
-    for RigidTransform3D<T, Src, Dst>
-{
+impl<T: Float + ApproxEq<T>, Src, Dst> From<Vector3D<T, Dst>> for RigidTransform3D<T, Src, Dst> {
     fn from(t: Vector3D<T, Dst>) -> Self {
         Self::from_translation(t)
     }
@@ -229,9 +222,11 @@ mod test {
         let rotation = Rotation3D::unit_quaternion(0.5, -7.8, 2.2, 4.3);
 
         let rigid = RigidTransform3D::new(rotation, translation);
-        assert!(rigid
-            .to_transform()
-            .approx_eq(&translation.to_transform().pre_transform(&rotation.to_transform())));
+        assert!(rigid.to_transform().approx_eq(
+            &translation
+                .to_transform()
+                .pre_transform(&rotation.to_transform())
+        ));
 
         let rigid = RigidTransform3D::new_from_reversed(translation, rotation);
         assert!(rigid.to_transform().approx_eq(

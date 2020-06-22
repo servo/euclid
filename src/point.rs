@@ -9,20 +9,20 @@
 
 use super::UnknownUnit;
 use crate::approxeq::ApproxEq;
-use crate::approxord::{min, max};
+use crate::approxord::{max, min};
 use crate::length::Length;
+use crate::num::*;
 use crate::scale::Scale;
 use crate::size::{Size2D, Size3D};
+use crate::vector::{vec2, vec3, Vector2D, Vector3D};
+use core::cmp::{Eq, PartialEq};
+use core::fmt;
+use core::hash::Hash;
+use core::marker::PhantomData;
+use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 #[cfg(feature = "mint")]
 use mint;
-use crate::num::*;
 use num_traits::{Float, NumCast};
-use crate::vector::{Vector2D, Vector3D, vec2, vec3};
-use core::fmt;
-use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
-use core::marker::PhantomData;
-use core::cmp::{Eq, PartialEq};
-use core::hash::{Hash};
 #[cfg(feature = "serde")]
 use serde;
 
@@ -49,22 +49,30 @@ impl<T: Clone, U> Clone for Point2D<T, U> {
 
 #[cfg(feature = "serde")]
 impl<'de, T, U> serde::Deserialize<'de> for Point2D<T, U>
-    where T: serde::Deserialize<'de>
+where
+    T: serde::Deserialize<'de>,
 {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-        where D: serde::Deserializer<'de>
+    where
+        D: serde::Deserializer<'de>,
     {
         let (x, y) = serde::Deserialize::deserialize(deserializer)?;
-        Ok(Point2D { x, y, _unit: PhantomData })
+        Ok(Point2D {
+            x,
+            y,
+            _unit: PhantomData,
+        })
     }
 }
 
 #[cfg(feature = "serde")]
 impl<T, U> serde::Serialize for Point2D<T, U>
-    where T: serde::Serialize
+where
+    T: serde::Serialize,
 {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where S: serde::Serializer
+    where
+        S: serde::Serializer,
     {
         (&self.x, &self.y).serialize(serializer)
     }
@@ -73,7 +81,8 @@ impl<T, U> serde::Serialize for Point2D<T, U>
 impl<T, U> Eq for Point2D<T, U> where T: Eq {}
 
 impl<T, U> PartialEq for Point2D<T, U>
-    where T: PartialEq
+where
+    T: PartialEq,
 {
     fn eq(&self, other: &Self) -> bool {
         self.x == other.x && self.y == other.y
@@ -81,7 +90,8 @@ impl<T, U> PartialEq for Point2D<T, U>
 }
 
 impl<T, U> Hash for Point2D<T, U>
-    where T: Hash
+where
+    T: Hash,
 {
     fn hash<H: core::hash::Hasher>(&self, h: &mut H) {
         self.x.hash(h);
@@ -93,10 +103,7 @@ mint_vec!(Point2D[x, y] = Point2);
 
 impl<T: fmt::Debug, U> fmt::Debug for Point2D<T, U> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        f.debug_tuple("")
-            .field(&self.x)
-            .field(&self.y)
-            .finish()
+        f.debug_tuple("").field(&self.x).field(&self.y).finish()
     }
 }
 
@@ -115,7 +122,6 @@ impl<T: Default, U> Default for Point2D<T, U> {
         Point2D::new(Default::default(), Default::default())
     }
 }
-
 
 impl<T, U> Point2D<T, U> {
     /// Constructor, setting all components to zero.
@@ -355,10 +361,7 @@ impl<T: Copy, U> Point2D<T, U> {
         T: One + Sub<Output = T> + Mul<Output = T> + Add<Output = T>,
     {
         let one_t = T::one() - t;
-        point2(
-            one_t * self.x + t * other.x,
-            one_t * self.y + t * other.y,
-        )
+        point2(one_t * self.x + t * other.x, one_t * self.y + t * other.y)
     }
 }
 
@@ -478,7 +481,6 @@ impl<T: Float + Sub<T, Output = T>, U> Point2D<T, U> {
     }
 }
 
-
 impl<T: Neg, U> Neg for Point2D<T, U> {
     type Output = Point2D<T::Output, U>;
 
@@ -487,7 +489,6 @@ impl<T: Neg, U> Neg for Point2D<T, U> {
         point2(-self.x, -self.y)
     }
 }
-
 
 impl<T: Add, U> Add<Size2D<T, U>> for Point2D<T, U> {
     type Output = Point2D<T::Output, U>;
@@ -521,7 +522,6 @@ impl<T: Copy + Add<T, Output = T>, U> AddAssign<Vector2D<T, U>> for Point2D<T, U
         *self = *self + other
     }
 }
-
 
 impl<T: Sub, U> Sub for Point2D<T, U> {
     type Output = Vector2D<T::Output, U>;
@@ -565,7 +565,6 @@ impl<T: Copy + Sub<T, Output = T>, U> SubAssign<Vector2D<T, U>> for Point2D<T, U
     }
 }
 
-
 impl<T: Clone + Mul, U> Mul<T> for Point2D<T, U> {
     type Output = Point2D<T::Output, U>;
 
@@ -599,7 +598,6 @@ impl<T: Clone + MulAssign, U> MulAssign<Scale<T, U, U>> for Point2D<T, U> {
     }
 }
 
-
 impl<T: Clone + Div, U> Div<T> for Point2D<T, U> {
     type Output = Point2D<T::Output, U>;
 
@@ -632,7 +630,6 @@ impl<T: Clone + DivAssign, U> DivAssign<Scale<T, U, U>> for Point2D<T, U> {
         self.y /= scale.0;
     }
 }
-
 
 impl<T: Zero, U> Zero for Point2D<T, U> {
     #[inline]
@@ -677,7 +674,6 @@ impl<T: ApproxEq<T>, U> ApproxEq<Point2D<T, U>> for Point2D<T, U> {
     }
 }
 
-
 impl<T, U> Into<[T; 2]> for Point2D<T, U> {
     fn into(self) -> [T; 2] {
         [self.x, self.y]
@@ -701,8 +697,6 @@ impl<T, U> From<(T, T)> for Point2D<T, U> {
         point2(tuple.0, tuple.1)
     }
 }
-
-
 
 /// A 3d Point tagged with a unit.
 #[repr(C)]
@@ -731,22 +725,31 @@ impl<T: Clone, U> Clone for Point3D<T, U> {
 
 #[cfg(feature = "serde")]
 impl<'de, T, U> serde::Deserialize<'de> for Point3D<T, U>
-    where T: serde::Deserialize<'de>
+where
+    T: serde::Deserialize<'de>,
 {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-        where D: serde::Deserializer<'de>
+    where
+        D: serde::Deserializer<'de>,
     {
         let (x, y, z) = serde::Deserialize::deserialize(deserializer)?;
-        Ok(Point3D { x, y, z, _unit: PhantomData })
+        Ok(Point3D {
+            x,
+            y,
+            z,
+            _unit: PhantomData,
+        })
     }
 }
 
 #[cfg(feature = "serde")]
 impl<T, U> serde::Serialize for Point3D<T, U>
-    where T: serde::Serialize
+where
+    T: serde::Serialize,
 {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where S: serde::Serializer
+    where
+        S: serde::Serializer,
     {
         (&self.x, &self.y, &self.z).serialize(serializer)
     }
@@ -755,7 +758,8 @@ impl<T, U> serde::Serialize for Point3D<T, U>
 impl<T, U> Eq for Point3D<T, U> where T: Eq {}
 
 impl<T, U> PartialEq for Point3D<T, U>
-    where T: PartialEq
+where
+    T: PartialEq,
 {
     fn eq(&self, other: &Self) -> bool {
         self.x == other.x && self.y == other.y && self.z == other.z
@@ -763,7 +767,8 @@ impl<T, U> PartialEq for Point3D<T, U>
 }
 
 impl<T, U> Hash for Point3D<T, U>
-    where T: Hash
+where
+    T: Hash,
 {
     fn hash<H: core::hash::Hasher>(&self, h: &mut H) {
         self.x.hash(h);
@@ -799,7 +804,6 @@ impl<T: Default, U> Default for Point3D<T, U> {
         Point3D::new(Default::default(), Default::default(), Default::default())
     }
 }
-
 
 impl<T, U> Point3D<T, U> {
     /// Constructor, setting all components to zero.
@@ -1176,7 +1180,11 @@ impl<T: NumCast + Copy, U> Point3D<T, U> {
 impl<T: Copy + Add<T, Output = T>, U> Point3D<T, U> {
     #[inline]
     pub fn add_size(&self, other: &Size3D<T, U>) -> Self {
-        point3(self.x + other.width, self.y + other.height, self.z + other.depth)
+        point3(
+            self.x + other.width,
+            self.y + other.height,
+            self.z + other.depth,
+        )
     }
 }
 
@@ -1187,7 +1195,6 @@ impl<T: Float + Sub<T, Output = T>, U> Point3D<T, U> {
     }
 }
 
-
 impl<T: Neg, U> Neg for Point3D<T, U> {
     type Output = Point3D<T::Output, U>;
 
@@ -1197,13 +1204,16 @@ impl<T: Neg, U> Neg for Point3D<T, U> {
     }
 }
 
-
 impl<T: Add, U> Add<Size3D<T, U>> for Point3D<T, U> {
     type Output = Point3D<T::Output, U>;
 
     #[inline]
     fn add(self, other: Size3D<T, U>) -> Self::Output {
-        point3(self.x + other.width, self.y + other.height, self.z + other.depth)
+        point3(
+            self.x + other.width,
+            self.y + other.height,
+            self.z + other.depth,
+        )
     }
 }
 
@@ -1232,7 +1242,6 @@ impl<T: Copy + Add<T, Output = T>, U> AddAssign<Vector3D<T, U>> for Point3D<T, U
     }
 }
 
-
 impl<T: Sub, U> Sub for Point3D<T, U> {
     type Output = Vector3D<T::Output, U>;
 
@@ -1247,7 +1256,11 @@ impl<T: Sub, U> Sub<Size3D<T, U>> for Point3D<T, U> {
 
     #[inline]
     fn sub(self, other: Size3D<T, U>) -> Self::Output {
-        point3(self.x - other.width, self.y - other.height, self.z - other.depth)
+        point3(
+            self.x - other.width,
+            self.y - other.height,
+            self.z - other.depth,
+        )
     }
 }
 
@@ -1276,7 +1289,6 @@ impl<T: Copy + Sub<T, Output = T>, U> SubAssign<Vector3D<T, U>> for Point3D<T, U
     }
 }
 
-
 impl<T: Clone + Mul, U> Mul<T> for Point3D<T, U> {
     type Output = Point3D<T::Output, U>;
 
@@ -1285,7 +1297,7 @@ impl<T: Clone + Mul, U> Mul<T> for Point3D<T, U> {
         point3(
             self.x * scale.clone(),
             self.y * scale.clone(),
-            self.z * scale
+            self.z * scale,
         )
     }
 }
@@ -1307,7 +1319,7 @@ impl<T: Clone + Mul, U1, U2> Mul<Scale<T, U1, U2>> for Point3D<T, U1> {
         point3(
             self.x * scale.0.clone(),
             self.y * scale.0.clone(),
-            self.z * scale.0
+            self.z * scale.0,
         )
     }
 }
@@ -1319,7 +1331,6 @@ impl<T: Clone + MulAssign, U> MulAssign<Scale<T, U, U>> for Point3D<T, U> {
     }
 }
 
-
 impl<T: Clone + Div, U> Div<T> for Point3D<T, U> {
     type Output = Point3D<T::Output, U>;
 
@@ -1328,7 +1339,7 @@ impl<T: Clone + Div, U> Div<T> for Point3D<T, U> {
         point3(
             self.x / scale.clone(),
             self.y / scale.clone(),
-            self.z / scale
+            self.z / scale,
         )
     }
 }
@@ -1350,7 +1361,7 @@ impl<T: Clone + Div, U1, U2> Div<Scale<T, U1, U2>> for Point3D<T, U2> {
         point3(
             self.x / scale.0.clone(),
             self.y / scale.0.clone(),
-            self.z / scale.0
+            self.z / scale.0,
         )
     }
 }
@@ -1361,7 +1372,6 @@ impl<T: Clone + DivAssign, U> DivAssign<Scale<T, U, U>> for Point3D<T, U> {
         *self /= scale.0;
     }
 }
-
 
 impl<T: Zero, U> Zero for Point3D<T, U> {
     #[inline]
@@ -1406,11 +1416,11 @@ impl<T: ApproxEq<T>, U> ApproxEq<Point3D<T, U>> for Point3D<T, U> {
 
     #[inline]
     fn approx_eq_eps(&self, other: &Self, eps: &Self) -> bool {
-        self.x.approx_eq_eps(&other.x, &eps.x) && self.y.approx_eq_eps(&other.y, &eps.y)
+        self.x.approx_eq_eps(&other.x, &eps.x)
+            && self.y.approx_eq_eps(&other.y, &eps.y)
             && self.z.approx_eq_eps(&other.z, &eps.z)
     }
 }
-
 
 impl<T, U> Into<[T; 3]> for Point3D<T, U> {
     fn into(self) -> [T; 3] {
@@ -1456,7 +1466,6 @@ pub const fn point3<T, U>(x: T, y: T, z: T) -> Point3D<T, U> {
         _unit: PhantomData,
     }
 }
-
 
 #[cfg(test)]
 mod point2d {
@@ -1528,8 +1537,8 @@ mod point2d {
 
     mod ops {
         use crate::default::Point2D;
-        use crate::{size2, vec2, Vector2D};
         use crate::scale::Scale;
+        use crate::{size2, vec2, Vector2D};
 
         pub enum Mm {}
         pub enum Cm {}
@@ -1539,11 +1548,10 @@ mod point2d {
 
         #[test]
         pub fn test_neg() {
-            assert_eq!(-Point2D::new( 1.0,  2.0), Point2D::new(-1.0, -2.0));
-            assert_eq!(-Point2D::new( 0.0,  0.0), Point2D::new(-0.0, -0.0));
-            assert_eq!(-Point2D::new(-1.0, -2.0), Point2D::new( 1.0,  2.0));
+            assert_eq!(-Point2D::new(1.0, 2.0), Point2D::new(-1.0, -2.0));
+            assert_eq!(-Point2D::new(0.0, 0.0), Point2D::new(-0.0, -0.0));
+            assert_eq!(-Point2D::new(-1.0, -2.0), Point2D::new(1.0, 2.0));
         }
-
 
         #[test]
         pub fn test_add_size() {
@@ -1582,7 +1590,6 @@ mod point2d {
 
             assert_eq!(p1, Point2DMm::new(4.0, 6.0));
         }
-
 
         #[test]
         pub fn test_sub() {
@@ -1632,7 +1639,6 @@ mod point2d {
             assert_eq!(p1, Point2DMm::new(-2.0, -2.0));
         }
 
-
         #[test]
         pub fn test_mul_scalar() {
             let p1: Point2D<f32> = Point2D::new(3.0, 5.0);
@@ -1670,7 +1676,6 @@ mod point2d {
 
             assert_eq!(p1, Point2DMm::new(0.1, 0.2));
         }
-
 
         #[test]
         pub fn test_div_scalar() {
@@ -1802,8 +1807,8 @@ mod point3d {
 
     mod ops {
         use crate::default::Point3D;
-        use crate::{size3, vec3, Vector3D};
         use crate::scale::Scale;
+        use crate::{size3, vec3, Vector3D};
 
         pub enum Mm {}
         pub enum Cm {}
@@ -1813,11 +1818,10 @@ mod point3d {
 
         #[test]
         pub fn test_neg() {
-            assert_eq!(-Point3D::new( 1.0,  2.0,  3.0), Point3D::new(-1.0, -2.0, -3.0));
-            assert_eq!(-Point3D::new( 0.0,  0.0,  0.0), Point3D::new(-0.0, -0.0, -0.0));
-            assert_eq!(-Point3D::new(-1.0, -2.0, -3.0), Point3D::new( 1.0,  2.0,  3.0));
+            assert_eq!(-Point3D::new(1.0, 2.0, 3.0), Point3D::new(-1.0, -2.0, -3.0));
+            assert_eq!(-Point3D::new(0.0, 0.0, 0.0), Point3D::new(-0.0, -0.0, -0.0));
+            assert_eq!(-Point3D::new(-1.0, -2.0, -3.0), Point3D::new(1.0, 2.0, 3.0));
         }
-
 
         #[test]
         pub fn test_add_size() {
@@ -1856,7 +1860,6 @@ mod point3d {
 
             assert_eq!(p1, Point3DMm::new(5.0, 7.0, 9.0));
         }
-
 
         #[test]
         pub fn test_sub() {
@@ -1906,7 +1909,6 @@ mod point3d {
             assert_eq!(p1, Point3DMm::new(-3.0, -3.0, -3.0));
         }
 
-
         #[test]
         pub fn test_mul_scalar() {
             let p1: Point3D<f32> = Point3D::new(3.0, 5.0, 7.0);
@@ -1944,7 +1946,6 @@ mod point3d {
 
             assert_eq!(p1, Point3DMm::new(0.1, 0.2, 0.3));
         }
-
 
         #[test]
         pub fn test_div_scalar() {

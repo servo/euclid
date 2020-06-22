@@ -8,14 +8,14 @@
 // except according to those terms.
 
 use super::UnknownUnit;
-use crate::scale::Scale;
-use crate::num::*;
 use crate::box2d::Box2D;
+use crate::nonempty::NonEmpty;
+use crate::num::*;
 use crate::point::Point2D;
-use crate::vector::Vector2D;
+use crate::scale::Scale;
 use crate::side_offsets::SideOffsets2D;
 use crate::size::Size2D;
-use crate::nonempty::NonEmpty;
+use crate::vector::Vector2D;
 
 use num_traits::NumCast;
 #[cfg(feature = "serde")]
@@ -25,13 +25,15 @@ use core::borrow::Borrow;
 use core::cmp::PartialOrd;
 use core::fmt;
 use core::hash::{Hash, Hasher};
-use core::ops::{Add, Div, DivAssign, Mul, MulAssign, Sub, Range};
-
+use core::ops::{Add, Div, DivAssign, Mul, MulAssign, Range, Sub};
 
 /// A 2d Rectangle optionally tagged with a unit.
 #[repr(C)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "serde", serde(bound(serialize = "T: Serialize", deserialize = "T: Deserialize<'de>")))]
+#[cfg_attr(
+    feature = "serde",
+    serde(bound(serialize = "T: Serialize", deserialize = "T: Deserialize<'de>"))
+)]
 pub struct Rect<T, U> {
     pub origin: Point2D<T, U>,
     pub size: Size2D<T, U>,
@@ -90,16 +92,13 @@ impl<T, U> Rect<T, U> {
     /// Constructor.
     #[inline]
     pub const fn new(origin: Point2D<T, U>, size: Size2D<T, U>) -> Self {
-        Rect {
-            origin,
-            size,
-        }
+        Rect { origin, size }
     }
 }
 
 impl<T, U> Rect<T, U>
 where
-    T: Zero
+    T: Zero,
 {
     /// Constructor, setting all sides to zero.
     #[inline]
@@ -218,7 +217,6 @@ where
 
         Some(box2d.to_rect())
     }
-
 }
 
 impl<T, U> Rect<T, U>
@@ -248,8 +246,10 @@ where
     #[inline]
     pub fn contains_rect(&self, rect: &Self) -> bool {
         rect.is_empty_or_negative()
-            || (self.min_x() <= rect.min_x() && rect.max_x() <= self.max_x()
-                && self.min_y() <= rect.min_y() && rect.max_y() <= self.max_y())
+            || (self.min_x() <= rect.min_x()
+                && rect.max_x() <= self.max_x()
+                && self.min_y() <= rect.min_y()
+                && rect.max_y() <= self.max_y())
     }
 }
 
@@ -264,14 +264,11 @@ where
     /// This method assumes y oriented downward.
     pub fn inner_rect(&self, offsets: SideOffsets2D<T, U>) -> Self {
         let rect = Rect::new(
-            Point2D::new(
-                self.origin.x + offsets.left,
-                self.origin.y + offsets.top
-            ),
+            Point2D::new(self.origin.x + offsets.left, self.origin.y + offsets.top),
             Size2D::new(
                 self.size.width - offsets.horizontal(),
-                self.size.height - offsets.vertical()
-            )
+                self.size.height - offsets.vertical(),
+            ),
         );
         debug_assert!(rect.size.width >= Zero::zero());
         debug_assert!(rect.size.height >= Zero::zero());
@@ -289,14 +286,11 @@ where
     /// This method assumes y oriented downward.
     pub fn outer_rect(&self, offsets: SideOffsets2D<T, U>) -> Self {
         Rect::new(
-            Point2D::new(
-                self.origin.x - offsets.left,
-                self.origin.y - offsets.top
-            ),
+            Point2D::new(self.origin.x - offsets.left, self.origin.y - offsets.top),
             Size2D::new(
                 self.size.width + offsets.horizontal(),
-                self.size.height + offsets.vertical()
-            )
+                self.size.height + offsets.vertical(),
+            ),
         )
     }
 }
@@ -392,7 +386,6 @@ impl<T: Zero + PartialEq, U> Rect<T, U> {
 }
 
 impl<T: Zero + PartialOrd, U> Rect<T, U> {
-
     #[inline]
     pub fn is_empty_or_negative(&self) -> bool {
         self.size.is_empty_or_negative()
@@ -409,7 +402,6 @@ impl<T: Copy + Zero + PartialOrd, U> Rect<T, U> {
         Some(NonEmpty(*self))
     }
 }
-
 
 impl<T: Clone + Mul, U> Mul<T> for Rect<T, U> {
     type Output = Rect<T::Output, U>;
@@ -456,7 +448,7 @@ impl<T: Clone + MulAssign, U> MulAssign<Scale<T, U, U>> for Rect<T, U> {
     #[inline]
     fn mul_assign(&mut self, scale: Scale<T, U, U>) {
         self.origin *= scale.clone();
-        self.size   *= scale;
+        self.size *= scale;
     }
 }
 
@@ -473,10 +465,9 @@ impl<T: Clone + DivAssign, U> DivAssign<Scale<T, U, U>> for Rect<T, U> {
     #[inline]
     fn div_assign(&mut self, scale: Scale<T, U, U>) {
         self.origin /= scale.clone();
-        self.size   /= scale;
+        self.size /= scale;
     }
 }
-
 
 impl<T: Copy, U> Rect<T, U> {
     /// Drop the units, preserving only the numeric value.
@@ -509,10 +500,7 @@ impl<T: NumCast + Copy, U> Rect<T, U> {
     /// geometrically. Consider using round(), round_in or round_out() before casting.
     #[inline]
     pub fn cast<NewT: NumCast>(&self) -> Rect<NewT, U> {
-        Rect::new(
-            self.origin.cast(),
-            self.size.cast(),
-        )
+        Rect::new(self.origin.cast(), self.size.cast())
     }
 
     /// Fallible cast from one numeric representation to another, preserving the units.
@@ -644,7 +632,8 @@ impl<T: Floor + Ceil + Round + Add<T, Output = T> + Sub<T, Output = T>, U> Rect<
 }
 
 impl<T, U> From<Size2D<T, U>> for Rect<T, U>
-where T: Zero
+where
+    T: Zero,
 {
     fn from(size: Size2D<T, U>) -> Self {
         Self::from_size(size)
@@ -659,8 +648,8 @@ pub const fn rect<T, U>(x: T, y: T, w: T, h: T) -> Rect<T, U> {
 #[cfg(test)]
 mod tests {
     use crate::default::{Point2D, Rect, Size2D};
-    use crate::{point2, vec2, rect, size2};
     use crate::side_offsets::SideOffsets2D;
+    use crate::{point2, rect, size2, vec2};
 
     #[test]
     fn test_translate() {
@@ -728,7 +717,10 @@ mod tests {
         // test some scenarios where the intersection can overflow but
         // the min_x() and max_x() don't. Gecko currently fails these cases
         let p = Rect::new(Point2D::new(-2147483648, -2147483648), Size2D::new(0, 0));
-        let q = Rect::new(Point2D::new(2136893440, 2136893440), Size2D::new(279552, 279552));
+        let q = Rect::new(
+            Point2D::new(2136893440, 2136893440),
+            Size2D::new(279552, 279552),
+        );
         let r = Rect::new(Point2D::new(-2147483648, -2147483648), Size2D::new(1, 1));
 
         assert!(p.is_empty());
