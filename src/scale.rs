@@ -15,7 +15,7 @@ use core::cmp::Ordering;
 use core::fmt;
 use core::hash::{Hash, Hasher};
 use core::marker::PhantomData;
-use core::ops::{Add, Div, Mul, Neg, Sub};
+use core::ops::{Add, Div, Mul, Sub};
 use num_traits::NumCast;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -143,15 +143,6 @@ impl<T, Src, Dst> Scale<T, Src, Dst> {
         )
     }
 
-    /// Returns the inverse of this scale.
-    #[inline]
-    pub fn inverse(&self) -> Scale<T::Output, Dst, Src>
-    where
-        T: Clone + Neg,
-    {
-        Scale::new(-self.get())
-    }
-
     /// Returns `true` if this scale has no effect.
     ///
     /// # Example
@@ -195,9 +186,9 @@ impl<T: Clone, Src, Dst> Scale<T, Src, Dst> {
     ///
     /// let cm_per_mm: Scale<f32, Cm, Mm> = Scale::new(0.1);
     ///
-    /// assert_eq!(cm_per_mm.inv(), Scale::new(10.0));
+    /// assert_eq!(cm_per_mm.inverse(), Scale::new(10.0));
     /// ```
-    pub fn inv(&self) -> Scale<T::Output, Dst, Src>
+    pub fn inverse(&self) -> Scale<T::Output, Dst, Src>
     where
         T: One + Div,
     {
@@ -374,7 +365,7 @@ mod tests {
         let mm_per_inch: Scale<f32, Inch, Mm> = Scale::new(25.4);
         let cm_per_mm: Scale<f32, Mm, Cm> = Scale::new(0.1);
 
-        let mm_per_cm: Scale<f32, Cm, Mm> = cm_per_mm.inv();
+        let mm_per_cm: Scale<f32, Cm, Mm> = cm_per_mm.inverse();
         assert_eq!(mm_per_cm.get(), 10.0);
 
         let one: Scale<f32, Mm, Mm> = cm_per_mm * mm_per_cm;
