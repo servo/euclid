@@ -11,6 +11,7 @@
 use crate::approxeq::ApproxEq;
 use crate::num::Zero;
 use crate::scale::Scale;
+use crate::approxord::{max, min};
 
 use crate::num::One;
 use core::cmp::Ordering;
@@ -116,6 +117,20 @@ impl<T: Clone, U> Length<T, U> {
     {
         let one_t = T::one() - t.clone();
         Length::new(one_t * self.0.clone() + t * other.0)
+    }
+}
+
+impl<T: PartialOrd, U> Length<T, U> {
+    /// Returns minimum between this length and another length.
+    #[inline]
+    pub fn min(self, other: Self) -> Self {
+        min(self, other)
+    }
+
+    /// Returns maximum between this length and another length.
+    #[inline]
+    pub fn max(self, other: Self) -> Self {
+        max(self, other)
     }
 }
 
