@@ -897,4 +897,12 @@ mod tests {
         let r: Rect<f32> = rect(1.0, 2.0, 3.0, 4.0);
         assert_eq!(r.center(), point2(2.5, 4.0));
     }
+
+    #[test]
+    fn test_nan() {
+        let r1: Rect<f32> = rect(-2.0, 5.0, 4.0, std::f32::NAN);
+        let r2: Rect<f32> = rect(std::f32::NAN, -1.0, 3.0, 10.0);
+
+        assert_eq!(r1.intersection(&r2), None);
+    }
 }
