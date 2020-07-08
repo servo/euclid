@@ -107,16 +107,6 @@ impl<T: fmt::Debug, U> fmt::Debug for Point2D<T, U> {
     }
 }
 
-impl<T: fmt::Display, U> fmt::Display for Point2D<T, U> {
-    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        write!(formatter, "(")?;
-        fmt::Display::fmt(&self.x, formatter)?;
-        write!(formatter, ",")?;
-        fmt::Display::fmt(&self.y, formatter)?;
-        write!(formatter, ")")
-    }
-}
-
 impl<T: Default, U> Default for Point2D<T, U> {
     fn default() -> Self {
         Point2D::new(Default::default(), Default::default())
@@ -784,18 +774,6 @@ impl<T: fmt::Debug, U> fmt::Debug for Point3D<T, U> {
             .field(&self.y)
             .field(&self.z)
             .finish()
-    }
-}
-
-impl<T: fmt::Display, U> fmt::Display for Point3D<T, U> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "(")?;
-        fmt::Display::fmt(&self.x, f)?;
-        write!(f, ",")?;
-        fmt::Display::fmt(&self.y, f)?;
-        write!(f, ",")?;
-        fmt::Display::fmt(&self.z, f)?;
-        write!(f, ")")
     }
 }
 

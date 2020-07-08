@@ -138,12 +138,6 @@ impl<T: fmt::Debug, U> fmt::Debug for Length<T, U> {
     }
 }
 
-impl<T: fmt::Display, U> fmt::Display for Length<T, U> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        self.0.fmt(f)
-    }
-}
-
 impl<T: Default, U> Default for Length<T, U> {
     #[inline]
     fn default() -> Self {
