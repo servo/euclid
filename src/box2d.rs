@@ -127,7 +127,7 @@ where
     /// Returns true if the size is zero or negative.
     #[inline]
     pub fn is_empty_or_negative(&self) -> bool {
-        self.max.x <= self.min.x || self.max.y <= self.min.y
+        !(self.max.x > self.min.x && self.max.y > self.min.y)
     }
 
     /// Returns `true` if the two boxes intersect.
@@ -839,5 +839,14 @@ mod tests {
             let b = Box2D::from_points(&[Point2D::from(coords_neg), Point2D::from(coords_pos)]);
             assert!(b.is_empty());
         }
+    }
+
+    #[test]
+    fn test_nan_empty_or_negative() {
+        use std::f32::NAN;
+        assert!(Box2D { min: point2(NAN, 2.0), max: point2(1.0, 3.0) }.is_empty_or_negative());
+        assert!(Box2D { min: point2(0.0, NAN), max: point2(1.0, 2.0) }.is_empty_or_negative());
+        assert!(Box2D { min: point2(1.0, -2.0), max: point2(NAN, 2.0) }.is_empty_or_negative());
+        assert!(Box2D { min: point2(1.0, -2.0), max: point2(0.0, NAN) }.is_empty_or_negative());
     }
 }

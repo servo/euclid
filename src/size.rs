@@ -432,7 +432,9 @@ impl<T: PartialOrd, U> Size2D<T, U> {
         T: Zero,
     {
         let zero = T::zero();
-        self.width <= zero || self.height <= zero
+        // The condition is experessed this way so that we return true in
+        // the presence of NaN. 
+        !(self.width > zero && self.height > zero)
     }
 }
 
@@ -857,6 +859,14 @@ mod size2d {
 
             assert_eq!(s1, Size2DMm::new(1.0, 2.0));
         }
+
+        #[test]
+        pub fn test_nan_empty() {
+            use std::f32::NAN;
+            assert!(Size2D::new(NAN, 2.0).is_empty_or_negative());
+            assert!(Size2D::new(0.0, NAN).is_empty_or_negative());
+            assert!(Size2D::new(NAN, -2.0).is_empty_or_negative());
+        }
     }
 }
 
@@ -1269,7 +1279,7 @@ impl<T: PartialOrd, U> Size3D<T, U> {
         T: Zero,
     {
         let zero = T::zero();
-        self.width <= zero || self.height <= zero || self.depth <= zero
+        !(self.width > zero && self.height > zero && self.depth <= zero)
     }
 }
 
@@ -1693,6 +1703,14 @@ mod size3d {
             s1 /= scale;
 
             assert_eq!(s1, Size3DMm::new(1.0, 2.0, 3.0));
+        }
+
+        #[test]
+        pub fn test_nan_empty() {
+            use std::f32::NAN;
+            assert!(Size3D::new(NAN, 2.0, 3.0).is_empty_or_negative());
+            assert!(Size3D::new(0.0, NAN, 0.0).is_empty_or_negative());
+            assert!(Size3D::new(1.0, 2.0, NAN).is_empty_or_negative());
         }
     }
 }

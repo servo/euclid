@@ -105,7 +105,7 @@ where
     /// Returns true if the size is zero or negative.
     #[inline]
     pub fn is_empty_or_negative(&self) -> bool {
-        self.max.x <= self.min.x || self.max.y <= self.min.y || self.max.z <= self.min.z
+        !(self.max.x > self.min.x && self.max.y > self.min.y && self.max.z > self.min.z)
     }
 
     #[inline]
@@ -879,5 +879,16 @@ mod tests {
             let b = Box3D::from_points(&[Point3D::from(coords_neg), Point3D::from(coords_pos)]);
             assert!(b.is_empty());
         }
+    }
+
+    #[test]
+    fn test_nan_empty_or_negative() {
+        use std::f32::NAN;
+        assert!(Box3D { min: point3(NAN, 2.0, 1.0), max: point3(1.0, 3.0, 5.0) }.is_empty_or_negative());
+        assert!(Box3D { min: point3(0.0, NAN, 1.0), max: point3(1.0, 2.0, 5.0) }.is_empty_or_negative());
+        assert!(Box3D { min: point3(1.0, -2.0, NAN), max: point3(3.0, 2.0, 5.0) }.is_empty_or_negative());
+        assert!(Box3D { min: point3(1.0, -2.0, 1.0), max: point3(NAN, 2.0, 5.0) }.is_empty_or_negative());
+        assert!(Box3D { min: point3(1.0, -2.0, 1.0), max: point3(0.0, NAN, 5.0) }.is_empty_or_negative());
+        assert!(Box3D { min: point3(1.0, -2.0, 1.0), max: point3(0.0, 1.0, NAN) }.is_empty_or_negative());
     }
 }
