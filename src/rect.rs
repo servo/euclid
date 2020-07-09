@@ -28,6 +28,22 @@ use core::hash::{Hash, Hasher};
 use core::ops::{Add, Div, DivAssign, Mul, MulAssign, Range, Sub};
 
 /// A 2d Rectangle optionally tagged with a unit.
+///
+/// # Representation
+///
+/// `Rect` is represented by an origin point and a size.
+///
+/// See [`Rect`] for a rectangle represented by two endpoints.
+///
+/// # Empty rectangle
+///
+/// A rectangle is considered empty (see [`is_empty`]) if any of the following is true:
+/// - it's area is empty,
+/// - it's area is negative (`size.x < 0` or `size.y < 0`),
+/// - it contains NaNs.
+///
+/// [`is_empty`]: #method.is_empty
+/// [`Box2D`]: struct.Box2D.html
 #[repr(C)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(
@@ -211,7 +227,7 @@ where
     #[inline]
     pub fn intersection(&self, other: &Self) -> Option<Self> {
         let box2d = self.to_box2d().intersection(&other.to_box2d());
-        if box2d.is_empty_or_negative() {
+        if box2d.is_empty() {
             return None;
         }
 
@@ -245,7 +261,7 @@ where
     /// nonempty but this rectangle is empty.
     #[inline]
     pub fn contains_rect(&self, rect: &Self) -> bool {
-        rect.is_empty_or_negative()
+        rect.is_empty()
             || (self.min_x() <= rect.min_x()
                 && rect.max_x() <= self.max_x()
                 && self.min_y() <= rect.min_y()
@@ -378,24 +394,17 @@ impl<T: Copy + Mul<T, Output = T>, U> Rect<T, U> {
     }
 }
 
-impl<T: Zero + PartialEq, U> Rect<T, U> {
-    /// Returns true if the size is zero, regardless of the origin's value.
-    pub fn is_empty(&self) -> bool {
-        self.size.width == Zero::zero() || self.size.height == Zero::zero()
-    }
-}
-
 impl<T: Zero + PartialOrd, U> Rect<T, U> {
     #[inline]
-    pub fn is_empty_or_negative(&self) -> bool {
-        self.size.is_empty_or_negative()
+    pub fn is_empty(&self) -> bool {
+        self.size.is_empty()
     }
 }
 
 impl<T: Copy + Zero + PartialOrd, U> Rect<T, U> {
     #[inline]
     pub fn to_non_empty(&self) -> Option<NonEmpty<Self>> {
-        if self.is_empty_or_negative() {
+        if self.is_empty() {
             return None;
         }
 

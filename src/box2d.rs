@@ -28,15 +28,15 @@ use core::fmt;
 use core::hash::{Hash, Hasher};
 use core::ops::{Add, Div, DivAssign, Mul, MulAssign, Sub};
 
-/// An axis aligned rectangle represented by its minimum and maximum coordinates.
+/// A 2d axis aligned rectangle represented by its minimum and maximum coordinates.
 ///
-/// That struct is similar to the [`Rect`] struct, but stores rectangle as two corners
+/// # Representation
+///
+/// This struct is similar to [`Rect`], but stores rectangle as two endpoints
 /// instead of origin point and size. Such representation has several advantages over
 /// [`Rect`] representation:
 /// - Several operations are more efficient with `Box2D`, including [`intersection`],
 ///   [`union`], and point-in-rect.
-/// - The representation is more symmetric, since it stores two quantities of the
-///   same kind (two points) rather than a point and a dimension (width/height).
 /// - The representation is less susceptible to overflow. With [`Rect`], computation
 ///   of second point can overflow for a large range of values of origin and size.
 ///   However, with `Box2D`, computation of [`size`] cannot overflow if the coordinates
@@ -45,8 +45,16 @@ use core::ops::{Add, Div, DivAssign, Mul, MulAssign, Sub};
 /// A known disadvantage of `Box2D` is that translating the rectangle requires translating
 /// both points, whereas translating [`Rect`] only requires translating one point.
 ///
+/// # Empty box
+///
+/// A box is considered empty (see [`is_empty`]) if any of the following is true:
+/// - it's area is empty,
+/// - it's area is negative (`min.x > max.x` or `min.y > max.y`),
+/// - it contains NaNs.
+///
 /// [`Rect`]: struct.Rect.html
 /// [`intersection`]: #method.intersection
+/// [`is_empty`]: #method.is_empty
 /// [`union`]: #method.union
 /// [`size`]: #method.size
 #[repr(C)]
@@ -123,9 +131,9 @@ where
         self.max.x < self.min.x || self.max.y < self.min.y
     }
 
-    /// Returns true if the size is zero or negative.
+    /// Returns true if the size is zero, negative or NaN.
     #[inline]
-    pub fn is_empty_or_negative(&self) -> bool {
+    pub fn is_empty(&self) -> bool {
         !(self.max.x > self.min.x && self.max.y > self.min.y)
     }
 
@@ -151,7 +159,7 @@ where
     /// nonempty but this box is empty.
     #[inline]
     pub fn contains_box(&self, other: &Self) -> bool {
-        other.is_empty_or_negative()
+        other.is_empty()
             || (self.min.x <= other.min.x
                 && other.max.x <= self.max.x
                 && self.min.y <= other.min.y
@@ -165,7 +173,7 @@ where
 {
     #[inline]
     pub fn to_non_empty(&self) -> Option<NonEmpty<Self>> {
-        if self.is_empty_or_negative() {
+        if self.is_empty() {
             return None;
         }
 
@@ -369,17 +377,6 @@ where
     /// Constructor, setting all sides to zero.
     pub fn zero() -> Self {
         Box2D::new(Point2D::zero(), Point2D::zero())
-    }
-}
-
-impl<T, U> Box2D<T, U>
-where
-    T: PartialEq,
-{
-    /// Returns true if the size is zero.
-    #[inline]
-    pub fn is_empty(&self) -> bool {
-        self.min.x == self.max.x || self.min.y == self.max.y
     }
 }
 
@@ -818,11 +815,11 @@ mod tests {
     }
 
     #[test]
-    fn test_nan_empty_or_negative() {
+    fn test_nan_empty() {
         use std::f32::NAN;
-        assert!(Box2D { min: point2(NAN, 2.0), max: point2(1.0, 3.0) }.is_empty_or_negative());
-        assert!(Box2D { min: point2(0.0, NAN), max: point2(1.0, 2.0) }.is_empty_or_negative());
-        assert!(Box2D { min: point2(1.0, -2.0), max: point2(NAN, 2.0) }.is_empty_or_negative());
-        assert!(Box2D { min: point2(1.0, -2.0), max: point2(0.0, NAN) }.is_empty_or_negative());
+        assert!(Box2D { min: point2(NAN, 2.0), max: point2(1.0, 3.0) }.is_empty());
+        assert!(Box2D { min: point2(0.0, NAN), max: point2(1.0, 2.0) }.is_empty());
+        assert!(Box2D { min: point2(1.0, -2.0), max: point2(NAN, 2.0) }.is_empty());
+        assert!(Box2D { min: point2(1.0, -2.0), max: point2(0.0, NAN) }.is_empty());
     }
 }

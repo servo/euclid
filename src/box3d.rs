@@ -101,9 +101,9 @@ where
         self.max.x < self.min.x || self.max.y < self.min.y || self.max.z < self.min.z
     }
 
-    /// Returns true if the size is zero or negative.
+    /// Returns true if the size is zero, negative or NaN.
     #[inline]
-    pub fn is_empty_or_negative(&self) -> bool {
+    pub fn is_empty(&self) -> bool {
         !(self.max.x > self.min.x && self.max.y > self.min.y && self.max.z > self.min.z)
     }
 
@@ -135,7 +135,7 @@ where
     /// nonempty but this box3d is empty.
     #[inline]
     pub fn contains_box(&self, other: &Self) -> bool {
-        other.is_empty_or_negative()
+        other.is_empty()
             || (self.min.x <= other.min.x
                 && other.max.x <= self.max.x
                 && self.min.y <= other.min.y
@@ -151,7 +151,7 @@ where
 {
     #[inline]
     pub fn to_non_empty(&self) -> Option<NonEmpty<Self>> {
-        if self.is_empty_or_negative() {
+        if self.is_empty() {
             return None;
         }
 
@@ -372,17 +372,6 @@ where
     /// Constructor, setting all sides to zero.
     pub fn zero() -> Self {
         Box3D::new(Point3D::zero(), Point3D::zero())
-    }
-}
-
-impl<T, U> Box3D<T, U>
-where
-    T: PartialEq,
-{
-    /// Returns true if the volume is zero.
-    #[inline]
-    pub fn is_empty(&self) -> bool {
-        self.min.x == self.max.x || self.min.y == self.max.y || self.min.z == self.max.z
     }
 }
 
@@ -891,11 +880,11 @@ mod tests {
     #[test]
     fn test_nan_empty_or_negative() {
         use std::f32::NAN;
-        assert!(Box3D { min: point3(NAN, 2.0, 1.0), max: point3(1.0, 3.0, 5.0) }.is_empty_or_negative());
-        assert!(Box3D { min: point3(0.0, NAN, 1.0), max: point3(1.0, 2.0, 5.0) }.is_empty_or_negative());
-        assert!(Box3D { min: point3(1.0, -2.0, NAN), max: point3(3.0, 2.0, 5.0) }.is_empty_or_negative());
-        assert!(Box3D { min: point3(1.0, -2.0, 1.0), max: point3(NAN, 2.0, 5.0) }.is_empty_or_negative());
-        assert!(Box3D { min: point3(1.0, -2.0, 1.0), max: point3(0.0, NAN, 5.0) }.is_empty_or_negative());
-        assert!(Box3D { min: point3(1.0, -2.0, 1.0), max: point3(0.0, 1.0, NAN) }.is_empty_or_negative());
+        assert!(Box3D { min: point3(NAN, 2.0, 1.0), max: point3(1.0, 3.0, 5.0) }.is_empty());
+        assert!(Box3D { min: point3(0.0, NAN, 1.0), max: point3(1.0, 2.0, 5.0) }.is_empty());
+        assert!(Box3D { min: point3(1.0, -2.0, NAN), max: point3(3.0, 2.0, 5.0) }.is_empty());
+        assert!(Box3D { min: point3(1.0, -2.0, 1.0), max: point3(NAN, 2.0, 5.0) }.is_empty());
+        assert!(Box3D { min: point3(1.0, -2.0, 1.0), max: point3(0.0, NAN, 5.0) }.is_empty());
+        assert!(Box3D { min: point3(1.0, -2.0, 1.0), max: point3(0.0, 1.0, NAN) }.is_empty());
     }
 }
