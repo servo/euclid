@@ -336,12 +336,6 @@ impl<T: fmt::Debug, Src, Dst> fmt::Debug for Scale<T, Src, Dst> {
     }
 }
 
-impl<T: fmt::Display, Src, Dst> fmt::Display for Scale<T, Src, Dst> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        self.0.fmt(f)
-    }
-}
-
 impl<T: Default, Src, Dst> Default for Scale<T, Src, Dst> {
     fn default() -> Self {
         Self::new(T::default())

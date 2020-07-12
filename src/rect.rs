@@ -72,16 +72,6 @@ impl<T: fmt::Debug, U> fmt::Debug for Rect<T, U> {
     }
 }
 
-impl<T: fmt::Display, U> fmt::Display for Rect<T, U> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Rect(")?;
-        fmt::Display::fmt(&self.size, f)?;
-        write!(f, " at ")?;
-        fmt::Display::fmt(&self.origin, f)?;
-        write!(f, ")")
-    }
-}
-
 impl<T: Default, U> Default for Rect<T, U> {
     fn default() -> Self {
         Rect::new(Default::default(), Default::default())

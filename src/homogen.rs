@@ -184,20 +184,6 @@ impl<T: fmt::Debug, U> fmt::Debug for HomogeneousVector<T, U> {
     }
 }
 
-impl<T: fmt::Display, U> fmt::Display for HomogeneousVector<T, U> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "(")?;
-        fmt::Display::fmt(&self.x, f)?;
-        write!(f, ",")?;
-        fmt::Display::fmt(&self.y, f)?;
-        write!(f, ",")?;
-        fmt::Display::fmt(&self.z, f)?;
-        write!(f, ",")?;
-        fmt::Display::fmt(&self.w, f)?;
-        write!(f, ")")
-    }
-}
-
 #[cfg(test)]
 mod homogeneous {
     use super::HomogeneousVector;

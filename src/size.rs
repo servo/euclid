@@ -111,16 +111,6 @@ impl<T: fmt::Debug, U> fmt::Debug for Size2D<T, U> {
     }
 }
 
-impl<T: fmt::Display, U> fmt::Display for Size2D<T, U> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "(")?;
-        fmt::Display::fmt(&self.width, f)?;
-        write!(f, "x")?;
-        fmt::Display::fmt(&self.height, f)?;
-        write!(f, ")")
-    }
-}
-
 impl<T: Default, U> Default for Size2D<T, U> {
     fn default() -> Self {
         Size2D::new(Default::default(), Default::default())
@@ -950,18 +940,6 @@ impl<T: fmt::Debug, U> fmt::Debug for Size3D<T, U> {
         fmt::Debug::fmt(&self.height, f)?;
         write!(f, "x")?;
         fmt::Debug::fmt(&self.depth, f)
-    }
-}
-
-impl<T: fmt::Display, U> fmt::Display for Size3D<T, U> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "(")?;
-        fmt::Display::fmt(&self.width, f)?;
-        write!(f, "x")?;
-        fmt::Display::fmt(&self.height, f)?;
-        write!(f, "x")?;
-        fmt::Display::fmt(&self.depth, f)?;
-        write!(f, ")")
     }
 }
 

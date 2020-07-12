@@ -730,16 +730,6 @@ impl<T: fmt::Debug, Src, Dst> fmt::Debug for Rotation3D<T, Src, Dst> {
     }
 }
 
-impl<T: fmt::Display, Src, Dst> fmt::Display for Rotation3D<T, Src, Dst> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "Quat({}*i + {}*j + {}*k + {})",
-            self.i, self.j, self.k, self.r
-        )
-    }
-}
-
 impl<T, Src, Dst> ApproxEq<T> for Rotation3D<T, Src, Dst>
 where
     T: Copy + Neg<Output = T> + ApproxEq<T>,
