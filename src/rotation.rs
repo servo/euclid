@@ -222,7 +222,7 @@ where
     /// Returns the matrix representation of this rotation.
     #[inline]
     pub fn to_transform(&self) -> Transform2D<T, Src, Dst> {
-        Transform2D::create_rotation(self.get_angle())
+        Transform2D::rotation(self.get_angle())
     }
 }
 
