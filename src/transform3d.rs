@@ -501,38 +501,28 @@ where
     ///
     /// Assuming row vectors, this is equivalent to self * mat
     #[must_use]
-    pub fn post_transform<NewDst>(&self, mat: &Transform3D<T, Dst, NewDst>) -> Transform3D<T, Src, NewDst> {
+    pub fn then<NewDst>(&self, other: &Transform3D<T, Dst, NewDst>) -> Transform3D<T, Src, NewDst> {
         Transform3D::row_major(
-            self.m11 * mat.m11  +  self.m12 * mat.m21  +  self.m13 * mat.m31  +  self.m14 * mat.m41,
-            self.m11 * mat.m12  +  self.m12 * mat.m22  +  self.m13 * mat.m32  +  self.m14 * mat.m42,
-            self.m11 * mat.m13  +  self.m12 * mat.m23  +  self.m13 * mat.m33  +  self.m14 * mat.m43,
-            self.m11 * mat.m14  +  self.m12 * mat.m24  +  self.m13 * mat.m34  +  self.m14 * mat.m44,
+            self.m11 * other.m11  +  self.m12 * other.m21  +  self.m13 * other.m31  +  self.m14 * other.m41,
+            self.m11 * other.m12  +  self.m12 * other.m22  +  self.m13 * other.m32  +  self.m14 * other.m42,
+            self.m11 * other.m13  +  self.m12 * other.m23  +  self.m13 * other.m33  +  self.m14 * other.m43,
+            self.m11 * other.m14  +  self.m12 * other.m24  +  self.m13 * other.m34  +  self.m14 * other.m44,
 
-            self.m21 * mat.m11  +  self.m22 * mat.m21  +  self.m23 * mat.m31  +  self.m24 * mat.m41,
-            self.m21 * mat.m12  +  self.m22 * mat.m22  +  self.m23 * mat.m32  +  self.m24 * mat.m42,
-            self.m21 * mat.m13  +  self.m22 * mat.m23  +  self.m23 * mat.m33  +  self.m24 * mat.m43,
-            self.m21 * mat.m14  +  self.m22 * mat.m24  +  self.m23 * mat.m34  +  self.m24 * mat.m44,
+            self.m21 * other.m11  +  self.m22 * other.m21  +  self.m23 * other.m31  +  self.m24 * other.m41,
+            self.m21 * other.m12  +  self.m22 * other.m22  +  self.m23 * other.m32  +  self.m24 * other.m42,
+            self.m21 * other.m13  +  self.m22 * other.m23  +  self.m23 * other.m33  +  self.m24 * other.m43,
+            self.m21 * other.m14  +  self.m22 * other.m24  +  self.m23 * other.m34  +  self.m24 * other.m44,
 
-            self.m31 * mat.m11  +  self.m32 * mat.m21  +  self.m33 * mat.m31  +  self.m34 * mat.m41,
-            self.m31 * mat.m12  +  self.m32 * mat.m22  +  self.m33 * mat.m32  +  self.m34 * mat.m42,
-            self.m31 * mat.m13  +  self.m32 * mat.m23  +  self.m33 * mat.m33  +  self.m34 * mat.m43,
-            self.m31 * mat.m14  +  self.m32 * mat.m24  +  self.m33 * mat.m34  +  self.m34 * mat.m44,
+            self.m31 * other.m11  +  self.m32 * other.m21  +  self.m33 * other.m31  +  self.m34 * other.m41,
+            self.m31 * other.m12  +  self.m32 * other.m22  +  self.m33 * other.m32  +  self.m34 * other.m42,
+            self.m31 * other.m13  +  self.m32 * other.m23  +  self.m33 * other.m33  +  self.m34 * other.m43,
+            self.m31 * other.m14  +  self.m32 * other.m24  +  self.m33 * other.m34  +  self.m34 * other.m44,
 
-            self.m41 * mat.m11  +  self.m42 * mat.m21  +  self.m43 * mat.m31  +  self.m44 * mat.m41,
-            self.m41 * mat.m12  +  self.m42 * mat.m22  +  self.m43 * mat.m32  +  self.m44 * mat.m42,
-            self.m41 * mat.m13  +  self.m42 * mat.m23  +  self.m43 * mat.m33  +  self.m44 * mat.m43,
-            self.m41 * mat.m14  +  self.m42 * mat.m24  +  self.m43 * mat.m34  +  self.m44 * mat.m44,
+            self.m41 * other.m11  +  self.m42 * other.m21  +  self.m43 * other.m31  +  self.m44 * other.m41,
+            self.m41 * other.m12  +  self.m42 * other.m22  +  self.m43 * other.m32  +  self.m44 * other.m42,
+            self.m41 * other.m13  +  self.m42 * other.m23  +  self.m43 * other.m33  +  self.m44 * other.m43,
+            self.m41 * other.m14  +  self.m42 * other.m24  +  self.m43 * other.m34  +  self.m44 * other.m44,
         )
-    }
-
-    /// Returns the multiplication of the two matrices such that mat's transformation
-    /// applies before self's transformation.
-    ///
-    /// Assuming row vectors, this is equivalent to mat * self
-    #[inline]
-    #[must_use]
-    pub fn pre_transform<NewSrc>(&self, mat: &Transform3D<T, NewSrc, Src>) -> Transform3D<T, NewSrc, Dst> {
-        mat.post_transform(self)
     }
 }
 
@@ -568,16 +558,16 @@ where
     where
         T: Copy + Add<Output = T> + Mul<Output = T>,
     {
-        self.pre_transform(&Transform3D::translation(v.x, v.y, v.z))
+        Transform3D::translation(v.x, v.y, v.z).then(self)
     }
 
     /// Returns a transform with a translation applied after self's transformation.
     #[must_use]
-    pub fn post_translate(&self, v: Vector3D<T, Dst>) -> Self
+    pub fn then_translate(&self, v: Vector3D<T, Dst>) -> Self
     where
         T: Copy + Add<Output = T> + Mul<Output = T>,
     {
-        self.post_transform(&Transform3D::translation(v.x, v.y, v.z))
+        self.then(&Transform3D::translation(v.x, v.y, v.z))
     }
 }
 
@@ -626,14 +616,14 @@ where
 
     /// Returns a transform with a rotation applied after self's transformation.
     #[must_use]
-    pub fn post_rotate(&self, x: T, y: T, z: T, theta: Angle<T>) -> Self {
-        self.post_transform(&Transform3D::rotation(x, y, z, theta))
+    pub fn then_rotate(&self, x: T, y: T, z: T, theta: Angle<T>) -> Self {
+        self.then(&Transform3D::rotation(x, y, z, theta))
     }
 
     /// Returns a transform with a rotation applied before self's transformation.
     #[must_use]
     pub fn pre_rotate(&self, x: T, y: T, z: T, theta: Angle<T>) -> Self {
-        self.pre_transform(&Transform3D::rotation(x, y, z, theta))
+        Transform3D::rotation(x, y, z, theta).then(self)
     }
 }
 
@@ -679,11 +669,11 @@ where
 
     /// Returns a transform with a scale applied after self's transformation.
     #[must_use]
-    pub fn post_scale(&self, x: T, y: T, z: T) -> Self
+    pub fn then_scale(&self, x: T, y: T, z: T) -> Self
     where
         T: Copy + Add<Output = T> + Mul<Output = T>,
     {
-        self.post_transform(&Transform3D::scale(x, y, z))
+        self.then(&Transform3D::scale(x, y, z))
     }
 }
 
@@ -1157,14 +1147,14 @@ mod tests {
     pub fn test_translation() {
         let t1 = Mf32::translation(1.0, 2.0, 3.0);
         let t2 = Mf32::identity().pre_translate(vec3(1.0, 2.0, 3.0));
-        let t3 = Mf32::identity().post_translate(vec3(1.0, 2.0, 3.0));
+        let t3 = Mf32::identity().then_translate(vec3(1.0, 2.0, 3.0));
         assert_eq!(t1, t2);
         assert_eq!(t1, t3);
 
         assert_eq!(t1.transform_point3d(point3(1.0, 1.0, 1.0)), Some(point3(2.0, 3.0, 4.0)));
         assert_eq!(t1.transform_point2d(point2(1.0, 1.0)), Some(point2(2.0, 3.0)));
 
-        assert_eq!(t1.post_transform(&t1), Mf32::translation(2.0, 4.0, 6.0));
+        assert_eq!(t1.then(&t1), Mf32::translation(2.0, 4.0, 6.0));
 
         assert!(!t1.is_2d());
         assert_eq!(Mf32::translation(1.0, 2.0, 3.0).to_2d(), Transform2D::translation(1.0, 2.0));
@@ -1174,14 +1164,14 @@ mod tests {
     pub fn test_rotation() {
         let r1 = Mf32::rotation(0.0, 0.0, 1.0, rad(FRAC_PI_2));
         let r2 = Mf32::identity().pre_rotate(0.0, 0.0, 1.0, rad(FRAC_PI_2));
-        let r3 = Mf32::identity().post_rotate(0.0, 0.0, 1.0, rad(FRAC_PI_2));
+        let r3 = Mf32::identity().then_rotate(0.0, 0.0, 1.0, rad(FRAC_PI_2));
         assert_eq!(r1, r2);
         assert_eq!(r1, r3);
 
         assert!(r1.transform_point3d(point3(1.0, 2.0, 3.0)).unwrap().approx_eq(&point3(-2.0, 1.0, 3.0)));
         assert!(r1.transform_point2d(point2(1.0, 2.0)).unwrap().approx_eq(&point2(-2.0, 1.0)));
 
-        assert!(r1.post_transform(&r1).approx_eq(&Mf32::rotation(0.0, 0.0, 1.0, rad(FRAC_PI_2*2.0))));
+        assert!(r1.then(&r1).approx_eq(&Mf32::rotation(0.0, 0.0, 1.0, rad(FRAC_PI_2*2.0))));
 
         assert!(r1.is_2d());
         assert!(r1.to_2d().approx_eq(&Transform2D::rotation(rad(FRAC_PI_2))));
@@ -1191,14 +1181,14 @@ mod tests {
     pub fn test_scale() {
         let s1 = Mf32::scale(2.0, 3.0, 4.0);
         let s2 = Mf32::identity().pre_scale(2.0, 3.0, 4.0);
-        let s3 = Mf32::identity().post_scale(2.0, 3.0, 4.0);
+        let s3 = Mf32::identity().then_scale(2.0, 3.0, 4.0);
         assert_eq!(s1, s2);
         assert_eq!(s1, s3);
 
         assert!(s1.transform_point3d(point3(2.0, 2.0, 2.0)).unwrap().approx_eq(&point3(4.0, 6.0, 8.0)));
         assert!(s1.transform_point2d(point2(2.0, 2.0)).unwrap().approx_eq(&point2(4.0, 6.0)));
 
-        assert_eq!(s1.post_transform(&s1), Mf32::scale(4.0, 9.0, 16.0));
+        assert_eq!(s1.then(&s1), Mf32::scale(4.0, 9.0, 16.0));
 
         assert!(!s1.is_2d());
         assert_eq!(Mf32::scale(2.0, 3.0, 0.0).to_2d(), Transform2D::scale(2.0, 3.0));
@@ -1206,11 +1196,10 @@ mod tests {
 
 
     #[test]
-    pub fn test_pre_post_scale() {
-        let m = Mf32::rotation(0.0, 0.0, 1.0, rad(FRAC_PI_2)).post_translate(vec3(6.0, 7.0, 8.0));
+    pub fn test_pre_then_scale() {
+        let m = Mf32::rotation(0.0, 0.0, 1.0, rad(FRAC_PI_2)).then_translate(vec3(6.0, 7.0, 8.0));
         let s = Mf32::scale(2.0, 3.0, 4.0);
-        assert_eq!(m.post_transform(&s), m.post_scale(2.0, 3.0, 4.0));
-        assert_eq!(m.pre_transform(&s), m.pre_scale(2.0, 3.0, 4.0));
+        assert_eq!(m.then(&s), m.then_scale(2.0, 3.0, 4.0));
     }
 
 
@@ -1276,28 +1265,32 @@ mod tests {
     pub fn test_inverse_scale() {
         let m1 = Mf32::scale(1.5, 0.3, 2.1);
         let m2 = m1.inverse().unwrap();
-        assert!(m1.pre_transform(&m2).approx_eq(&Mf32::identity()));
+        assert!(m1.then(&m2).approx_eq(&Mf32::identity()));
+        assert!(m2.then(&m1).approx_eq(&Mf32::identity()));
     }
 
     #[test]
     pub fn test_inverse_translate() {
         let m1 = Mf32::translation(-132.0, 0.3, 493.0);
         let m2 = m1.inverse().unwrap();
-        assert!(m1.pre_transform(&m2).approx_eq(&Mf32::identity()));
+        assert!(m1.then(&m2).approx_eq(&Mf32::identity()));
+        assert!(m2.then(&m1).approx_eq(&Mf32::identity()));
     }
 
     #[test]
     pub fn test_inverse_rotate() {
         let m1 = Mf32::rotation(0.0, 1.0, 0.0, rad(1.57));
         let m2 = m1.inverse().unwrap();
-        assert!(m1.pre_transform(&m2).approx_eq(&Mf32::identity()));
+        assert!(m1.then(&m2).approx_eq(&Mf32::identity()));
+        assert!(m2.then(&m1).approx_eq(&Mf32::identity()));
     }
 
     #[test]
     pub fn test_inverse_transform_point_2d() {
         let m1 = Mf32::translation(100.0, 200.0, 0.0);
         let m2 = m1.inverse().unwrap();
-        assert!(m1.pre_transform(&m2).approx_eq(&Mf32::identity()));
+        assert!(m1.then(&m2).approx_eq(&Mf32::identity()));
+        assert!(m2.then(&m1).approx_eq(&Mf32::identity()));
 
         let p1 = point2(1000.0, 2000.0);
         let p2 = m1.transform_point2d(p1);
@@ -1315,7 +1308,7 @@ mod tests {
 
     #[test]
     pub fn test_pre_post() {
-        let m1 = default::Transform3D::identity().post_scale(1.0, 2.0, 3.0).post_translate(vec3(1.0, 2.0, 3.0));
+        let m1 = default::Transform3D::identity().then_scale(1.0, 2.0, 3.0).then_translate(vec3(1.0, 2.0, 3.0));
         let m2 = default::Transform3D::identity().pre_translate(vec3(1.0, 2.0, 3.0)).pre_scale(1.0, 2.0, 3.0);
         assert!(m1.approx_eq(&m2));
 
@@ -1324,13 +1317,9 @@ mod tests {
 
         let a = point3(1.0, 1.0, 1.0);
 
-        assert!(r.post_transform(&t).transform_point3d(a).unwrap().approx_eq(&point3(1.0, 4.0, 1.0)));
-        assert!(t.post_transform(&r).transform_point3d(a).unwrap().approx_eq(&point3(-4.0, 3.0, 1.0)));
-        assert!(t.post_transform(&r).transform_point3d(a).unwrap().approx_eq(&r.transform_point3d(t.transform_point3d(a).unwrap()).unwrap()));
-
-        assert!(r.pre_transform(&t).transform_point3d(a).unwrap().approx_eq(&point3(-4.0, 3.0, 1.0)));
-        assert!(t.pre_transform(&r).transform_point3d(a).unwrap().approx_eq(&point3(1.0, 4.0, 1.0)));
-        assert!(t.pre_transform(&r).transform_point3d(a).unwrap().approx_eq(&t.transform_point3d(r.transform_point3d(a).unwrap()).unwrap()));
+        assert!(r.then(&t).transform_point3d(a).unwrap().approx_eq(&point3(1.0, 4.0, 1.0)));
+        assert!(t.then(&r).transform_point3d(a).unwrap().approx_eq(&point3(-4.0, 3.0, 1.0)));
+        assert!(t.then(&r).transform_point3d(a).unwrap().approx_eq(&r.transform_point3d(t.transform_point3d(a).unwrap()).unwrap()));
     }
 
     #[test]
@@ -1352,7 +1341,7 @@ mod tests {
                                  -2.5, 6.0, 1.0, 1.0);
 
         let p = point3(1.0, 3.0, 5.0);
-        let p1 = m2.pre_transform(&m1).transform_point3d(p).unwrap();
+        let p1 = m1.then(&m2).transform_point3d(p).unwrap();
         let p2 = m2.transform_point3d(m1.transform_point3d(p).unwrap()).unwrap();
         assert!(p1.approx_eq(&p2));
     }
@@ -1361,7 +1350,7 @@ mod tests {
     pub fn test_is_identity() {
         let m1 = default::Transform3D::identity();
         assert!(m1.is_identity());
-        let m2 = m1.post_translate(vec3(0.1, 0.0, 0.0));
+        let m2 = m1.then_translate(vec3(0.1, 0.0, 0.0));
         assert!(!m2.is_identity());
     }
 

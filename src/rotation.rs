@@ -181,20 +181,11 @@ impl<T: Float, Src, Dst> Rotation2D<T, Src, Dst> {
 
     /// Returns a rotation representing the other rotation followed by this rotation.
     #[inline]
-    pub fn pre_rotate<NewSrc>(
+    pub fn then<NewSrc>(
         &self,
         other: &Rotation2D<T, NewSrc, Src>,
     ) -> Rotation2D<T, NewSrc, Dst> {
         Rotation2D::radians(self.angle + other.angle)
-    }
-
-    /// Returns a rotation representing this rotation followed by the other rotation.
-    #[inline]
-    pub fn post_rotate<NewDst>(
-        &self,
-        other: &Rotation2D<T, Dst, NewDst>,
-    ) -> Rotation2D<T, Src, NewDst> {
-        other.pre_rotate(self)
     }
 
     /// Returns the given 2d point transformed by this rotation.
@@ -657,33 +648,22 @@ where
         )
     }
 
-    /// Returns a rotation representing the other rotation followed by this rotation.
-    pub fn pre_rotate<NewSrc>(
-        &self,
-        other: &Rotation3D<T, NewSrc, Src>,
-    ) -> Rotation3D<T, NewSrc, Dst>
-    where
-        T: ApproxEq<T>,
-    {
-        debug_assert!(self.is_normalized());
-        Rotation3D::quaternion(
-            self.i * other.r + self.r * other.i + self.j * other.k - self.k * other.j,
-            self.j * other.r + self.r * other.j + self.k * other.i - self.i * other.k,
-            self.k * other.r + self.r * other.k + self.i * other.j - self.j * other.i,
-            self.r * other.r - self.i * other.i - self.j * other.j - self.k * other.k,
-        )
-    }
-
     /// Returns a rotation representing this rotation followed by the other rotation.
     #[inline]
-    pub fn post_rotate<NewDst>(
+    pub fn then<NewDst>(
         &self,
         other: &Rotation3D<T, Dst, NewDst>,
     ) -> Rotation3D<T, Src, NewDst>
     where
         T: ApproxEq<T>,
     {
-        other.pre_rotate(self)
+        debug_assert!(self.is_normalized());
+        Rotation3D::quaternion(
+            other.i * self.r + other.r * self.i + other.j * self.k - other.k * self.j,
+            other.j * self.r + other.r * self.j + other.k * self.i - other.i * self.k,
+            other.k * self.r + other.r * self.k + other.i * self.j - other.j * self.i,
+            other.r * self.r - other.i * self.i - other.j * self.j - other.k * self.k,
+        )
     }
 
     // add, sub and mul are used internally for intermediate computation but aren't public
@@ -827,18 +807,18 @@ fn pre_post() {
 
     // Check that the order of transformations is correct (corresponds to what
     // we do in Transform3D).
-    let p1 = r1.post_rotate(&r2).post_rotate(&r3).transform_point3d(p);
+    let p1 = r1.then(&r2).then(&r3).transform_point3d(p);
     let p2 = t1
-        .post_transform(&t2)
-        .post_transform(&t3)
+        .then(&t2)
+        .then(&t3)
         .transform_point3d(p);
 
     assert!(p1.approx_eq(&p2.unwrap()));
 
     // Check that changing the order indeed matters.
     let p3 = t3
-        .post_transform(&t1)
-        .post_transform(&t2)
+        .then(&t1)
+        .then(&t2)
         .transform_point3d(p);
     assert!(!p1.approx_eq(&p3.unwrap()));
 }
@@ -1008,7 +988,7 @@ fn from_euler() {
     // Now check that the yaw pitch and roll transformations when combined are applied in
     // the proper order: roll -> pitch -> yaw.
     let ypr_e = Rotation3D::euler(angle, angle, angle);
-    let ypr_q = roll_rq.post_rotate(&pitch_rq).post_rotate(&yaw_rq);
+    let ypr_q = roll_rq.then(&pitch_rq).then(&yaw_rq);
     let ypr_pe = ypr_e.transform_point3d(p);
     let ypr_pq = ypr_q.transform_point3d(p);
 
