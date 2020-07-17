@@ -663,7 +663,7 @@ mod tests {
     #[test]
     fn test_round() {
         let b = Box2D::from_points(&[point2(-25.5, -40.4), point2(60.3, 36.5)]).round();
-        assert_eq!(b.min.x, -26.0);
+        assert_eq!(b.min.x, -25.0);
         assert_eq!(b.min.y, -40.0);
         assert_eq!(b.max.x, 60.0);
         assert_eq!(b.max.y, 37.0);

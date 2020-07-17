@@ -728,7 +728,7 @@ mod tests {
     fn test_round() {
         let b =
             Box3D::from_points(&[point3(-25.5, -40.4, -70.9), point3(60.3, 36.5, 89.8)]).round();
-        assert!(b.min.x == -26.0);
+        assert!(b.min.x == -25.0);
         assert!(b.min.y == -40.0);
         assert!(b.min.z == -71.0);
         assert!(b.max.x == 60.0);
