@@ -139,18 +139,6 @@ impl<T: Float + ApproxEq<T>, Src, Dst> RigidTransform3D<T, Src, Dst> {
         }
     }
 
-    /// Returns the multiplication of the two transforms such that
-    /// self's transformation applies after other's transformation.
-    ///
-    /// i.e., this produces `other * self` in row-vector notation
-    #[inline]
-    pub fn pre_transform<Src2>(
-        &self,
-        other: &RigidTransform3D<T, Src2, Src>,
-    ) -> RigidTransform3D<T, Src2, Dst> {
-        other.then(&self)
-    }
-
     /// Inverts the transformation
     #[inline]
     pub fn inverse(&self) -> RigidTransform3D<T, Dst, Src> {
