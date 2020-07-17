@@ -419,8 +419,8 @@ impl<T: PartialOrd, U> Size2D<T, U> {
         }
     }
 
-    /// Returns `true` if any component of size is zero or negative.
-    pub fn is_empty_or_negative(&self) -> bool
+    /// Returns `true` if any component of size is zero, negative, or NaN.
+    pub fn is_empty(&self) -> bool
     where
         T: Zero,
     {
@@ -846,9 +846,9 @@ mod size2d {
         #[test]
         pub fn test_nan_empty() {
             use std::f32::NAN;
-            assert!(Size2D::new(NAN, 2.0).is_empty_or_negative());
-            assert!(Size2D::new(0.0, NAN).is_empty_or_negative());
-            assert!(Size2D::new(NAN, -2.0).is_empty_or_negative());
+            assert!(Size2D::new(NAN, 2.0).is_empty());
+            assert!(Size2D::new(0.0, NAN).is_empty());
+            assert!(Size2D::new(NAN, -2.0).is_empty());
         }
     }
 }
@@ -1256,8 +1256,8 @@ impl<T: PartialOrd, U> Size3D<T, U> {
         }
     }
 
-    /// Returns `true` if any component of size is zero or negative.
-    pub fn is_empty_or_negative(&self) -> bool
+    /// Returns `true` if any component of size is zero, negative or NaN.
+    pub fn is_empty(&self) -> bool
     where
         T: Zero,
     {
@@ -1688,9 +1688,9 @@ mod size3d {
         #[test]
         pub fn test_nan_empty() {
             use std::f32::NAN;
-            assert!(Size3D::new(NAN, 2.0, 3.0).is_empty_or_negative());
-            assert!(Size3D::new(0.0, NAN, 0.0).is_empty_or_negative());
-            assert!(Size3D::new(1.0, 2.0, NAN).is_empty_or_negative());
+            assert!(Size3D::new(NAN, 2.0, 3.0).is_empty());
+            assert!(Size3D::new(0.0, NAN, 0.0).is_empty());
+            assert!(Size3D::new(1.0, 2.0, NAN).is_empty());
         }
     }
 }
