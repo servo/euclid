@@ -643,8 +643,11 @@ where
         let m32 = jk - ri;
         let m33 = one - (ii + jj);
 
-        Transform3D::row_major(
-            m11, m12, m13, zero, m21, m22, m23, zero, m31, m32, m33, zero, zero, zero, zero, one,
+        Transform3D::new(
+            m11, m12, m13, zero,
+            m21, m22, m23, zero,
+            m31, m32, m33, zero,
+            zero, zero, zero, one,
         )
     }
 
