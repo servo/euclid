@@ -375,7 +375,7 @@ where
     ///
     /// Assuming row vectors, this is equivalent to self * mat
     #[must_use]
-    pub fn post_transform<NewDst>(&self, mat: &Transform2D<T, Dst, NewDst>) -> Transform2D<T, Src, NewDst> {
+    pub fn then<NewDst>(&self, mat: &Transform2D<T, Dst, NewDst>) -> Transform2D<T, Src, NewDst> {
         Transform2D::row_major(
             self.m11 * mat.m11 + self.m12 * mat.m21,
             self.m11 * mat.m12 + self.m12 * mat.m22,
@@ -386,16 +386,6 @@ where
             self.m31 * mat.m11 + self.m32 * mat.m21 + mat.m31,
             self.m31 * mat.m12 + self.m32 * mat.m22 + mat.m32,
         )
-    }
-
-    /// Returns the multiplication of the two matrices such that mat's transformation
-    /// applies before self's transformation.
-    ///
-    /// Assuming row vectors, this is equivalent to mat * self
-    #[inline]
-    #[must_use]
-    pub fn pre_transform<NewSrc>(&self, mat: &Transform2D<T, NewSrc, Src>) -> Transform2D<T, NewSrc, Dst> {
-        mat.post_transform(self)
     }
 }
 
@@ -426,11 +416,11 @@ where
     /// Applies a translation after self's transformation and returns the resulting transform.
     #[inline]
     #[must_use]
-    pub fn post_translate(&self, v: Vector2D<T, Dst>) -> Self
+    pub fn then_translate(&self, v: Vector2D<T, Dst>) -> Self
     where
         T: Copy + Add<Output = T> + Mul<Output = T>,
     {
-        self.post_transform(&Transform2D::translation(v.x, v.y))
+        self.then(&Transform2D::translation(v.x, v.y))
     }
 
     /// Applies a translation before self's transformation and returns the resulting transform.
@@ -440,7 +430,7 @@ where
     where
         T: Copy + Add<Output = T> + Mul<Output = T>,
     {
-        self.pre_transform(&Transform2D::translation(v.x, v.y))
+        Transform2D::translation(v.x, v.y).then(self)
     }
 }
 
@@ -465,15 +455,15 @@ where
     /// Applies a rotation after self's transformation and returns the resulting transform.
     #[inline]
     #[must_use]
-    pub fn post_rotate(&self, theta: Angle<T>) -> Self {
-        self.post_transform(&Transform2D::rotation(theta))
+    pub fn then_rotate(&self, theta: Angle<T>) -> Self {
+        self.then(&Transform2D::rotation(theta))
     }
 
     /// Applies a rotation before self's transformation and returns the resulting transform.
     #[inline]
     #[must_use]
     pub fn pre_rotate(&self, theta: Angle<T>) -> Self {
-        self.pre_transform(&Transform2D::rotation(theta))
+        Transform2D::rotation(theta).then(self)
     }
 }
 
@@ -503,11 +493,11 @@ impl<T, Src, Dst> Transform2D<T, Src, Dst> {
     /// Applies a scale after self's transformation and returns the resulting transform.
     #[inline]
     #[must_use]
-    pub fn post_scale(&self, x: T, y: T) -> Self
+    pub fn then_scale(&self, x: T, y: T) -> Self
     where
         T: Copy + Add<Output = T> + Mul<Output = T> + Zero,
     {
-        self.post_transform(&Transform2D::scale(x, y))
+        self.then(&Transform2D::scale(x, y))
     }
 
     /// Applies a scale before self's transformation and returns the resulting transform.
@@ -687,33 +677,33 @@ mod test {
     pub fn test_translation() {
         let t1 = Mat::translation(1.0, 2.0);
         let t2 = Mat::identity().pre_translate(vec2(1.0, 2.0));
-        let t3 = Mat::identity().post_translate(vec2(1.0, 2.0));
+        let t3 = Mat::identity().then_translate(vec2(1.0, 2.0));
         assert_eq!(t1, t2);
         assert_eq!(t1, t3);
 
         assert_eq!(t1.transform_point(Point2D::new(1.0, 1.0)), Point2D::new(2.0, 3.0));
 
-        assert_eq!(t1.post_transform(&t1), Mat::translation(2.0, 4.0));
+        assert_eq!(t1.then(&t1), Mat::translation(2.0, 4.0));
     }
 
     #[test]
     pub fn test_rotation() {
         let r1 = Mat::rotation(rad(FRAC_PI_2));
         let r2 = Mat::identity().pre_rotate(rad(FRAC_PI_2));
-        let r3 = Mat::identity().post_rotate(rad(FRAC_PI_2));
+        let r3 = Mat::identity().then_rotate(rad(FRAC_PI_2));
         assert_eq!(r1, r2);
         assert_eq!(r1, r3);
 
         assert!(r1.transform_point(Point2D::new(1.0, 2.0)).approx_eq(&Point2D::new(-2.0, 1.0)));
 
-        assert!(r1.post_transform(&r1).approx_eq(&Mat::rotation(rad(FRAC_PI_2*2.0))));
+        assert!(r1.then(&r1).approx_eq(&Mat::rotation(rad(FRAC_PI_2*2.0))));
     }
 
     #[test]
     pub fn test_scale() {
         let s1 = Mat::scale(2.0, 3.0);
         let s2 = Mat::identity().pre_scale(2.0, 3.0);
-        let s3 = Mat::identity().post_scale(2.0, 3.0);
+        let s3 = Mat::identity().then_scale(2.0, 3.0);
         assert_eq!(s1, s2);
         assert_eq!(s1, s3);
 
@@ -722,11 +712,10 @@ mod test {
 
 
     #[test]
-    pub fn test_pre_post_scale() {
-        let m = Mat::rotation(rad(FRAC_PI_2)).post_translate(vec2(6.0, 7.0));
+    pub fn test_pre_then_scale() {
+        let m = Mat::rotation(rad(FRAC_PI_2)).then_translate(vec2(6.0, 7.0));
         let s = Mat::scale(2.0, 3.0);
-        assert_eq!(m.post_transform(&s), m.post_scale(2.0, 3.0));
-        assert_eq!(m.pre_transform(&s), m.pre_scale(2.0, 3.0));
+        assert_eq!(m.then(&s), m.then_scale(2.0, 3.0));
     }
 
     #[test]
@@ -755,14 +744,16 @@ mod test {
     pub fn test_inverse_scale() {
         let m1 = Mat::scale(1.5, 0.3);
         let m2 = m1.inverse().unwrap();
-        assert!(m1.pre_transform(&m2).approx_eq(&Mat::identity()));
+        assert!(m1.then(&m2).approx_eq(&Mat::identity()));
+        assert!(m2.then(&m1).approx_eq(&Mat::identity()));
     }
 
     #[test]
     pub fn test_inverse_translate() {
         let m1 = Mat::translation(-132.0, 0.3);
         let m2 = m1.inverse().unwrap();
-        assert!(m1.pre_transform(&m2).approx_eq(&Mat::identity()));
+        assert!(m1.then(&m2).approx_eq(&Mat::identity()));
+        assert!(m2.then(&m1).approx_eq(&Mat::identity()));
     }
 
     #[test]
@@ -773,7 +764,7 @@ mod test {
 
     #[test]
     pub fn test_pre_post() {
-        let m1 = default::Transform2D::identity().post_scale(1.0, 2.0).post_translate(vec2(1.0, 2.0));
+        let m1 = default::Transform2D::identity().then_scale(1.0, 2.0).then_translate(vec2(1.0, 2.0));
         let m2 = default::Transform2D::identity().pre_translate(vec2(1.0, 2.0)).pre_scale(1.0, 2.0);
         assert!(m1.approx_eq(&m2));
 
@@ -782,13 +773,9 @@ mod test {
 
         let a = Point2D::new(1.0, 1.0);
 
-        assert!(r.post_transform(&t).transform_point(a).approx_eq(&Point2D::new(1.0, 4.0)));
-        assert!(t.post_transform(&r).transform_point(a).approx_eq(&Point2D::new(-4.0, 3.0)));
-        assert!(t.post_transform(&r).transform_point(a).approx_eq(&r.transform_point(t.transform_point(a))));
-
-        assert!(r.pre_transform(&t).transform_point(a).approx_eq(&Point2D::new(-4.0, 3.0)));
-        assert!(t.pre_transform(&r).transform_point(a).approx_eq(&Point2D::new(1.0, 4.0)));
-        assert!(t.pre_transform(&r).transform_point(a).approx_eq(&t.transform_point(r.transform_point(a))));
+        assert!(r.then(&t).transform_point(a).approx_eq(&Point2D::new(1.0, 4.0)));
+        assert!(t.then(&r).transform_point(a).approx_eq(&Point2D::new(-4.0, 3.0)));
+        assert!(t.then(&r).transform_point(a).approx_eq(&r.transform_point(t.transform_point(a))));
     }
 
     #[test]
@@ -802,7 +789,7 @@ mod test {
     pub fn test_is_identity() {
         let m1 = default::Transform2D::identity();
         assert!(m1.is_identity());
-        let m2 = m1.post_translate(vec2(0.1, 0.0));
+        let m2 = m1.then_translate(vec2(0.1, 0.0));
         assert!(!m2.is_identity());
     }
 
