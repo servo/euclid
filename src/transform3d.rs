@@ -28,7 +28,7 @@ use core::cmp::{Eq, PartialEq};
 use core::hash::{Hash};
 use num_traits::NumCast;
 #[cfg(feature = "serde")]
-use serde;
+use serde::{Deserialize, Serialize};
 
 /// A 3d transform stored as a column-major 4 by 4 matrix.
 ///
@@ -54,6 +54,11 @@ use serde;
 ///
 /// The translation terms are m41, m42 and m43.
 #[repr(C)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(
+    feature = "serde",
+    serde(bound(serialize = "T: Serialize", deserialize = "T: Deserialize<'de>"))
+)]
 pub struct Transform3D<T, Src, Dst> {
     pub m11: T, pub m12: T, pub m13: T, pub m14: T,
     pub m21: T, pub m22: T, pub m23: T, pub m24: T,
@@ -86,45 +91,6 @@ impl<T: Clone, Src, Dst> Clone for Transform3D<T, Src, Dst> {
             m44: self.m44.clone(),
             _unit: PhantomData,
         }
-    }
-}
-
-#[cfg(feature = "serde")]
-impl<'de, T, Src, Dst> serde::Deserialize<'de> for Transform3D<T, Src, Dst>
-    where T: serde::Deserialize<'de>
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-        where D: serde::Deserializer<'de>
-    {
-        let (
-            m11, m12, m13, m14,
-            m21, m22, m23, m24,
-            m31, m32, m33, m34,
-            m41, m42, m43, m44,
-        ) = serde::Deserialize::deserialize(deserializer)?;
-        Ok(Transform3D {
-            m11, m12, m13, m14,
-            m21, m22, m23, m24,
-            m31, m32, m33, m34,
-            m41, m42, m43, m44,
-            _unit: PhantomData
-        })
-    }
-}
-
-#[cfg(feature = "serde")]
-impl<T, Src, Dst> serde::Serialize for Transform3D<T, Src, Dst>
-    where T: serde::Serialize
-{
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where S: serde::Serializer
-    {
-        (
-            &self.m11, &self.m12, &self.m13, &self.m14,
-            &self.m21, &self.m22, &self.m23, &self.m24,
-            &self.m31, &self.m32, &self.m33, &self.m34,
-            &self.m41, &self.m42, &self.m43, &self.m44,
-        ).serialize(serializer)
     }
 }
 
