@@ -28,7 +28,7 @@ use num_traits::NumCast;
 #[cfg(feature = "serde")]
 use serde;
 
-/// A 2d transform stored as a 3 by 2 matrix in row-major order in memory.
+/// A 2d transform represented by a column-major 3 by 3 matrix, compressed down to 3 by 2.
 ///
 /// Transforms can be parametrized over the source and destination units, to describe a
 /// transformation from a space to another.
@@ -36,13 +36,24 @@ use serde;
 /// takes a `Point2D<f32, WorldSpace>` and returns a `Point2D<f32, ScreenSpace>`.
 ///
 /// Transforms expose a set of convenience methods for pre- and post-transformations.
-/// A pre-transformation corresponds to adding an operation that is applied before
-/// the rest of the transformation, while a post-transformation adds an operation
-/// that is applied after.
+/// Pre-transformations (`pre_*` methods) correspond to adding an operation that is
+/// applied before the rest of the transformation, while post-transformations (`then_*`
+/// methods) add an operation that is applied after.
 ///
-/// These transforms are for working with _row vectors_, so the matrix math for transforming
-/// a vector is `v * T`. If your library is using column vectors, use `row_major` functions when you
-/// are asked for `column_major` representations and vice versa.
+/// The matrix representation is conceptually equivalent to a 3 by 3 matrix transformation
+/// compressed to 3 by 2 with the components that aren't needed to describe the set of 2d
+/// transformations we are interested in implicitly defined:
+///
+/// ```text
+///  | m11 m12 0 |   |x|   |x'|
+///  | m21 m22 0 | x |y| = |y'|
+///  | m31 m32 1 |   |1|   |w |
+/// ```
+///
+/// When translating Transform2D into general matrix representations, consider that the
+/// representation follows the column-major notation with column vectors.
+///
+/// The translation terms are m31 and m32.
 #[repr(C)]
 pub struct Transform2D<T, Src, Dst> {
     pub m11: T, pub m12: T,
@@ -134,12 +145,22 @@ impl<T, Src, Dst> Hash for Transform2D<T, Src, Dst>
 
 
 impl<T, Src, Dst> Transform2D<T, Src, Dst> {
-    /// Create a transform specifying its matrix elements in row-major order.
+    /// Create a transform specifying its components in using the column-major-column-vector
+    /// matrix notation.
     ///
-    /// Beware: This library is written with the assumption that row vectors
-    /// are being used. If your matrices use column vectors (i.e. transforming a vector
-    /// is `T * v`), then please use `column_major`
-    pub const fn row_major(m11: T, m12: T, m21: T, m22: T, m31: T, m32: T) -> Self {
+    /// For example, the translation terms m31 and m32 are the last two parameters parameters.
+    ///
+    /// ```
+    /// use euclid::default::Transform2D;
+    /// let tx = 1.0;
+    /// let ty = 2.0;
+    /// let translation = Transform2D::new(
+    ///   1.0, 0.0,
+    ///   0.0, 1.0,
+    ///   tx,  ty,
+    /// );
+    /// ```
+    pub const fn new(m11: T, m12: T, m21: T, m22: T, m31: T, m32: T) -> Self {
         Transform2D {
             m11, m12,
             m21, m22,
@@ -147,21 +168,6 @@ impl<T, Src, Dst> Transform2D<T, Src, Dst> {
             _unit: PhantomData,
         }
     }
-
-    /// Create a transform specifying its matrix elements in column-major order.
-    ///
-    /// Beware: This library is written with the assumption that row vectors
-    /// are being used. If your matrices use column vectors (i.e. transforming a vector
-    /// is `T * v`), then please use `row_major`
-    pub const fn column_major(m11: T, m21: T, m31: T, m12: T, m22: T, m32: T) -> Self {
-        Transform2D {
-            m11, m12,
-            m21, m22,
-            m31, m32,
-            _unit: PhantomData,
-        }
-    }
-
 
     /// Returns true is this transform is approximately equal to the other one, using
     /// T's default epsilon value.
@@ -189,14 +195,16 @@ impl<T, Src, Dst> Transform2D<T, Src, Dst> {
 }
 
 impl<T: Copy, Src, Dst> Transform2D<T, Src, Dst> {
-    /// Returns an array containing this transform's terms in row-major order (the order
-    /// in which the transform is actually laid out in memory).
+    /// Returns an array containing this transform's terms.
     ///
-    /// Beware: This library is written with the assumption that row vectors
-    /// are being used. If your matrices use column vectors (i.e. transforming a vector
-    /// is `T * v`), then please use `to_column_major_array`
+    /// The terms are laid out in the same order as they are
+    /// specified in `Transform2D::new`, that is following the
+    /// column-major-column-vector matrix notation.
+    ///
+    /// For example the translation terms are found in the
+    /// last two slots of the array.
     #[inline]
-    pub fn to_row_major_array(&self) -> [T; 6] {
+    pub fn to_array(&self) -> [T; 6] {
         [
             self.m11, self.m12,
             self.m21, self.m22,
@@ -204,29 +212,26 @@ impl<T: Copy, Src, Dst> Transform2D<T, Src, Dst> {
         ]
     }
 
-    /// Returns an array containing this transform's terms in column-major order.
+    /// Returns an array containing this transform's terms transposed.
     ///
-    /// Beware: This library is written with the assumption that row vectors
-    /// are being used. If your matrices use column vectors (i.e. transforming a vector
-    /// is `T * v`), then please use `to_row_major_array`
+    /// The terms are laid out in transposed order from the same order of
+    /// `Transform3D::new` and `Transform3D::to_array`, that is following
+    /// the row-major-column-vector matrix notation.
+    ///
+    /// For example the translation terms are found at indices 2 and 5
+    /// in the array.
     #[inline]
-    pub fn to_column_major_array(&self) -> [T; 6] {
+    pub fn to_array_transposed(&self) -> [T; 6] {
         [
             self.m11, self.m21, self.m31,
             self.m12, self.m22, self.m32
         ]
     }
 
-    /// Returns an array containing this transform's 3 rows in (in row-major order)
-    /// as arrays.
-    ///
-    /// This is a convenience method to interface with other libraries like glium.
-    ///
-    /// Beware: This library is written with the assumption that row vectors
-    /// are being used. If your matrices use column vectors (i.e. transforming a vector
-    /// is `T * v`), this will return column major arrays.
+    /// Equivalent to `to_array` with elements packed two at a time
+    /// in an array of arrays.
     #[inline]
-    pub fn to_row_arrays(&self) -> [[T; 2]; 3] {
+    pub fn to_arrays(&self) -> [[T; 2]; 3] {
         [
             [self.m11, self.m12],
             [self.m21, self.m22],
@@ -234,28 +239,30 @@ impl<T: Copy, Src, Dst> Transform2D<T, Src, Dst> {
         ]
     }
 
-    /// Creates a transform from an array of 6 elements in row-major order.
+    /// Create a transform providing its components via an array
+    /// of 6 elements instead of as individual parameters.
     ///
-    /// Beware: This library is written with the assumption that row vectors
-    /// are being used. If your matrices use column vectors (i.e. transforming a vector
-    /// is `T * v`), please provide a column major array.
+    /// The order of the components corresponds to the
+    /// column-major-column-vector matrix notation (the same order
+    /// as `Transform2D::new`).
     #[inline]
-    pub fn from_row_major_array(array: [T; 6]) -> Self {
-        Self::row_major(
+    pub fn from_array(array: [T; 6]) -> Self {
+        Self::new(
             array[0], array[1],
             array[2], array[3],
             array[4], array[5],
         )
     }
 
-    /// Creates a transform from 3 rows of 2 elements (row-major order).
+    /// Equivalent to `from_array` with elements packed two at a time
+    /// in an array of arrays.
     ///
-    /// Beware: This library is written with the assumption that row vectors
-    /// are being used. If your matrices use column vectors (i.e. transforming a vector
-    /// is `T * v`), please provide a column major array.
+    /// The order of the components corresponds to the
+    /// column-major-column-vector matrix notation (the same order
+    /// as `Transform3D::new`).
     #[inline]
-    pub fn from_row_arrays(array: [[T; 2]; 3]) -> Self {
-        Self::row_major(
+    pub fn from_arrays(array: [[T; 2]; 3]) -> Self {
+        Self::new(
             array[0][0], array[0][1],
             array[1][0], array[1][1],
             array[2][0], array[2][1],
@@ -265,7 +272,7 @@ impl<T: Copy, Src, Dst> Transform2D<T, Src, Dst> {
     /// Drop the units, preserving only the numeric value.
     #[inline]
     pub fn to_untyped(&self) -> Transform2D<T, UnknownUnit, UnknownUnit> {
-        Transform2D::row_major(
+        Transform2D::new(
             self.m11, self.m12,
             self.m21, self.m22,
             self.m31, self.m32
@@ -275,7 +282,7 @@ impl<T: Copy, Src, Dst> Transform2D<T, Src, Dst> {
     /// Tag a unitless value with units.
     #[inline]
     pub fn from_untyped(p: &Transform2D<T, UnknownUnit, UnknownUnit>) -> Self {
-        Transform2D::row_major(
+        Transform2D::new(
             p.m11, p.m12,
             p.m21, p.m22,
             p.m31, p.m32
@@ -285,7 +292,7 @@ impl<T: Copy, Src, Dst> Transform2D<T, Src, Dst> {
     /// Returns the same transform with a different source unit.
     #[inline]
     pub fn with_source<NewSrc>(&self) -> Transform2D<T, NewSrc, Dst> {
-        Transform2D::row_major(
+        Transform2D::new(
             self.m11, self.m12,
             self.m21, self.m22,
             self.m31, self.m32,
@@ -295,7 +302,7 @@ impl<T: Copy, Src, Dst> Transform2D<T, Src, Dst> {
     /// Returns the same transform with a different destination unit.
     #[inline]
     pub fn with_destination<NewDst>(&self) -> Transform2D<T, Src, NewDst> {
-        Transform2D::row_major(
+        Transform2D::new(
             self.m11, self.m12,
             self.m21, self.m22,
             self.m31, self.m32,
@@ -307,7 +314,7 @@ impl<T: Copy, Src, Dst> Transform2D<T, Src, Dst> {
     where
         T: Zero + One,
     {
-        Transform3D::row_major_2d(self.m11, self.m12, self.m21, self.m22, self.m31, self.m32)
+        Transform3D::new_2d(self.m11, self.m12, self.m21, self.m22, self.m31, self.m32)
     }
 }
 
@@ -326,7 +333,7 @@ impl<T: NumCast + Copy, Src, Dst> Transform2D<T, Src, Dst> {
             (Some(m11), Some(m12),
              Some(m21), Some(m22),
              Some(m31), Some(m32)) => {
-                Some(Transform2D::row_major(
+                Some(Transform2D::new(
                     m11, m12,
                     m21, m22,
                     m31, m32
@@ -372,11 +379,9 @@ where
 {
     /// Returns the multiplication of the two matrices such that mat's transformation
     /// applies after self's transformation.
-    ///
-    /// Assuming row vectors, this is equivalent to self * mat
     #[must_use]
     pub fn then<NewDst>(&self, mat: &Transform2D<T, Dst, NewDst>) -> Transform2D<T, Src, NewDst> {
-        Transform2D::row_major(
+        Transform2D::new(
             self.m11 * mat.m11 + self.m12 * mat.m21,
             self.m11 * mat.m12 + self.m12 * mat.m22,
 
@@ -406,7 +411,7 @@ where
         let _0 = || T::zero();
         let _1 = || T::one();
 
-        Self::row_major(
+        Self::new(
             _1(), _0(),
             _0(), _1(),
              x,    y,
@@ -445,7 +450,7 @@ where
         let _0 = Zero::zero();
         let cos = theta.get().cos();
         let sin = theta.get().sin();
-        Transform2D::row_major(
+        Transform2D::new(
             cos, sin,
             _0 - sin, cos,
             _0, _0
@@ -483,7 +488,7 @@ impl<T, Src, Dst> Transform2D<T, Src, Dst> {
     {
         let _0 = || Zero::zero();
 
-        Self::row_major(
+        Self::new(
              x,   _0(),
             _0(),  y,
             _0(), _0(),
@@ -507,7 +512,7 @@ impl<T, Src, Dst> Transform2D<T, Src, Dst> {
     where
         T: Copy + Mul<Output = T>,
     {
-        Transform2D::row_major(
+        Transform2D::new(
             self.m11 * x, self.m12 * x,
             self.m21 * y, self.m22 * y,
             self.m31,     self.m32
@@ -521,8 +526,6 @@ where
     T: Copy + Add<Output = T> + Mul<Output = T>,
 {
     /// Returns the given point transformed by this transform.
-    ///
-    /// Assuming row vectors, this is equivalent to `p * self`
     #[inline]
     #[must_use]
     pub fn transform_point(&self, point: Point2D<T, Src>) -> Point2D<T, Dst> {
@@ -533,8 +536,6 @@ where
     }
 
     /// Returns the given vector transformed by this matrix.
-    ///
-    /// Assuming row vectors, this is equivalent to `v * self`
     #[inline]
     #[must_use]
     pub fn transform_vector(&self, vec: Vector2D<T, Src>) -> Vector2D<T, Dst> {
@@ -590,7 +591,7 @@ where
         }
 
         let inv_det = _1 / det;
-        Some(Transform2D::row_major(
+        Some(Transform2D::new(
             inv_det * self.m22,
             inv_det * (_0 - self.m12),
             inv_det * (_0 - self.m21),
@@ -631,7 +632,7 @@ where T: Copy + fmt::Debug +
         if self.is_identity() {
             write!(f, "[I]")
         } else {
-            self.to_row_major_array().fmt(f)
+            self.to_array().fmt(f)
         }
     }
 }
@@ -716,21 +717,6 @@ mod test {
         let m = Mat::rotation(rad(FRAC_PI_2)).then_translate(vec2(6.0, 7.0));
         let s = Mat::scale(2.0, 3.0);
         assert_eq!(m.then(&s), m.then_scale(2.0, 3.0));
-    }
-
-    #[test]
-    fn test_column_major() {
-        assert_eq!(
-            Mat::row_major(
-                1.0,  2.0,
-                3.0,  4.0,
-                5.0,  6.0
-            ),
-            Mat::column_major(
-                1.0,  3.0,  5.0,
-                2.0,  4.0,  6.0,
-            )
-        );
     }
 
     #[test]
