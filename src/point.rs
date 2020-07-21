@@ -555,12 +555,12 @@ impl<T: Copy + Sub<T, Output = T>, U> SubAssign<Vector2D<T, U>> for Point2D<T, U
     }
 }
 
-impl<T: Clone + Mul, U> Mul<T> for Point2D<T, U> {
+impl<T: Copy + Mul, U> Mul<T> for Point2D<T, U> {
     type Output = Point2D<T::Output, U>;
 
     #[inline]
     fn mul(self, scale: T) -> Self::Output {
-        point2(self.x * scale.clone(), self.y * scale)
+        point2(self.x * scale, self.y * scale)
     }
 }
 
@@ -571,29 +571,29 @@ impl<T: Copy + Mul<T, Output = T>, U> MulAssign<T> for Point2D<T, U> {
     }
 }
 
-impl<T: Clone + Mul, U1, U2> Mul<Scale<T, U1, U2>> for Point2D<T, U1> {
+impl<T: Copy + Mul, U1, U2> Mul<Scale<T, U1, U2>> for Point2D<T, U1> {
     type Output = Point2D<T::Output, U2>;
 
     #[inline]
     fn mul(self, scale: Scale<T, U1, U2>) -> Self::Output {
-        point2(self.x * scale.0.clone(), self.y * scale.0)
+        point2(self.x * scale.0, self.y * scale.0)
     }
 }
 
-impl<T: Clone + MulAssign, U> MulAssign<Scale<T, U, U>> for Point2D<T, U> {
+impl<T: Copy + MulAssign, U> MulAssign<Scale<T, U, U>> for Point2D<T, U> {
     #[inline]
     fn mul_assign(&mut self, scale: Scale<T, U, U>) {
-        self.x *= scale.0.clone();
+        self.x *= scale.0;
         self.y *= scale.0;
     }
 }
 
-impl<T: Clone + Div, U> Div<T> for Point2D<T, U> {
+impl<T: Copy + Div, U> Div<T> for Point2D<T, U> {
     type Output = Point2D<T::Output, U>;
 
     #[inline]
     fn div(self, scale: T) -> Self::Output {
-        point2(self.x / scale.clone(), self.y / scale)
+        point2(self.x / scale, self.y / scale)
     }
 }
 
@@ -604,19 +604,19 @@ impl<T: Copy + Div<T, Output = T>, U> DivAssign<T> for Point2D<T, U> {
     }
 }
 
-impl<T: Clone + Div, U1, U2> Div<Scale<T, U1, U2>> for Point2D<T, U2> {
+impl<T: Copy + Div, U1, U2> Div<Scale<T, U1, U2>> for Point2D<T, U2> {
     type Output = Point2D<T::Output, U1>;
 
     #[inline]
     fn div(self, scale: Scale<T, U1, U2>) -> Self::Output {
-        point2(self.x / scale.0.clone(), self.y / scale.0)
+        point2(self.x / scale.0, self.y / scale.0)
     }
 }
 
-impl<T: Clone + DivAssign, U> DivAssign<Scale<T, U, U>> for Point2D<T, U> {
+impl<T: Copy + DivAssign, U> DivAssign<Scale<T, U, U>> for Point2D<T, U> {
     #[inline]
     fn div_assign(&mut self, scale: Scale<T, U, U>) {
-        self.x /= scale.0.clone();
+        self.x /= scale.0;
         self.y /= scale.0;
     }
 }
@@ -1267,84 +1267,84 @@ impl<T: Copy + Sub<T, Output = T>, U> SubAssign<Vector3D<T, U>> for Point3D<T, U
     }
 }
 
-impl<T: Clone + Mul, U> Mul<T> for Point3D<T, U> {
+impl<T: Copy + Mul, U> Mul<T> for Point3D<T, U> {
     type Output = Point3D<T::Output, U>;
 
     #[inline]
     fn mul(self, scale: T) -> Self::Output {
         point3(
-            self.x * scale.clone(),
-            self.y * scale.clone(),
+            self.x * scale,
+            self.y * scale,
             self.z * scale,
         )
     }
 }
 
-impl<T: Clone + MulAssign, U> MulAssign<T> for Point3D<T, U> {
+impl<T: Copy + MulAssign, U> MulAssign<T> for Point3D<T, U> {
     #[inline]
     fn mul_assign(&mut self, scale: T) {
-        self.x *= scale.clone();
-        self.y *= scale.clone();
+        self.x *= scale;
+        self.y *= scale;
         self.z *= scale;
     }
 }
 
-impl<T: Clone + Mul, U1, U2> Mul<Scale<T, U1, U2>> for Point3D<T, U1> {
+impl<T: Copy + Mul, U1, U2> Mul<Scale<T, U1, U2>> for Point3D<T, U1> {
     type Output = Point3D<T::Output, U2>;
 
     #[inline]
     fn mul(self, scale: Scale<T, U1, U2>) -> Self::Output {
         point3(
-            self.x * scale.0.clone(),
-            self.y * scale.0.clone(),
+            self.x * scale.0,
+            self.y * scale.0,
             self.z * scale.0,
         )
     }
 }
 
-impl<T: Clone + MulAssign, U> MulAssign<Scale<T, U, U>> for Point3D<T, U> {
+impl<T: Copy + MulAssign, U> MulAssign<Scale<T, U, U>> for Point3D<T, U> {
     #[inline]
     fn mul_assign(&mut self, scale: Scale<T, U, U>) {
         *self *= scale.0;
     }
 }
 
-impl<T: Clone + Div, U> Div<T> for Point3D<T, U> {
+impl<T: Copy + Div, U> Div<T> for Point3D<T, U> {
     type Output = Point3D<T::Output, U>;
 
     #[inline]
     fn div(self, scale: T) -> Self::Output {
         point3(
-            self.x / scale.clone(),
-            self.y / scale.clone(),
+            self.x / scale,
+            self.y / scale,
             self.z / scale,
         )
     }
 }
 
-impl<T: Clone + DivAssign, U> DivAssign<T> for Point3D<T, U> {
+impl<T: Copy + DivAssign, U> DivAssign<T> for Point3D<T, U> {
     #[inline]
     fn div_assign(&mut self, scale: T) {
-        self.x /= scale.clone();
-        self.y /= scale.clone();
+        self.x /= scale;
+        self.y /= scale;
         self.z /= scale;
     }
 }
 
-impl<T: Clone + Div, U1, U2> Div<Scale<T, U1, U2>> for Point3D<T, U2> {
+impl<T: Copy + Div, U1, U2> Div<Scale<T, U1, U2>> for Point3D<T, U2> {
     type Output = Point3D<T::Output, U1>;
 
     #[inline]
     fn div(self, scale: Scale<T, U1, U2>) -> Self::Output {
         point3(
-            self.x / scale.0.clone(),
-            self.y / scale.0.clone(),
+            self.x / scale.0,
+            self.y / scale.0,
             self.z / scale.0,
         )
     }
 }
 
-impl<T: Clone + DivAssign, U> DivAssign<Scale<T, U, U>> for Point3D<T, U> {
+impl<T: Copy + DivAssign, U> DivAssign<Scale<T, U, U>> for Point3D<T, U> {
     #[inline]
     fn div_assign(&mut self, scale: Scale<T, U, U>) {
         *self /= scale.0;

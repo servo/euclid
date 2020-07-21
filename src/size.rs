@@ -523,66 +523,66 @@ impl<T: SubAssign, U> SubAssign for Size2D<T, U> {
     }
 }
 
-impl<T: Clone + Mul, U> Mul<T> for Size2D<T, U> {
+impl<T: Copy + Mul, U> Mul<T> for Size2D<T, U> {
     type Output = Size2D<T::Output, U>;
 
     #[inline]
     fn mul(self, scale: T) -> Self::Output {
-        Size2D::new(self.width * scale.clone(), self.height * scale)
+        Size2D::new(self.width * scale, self.height * scale)
     }
 }
 
-impl<T: Clone + MulAssign, U> MulAssign<T> for Size2D<T, U> {
+impl<T: Copy + MulAssign, U> MulAssign<T> for Size2D<T, U> {
     #[inline]
     fn mul_assign(&mut self, other: T) {
-        self.width *= other.clone();
+        self.width *= other;
         self.height *= other;
     }
 }
 
-impl<T: Clone + Mul, U1, U2> Mul<Scale<T, U1, U2>> for Size2D<T, U1> {
+impl<T: Copy + Mul, U1, U2> Mul<Scale<T, U1, U2>> for Size2D<T, U1> {
     type Output = Size2D<T::Output, U2>;
 
     #[inline]
     fn mul(self, scale: Scale<T, U1, U2>) -> Self::Output {
-        Size2D::new(self.width * scale.0.clone(), self.height * scale.0)
+        Size2D::new(self.width * scale.0, self.height * scale.0)
     }
 }
 
-impl<T: Clone + MulAssign, U> MulAssign<Scale<T, U, U>> for Size2D<T, U> {
+impl<T: Copy + MulAssign, U> MulAssign<Scale<T, U, U>> for Size2D<T, U> {
     #[inline]
     fn mul_assign(&mut self, other: Scale<T, U, U>) {
         *self *= other.0;
     }
 }
 
-impl<T: Clone + Div, U> Div<T> for Size2D<T, U> {
+impl<T: Copy + Div, U> Div<T> for Size2D<T, U> {
     type Output = Size2D<T::Output, U>;
 
     #[inline]
     fn div(self, scale: T) -> Self::Output {
-        Size2D::new(self.width / scale.clone(), self.height / scale)
+        Size2D::new(self.width / scale, self.height / scale)
     }
 }
 
-impl<T: Clone + DivAssign, U> DivAssign<T> for Size2D<T, U> {
+impl<T: Copy + DivAssign, U> DivAssign<T> for Size2D<T, U> {
     #[inline]
     fn div_assign(&mut self, other: T) {
-        self.width /= other.clone();
+        self.width /= other;
         self.height /= other;
     }
 }
 
-impl<T: Clone + Div, U1, U2> Div<Scale<T, U1, U2>> for Size2D<T, U2> {
+impl<T: Copy + Div, U1, U2> Div<Scale<T, U1, U2>> for Size2D<T, U2> {
     type Output = Size2D<T::Output, U1>;
 
     #[inline]
     fn div(self, scale: Scale<T, U1, U2>) -> Self::Output {
-        Size2D::new(self.width / scale.0.clone(), self.height / scale.0)
+        Size2D::new(self.width / scale.0, self.height / scale.0)
     }
 }
 
-impl<T: Clone + DivAssign, U> DivAssign<Scale<T, U, U>> for Size2D<T, U> {
+impl<T: Copy + DivAssign, U> DivAssign<Scale<T, U, U>> for Size2D<T, U> {
     #[inline]
     fn div_assign(&mut self, other: Scale<T, U, U>) {
         *self /= other.0;
@@ -1370,84 +1370,84 @@ impl<T: SubAssign, U> SubAssign for Size3D<T, U> {
     }
 }
 
-impl<T: Clone + Mul, U> Mul<T> for Size3D<T, U> {
+impl<T: Copy + Mul, U> Mul<T> for Size3D<T, U> {
     type Output = Size3D<T::Output, U>;
 
     #[inline]
     fn mul(self, scale: T) -> Self::Output {
         Size3D::new(
-            self.width * scale.clone(),
-            self.height * scale.clone(),
+            self.width * scale,
+            self.height * scale,
             self.depth * scale,
         )
     }
 }
 
-impl<T: Clone + MulAssign, U> MulAssign<T> for Size3D<T, U> {
+impl<T: Copy + MulAssign, U> MulAssign<T> for Size3D<T, U> {
     #[inline]
     fn mul_assign(&mut self, other: T) {
-        self.width *= other.clone();
-        self.height *= other.clone();
+        self.width *= other;
+        self.height *= other;
         self.depth *= other;
     }
 }
 
-impl<T: Clone + Mul, U1, U2> Mul<Scale<T, U1, U2>> for Size3D<T, U1> {
+impl<T: Copy + Mul, U1, U2> Mul<Scale<T, U1, U2>> for Size3D<T, U1> {
     type Output = Size3D<T::Output, U2>;
 
     #[inline]
     fn mul(self, scale: Scale<T, U1, U2>) -> Self::Output {
         Size3D::new(
-            self.width * scale.0.clone(),
-            self.height * scale.0.clone(),
+            self.width * scale.0,
+            self.height * scale.0,
             self.depth * scale.0,
         )
     }
 }
 
-impl<T: Clone + MulAssign, U> MulAssign<Scale<T, U, U>> for Size3D<T, U> {
+impl<T: Copy + MulAssign, U> MulAssign<Scale<T, U, U>> for Size3D<T, U> {
     #[inline]
     fn mul_assign(&mut self, other: Scale<T, U, U>) {
         *self *= other.0;
     }
 }
 
-impl<T: Clone + Div, U> Div<T> for Size3D<T, U> {
+impl<T: Copy + Div, U> Div<T> for Size3D<T, U> {
     type Output = Size3D<T::Output, U>;
 
     #[inline]
     fn div(self, scale: T) -> Self::Output {
         Size3D::new(
-            self.width / scale.clone(),
-            self.height / scale.clone(),
+            self.width / scale,
+            self.height / scale,
             self.depth / scale,
         )
     }
 }
 
-impl<T: Clone + DivAssign, U> DivAssign<T> for Size3D<T, U> {
+impl<T: Copy + DivAssign, U> DivAssign<T> for Size3D<T, U> {
     #[inline]
     fn div_assign(&mut self, other: T) {
-        self.width /= other.clone();
-        self.height /= other.clone();
+        self.width /= other;
+        self.height /= other;
         self.depth /= other;
     }
 }
 
-impl<T: Clone + Div, U1, U2> Div<Scale<T, U1, U2>> for Size3D<T, U2> {
+impl<T: Copy + Div, U1, U2> Div<Scale<T, U1, U2>> for Size3D<T, U2> {
     type Output = Size3D<T::Output, U1>;
 
     #[inline]
     fn div(self, scale: Scale<T, U1, U2>) -> Self::Output {
         Size3D::new(
-            self.width / scale.0.clone(),
-            self.height / scale.0.clone(),
+            self.width / scale.0,
+            self.height / scale.0,
             self.depth / scale.0,
         )
     }
 }
 
-impl<T: Clone + DivAssign, U> DivAssign<Scale<T, U, U>> for Size3D<T, U> {
+impl<T: Copy + DivAssign, U> DivAssign<Scale<T, U, U>> for Size3D<T, U> {
     #[inline]
     fn div_assign(&mut self, other: Scale<T, U, U>) {
         *self /= other.0;

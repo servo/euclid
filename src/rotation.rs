@@ -158,11 +158,11 @@ impl<T: Copy, Src, Dst> Rotation2D<T, Src, Dst> {
 
 impl<T, Src, Dst> Rotation2D<T, Src, Dst>
 where
-    T: Clone,
+    T: Copy,
 {
     /// Returns self.angle as a strongly typed `Angle<T>`.
     pub fn get_angle(&self) -> Angle<T> {
-        Angle::radians(self.angle.clone())
+        Angle::radians(self.angle)
     }
 }
 
