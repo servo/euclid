@@ -365,24 +365,24 @@ where
     }
 }
 
-impl<T: Clone + Mul, U> Mul<T> for Box3D<T, U> {
+impl<T: Copy + Mul, U> Mul<T> for Box3D<T, U> {
     type Output = Box3D<T::Output, U>;
 
     #[inline]
     fn mul(self, scale: T) -> Self::Output {
-        Box3D::new(self.min * scale.clone(), self.max * scale)
+        Box3D::new(self.min * scale, self.max * scale)
     }
 }
 
-impl<T: Clone + MulAssign, U> MulAssign<T> for Box3D<T, U> {
+impl<T: Copy + MulAssign, U> MulAssign<T> for Box3D<T, U> {
     #[inline]
     fn mul_assign(&mut self, scale: T) {
-        self.min *= scale.clone();
+        self.min *= scale;
         self.max *= scale;
     }
 }
 
-impl<T: Clone + Div, U> Div<T> for Box3D<T, U> {
+impl<T: Copy + Div, U> Div<T> for Box3D<T, U> {
     type Output = Box3D<T::Output, U>;
 
     #[inline]
@@ -391,15 +391,15 @@ impl<T: Clone + Div, U> Div<T> for Box3D<T, U> {
     }
 }
 
-impl<T: Clone + DivAssign, U> DivAssign<T> for Box3D<T, U> {
+impl<T: Copy + DivAssign, U> DivAssign<T> for Box3D<T, U> {
     #[inline]
     fn div_assign(&mut self, scale: T) {
-        self.min /= scale.clone();
+        self.min /= scale;
         self.max /= scale;
     }
 }
 
-impl<T: Clone + Mul, U1, U2> Mul<Scale<T, U1, U2>> for Box3D<T, U1> {
+impl<T: Copy + Mul, U1, U2> Mul<Scale<T, U1, U2>> for Box3D<T, U1> {
     type Output = Box3D<T::Output, U2>;
 
     #[inline]
@@ -408,7 +408,7 @@ impl<T: Clone + Mul, U1, U2> Mul<Scale<T, U1, U2>> for Box3D<T, U1> {
     }
 }
 
-impl<T: Clone + MulAssign, U> MulAssign<Scale<T, U, U>> for Box3D<T, U> {
+impl<T: Copy + MulAssign, U> MulAssign<Scale<T, U, U>> for Box3D<T, U> {
     #[inline]
     fn mul_assign(&mut self, scale: Scale<T, U, U>) {
         self.min *= scale.clone();
@@ -416,7 +416,7 @@ impl<T: Clone + MulAssign, U> MulAssign<Scale<T, U, U>> for Box3D<T, U> {
     }
 }
 
-impl<T: Clone + Div, U1, U2> Div<Scale<T, U1, U2>> for Box3D<T, U2> {
+impl<T: Copy + Div, U1, U2> Div<Scale<T, U1, U2>> for Box3D<T, U2> {
     type Output = Box3D<T::Output, U1>;
 
     #[inline]
@@ -425,7 +425,7 @@ impl<T: Clone + Div, U1, U2> Div<Scale<T, U1, U2>> for Box3D<T, U2> {
     }
 }
 
-impl<T: Clone + DivAssign, U> DivAssign<Scale<T, U, U>> for Box3D<T, U> {
+impl<T: Copy + DivAssign, U> DivAssign<Scale<T, U, U>> for Box3D<T, U> {
     #[inline]
     fn div_assign(&mut self, scale: Scale<T, U, U>) {
         self.min /= scale.clone();

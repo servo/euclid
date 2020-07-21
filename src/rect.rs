@@ -402,23 +402,23 @@ impl<T: Copy + Zero + PartialOrd, U> Rect<T, U> {
     }
 }
 
-impl<T: Clone + Mul, U> Mul<T> for Rect<T, U> {
+impl<T: Copy + Mul, U> Mul<T> for Rect<T, U> {
     type Output = Rect<T::Output, U>;
 
     #[inline]
     fn mul(self, scale: T) -> Self::Output {
-        Rect::new(self.origin * scale.clone(), self.size * scale)
+        Rect::new(self.origin * scale, self.size * scale)
     }
 }
 
-impl<T: Clone + MulAssign, U> MulAssign<T> for Rect<T, U> {
+impl<T: Copy + MulAssign, U> MulAssign<T> for Rect<T, U> {
     #[inline]
     fn mul_assign(&mut self, scale: T) {
         *self *= Scale::new(scale);
     }
 }
 
-impl<T: Clone + Div, U> Div<T> for Rect<T, U> {
+impl<T: Copy + Div, U> Div<T> for Rect<T, U> {
     type Output = Rect<T::Output, U>;
 
     #[inline]
@@ -427,14 +427,14 @@ impl<T: Clone + Div, U> Div<T> for Rect<T, U> {
     }
 }
 
-impl<T: Clone + DivAssign, U> DivAssign<T> for Rect<T, U> {
+impl<T: Copy + DivAssign, U> DivAssign<T> for Rect<T, U> {
     #[inline]
     fn div_assign(&mut self, scale: T) {
         *self /= Scale::new(scale);
     }
 }
 
-impl<T: Clone + Mul, U1, U2> Mul<Scale<T, U1, U2>> for Rect<T, U1> {
+impl<T: Copy + Mul, U1, U2> Mul<Scale<T, U1, U2>> for Rect<T, U1> {
     type Output = Rect<T::Output, U2>;
 
     #[inline]
@@ -443,7 +443,7 @@ impl<T: Clone + Mul, U1, U2> Mul<Scale<T, U1, U2>> for Rect<T, U1> {
     }
 }
 
-impl<T: Clone + MulAssign, U> MulAssign<Scale<T, U, U>> for Rect<T, U> {
+impl<T: Copy + MulAssign, U> MulAssign<Scale<T, U, U>> for Rect<T, U> {
     #[inline]
     fn mul_assign(&mut self, scale: Scale<T, U, U>) {
         self.origin *= scale.clone();
@@ -451,7 +451,7 @@ impl<T: Clone + MulAssign, U> MulAssign<Scale<T, U, U>> for Rect<T, U> {
     }
 }
 
-impl<T: Clone + Div, U1, U2> Div<Scale<T, U1, U2>> for Rect<T, U2> {
+impl<T: Copy + Div, U1, U2> Div<Scale<T, U1, U2>> for Rect<T, U2> {
     type Output = Rect<T::Output, U1>;
 
     #[inline]
@@ -460,7 +460,7 @@ impl<T: Clone + Div, U1, U2> Div<Scale<T, U1, U2>> for Rect<T, U2> {
     }
 }
 
-impl<T: Clone + DivAssign, U> DivAssign<Scale<T, U, U>> for Rect<T, U> {
+impl<T: Copy + DivAssign, U> DivAssign<Scale<T, U, U>> for Rect<T, U> {
     #[inline]
     fn div_assign(&mut self, scale: Scale<T, U, U>) {
         self.origin /= scale.clone();

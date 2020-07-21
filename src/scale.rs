@@ -72,9 +72,9 @@ impl<T, Src, Dst> Scale<T, Src, Dst> {
     #[inline]
     pub fn transform_point(self, point: Point2D<T, Src>) -> Point2D<T::Output, Dst>
     where
-        T: Clone + Mul,
+        T: Copy + Mul,
     {
-        Point2D::new(point.x * self.0.clone(), point.y * self.0)
+        Point2D::new(point.x * self.0, point.y * self.0)
     }
 
     /// Returns the given vector transformed by this scale.
@@ -93,9 +93,9 @@ impl<T, Src, Dst> Scale<T, Src, Dst> {
     #[inline]
     pub fn transform_vector(self, vec: Vector2D<T, Src>) -> Vector2D<T::Output, Dst>
     where
-        T: Clone + Mul,
+        T: Copy + Mul,
     {
-        Vector2D::new(vec.x * self.0.clone(), vec.y * self.0)
+        Vector2D::new(vec.x * self.0, vec.y * self.0)
     }
 
     /// Returns the given vector transformed by this scale.
@@ -114,9 +114,9 @@ impl<T, Src, Dst> Scale<T, Src, Dst> {
     #[inline]
     pub fn transform_size(self, size: Size2D<T, Src>) -> Size2D<T::Output, Dst>
     where
-        T: Clone + Mul,
+        T: Copy + Mul,
     {
-        Size2D::new(size.width * self.0.clone(), size.height * self.0)
+        Size2D::new(size.width * self.0, size.height * self.0)
     }
 
     /// Returns the given rect transformed by this scale.
