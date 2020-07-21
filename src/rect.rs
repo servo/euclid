@@ -384,7 +384,7 @@ impl<T: Copy + Mul<T, Output = T>, U> Rect<T, U> {
     }
 }
 
-impl<T: Zero + PartialOrd, U> Rect<T, U> {
+impl<T: Copy + Zero + PartialOrd, U> Rect<T, U> {
     #[inline]
     pub fn is_empty(&self) -> bool {
         self.size.is_empty()
