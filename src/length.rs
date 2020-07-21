@@ -83,15 +83,15 @@ impl<T, U> Length<T, U> {
 }
 
 impl<T: Clone, U> Length<T, U> {
-    /// Unpack the underlying value from the wrapper, cloning it.
-    pub fn get(&self) -> T {
-        self.0.clone()
+    /// Unpack the underlying value from the wrapper.
+    pub fn get(self) -> T {
+        self.0
     }
 
     /// Cast the unit
     #[inline]
-    pub fn cast_unit<V>(&self) -> Length<T, V> {
-        Length::new(self.0.clone())
+    pub fn cast_unit<V>(self) -> Length<T, V> {
+        Length::new(self.0)
     }
 
     /// Linearly interpolate between this length and another length.
@@ -111,7 +111,7 @@ impl<T: Clone, U> Length<T, U> {
     /// assert_eq!(from.lerp(to,  2.0), Length::new(16.0));
     /// ```
     #[inline]
-    pub fn lerp(&self, other: Self, t: T) -> Self
+    pub fn lerp(self, other: Self, t: T) -> Self
     where
         T: One + Sub<Output = T> + Mul<Output = T> + Add<Output = T>,
     {
@@ -137,13 +137,13 @@ impl<T: PartialOrd, U> Length<T, U> {
 impl<T: NumCast + Clone, U> Length<T, U> {
     /// Cast from one numeric representation to another, preserving the units.
     #[inline]
-    pub fn cast<NewT: NumCast>(&self) -> Length<NewT, U> {
+    pub fn cast<NewT: NumCast>(self) -> Length<NewT, U> {
         self.try_cast().unwrap()
     }
 
     /// Fallible cast from one numeric representation to another, preserving the units.
-    pub fn try_cast<NewT: NumCast>(&self) -> Option<Length<NewT, U>> {
-        NumCast::from(self.get()).map(Length::new)
+    pub fn try_cast<NewT: NumCast>(self) -> Option<Length<NewT, U>> {
+        NumCast::from(self.0).map(Length::new)
     }
 }
 
@@ -365,19 +365,6 @@ mod tests {
 
         assert_eq!(one_foot.get(), 12.0);
         assert_eq!(variable_length.get(), 24.0);
-    }
-
-    #[test]
-    fn test_get_clones_length_value() {
-        // Calling get returns a clone of the Length's value.
-        // To test this, we need something clone-able - hence a vector.
-        let mut length: Length<Vec<i32>, Inch> = Length::new(vec![1, 2, 3]);
-
-        let value = length.get();
-        length.0.push(4);
-
-        assert_eq!(value, vec![1, 2, 3]);
-        assert_eq!(length.get(), vec![1, 2, 3, 4]);
     }
 
     #[test]

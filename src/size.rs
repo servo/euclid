@@ -154,31 +154,31 @@ impl<T, U> Size2D<T, U> {
 impl<T: Copy, U> Size2D<T, U> {
     /// Return this size as an array of two elements (width, then height).
     #[inline]
-    pub fn to_array(&self) -> [T; 2] {
+    pub fn to_array(self) -> [T; 2] {
         [self.width, self.height]
     }
 
     /// Return this size as a tuple of two elements (width, then height).
     #[inline]
-    pub fn to_tuple(&self) -> (T, T) {
+    pub fn to_tuple(self) -> (T, T) {
         (self.width, self.height)
     }
 
     /// Return this size as a vector with width and height.
     #[inline]
-    pub fn to_vector(&self) -> Vector2D<T, U> {
+    pub fn to_vector(self) -> Vector2D<T, U> {
         vec2(self.width, self.height)
     }
 
     /// Drop the units, preserving only the numeric value.
     #[inline]
-    pub fn to_untyped(&self) -> Size2D<T, UnknownUnit> {
+    pub fn to_untyped(self) -> Size2D<T, UnknownUnit> {
         self.cast_unit()
     }
 
     /// Cast the unit
     #[inline]
-    pub fn cast_unit<V>(&self) -> Size2D<T, V> {
+    pub fn cast_unit<V>(self) -> Size2D<T, V> {
         Size2D::new(self.width, self.height)
     }
 
@@ -194,7 +194,7 @@ impl<T: Copy, U> Size2D<T, U> {
     /// ```
     #[inline]
     #[must_use]
-    pub fn round(&self) -> Self
+    pub fn round(self) -> Self
     where
         T: Round,
     {
@@ -213,7 +213,7 @@ impl<T: Copy, U> Size2D<T, U> {
     /// ```
     #[inline]
     #[must_use]
-    pub fn ceil(&self) -> Self
+    pub fn ceil(self) -> Self
     where
         T: Ceil,
     {
@@ -232,7 +232,7 @@ impl<T: Copy, U> Size2D<T, U> {
     /// ```
     #[inline]
     #[must_use]
-    pub fn floor(&self) -> Self
+    pub fn floor(self) -> Self
     where
         T: Floor,
     {
@@ -240,7 +240,7 @@ impl<T: Copy, U> Size2D<T, U> {
     }
 
     /// Returns result of multiplication of both components
-    pub fn area(&self) -> T::Output
+    pub fn area(self) -> T::Output
     where
         T: Mul,
     {
@@ -265,12 +265,12 @@ impl<T: Copy, U> Size2D<T, U> {
     /// assert_eq!(from.lerp(to,  2.0), size2(16.0, -18.0));
     /// ```
     #[inline]
-    pub fn lerp(&self, other: Self, t: T) -> Self
+    pub fn lerp(self, other: Self, t: T) -> Self
     where
         T: One + Sub<Output = T> + Mul<Output = T> + Add<Output = T>,
     {
         let one_t = T::one() - t;
-        (*self) * one_t + other * t
+        self * one_t + other * t
     }
 }
 
@@ -281,7 +281,7 @@ impl<T: NumCast + Copy, U> Size2D<T, U> {
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
     #[inline]
-    pub fn cast<NewT: NumCast>(&self) -> Size2D<NewT, U> {
+    pub fn cast<NewT: NumCast>(self) -> Size2D<NewT, U> {
         self.try_cast().unwrap()
     }
 
@@ -290,7 +290,7 @@ impl<T: NumCast + Copy, U> Size2D<T, U> {
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
-    pub fn try_cast<NewT: NumCast>(&self) -> Option<Size2D<NewT, U>> {
+    pub fn try_cast<NewT: NumCast>(self) -> Option<Size2D<NewT, U>> {
         match (NumCast::from(self.width), NumCast::from(self.height)) {
             (Some(w), Some(h)) => Some(Size2D::new(w, h)),
             _ => None,
@@ -301,13 +301,13 @@ impl<T: NumCast + Copy, U> Size2D<T, U> {
 
     /// Cast into an `f32` size.
     #[inline]
-    pub fn to_f32(&self) -> Size2D<f32, U> {
+    pub fn to_f32(self) -> Size2D<f32, U> {
         self.cast()
     }
 
     /// Cast into an `f64` size.
     #[inline]
-    pub fn to_f64(&self) -> Size2D<f64, U> {
+    pub fn to_f64(self) -> Size2D<f64, U> {
         self.cast()
     }
 
@@ -317,7 +317,7 @@ impl<T: NumCast + Copy, U> Size2D<T, U> {
     /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
     /// the desired conversion behavior.
     #[inline]
-    pub fn to_usize(&self) -> Size2D<usize, U> {
+    pub fn to_usize(self) -> Size2D<usize, U> {
         self.cast()
     }
 
@@ -327,7 +327,7 @@ impl<T: NumCast + Copy, U> Size2D<T, U> {
     /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
     /// the desired conversion behavior.
     #[inline]
-    pub fn to_u32(&self) -> Size2D<u32, U> {
+    pub fn to_u32(self) -> Size2D<u32, U> {
         self.cast()
     }
 
@@ -337,7 +337,7 @@ impl<T: NumCast + Copy, U> Size2D<T, U> {
     /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
     /// the desired conversion behavior.
     #[inline]
-    pub fn to_u64(&self) -> Size2D<u64, U> {
+    pub fn to_u64(self) -> Size2D<u64, U> {
         self.cast()
     }
 
@@ -347,7 +347,7 @@ impl<T: NumCast + Copy, U> Size2D<T, U> {
     /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
     /// the desired conversion behavior.
     #[inline]
-    pub fn to_i32(&self) -> Size2D<i32, U> {
+    pub fn to_i32(self) -> Size2D<i32, U> {
         self.cast()
     }
 
@@ -357,7 +357,7 @@ impl<T: NumCast + Copy, U> Size2D<T, U> {
     /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
     /// the desired conversion behavior.
     #[inline]
-    pub fn to_i64(&self) -> Size2D<i64, U> {
+    pub fn to_i64(self) -> Size2D<i64, U> {
         self.cast()
     }
 }
@@ -368,12 +368,12 @@ impl<T: Signed, U> Size2D<T, U> {
     /// For `f32` and `f64`, `NaN` will be returned for component if the component is `NaN`.
     ///
     /// For signed integers, `::MIN` will be returned for component if the component is `::MIN`.
-    pub fn abs(&self) -> Self {
+    pub fn abs(self) -> Self {
         size2(self.width.abs(), self.height.abs())
     }
 
     /// Returns `true` if both components is positive and `false` any component is zero or negative.
-    pub fn is_positive(&self) -> bool {
+    pub fn is_positive(self) -> bool {
         self.width.is_positive() && self.height.is_positive()
     }
 }
@@ -396,7 +396,7 @@ impl<T: PartialOrd, U> Size2D<T, U> {
     ///
     /// Shortcut for `self.max(start).min(end)`.
     #[inline]
-    pub fn clamp(&self, start: Self, end: Self) -> Self
+    pub fn clamp(self, start: Self, end: Self) -> Self
     where
         T: Copy,
     {
@@ -404,7 +404,7 @@ impl<T: PartialOrd, U> Size2D<T, U> {
     }
 
     /// Returns vector with results of "greater then" operation on each component.
-    pub fn greater_than(&self, other: Self) -> BoolVector2D {
+    pub fn greater_than(self, other: Self) -> BoolVector2D {
         BoolVector2D {
             x: self.width > other.width,
             y: self.height > other.height,
@@ -412,7 +412,7 @@ impl<T: PartialOrd, U> Size2D<T, U> {
     }
 
     /// Returns vector with results of "lower then" operation on each component.
-    pub fn lower_than(&self, other: Self) -> BoolVector2D {
+    pub fn lower_than(self, other: Self) -> BoolVector2D {
         BoolVector2D {
             x: self.width < other.width,
             y: self.height < other.height,
@@ -420,7 +420,7 @@ impl<T: PartialOrd, U> Size2D<T, U> {
     }
 
     /// Returns `true` if any component of size is zero, negative, or NaN.
-    pub fn is_empty(&self) -> bool
+    pub fn is_empty(self) -> bool
     where
         T: Zero,
     {
@@ -433,7 +433,7 @@ impl<T: PartialOrd, U> Size2D<T, U> {
 
 impl<T: PartialEq, U> Size2D<T, U> {
     /// Returns vector with results of "equal" operation on each component.
-    pub fn equal(&self, other: Self) -> BoolVector2D {
+    pub fn equal(self, other: Self) -> BoolVector2D {
         BoolVector2D {
             x: self.width == other.width,
             y: self.height == other.height,
@@ -441,7 +441,7 @@ impl<T: PartialEq, U> Size2D<T, U> {
     }
 
     /// Returns vector with results of "not equal" operation on each component.
-    pub fn not_equal(&self, other: Self) -> BoolVector2D {
+    pub fn not_equal(self, other: Self) -> BoolVector2D {
         BoolVector2D {
             x: self.width != other.width,
             y: self.height != other.height,
@@ -453,7 +453,7 @@ impl<T: Round, U> Round for Size2D<T, U> {
     /// See [`Size2D::round()`](#method.round).
     #[inline]
     fn round(self) -> Self {
-        (&self).round()
+        self.round()
     }
 }
 
@@ -461,7 +461,7 @@ impl<T: Ceil, U> Ceil for Size2D<T, U> {
     /// See [`Size2D::ceil()`](#method.ceil).
     #[inline]
     fn ceil(self) -> Self {
-        (&self).ceil()
+        self.ceil()
     }
 }
 
@@ -469,7 +469,7 @@ impl<T: Floor, U> Floor for Size2D<T, U> {
     /// See [`Size2D::floor()`](#method.floor).
     #[inline]
     fn floor(self) -> Self {
-        (&self).floor()
+        self.floor()
     }
 }
 
@@ -987,31 +987,31 @@ impl<T, U> Size3D<T, U> {
 impl<T: Copy, U> Size3D<T, U> {
     /// Return this size as an array of three elements (width, then height, then depth).
     #[inline]
-    pub fn to_array(&self) -> [T; 3] {
+    pub fn to_array(self) -> [T; 3] {
         [self.width, self.height, self.depth]
     }
 
     /// Return this size as an array of three elements (width, then height, then depth).
     #[inline]
-    pub fn to_tuple(&self) -> (T, T, T) {
+    pub fn to_tuple(self) -> (T, T, T) {
         (self.width, self.height, self.depth)
     }
 
     /// Return this size as a vector with width, height and depth.
     #[inline]
-    pub fn to_vector(&self) -> Vector3D<T, U> {
+    pub fn to_vector(self) -> Vector3D<T, U> {
         vec3(self.width, self.height, self.depth)
     }
 
     /// Drop the units, preserving only the numeric value.
     #[inline]
-    pub fn to_untyped(&self) -> Size3D<T, UnknownUnit> {
+    pub fn to_untyped(self) -> Size3D<T, UnknownUnit> {
         self.cast_unit()
     }
 
     /// Cast the unit
     #[inline]
-    pub fn cast_unit<V>(&self) -> Size3D<T, V> {
+    pub fn cast_unit<V>(self) -> Size3D<T, V> {
         Size3D::new(self.width, self.height, self.depth)
     }
 
@@ -1027,7 +1027,7 @@ impl<T: Copy, U> Size3D<T, U> {
     /// ```
     #[inline]
     #[must_use]
-    pub fn round(&self) -> Self
+    pub fn round(self) -> Self
     where
         T: Round,
     {
@@ -1046,7 +1046,7 @@ impl<T: Copy, U> Size3D<T, U> {
     /// ```
     #[inline]
     #[must_use]
-    pub fn ceil(&self) -> Self
+    pub fn ceil(self) -> Self
     where
         T: Ceil,
     {
@@ -1065,7 +1065,7 @@ impl<T: Copy, U> Size3D<T, U> {
     /// ```
     #[inline]
     #[must_use]
-    pub fn floor(&self) -> Self
+    pub fn floor(self) -> Self
     where
         T: Floor,
     {
@@ -1073,7 +1073,7 @@ impl<T: Copy, U> Size3D<T, U> {
     }
 
     /// Returns result of multiplication of all components
-    pub fn volume(&self) -> T
+    pub fn volume(self) -> T
     where
         T: Mul<Output = T>,
     {
@@ -1098,12 +1098,12 @@ impl<T: Copy, U> Size3D<T, U> {
     /// assert_eq!(from.lerp(to,  2.0), size3(16.0, -18.0,  1.0));
     /// ```
     #[inline]
-    pub fn lerp(&self, other: Self, t: T) -> Self
+    pub fn lerp(self, other: Self, t: T) -> Self
     where
         T: One + Sub<Output = T> + Mul<Output = T> + Add<Output = T>,
     {
         let one_t = T::one() - t;
-        (*self) * one_t + other * t
+        self * one_t + other * t
     }
 }
 
@@ -1114,7 +1114,7 @@ impl<T: NumCast + Copy, U> Size3D<T, U> {
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
     #[inline]
-    pub fn cast<NewT: NumCast>(&self) -> Size3D<NewT, U> {
+    pub fn cast<NewT: NumCast>(self) -> Size3D<NewT, U> {
         self.try_cast().unwrap()
     }
 
@@ -1123,7 +1123,7 @@ impl<T: NumCast + Copy, U> Size3D<T, U> {
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
-    pub fn try_cast<NewT: NumCast>(&self) -> Option<Size3D<NewT, U>> {
+    pub fn try_cast<NewT: NumCast>(self) -> Option<Size3D<NewT, U>> {
         match (
             NumCast::from(self.width),
             NumCast::from(self.height),
@@ -1138,13 +1138,13 @@ impl<T: NumCast + Copy, U> Size3D<T, U> {
 
     /// Cast into an `f32` size.
     #[inline]
-    pub fn to_f32(&self) -> Size3D<f32, U> {
+    pub fn to_f32(self) -> Size3D<f32, U> {
         self.cast()
     }
 
     /// Cast into an `f64` size.
     #[inline]
-    pub fn to_f64(&self) -> Size3D<f64, U> {
+    pub fn to_f64(self) -> Size3D<f64, U> {
         self.cast()
     }
 
@@ -1154,7 +1154,7 @@ impl<T: NumCast + Copy, U> Size3D<T, U> {
     /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
     /// the desired conversion behavior.
     #[inline]
-    pub fn to_usize(&self) -> Size3D<usize, U> {
+    pub fn to_usize(self) -> Size3D<usize, U> {
         self.cast()
     }
 
@@ -1164,7 +1164,7 @@ impl<T: NumCast + Copy, U> Size3D<T, U> {
     /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
     /// the desired conversion behavior.
     #[inline]
-    pub fn to_u32(&self) -> Size3D<u32, U> {
+    pub fn to_u32(self) -> Size3D<u32, U> {
         self.cast()
     }
 
@@ -1174,7 +1174,7 @@ impl<T: NumCast + Copy, U> Size3D<T, U> {
     /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
     /// the desired conversion behavior.
     #[inline]
-    pub fn to_i32(&self) -> Size3D<i32, U> {
+    pub fn to_i32(self) -> Size3D<i32, U> {
         self.cast()
     }
 
@@ -1184,7 +1184,7 @@ impl<T: NumCast + Copy, U> Size3D<T, U> {
     /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
     /// the desired conversion behavior.
     #[inline]
-    pub fn to_i64(&self) -> Size3D<i64, U> {
+    pub fn to_i64(self) -> Size3D<i64, U> {
         self.cast()
     }
 }
@@ -1195,12 +1195,12 @@ impl<T: Signed, U> Size3D<T, U> {
     /// For `f32` and `f64`, `NaN` will be returned for component if the component is `NaN`.
     ///
     /// For signed integers, `::MIN` will be returned for component if the component is `::MIN`.
-    pub fn abs(&self) -> Self {
+    pub fn abs(self) -> Self {
         size3(self.width.abs(), self.height.abs(), self.depth.abs())
     }
 
     /// Returns `true` if all components is positive and `false` any component is zero or negative.
-    pub fn is_positive(&self) -> bool {
+    pub fn is_positive(self) -> bool {
         self.width.is_positive() && self.height.is_positive() && self.depth.is_positive()
     }
 }
@@ -1231,7 +1231,7 @@ impl<T: PartialOrd, U> Size3D<T, U> {
     ///
     /// Shortcut for `self.max(start).min(end)`.
     #[inline]
-    pub fn clamp(&self, start: Self, end: Self) -> Self
+    pub fn clamp(self, start: Self, end: Self) -> Self
     where
         T: Copy,
     {
@@ -1239,7 +1239,7 @@ impl<T: PartialOrd, U> Size3D<T, U> {
     }
 
     /// Returns vector with results of "greater than" operation on each component.
-    pub fn greater_than(&self, other: Self) -> BoolVector3D {
+    pub fn greater_than(self, other: Self) -> BoolVector3D {
         BoolVector3D {
             x: self.width > other.width,
             y: self.height > other.height,
@@ -1248,7 +1248,7 @@ impl<T: PartialOrd, U> Size3D<T, U> {
     }
 
     /// Returns vector with results of "lower than" operation on each component.
-    pub fn lower_than(&self, other: Self) -> BoolVector3D {
+    pub fn lower_than(self, other: Self) -> BoolVector3D {
         BoolVector3D {
             x: self.width < other.width,
             y: self.height < other.height,
@@ -1257,7 +1257,7 @@ impl<T: PartialOrd, U> Size3D<T, U> {
     }
 
     /// Returns `true` if any component of size is zero, negative or NaN.
-    pub fn is_empty(&self) -> bool
+    pub fn is_empty(self) -> bool
     where
         T: Zero,
     {
@@ -1268,7 +1268,7 @@ impl<T: PartialOrd, U> Size3D<T, U> {
 
 impl<T: PartialEq, U> Size3D<T, U> {
     /// Returns vector with results of "equal" operation on each component.
-    pub fn equal(&self, other: Self) -> BoolVector3D {
+    pub fn equal(self, other: Self) -> BoolVector3D {
         BoolVector3D {
             x: self.width == other.width,
             y: self.height == other.height,
@@ -1277,7 +1277,7 @@ impl<T: PartialEq, U> Size3D<T, U> {
     }
 
     /// Returns vector with results of "not equal" operation on each component.
-    pub fn not_equal(&self, other: Self) -> BoolVector3D {
+    pub fn not_equal(self, other: Self) -> BoolVector3D {
         BoolVector3D {
             x: self.width != other.width,
             y: self.height != other.height,
@@ -1290,7 +1290,7 @@ impl<T: Round, U> Round for Size3D<T, U> {
     /// See [`Size3D::round()`](#method.round).
     #[inline]
     fn round(self) -> Self {
-        (&self).round()
+        self.round()
     }
 }
 
@@ -1298,7 +1298,7 @@ impl<T: Ceil, U> Ceil for Size3D<T, U> {
     /// See [`Size3D::ceil()`](#method.ceil).
     #[inline]
     fn ceil(self) -> Self {
-        (&self).ceil()
+        self.ceil()
     }
 }
 
@@ -1306,7 +1306,7 @@ impl<T: Floor, U> Floor for Size3D<T, U> {
     /// See [`Size3D::floor()`](#method.floor).
     #[inline]
     fn floor(self) -> Self {
-        (&self).floor()
+        self.floor()
     }
 }
 

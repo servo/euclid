@@ -120,7 +120,7 @@ impl<T: Copy + Div<T, Output = T> + Zero + PartialOrd, U> HomogeneousVector<T, U
     ///
     /// Returns None if the point is on or behind the W=0 hemisphere.
     #[inline]
-    pub fn to_point2d(&self) -> Option<Point2D<T, U>> {
+    pub fn to_point2d(self) -> Option<Point2D<T, U>> {
         if self.w > T::zero() {
             Some(Point2D::new(self.x / self.w, self.y / self.w))
         } else {
@@ -132,7 +132,7 @@ impl<T: Copy + Div<T, Output = T> + Zero + PartialOrd, U> HomogeneousVector<T, U
     ///
     /// Returns None if the point is on or behind the W=0 hemisphere.
     #[inline]
-    pub fn to_point3d(&self) -> Option<Point3D<T, U>> {
+    pub fn to_point3d(self) -> Option<Point3D<T, U>> {
         if self.w > T::zero() {
             Some(Point3D::new(
                 self.x / self.w,
