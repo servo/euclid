@@ -26,7 +26,7 @@ use crate::trig::Trig;
 use core::fmt;
 use num_traits::NumCast;
 #[cfg(feature = "serde")]
-use serde;
+use serde::{Deserialize, Serialize};
 
 /// A 2d transform represented by a column-major 3 by 3 matrix, compressed down to 3 by 2.
 ///
@@ -55,6 +55,11 @@ use serde;
 ///
 /// The translation terms are m31 and m32.
 #[repr(C)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(
+    feature = "serde",
+    serde(bound(serialize = "T: Serialize", deserialize = "T: Deserialize<'de>"))
+)]
 pub struct Transform2D<T, Src, Dst> {
     pub m11: T, pub m12: T,
     pub m21: T, pub m22: T,
@@ -76,42 +81,6 @@ impl<T: Clone, Src, Dst> Clone for Transform2D<T, Src, Dst> {
             m32: self.m32.clone(),
             _unit: PhantomData,
         }
-    }
-}
-
-#[cfg(feature = "serde")]
-impl<'de, T, Src, Dst> serde::Deserialize<'de> for Transform2D<T, Src, Dst>
-    where T: serde::Deserialize<'de>
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-        where D: serde::Deserializer<'de>
-    {
-        let (
-            m11, m12,
-            m21, m22,
-            m31, m32,
-        ) = serde::Deserialize::deserialize(deserializer)?;
-        Ok(Transform2D {
-            m11, m12,
-            m21, m22,
-            m31, m32,
-            _unit: PhantomData
-        })
-    }
-}
-
-#[cfg(feature = "serde")]
-impl<T, Src, Dst> serde::Serialize for Transform2D<T, Src, Dst>
-    where T: serde::Serialize
-{
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where S: serde::Serializer
-    {
-        (
-            &self.m11, &self.m12,
-            &self.m21, &self.m22,
-            &self.m31, &self.m32,
-        ).serialize(serializer)
     }
 }
 
