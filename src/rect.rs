@@ -215,13 +215,13 @@ where
     T: Copy + PartialOrd + Add<T, Output = T> + Sub<T, Output = T>,
 {
     #[inline]
-    pub fn intersection(&self, other: &Self) -> Option<Self> {
+    pub fn try_intersection(&self, other: &Self) -> Option<NonEmpty<Self>> {
         let box2d = self.to_box2d().intersection(&other.to_box2d());
         if box2d.is_empty() {
             return None;
         }
 
-        Some(box2d.to_rect())
+        Some(NonEmpty(box2d.to_rect()))
     }
 }
 
@@ -695,19 +695,19 @@ mod tests {
         let q = Rect::new(Point2D::new(5, 15), Size2D::new(10, 10));
         let r = Rect::new(Point2D::new(-5, -5), Size2D::new(8, 8));
 
-        let pq = p.intersection(&q);
+        let pq = p.try_intersection(&q);
         assert!(pq.is_some());
         let pq = pq.unwrap();
         assert!(pq.origin == Point2D::new(5, 15));
         assert!(pq.size == Size2D::new(5, 5));
 
-        let pr = p.intersection(&r);
+        let pr = p.try_intersection(&r);
         assert!(pr.is_some());
         let pr = pr.unwrap();
         assert!(pr.origin == Point2D::new(0, 0));
         assert!(pr.size == Size2D::new(3, 3));
 
-        let qr = q.intersection(&r);
+        let qr = q.try_intersection(&r);
         assert!(qr.is_none());
     }
 
@@ -723,10 +723,10 @@ mod tests {
         let r = Rect::new(Point2D::new(-2147483648, -2147483648), Size2D::new(1, 1));
 
         assert!(p.is_empty());
-        let pq = p.intersection(&q);
+        let pq = p.try_intersection(&q);
         assert!(pq.is_none());
 
-        let qr = q.intersection(&r);
+        let qr = q.try_intersection(&r);
         assert!(qr.is_none());
     }
 
@@ -902,6 +902,6 @@ mod tests {
         let r1: Rect<f32> = rect(-2.0, 5.0, 4.0, std::f32::NAN);
         let r2: Rect<f32> = rect(std::f32::NAN, -1.0, 3.0, 10.0);
 
-        assert_eq!(r1.intersection(&r2), None);
+        assert_eq!(r1.try_intersection(&r2), None);
     }
 }
