@@ -150,11 +150,7 @@ where
 
     #[inline]
     pub fn try_intersection(&self, other: &Self) -> Option<NonEmpty<Self>> {
-        if !self.intersects(other) {
-            return None;
-        }
-
-        Some(NonEmpty(self.intersection(other)))
+        self.intersection(other).to_non_empty()
     }
 
     pub fn intersection(&self, other: &Self) -> Self {
