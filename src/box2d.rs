@@ -183,13 +183,7 @@ where
     /// Computes the intersection of two boxes, returning `None` if the boxes do not intersect.
     #[inline]
     pub fn try_intersection(&self, other: &Self) -> Option<NonEmpty<Self>> {
-        let intersection = self.intersection(other);
-
-        if intersection.is_negative() {
-            return None;
-        }
-
-        Some(NonEmpty(intersection))
+        self.intersection(other).to_non_empty()
     }
 
     #[inline]
