@@ -15,9 +15,11 @@ use crate::homogen::HomogeneousVector;
 #[cfg(feature = "mint")]
 use mint;
 use crate::trig::Trig;
-use crate::point::{Point2D, point2, Point3D};
+use crate::point::{Point2D, point2, Point3D, point3};
 use crate::vector::{Vector2D, Vector3D, vec2, vec3};
 use crate::rect::Rect;
+use crate::box2d::Box2D;
+use crate::box3d::Box3D;
 use crate::transform2d::Transform2D;
 use crate::scale::Scale;
 use crate::num::{One, Zero};
@@ -727,7 +729,7 @@ where
 
     /// Returns a rectangle that encompasses the result of transforming the given rectangle by this
     /// transform, if the transform makes sense for it, or `None` otherwise.
-    pub fn transform_rect(&self, rect: &Rect<T, Src>) -> Option<Rect<T, Dst>>
+    pub fn outer_transformed_rect(&self, rect: &Rect<T, Src>) -> Option<Rect<T, Dst>>
     where
         T: Sub<Output = T> + Div<Output = T> + Zero + PartialOrd,
     {
@@ -738,6 +740,38 @@ where
             self.transform_point2d(max)?,
             self.transform_point2d(point2(max.x, min.y))?,
             self.transform_point2d(point2(min.x, max.y))?,
+        ]))
+    }
+
+    /// Returns a 2d box that encompasses the result of transforming the given box by this
+    /// transform, if the transform makes sense for it, or `None` otherwise.
+    pub fn outer_transformed_box2d(&self, b: &Box2D<T, Src>) -> Option<Box2D<T, Dst>>
+    where
+        T: Sub<Output = T> + Div<Output = T> + Zero + PartialOrd,
+    {
+        Some(Box2D::from_points(&[
+            self.transform_point2d(b.min)?,
+            self.transform_point2d(b.max)?,
+            self.transform_point2d(point2(b.max.x, b.min.y))?,
+            self.transform_point2d(point2(b.min.x, b.max.y))?,
+        ]))
+    }
+
+    /// Returns a 3d box that encompasses the result of transforming the given box by this
+    /// transform, if the transform makes sense for it, or `None` otherwise.
+    pub fn outer_transformed_box3d(&self, b: &Box3D<T, Src>) -> Option<Box3D<T, Dst>>
+    where
+        T: Sub<Output = T> + Div<Output = T> + Zero + PartialOrd,
+    {
+        Some(Box3D::from_points(&[
+            self.transform_point3d(point3(b.min.x, b.min.y, b.min.z))?,
+            self.transform_point3d(point3(b.min.x, b.min.y, b.max.z))?,
+            self.transform_point3d(point3(b.min.x, b.max.y, b.min.z))?,
+            self.transform_point3d(point3(b.min.x, b.max.y, b.max.z))?,
+            self.transform_point3d(point3(b.max.x, b.min.y, b.min.z))?,
+            self.transform_point3d(point3(b.max.x, b.min.y, b.max.z))?,
+            self.transform_point3d(point3(b.max.x, b.max.y, b.min.z))?,
+            self.transform_point3d(point3(b.max.x, b.max.y, b.max.z))?,
         ]))
     }
 }

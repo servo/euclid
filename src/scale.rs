@@ -10,7 +10,7 @@
 
 use crate::num::One;
 
-use crate::{Point2D, Rect, Size2D, Vector2D};
+use crate::{Point2D, Point3D, Rect, Size2D, Vector2D, Box2D, Box3D};
 use core::cmp::Ordering;
 use core::fmt;
 use core::hash::{Hash, Hasher};
@@ -77,6 +77,15 @@ impl<T, Src, Dst> Scale<T, Src, Dst> {
         Point2D::new(point.x * self.0, point.y * self.0)
     }
 
+    /// Returns the given point transformed by this scale.
+    #[inline]
+    pub fn transform_point3d(self, point: Point3D<T, Src>) -> Point3D<T::Output, Dst>
+    where
+        T: Copy + Mul,
+    {
+        Point3D::new(point.x * self.0, point.y * self.0, point.z * self.0)
+    }
+
     /// Returns the given vector transformed by this scale.
     ///
     /// # Example
@@ -141,6 +150,30 @@ impl<T, Src, Dst> Scale<T, Src, Dst> {
             self.transform_point(rect.origin),
             self.transform_size(rect.size),
         )
+    }
+
+    /// Returns the given box transformed by this scale.
+    #[inline]
+    pub fn transform_box2d(self, b: &Box2D<T, Src>) -> Box2D<T::Output, Dst>
+    where
+        T: Copy + Mul,
+    {
+        Box2D {
+            min: self.transform_point(b.min),
+            max: self.transform_point(b.max),
+        }
+    }
+
+    /// Returns the given box transformed by this scale.
+    #[inline]
+    pub fn transform_box3d(self, b: &Box3D<T, Src>) -> Box3D<T::Output, Dst>
+    where
+        T: Copy + Mul,
+    {
+        Box3D {
+            min: self.transform_point3d(b.min),
+            max: self.transform_point3d(b.max),
+        }
     }
 
     /// Returns `true` if this scale has no effect.
