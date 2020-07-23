@@ -56,6 +56,15 @@ impl<T, Src, Dst> Scale<T, Src, Dst> {
         Scale(x, PhantomData)
     }
 
+    /// Creates an identity scale (1.0).
+    #[inline]
+    pub fn identity() -> Self
+    where
+        T: One
+    {
+        Scale::new(T::one())
+    }
+
     /// Returns the given point transformed by this scale.
     ///
     /// # Example
@@ -251,11 +260,6 @@ impl<T: NumCast, Src, Dst> Scale<T, Src, Dst> {
     pub fn try_cast<NewT: NumCast>(self) -> Option<Scale<NewT, Src, Dst>> {
         NumCast::from(self.0).map(Scale::new)
     }
-}
-
-impl<Src, Dst> Scale<f32, Src, Dst> {
-    /// Identity scaling, could be used to safely transit from one space to another.
-    pub const ONE: Self = Scale(1.0, PhantomData);
 }
 
 // scale0 * scale1
