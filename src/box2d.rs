@@ -169,27 +169,25 @@ where
 
         Some(NonEmpty(*self))
     }
-    /// Computes the intersection of two boxes.
+
+    /// Computes the intersection of two boxes, returning `None` if the boxes do not intersect.
+    #[inline]
+    pub fn intersection(&self, other: &Self) -> Option<NonEmpty<Self>> {
+        self.intersection_unchecked(other).to_non_empty()
+    }
+
+    /// Computes the intersection of two boxes without check whether they do intersect.
     ///
     /// The result is a negative box if the boxes do not intersect.
+    /// This can be useful for computing the intersection of more than two boxes, as
+    /// it is possible to chain multiple intersection_unchecked calls and check for
+    /// empty/negative result at the end.
     #[inline]
-    pub fn intersection(&self, other: &Self) -> Self {
+    pub fn intersection_unchecked(&self, other: &Self) -> Self {
         Box2D {
             min: point2(max(self.min.x, other.min.x), max(self.min.y, other.min.y)),
             max: point2(min(self.max.x, other.max.x), min(self.max.y, other.max.y)),
         }
-    }
-
-    /// Computes the intersection of two boxes, returning `None` if the boxes do not intersect.
-    #[inline]
-    pub fn try_intersection(&self, other: &Self) -> Option<NonEmpty<Self>> {
-        let intersection = self.intersection(other);
-
-        if intersection.is_negative() {
-            return None;
-        }
-
-        Some(NonEmpty(intersection))
     }
 
     #[inline]
@@ -729,10 +727,10 @@ mod tests {
     }
 
     #[test]
-    fn test_intersection() {
+    fn test_intersection_unchecked() {
         let b1 = Box2D::from_points(&[point2(-15.0, -20.0), point2(10.0, 20.0)]);
         let b2 = Box2D::from_points(&[point2(-10.0, 20.0), point2(15.0, -20.0)]);
-        let b = b1.intersection(&b2);
+        let b = b1.intersection_unchecked(&b2);
         assert_eq!(b.max.x, 10.0);
         assert_eq!(b.max.y, 20.0);
         assert_eq!(b.min.x, -10.0);
@@ -740,14 +738,14 @@ mod tests {
     }
 
     #[test]
-    fn test_try_intersection() {
+    fn test_intersection() {
         let b1 = Box2D::from_points(&[point2(-15.0, -20.0), point2(10.0, 20.0)]);
         let b2 = Box2D::from_points(&[point2(-10.0, 20.0), point2(15.0, -20.0)]);
-        assert!(b1.try_intersection(&b2).is_some());
+        assert!(b1.intersection(&b2).is_some());
 
         let b1 = Box2D::from_points(&[point2(-15.0, -20.0), point2(-10.0, 20.0)]);
         let b2 = Box2D::from_points(&[point2(10.0, 20.0), point2(15.0, -20.0)]);
-        assert!(b1.try_intersection(&b2).is_none());
+        assert!(b1.intersection(&b2).is_none());
     }
 
     #[test]

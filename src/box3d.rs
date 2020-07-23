@@ -149,15 +149,11 @@ where
     }
 
     #[inline]
-    pub fn try_intersection(&self, other: &Self) -> Option<NonEmpty<Self>> {
-        if !self.intersects(other) {
-            return None;
-        }
-
-        Some(NonEmpty(self.intersection(other)))
+    pub fn intersection(&self, other: &Self) -> Option<NonEmpty<Self>> {
+        self.intersection_unchecked(other).to_non_empty()
     }
 
-    pub fn intersection(&self, other: &Self) -> Self {
+    pub fn intersection_unchecked(&self, other: &Self) -> Self {
         let intersection_min = Point3D::new(
             max(self.min.x, other.min.x),
             max(self.min.y, other.min.y),
@@ -774,10 +770,10 @@ mod tests {
     }
 
     #[test]
-    fn test_intersection() {
+    fn test_intersection_unchecked() {
         let b1 = Box3D::from_points(&[point3(-15.0, -20.0, -20.0), point3(10.0, 20.0, 20.0)]);
         let b2 = Box3D::from_points(&[point3(-10.0, 20.0, 20.0), point3(15.0, -20.0, -20.0)]);
-        let b = b1.intersection(&b2);
+        let b = b1.intersection_unchecked(&b2);
         assert!(b.max.x == 10.0);
         assert!(b.max.y == 20.0);
         assert!(b.max.z == 20.0);
@@ -788,14 +784,14 @@ mod tests {
     }
 
     #[test]
-    fn test_try_intersection() {
+    fn test_intersection() {
         let b1 = Box3D::from_points(&[point3(-15.0, -20.0, -20.0), point3(10.0, 20.0, 20.0)]);
         let b2 = Box3D::from_points(&[point3(-10.0, 20.0, 20.0), point3(15.0, -20.0, -20.0)]);
-        assert!(b1.try_intersection(&b2).is_some());
+        assert!(b1.intersection(&b2).is_some());
 
         let b1 = Box3D::from_points(&[point3(-15.0, -20.0, -20.0), point3(-10.0, 20.0, 20.0)]);
         let b2 = Box3D::from_points(&[point3(10.0, 20.0, 20.0), point3(15.0, -20.0, -20.0)]);
-        assert!(b1.try_intersection(&b2).is_none());
+        assert!(b1.intersection(&b2).is_none());
     }
 
     #[test]
