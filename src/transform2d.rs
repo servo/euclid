@@ -16,6 +16,7 @@ use crate::num::{One, Zero};
 use crate::point::{Point2D, point2};
 use crate::vector::{Vector2D, vec2};
 use crate::rect::Rect;
+use crate::box2d::Box2D;
 use crate::transform3d::Transform3D;
 use core::ops::{Add, Mul, Div, Sub};
 use core::marker::PhantomData;
@@ -516,7 +517,7 @@ where
     /// transform.
     #[inline]
     #[must_use]
-    pub fn transform_rect(&self, rect: &Rect<T, Src>) -> Rect<T, Dst>
+    pub fn outer_transformed_rect(&self, rect: &Rect<T, Src>) -> Rect<T, Dst>
     where
         T: Sub<Output = T> + Zero + PartialOrd,
     {
@@ -527,6 +528,23 @@ where
             self.transform_point(max),
             self.transform_point(point2(max.x, min.y)),
             self.transform_point(point2(min.x, max.y)),
+        ])
+    }
+
+
+    /// Returns a box that encompasses the result of transforming the given box by this
+    /// transform.
+    #[inline]
+    #[must_use]
+    pub fn outer_transformed_box(&self, b: &Box2D<T, Src>) -> Box2D<T, Dst>
+    where
+        T: Sub<Output = T> + Zero + PartialOrd,
+    {
+        Box2D::from_points(&[
+            self.transform_point(b.min),
+            self.transform_point(b.max),
+            self.transform_point(point2(b.max.x, b.min.y)),
+            self.transform_point(point2(b.min.x, b.max.y)),
         ])
     }
 }
