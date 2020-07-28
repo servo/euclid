@@ -169,6 +169,21 @@ where
         Box3D::new(intersection_min, intersection_max)
     }
 
+    /// Returns the intersection of this box and another one, or Box3D::zero()
+    /// if they don't intersect.
+    #[inline]
+    pub fn intersection_or_zero(&self, other: &Self) -> Self
+    where
+        T: Zero
+    {
+        let result = self.intersection_unchecked(other);
+        if result.is_empty() {
+            return Box3D::zero();
+        }
+
+        result
+    }
+
     /// Returns the smallest box containing both of the provided boxes.
     #[inline]
     pub fn union(&self, other: &Self) -> Self {

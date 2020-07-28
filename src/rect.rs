@@ -223,6 +223,18 @@ where
 
         Some(NonEmpty(box2d.to_rect()))
     }
+
+    /// Returns the intersection of this rectangle and another one, or Rect::zero()
+    /// if they don't intersect.
+    #[inline]
+    pub fn intersection_or_zero(&self, other: &Self) -> Self
+    where
+        T: Zero
+    {
+        self.to_box2d()
+            .intersection_or_zero(&other.to_box2d())
+            .to_rect()
+    }
 }
 
 impl<T, U> Rect<T, U>

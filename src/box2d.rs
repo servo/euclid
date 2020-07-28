@@ -190,6 +190,21 @@ where
         }
     }
 
+    /// Returns the intersection of this box and another one, or Box2D::zero()
+    /// if they don't intersect.
+    #[inline]
+    pub fn intersection_or_zero(&self, other: &Self) -> Self
+    where
+        T: Zero
+    {
+        let result = self.intersection_unchecked(other);
+        if result.is_empty() {
+            return Box2D::zero();
+        }
+
+        result
+    }
+
     #[inline]
     pub fn union(&self, other: &Self) -> Self {
         Box2D {
