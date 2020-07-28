@@ -153,6 +153,18 @@ impl<T, U> Point2D<T, U> {
     pub fn from_untyped(p: Point2D<T, UnknownUnit>) -> Self {
         point2(p.x, p.y)
     }
+
+    /// Return this point's x component as a strongly typed `Length`.
+    #[inline]
+    pub fn get_x(self) -> Length<T, U> {
+        Length::new(self.x)
+    }
+
+    /// Return this point's y component as a strongly typed `Length`.
+    #[inline]
+    pub fn get_y(self) -> Length<T, U> {
+        Length::new(self.y)
+    }
 }
 
 impl<T: Copy, U> Point2D<T, U> {
@@ -823,6 +835,24 @@ impl<T, U> Point3D<T, U> {
     #[inline]
     pub fn from_untyped(p: Point3D<T, UnknownUnit>) -> Self {
         point3(p.x, p.y, p.z)
+    }
+
+    /// Return this point's x component as a strongly typed `Length`.
+    #[inline]
+    pub fn get_x(self) -> Length<T, U> {
+        Length::new(self.x)
+    }
+
+    /// Return this point's y component as a strongly typed `Length`.
+    #[inline]
+    pub fn get_y(self) -> Length<T, U> {
+        Length::new(self.y)
+    }
+
+    /// Return this point's z component as a strongly typed `Length`.
+    #[inline]
+    pub fn get_z(self) -> Length<T, U> {
+        Length::new(self.z)
     }
 }
 

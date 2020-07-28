@@ -12,6 +12,7 @@ use crate::approxord::{max, min};
 use crate::nonempty::NonEmpty;
 use crate::num::*;
 use crate::point::{point2, Point2D};
+use crate::length::Length;
 use crate::rect::Rect;
 use crate::scale::Scale;
 use crate::side_offsets::SideOffsets2D;
@@ -230,6 +231,18 @@ where
     #[inline]
     pub fn height(&self) -> T {
         self.max.y - self.min.y
+    }
+
+    /// Return this box's width as a strongly typed `Length`.
+    #[inline]
+    pub fn get_width(self) -> Length<T, U> {
+        Length::new(self.width())
+    }
+
+    /// Return this box's height as a strongly typed `Length`.
+    #[inline]
+    pub fn get_height(self) -> Length<T, U> {
+        Length::new(self.height())
     }
 
     #[inline]

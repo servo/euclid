@@ -149,6 +149,18 @@ impl<T, U> Size2D<T, U> {
     pub fn from_untyped(p: Size2D<T, UnknownUnit>) -> Self {
         Size2D::new(p.width, p.height)
     }
+
+    /// Return this size's width as a strongly typed `Length`.
+    #[inline]
+    pub fn get_width(self) -> Length<T, U> {
+        Length::new(self.width)
+    }
+
+    /// Return this size's height as a strongly typed `Length`.
+    #[inline]
+    pub fn get_height(self) -> Length<T, U> {
+        Length::new(self.height)
+    }
 }
 
 impl<T: Copy, U> Size2D<T, U> {
@@ -981,6 +993,23 @@ impl<T, U> Size3D<T, U> {
     #[inline]
     pub fn from_untyped(p: Size3D<T, UnknownUnit>) -> Self {
         Size3D::new(p.width, p.height, p.depth)
+    }
+
+    /// Return this size's width as a strongly typed `Length`.
+    #[inline]
+    pub fn get_width(self) -> Length<T, U> {
+        Length::new(self.width)
+    }
+
+    /// Return this size's height as a strongly typed `Length`.
+    #[inline]
+    pub fn get_height(self) -> Length<T, U> {
+        Length::new(self.height)
+    }
+    /// Return this size's depth as a strongly typed `Length`.
+    #[inline]
+    pub fn get_depth(self) -> Length<T, U> {
+        Length::new(self.depth)
     }
 }
 

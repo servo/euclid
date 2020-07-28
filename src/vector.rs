@@ -205,6 +205,18 @@ impl<T, U> Vector2D<T, U> {
     {
         self.x * other.y - self.y * other.x
     }
+
+    /// Return this vector's x component as a strongly typed `Length`.
+    #[inline]
+    pub fn get_x(self) -> Length<T, U> {
+        Length::new(self.x)
+    }
+
+    /// Return this vector's y component as a strongly typed `Length`.
+    #[inline]
+    pub fn get_y(self) -> Length<T, U> {
+        Length::new(self.y)
+    }
 }
 
 impl<T: Copy, U> Vector2D<T, U> {
@@ -387,6 +399,12 @@ impl<T: Float, U> Vector2D<T, U> {
     #[inline]
     pub fn length(self) -> T {
         self.square_length().sqrt()
+    }
+
+    /// Returns the vector length as a strongly typed `Length`.
+    #[inline]
+    pub fn get_length(self) -> Length<T, U> {
+        Length::new(self.length())
     }
 
     /// Returns the vector with length of one unit.
@@ -973,6 +991,24 @@ impl<T, U> Vector3D<T, U> {
     {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
+
+    /// Return this vector's x component as a strongly typed `Length`.
+    #[inline]
+    pub fn get_x(self) -> Length<T, U> {
+        Length::new(self.x)
+    }
+
+    /// Return this vector's y component as a strongly typed `Length`.
+    #[inline]
+    pub fn get_y(self) -> Length<T, U> {
+        Length::new(self.y)
+    }
+
+    /// Return this vector's z component as a strongly typed `Length`.
+    #[inline]
+    pub fn get_z(self) -> Length<T, U> {
+        Length::new(self.z)
+    }
 }
 
 impl<T: Copy, U> Vector3D<T, U> {
@@ -1170,6 +1206,12 @@ impl<T: Float, U> Vector3D<T, U> {
     #[inline]
     pub fn length(self) -> T {
         self.square_length().sqrt()
+    }
+
+    /// Returns the vector length as a strongly typed `Length`.
+    #[inline]
+    pub fn get_length(self) -> Length<T, U> {
+        Length::new(self.length())
     }
 
     /// Returns the vector with length of one unit
