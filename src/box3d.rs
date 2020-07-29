@@ -149,8 +149,14 @@ where
     }
 
     #[inline]
-    pub fn intersection(&self, other: &Self) -> Option<NonEmpty<Self>> {
-        self.intersection_unchecked(other).to_non_empty()
+    pub fn intersection(&self, other: &Self) -> Option<Self> {
+        let b = self.intersection_unchecked(other);
+
+        if b.is_empty() {
+            return None;
+        }
+
+        Some(b)
     }
 
     pub fn intersection_unchecked(&self, other: &Self) -> Self {

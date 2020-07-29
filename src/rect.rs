@@ -215,13 +215,14 @@ where
     T: Copy + PartialOrd + Add<T, Output = T> + Sub<T, Output = T>,
 {
     #[inline]
-    pub fn intersection(&self, other: &Self) -> Option<NonEmpty<Self>> {
+    pub fn intersection(&self, other: &Self) -> Option<Self> {
         let box2d = self.to_box2d().intersection_unchecked(&other.to_box2d());
+
         if box2d.is_empty() {
             return None;
         }
 
-        Some(NonEmpty(box2d.to_rect()))
+        Some(box2d.to_rect())
     }
 }
 

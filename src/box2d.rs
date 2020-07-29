@@ -172,8 +172,14 @@ where
 
     /// Computes the intersection of two boxes, returning `None` if the boxes do not intersect.
     #[inline]
-    pub fn intersection(&self, other: &Self) -> Option<NonEmpty<Self>> {
-        self.intersection_unchecked(other).to_non_empty()
+    pub fn intersection(&self, other: &Self) -> Option<Self> {
+        let b = self.intersection_unchecked(other);
+
+        if b.is_empty() {
+            return None;
+        }
+
+        Some(b)
     }
 
     /// Computes the intersection of two boxes without check whether they do intersect.
