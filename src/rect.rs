@@ -112,6 +112,12 @@ where
         Rect::new(Point2D::origin(), Size2D::zero())
     }
 
+    /// Constructor, setting all sides to zero.
+    #[inline]
+    pub fn empty() -> Self {
+        Rect::zero()
+    }
+
     /// Creates a rect of the given size, at offset zero.
     #[inline]
     pub fn from_size(size: Size2D<T, U>) -> Self {
@@ -227,12 +233,12 @@ where
     /// Returns the intersection of this rectangle and another one, or Rect::zero()
     /// if they don't intersect.
     #[inline]
-    pub fn intersection_or_zero(&self, other: &Self) -> Self
+    pub fn intersection_or_empty(&self, other: &Self) -> Self
     where
         T: Zero
     {
         self.to_box2d()
-            .intersection_or_zero(&other.to_box2d())
+            .intersection_or_empty(&other.to_box2d())
             .to_rect()
     }
 }

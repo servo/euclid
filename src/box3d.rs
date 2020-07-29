@@ -172,13 +172,13 @@ where
     /// Returns the intersection of this box and another one, or Box3D::zero()
     /// if they don't intersect.
     #[inline]
-    pub fn intersection_or_zero(&self, other: &Self) -> Self
+    pub fn intersection_or_empty(&self, other: &Self) -> Self
     where
         T: Zero
     {
         let result = self.intersection_unchecked(other);
         if result.is_empty() {
-            return Box3D::zero();
+            return Box3D::empty();
         }
 
         result
@@ -373,6 +373,11 @@ where
     /// Constructor, setting all sides to zero.
     pub fn zero() -> Self {
         Box3D::new(Point3D::zero(), Point3D::zero())
+    }
+
+    /// Constructor, setting all sides to zero.
+    pub fn empty() -> Self {
+        Box3D::zero()
     }
 }
 
