@@ -9,7 +9,6 @@
 
 use super::UnknownUnit;
 use crate::approxord::{max, min};
-use crate::nonempty::NonEmpty;
 use crate::num::*;
 use crate::point::{point3, Point3D};
 use crate::scale::Scale;
@@ -140,12 +139,12 @@ where
     T: Copy + PartialOrd,
 {
     #[inline]
-    pub fn to_non_empty(&self) -> Option<NonEmpty<Self>> {
+    pub fn to_non_empty(&self) -> Option<Self> {
         if self.is_empty() {
             return None;
         }
 
-        Some(NonEmpty(*self))
+        Some(*self)
     }
 
     #[inline]

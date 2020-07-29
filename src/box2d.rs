@@ -9,7 +9,6 @@
 
 use super::UnknownUnit;
 use crate::approxord::{max, min};
-use crate::nonempty::NonEmpty;
 use crate::num::*;
 use crate::point::{point2, Point2D};
 use crate::rect::Rect;
@@ -162,12 +161,12 @@ where
     T: Copy + PartialOrd,
 {
     #[inline]
-    pub fn to_non_empty(&self) -> Option<NonEmpty<Self>> {
+    pub fn to_non_empty(&self) -> Option<Self> {
         if self.is_empty() {
             return None;
         }
 
-        Some(NonEmpty(*self))
+        Some(*self)
     }
 
     /// Computes the intersection of two boxes, returning `None` if the boxes do not intersect.
