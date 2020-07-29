@@ -9,7 +9,6 @@
 
 use super::UnknownUnit;
 use crate::box2d::Box2D;
-use crate::nonempty::NonEmpty;
 use crate::num::*;
 use crate::point::Point2D;
 use crate::scale::Scale;
@@ -215,13 +214,14 @@ where
     T: Copy + PartialOrd + Add<T, Output = T> + Sub<T, Output = T>,
 {
     #[inline]
-    pub fn intersection(&self, other: &Self) -> Option<NonEmpty<Self>> {
+    pub fn intersection(&self, other: &Self) -> Option<Self> {
         let box2d = self.to_box2d().intersection_unchecked(&other.to_box2d());
+
         if box2d.is_empty() {
             return None;
         }
 
-        Some(NonEmpty(box2d.to_rect()))
+        Some(box2d.to_rect())
     }
 }
 
@@ -393,12 +393,12 @@ impl<T: Copy + Zero + PartialOrd, U> Rect<T, U> {
 
 impl<T: Copy + Zero + PartialOrd, U> Rect<T, U> {
     #[inline]
-    pub fn to_non_empty(&self) -> Option<NonEmpty<Self>> {
+    pub fn to_non_empty(&self) -> Option<Self> {
         if self.is_empty() {
             return None;
         }
 
-        Some(NonEmpty(*self))
+        Some(*self)
     }
 }
 
