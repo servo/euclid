@@ -425,7 +425,7 @@ where
         )
     }
 
-    /// Create a simple perspective projection transform:
+    /// Create a simple perspective transform, projecting to the plane `z = -d`.
     ///
     /// ```text
     /// 1   0   0   0
@@ -433,6 +433,8 @@ where
     /// 0   0   1 -1/d
     /// 0   0   0   1
     /// ```
+    ///
+    /// See <https://drafts.csswg.org/css-transforms-2/#PerspectiveDefined>.
     pub fn perspective(d: T) -> Self
     where
         T: Neg<Output = T> + Div<Output = T>,
