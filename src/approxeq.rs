@@ -32,7 +32,7 @@ macro_rules! approx_eq {
             }
             #[inline]
             fn approx_eq_eps(&self, other: &$ty, approx_epsilon: &$ty) -> bool {
-                num_traits::Float::abs(*self - *other) < *approx_epsilon
+                num_traits::float::FloatCore::abs(*self - *other) < *approx_epsilon
             }
         }
     };

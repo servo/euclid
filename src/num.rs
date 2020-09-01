@@ -104,13 +104,13 @@ macro_rules! num_float {
         impl Floor for $ty {
             #[inline]
             fn floor(self) -> $ty {
-                num_traits::Float::floor(self)
+                num_traits::float::FloatCore::floor(self)
             }
         }
         impl Ceil for $ty {
             #[inline]
             fn ceil(self) -> $ty {
-                num_traits::Float::ceil(self)
+                num_traits::float::FloatCore::ceil(self)
             }
         }
     };

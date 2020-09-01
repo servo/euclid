@@ -12,7 +12,9 @@ use crate::trig::Trig;
 use core::cmp::{Eq, PartialEq};
 use core::hash::Hash;
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, Sub, SubAssign};
-use num_traits::{Float, FloatConst, NumCast, One, Zero};
+use num_traits::{FloatConst, NumCast, One, Zero};
+#[cfg(feature = "std")]
+use num_traits::Float;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -99,6 +101,7 @@ where
     }
 }
 
+#[cfg(feature = "std")]
 impl<T> Angle<T>
 where
     T: Float,
