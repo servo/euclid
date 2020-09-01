@@ -27,7 +27,7 @@ use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAss
 #[cfg(feature = "mint")]
 use mint;
 use num_traits::{NumCast, Signed};
-#[cfg(feature = "std")]
+#[cfg(any(feature = "std", feature = "libm"))]
 use num_traits::Float;
 #[cfg(feature = "serde")]
 use serde;
@@ -144,7 +144,7 @@ impl<T, U> Vector2D<T, U> {
     }
 
     /// Constructor taking angle and length
-    #[cfg(feature = "std")]
+    #[cfg(any(feature = "std", feature = "libm"))]
     pub fn from_angle_and_length(angle: Angle<T>, length: T) -> Self
     where
         T: Trig + Mul<Output = T> + Copy,
@@ -336,7 +336,7 @@ impl<T: Copy, U> Vector2D<T, U> {
     /// is `+y` axis.
     ///
     /// The returned angle is between -PI and PI.
-    #[cfg(feature = "std")]
+    #[cfg(any(feature = "std", feature = "libm"))]
     pub fn angle_from_x_axis(self) -> Angle<T>
     where
         T: Trig,
@@ -378,7 +378,7 @@ where
     /// Returns the signed angle between this vector and another vector.
     ///
     /// The returned angle is between -PI and PI.
-    #[cfg(feature = "std")]
+    #[cfg(any(feature = "std", feature = "libm"))]
     pub fn angle_to(self, other: Self) -> Angle<T>
     where
         T: Sub<Output = T> + Trig,
@@ -387,7 +387,7 @@ where
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T: Float, U> Vector2D<T, U> {
     /// Returns the vector length.
     #[inline]
@@ -1158,7 +1158,7 @@ where
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T: Float, U> Vector3D<T, U> {
     /// Returns the positive angle between this vector and another vector.
     ///

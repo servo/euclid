@@ -9,13 +9,13 @@
 
 /// Trait for basic trigonometry functions, so they can be used on generic numeric types
 pub trait Trig {
-    #[cfg(feature = "std")]
+    #[cfg(any(feature = "std", feature = "libm"))]
     fn sin(self) -> Self;
-    #[cfg(feature = "std")]
+    #[cfg(any(feature = "std", feature = "libm"))]
     fn cos(self) -> Self;
-    #[cfg(feature = "std")]
+    #[cfg(any(feature = "std", feature = "libm"))]
     fn tan(self) -> Self;
-    #[cfg(feature = "std")]
+    #[cfg(any(feature = "std", feature = "libm"))]
     fn fast_atan2(y: Self, x: Self) -> Self;
     fn degrees_to_radians(deg: Self) -> Self;
     fn radians_to_degrees(rad: Self) -> Self;
@@ -24,17 +24,17 @@ pub trait Trig {
 macro_rules! trig {
     ($ty:ident) => {
         impl Trig for $ty {
-            #[cfg(feature = "std")]
+            #[cfg(any(feature = "std", feature = "libm"))]
             #[inline]
             fn sin(self) -> $ty {
                 num_traits::Float::sin(self)
             }
-            #[cfg(feature = "std")]
+            #[cfg(any(feature = "std", feature = "libm"))]
             #[inline]
             fn cos(self) -> $ty {
                 num_traits::Float::cos(self)
             }
-            #[cfg(feature = "std")]
+            #[cfg(any(feature = "std", feature = "libm"))]
             #[inline]
             fn tan(self) -> $ty {
                 num_traits::Float::tan(self)
@@ -43,7 +43,7 @@ macro_rules! trig {
             /// A slightly faster approximation of `atan2`.
             ///
             /// Note that it does not deal with the case where both x and y are 0.
-            #[cfg(feature = "std")]
+            #[cfg(any(feature = "std", feature = "libm"))]
             #[inline]
             fn fast_atan2(y: $ty, x: $ty) -> $ty {
                 // This macro is used with f32 and f64 and clippy warns about the extra

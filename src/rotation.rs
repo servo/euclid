@@ -17,7 +17,7 @@ use core::hash::Hash;
 use core::marker::PhantomData;
 use core::ops::{Add, Mul, Neg, Sub};
 use num_traits::{NumCast, One, Zero};
-#[cfg(feature = "std")]
+#[cfg(any(feature = "std", feature = "libm"))]
 use num_traits::Float;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -168,7 +168,7 @@ where
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T: Float, Src, Dst> Rotation2D<T, Src, Dst> {
     /// Creates a 3d rotation (around the z axis) from this 2d rotation.
     #[inline]
@@ -209,7 +209,7 @@ impl<T: Float, Src, Dst> Rotation2D<T, Src, Dst> {
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T, Src, Dst> Rotation2D<T, Src, Dst>
 where
     T: Copy + Add<Output = T> + Sub<Output = T> + Mul<Output = T> + Zero + Trig,
@@ -404,7 +404,7 @@ where
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T, Src, Dst> Rotation3D<T, Src, Dst>
 where
     T: Float,

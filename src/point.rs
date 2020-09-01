@@ -23,7 +23,7 @@ use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAss
 #[cfg(feature = "mint")]
 use mint;
 use num_traits::NumCast;
-#[cfg(feature = "std")]
+#[cfg(any(feature = "std", feature = "libm"))]
 use num_traits::Float;
 #[cfg(feature = "serde")]
 use serde;
@@ -466,7 +466,7 @@ impl<T: Copy + Add<T, Output = T>, U> Point2D<T, U> {
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T: Float + Sub<T, Output = T>, U> Point2D<T, U> {
     #[inline]
     pub fn distance_to(self, other: Self) -> T {
@@ -1169,7 +1169,7 @@ impl<T: Copy + Add<T, Output = T>, U> Point3D<T, U> {
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T: Float + Sub<T, Output = T>, U> Point3D<T, U> {
     #[inline]
     pub fn distance_to(self, other: Self) -> T {

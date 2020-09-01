@@ -409,7 +409,7 @@ where
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(any(feature = "std", feature = "libm"))]
 /// Methods for creating and combining rotation transformations
 impl<T, Src, Dst> Transform2D<T, Src, Dst>
 where

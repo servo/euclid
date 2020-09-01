@@ -5,7 +5,7 @@
 use crate::approxeq::ApproxEq;
 use crate::trig::Trig;
 use crate::{Rotation3D, Transform3D, UnknownUnit, Vector3D};
-#[cfg(feature = "std")]
+#[cfg(any(feature = "std", feature = "libm"))]
 use num_traits::Float;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -46,7 +46,7 @@ impl<T: Copy, Src, Dst> RigidTransform3D<T, Src, Dst> {
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T: Float + ApproxEq<T>, Src, Dst> RigidTransform3D<T, Src, Dst> {
     /// Construct an identity transform
     #[inline]
@@ -185,7 +185,7 @@ impl<T: Float + ApproxEq<T>, Src, Dst> RigidTransform3D<T, Src, Dst> {
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T: Float + ApproxEq<T>, Src, Dst> From<Rotation3D<T, Src, Dst>>
     for RigidTransform3D<T, Src, Dst>
 {
@@ -194,7 +194,7 @@ impl<T: Float + ApproxEq<T>, Src, Dst> From<Rotation3D<T, Src, Dst>>
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T: Float + ApproxEq<T>, Src, Dst> From<Vector3D<T, Dst>> for RigidTransform3D<T, Src, Dst> {
     fn from(t: Vector3D<T, Dst>) -> Self {
         Self::from_translation(t)
