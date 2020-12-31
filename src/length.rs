@@ -405,8 +405,8 @@ mod tests {
         type L = Length<f32, Mm>;
         let lengths = [L::new(1.0), L::new(2.0), L::new(3.0)];
 
-        assert_eq!(lengths.iter().copied().sum::<L>(), L::new(6.0));
         assert_eq!(lengths.iter().sum::<L>(), L::new(6.0));
+        assert_eq!(lengths.into_iter().sum::<L>(), L::new(6.0));
     }
 
     #[test]

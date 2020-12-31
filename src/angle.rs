@@ -340,6 +340,6 @@ fn sum() {
     type A = Angle<f32>;
     let angles = [A::radians(1.0), A::radians(2.0), A::radians(3.0)];
     let sum = A::radians(6.0);
-    assert_eq!(angles.iter().copied().sum::<A>(), sum);
     assert_eq!(angles.iter().sum::<A>(), sum);
+    assert_eq!(angles.into_iter().sum::<A>(), sum);
 }
