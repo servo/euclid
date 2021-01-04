@@ -20,6 +20,7 @@ use mint;
 use core::cmp::{Eq, PartialEq};
 use core::fmt;
 use core::hash::Hash;
+use core::iter::Sum;
 use core::marker::PhantomData;
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 use num_traits::{NumCast, Signed};
@@ -498,6 +499,25 @@ impl<T: Add, U> Add for Size2D<T, U> {
     }
 }
 
+impl<T: Copy + Add<T, Output = T>, U> Add<&Self> for Size2D<T, U> {
+    type Output = Self;
+    fn add(self, other: &Self) -> Self {
+        Size2D::new(self.width + other.width, self.height + other.height)
+    }
+}
+
+impl<T: Add<Output = T> + Zero, U> Sum for Size2D<T, U> {
+    fn sum<I: Iterator<Item=Self>>(iter: I) -> Self {
+        iter.fold(Self::zero(), Add::add)
+    }
+}
+
+impl<'a, T: 'a + Add<Output = T> + Copy + Zero, U: 'a> Sum<&'a Self> for Size2D<T, U> {
+    fn sum<I: Iterator<Item=&'a Self>>(iter: I) -> Self {
+        iter.fold(Self::zero(), Add::add)
+    }
+}
+
 impl<T: AddAssign, U> AddAssign for Size2D<T, U> {
     #[inline]
     fn add_assign(&mut self, other: Self) {
@@ -696,18 +716,22 @@ mod size2d {
             let s1 = Size2D::new(1.0, 2.0);
             let s2 = Size2D::new(3.0, 4.0);
             assert_eq!(s1 + s2, Size2D::new(4.0, 6.0));
+            assert_eq!(s1 + &s2, Size2D::new(4.0, 6.0));
 
             let s1 = Size2D::new(1.0, 2.0);
             let s2 = Size2D::new(0.0, 0.0);
             assert_eq!(s1 + s2, Size2D::new(1.0, 2.0));
+            assert_eq!(s1 + &s2, Size2D::new(1.0, 2.0));
 
             let s1 = Size2D::new(1.0, 2.0);
             let s2 = Size2D::new(-3.0, -4.0);
             assert_eq!(s1 + s2, Size2D::new(-2.0, -2.0));
+            assert_eq!(s1 + &s2, Size2D::new(-2.0, -2.0));
 
             let s1 = Size2D::new(0.0, 0.0);
             let s2 = Size2D::new(0.0, 0.0);
             assert_eq!(s1 + s2, Size2D::new(0.0, 0.0));
+            assert_eq!(s1 + &s2, Size2D::new(0.0, 0.0));
         }
 
         #[test]
@@ -727,6 +751,18 @@ mod size2d {
             let mut s = Size2D::new(0.0, 0.0);
             s += Size2D::new(0.0, 0.0);
             assert_eq!(s, Size2D::new(0.0, 0.0));
+        }
+
+        #[test]
+        pub fn test_sum() {
+            let sizes = [
+                Size2D::new(0.0, 1.0),
+                Size2D::new(1.0, 2.0),
+                Size2D::new(2.0, 3.0)
+            ];
+            let sum = Size2D::new(3.0, 6.0);
+            assert_eq!(sizes.iter().sum::<Size2D<_>>(), sum);
+            assert_eq!(sizes.into_iter().sum::<Size2D<_>>(), sum);
         }
 
         #[test]
@@ -1339,6 +1375,29 @@ impl<T: Add, U> Add for Size3D<T, U> {
     }
 }
 
+impl<T: Copy + Add<T, Output = T>, U> Add<&Self> for Size3D<T, U> {
+    type Output = Self;
+    fn add(self, other: &Self) -> Self {
+        Size3D::new(
+            self.width + other.width,
+            self.height + other.height,
+            self.depth + other.depth,
+        )
+    }
+}
+
+impl<T: Add<Output = T> + Zero, U> Sum for Size3D<T, U> {
+    fn sum<I: Iterator<Item=Self>>(iter: I) -> Self {
+        iter.fold(Self::zero(), Add::add)
+    }
+}
+
+impl<'a, T: 'a + Add<Output = T> + Copy + Zero, U: 'a> Sum<&'a Self> for Size3D<T, U> {
+    fn sum<I: Iterator<Item=&'a Self>>(iter: I) -> Self {
+        iter.fold(Self::zero(), Add::add)
+    }
+}
+
 impl<T: AddAssign, U> AddAssign for Size3D<T, U> {
     #[inline]
     fn add_assign(&mut self, other: Self) {
@@ -1538,18 +1597,34 @@ mod size3d {
             let s1 = Size3D::new(1.0, 2.0, 3.0);
             let s2 = Size3D::new(4.0, 5.0, 6.0);
             assert_eq!(s1 + s2, Size3D::new(5.0, 7.0, 9.0));
+            assert_eq!(s1 + &s2, Size3D::new(5.0, 7.0, 9.0));
 
             let s1 = Size3D::new(1.0, 2.0, 3.0);
             let s2 = Size3D::new(0.0, 0.0, 0.0);
             assert_eq!(s1 + s2, Size3D::new(1.0, 2.0, 3.0));
+            assert_eq!(s1 + &s2, Size3D::new(1.0, 2.0, 3.0));
 
             let s1 = Size3D::new(1.0, 2.0, 3.0);
             let s2 = Size3D::new(-4.0, -5.0, -6.0);
             assert_eq!(s1 + s2, Size3D::new(-3.0, -3.0, -3.0));
+            assert_eq!(s1 + &s2, Size3D::new(-3.0, -3.0, -3.0));
 
             let s1 = Size3D::new(0.0, 0.0, 0.0);
             let s2 = Size3D::new(0.0, 0.0, 0.0);
             assert_eq!(s1 + s2, Size3D::new(0.0, 0.0, 0.0));
+            assert_eq!(s1 + &s2, Size3D::new(0.0, 0.0, 0.0));
+        }
+
+        #[test]
+        pub fn test_sum() {
+            let sizes = [
+                Size3D::new(0.0, 1.0, 2.0),
+                Size3D::new(1.0, 2.0, 3.0),
+                Size3D::new(2.0, 3.0, 4.0)
+            ];
+            let sum = Size3D::new(3.0, 6.0, 9.0);
+            assert_eq!(sizes.iter().sum::<Size3D<_>>(), sum);
+            assert_eq!(sizes.into_iter().sum::<Size3D<_>>(), sum);
         }
 
         #[test]

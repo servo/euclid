@@ -11,6 +11,7 @@ use crate::approxeq::ApproxEq;
 use crate::trig::Trig;
 use core::cmp::{Eq, PartialEq};
 use core::hash::Hash;
+use core::iter::Sum;
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, Sub, SubAssign};
 use num_traits::{Float, FloatConst, NumCast, One, Zero};
 #[cfg(feature = "serde")]
@@ -174,9 +175,28 @@ where
 }
 
 impl<T: Add<T, Output = T>> Add for Angle<T> {
-    type Output = Angle<T>;
-    fn add(self, other: Angle<T>) -> Angle<T> {
-        Angle::radians(self.radians + other.radians)
+    type Output = Self;
+    fn add(self, other: Self) -> Self {
+        Self::radians(self.radians + other.radians)
+    }
+}
+
+impl<T: Copy + Add<T, Output = T>> Add<&Self> for Angle<T> {
+    type Output = Self;
+    fn add(self, other: &Self) -> Self {
+        Self::radians(self.radians + other.radians)
+    }
+}
+
+impl<T: Add + Zero> Sum for Angle<T> {
+    fn sum<I: Iterator<Item=Self>>(iter: I) -> Self {
+        iter.fold(Self::zero(), Add::add)
+    }
+}
+
+impl<'a, T: 'a + Add + Copy + Zero> Sum<&'a Self> for Angle<T> {
+    fn sum<I: Iterator<Item=&'a Self>>(iter: I) -> Self {
+        iter.fold(Self::zero(), Add::add)
     }
 }
 
@@ -313,4 +333,13 @@ fn lerp() {
     assert!(a
         .lerp(b + A::two_pi() * 5.0, 0.75)
         .approx_eq(&Angle::radians(1.75)));
+}
+
+#[test]
+fn sum() {
+    type A = Angle<f32>;
+    let angles = [A::radians(1.0), A::radians(2.0), A::radians(3.0)];
+    let sum = A::radians(6.0);
+    assert_eq!(angles.iter().sum::<A>(), sum);
+    assert_eq!(angles.into_iter().sum::<A>(), sum);
 }

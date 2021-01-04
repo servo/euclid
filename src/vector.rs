@@ -22,6 +22,7 @@ use crate::Angle;
 use core::cmp::{Eq, PartialEq};
 use core::fmt;
 use core::hash::Hash;
+use core::iter::Sum;
 use core::marker::PhantomData;
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 #[cfg(feature = "mint")]
@@ -646,6 +647,27 @@ impl<T: Add, U> Add for Vector2D<T, U> {
     #[inline]
     fn add(self, other: Self) -> Self::Output {
         Vector2D::new(self.x + other.x, self.y + other.y)
+    }
+}
+
+impl<T: Add + Copy, U> Add<&Self> for Vector2D<T, U> {
+    type Output = Vector2D<T::Output, U>;
+
+    #[inline]
+    fn add(self, other: &Self) -> Self::Output {
+        Vector2D::new(self.x + other.x, self.y + other.y)
+    }
+}
+
+impl<T: Add<Output = T> + Zero, U> Sum for Vector2D<T, U> {
+    fn sum<I: Iterator<Item=Self>>(iter: I) -> Self {
+        iter.fold(Self::zero(), Add::add)
+    }
+}
+
+impl<'a, T: 'a + Add<Output = T> + Copy + Zero, U: 'a> Sum<&'a Self> for Vector2D<T, U> {
+    fn sum<I: Iterator<Item=&'a Self>>(iter: I) -> Self {
+        iter.fold(Self::zero(), Add::add)
     }
 }
 
@@ -1448,6 +1470,27 @@ impl<T: Add, U> Add for Vector3D<T, U> {
     }
 }
 
+impl<'a, T: 'a + Add + Copy, U: 'a> Add<&Self> for Vector3D<T, U> {
+    type Output = Vector3D<T::Output, U>;
+
+    #[inline]
+    fn add(self, other: &Self) -> Self::Output {
+        vec3(self.x + other.x, self.y + other.y, self.z + other.z)
+    }
+}
+
+impl<T: Add<Output = T> + Zero, U> Sum for Vector3D<T, U> {
+    fn sum<I: Iterator<Item=Self>>(iter: I) -> Self {
+        iter.fold(Self::zero(), Add::add)
+    }
+}
+
+impl<'a, T: 'a + Add<Output = T> + Copy + Zero, U: 'a> Sum<&'a Self> for Vector3D<T, U> {
+    fn sum<I: Iterator<Item=&'a Self>>(iter: I) -> Self {
+        iter.fold(Self::zero(), Add::add)
+    }
+}
+
 impl<T: Copy + Add<T, Output = T>, U> AddAssign for Vector3D<T, U> {
     #[inline]
     fn add_assign(&mut self, other: Self) {
@@ -2043,9 +2086,20 @@ mod vector2d {
         let p1 = Vector2DMm::new(1.0, 2.0);
         let p2 = Vector2DMm::new(3.0, 4.0);
 
-        let result = p1 + p2;
+        assert_eq!(p1 + p2, vec2(4.0, 6.0));
+        assert_eq!(p1 + &p2, vec2(4.0, 6.0));
+    }
 
-        assert_eq!(result, vec2(4.0, 6.0));
+    #[test]
+    pub fn test_sum() {
+        let vecs = [
+            Vector2DMm::new(1.0, 2.0),
+            Vector2DMm::new(3.0, 4.0),
+            Vector2DMm::new(5.0, 6.0)
+        ];
+        let sum = Vector2DMm::new(9.0, 12.0);
+        assert_eq!(vecs.iter().sum::<Vector2DMm<_>>(), sum);
+        assert_eq!(vecs.into_iter().sum::<Vector2DMm<_>>(), sum);
     }
 
     #[test]
@@ -2092,6 +2146,27 @@ mod vector3d {
     use mint;
 
     type Vec3 = default::Vector3D<f32>;
+
+    #[test]
+    pub fn test_add() {
+        let p1 = Vec3::new(1.0, 2.0, 3.0);
+        let p2 = Vec3::new(4.0, 5.0, 6.0);
+
+        assert_eq!(p1 + p2, vec3(5.0, 7.0, 9.0));
+        assert_eq!(p1 + &p2, vec3(5.0, 7.0, 9.0));
+    }
+
+    #[test]
+    pub fn test_sum() {
+        let vecs = [
+            Vec3::new(1.0, 2.0, 3.0),
+            Vec3::new(4.0, 5.0, 6.0),
+            Vec3::new(7.0, 8.0, 9.0)
+        ];
+        let sum = Vec3::new(12.0, 15.0, 18.0);
+        assert_eq!(vecs.iter().sum::<Vec3>(), sum);
+        assert_eq!(vecs.into_iter().sum::<Vec3>(), sum);
+    }
 
     #[test]
     pub fn test_dot() {
