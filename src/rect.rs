@@ -32,7 +32,7 @@ use core::ops::{Add, Div, DivAssign, Mul, MulAssign, Range, Sub};
 ///
 /// `Rect` is represented by an origin point and a size.
 ///
-/// See [`Rect`] for a rectangle represented by two endpoints.
+/// See [`Box2D`] for a rectangle represented by two endpoints.
 ///
 /// # Empty rectangle
 ///
