@@ -132,12 +132,34 @@ impl<T, U> Vector2D<T, U> {
         Vector2D::new(Zero::zero(), Zero::zero())
     }
 
+    /// Constructor, setting all components to one.
+    #[inline]
+    pub fn one() -> Self
+    where
+        T: One,
+    {
+        Vector2D::new(One::one(), One::one())
+    }
+
     /// Constructor taking scalar values directly.
     #[inline]
     pub const fn new(x: T, y: T) -> Self {
         Vector2D {
             x,
             y,
+            _unit: PhantomData,
+        }
+    }
+
+    /// Constructor setting all components to the same value.
+    #[inline]
+    pub fn splat(v: T) -> Self
+    where
+        T: Clone,
+    {
+        Vector2D {
+            x: v.clone(),
+            y: v,
             _unit: PhantomData,
         }
     }
@@ -936,6 +958,15 @@ impl<T, U> Vector3D<T, U> {
         vec3(Zero::zero(), Zero::zero(), Zero::zero())
     }
 
+    /// Constructor, setting all components to one.
+    #[inline]
+    pub fn one() -> Self
+    where
+        T: One,
+    {
+        vec3(One::one(), One::one(), One::one())
+    }
+
     /// Constructor taking scalar values directly.
     #[inline]
     pub const fn new(x: T, y: T, z: T) -> Self {
@@ -943,6 +974,19 @@ impl<T, U> Vector3D<T, U> {
             x,
             y,
             z,
+            _unit: PhantomData,
+        }
+    }
+    /// Constructor setting all components to the same value.
+    #[inline]
+    pub fn splat(v: T) -> Self
+    where
+        T: Clone,
+    {
+        Vector3D {
+            x: v.clone(),
+            y: v.clone(),
+            z: v,
             _unit: PhantomData,
         }
     }

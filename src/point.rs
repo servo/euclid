@@ -148,6 +148,19 @@ impl<T, U> Point2D<T, U> {
         point2(x.0, y.0)
     }
 
+    /// Constructor setting all components to the same value.
+    #[inline]
+    pub fn splat(v: T) -> Self
+    where
+        T: Clone,
+    {
+        Point2D {
+            x: v.clone(),
+            y: v,
+            _unit: PhantomData,
+        }
+    }
+
     /// Tag a unitless value with units.
     #[inline]
     pub fn from_untyped(p: Point2D<T, UnknownUnit>) -> Self {
@@ -817,6 +830,20 @@ impl<T, U> Point3D<T, U> {
     #[inline]
     pub fn from_lengths(x: Length<T, U>, y: Length<T, U>, z: Length<T, U>) -> Self {
         point3(x.0, y.0, z.0)
+    }
+
+    /// Constructor setting all components to the same value.
+    #[inline]
+    pub fn splat(v: T) -> Self
+    where
+        T: Clone,
+    {
+        Point3D {
+            x: v.clone(),
+            y: v.clone(),
+            z: v,
+            _unit: PhantomData,
+        }
     }
 
     /// Tag a unitless value with units.
