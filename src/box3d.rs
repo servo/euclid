@@ -11,6 +11,7 @@ use super::UnknownUnit;
 use crate::approxord::{max, min};
 use crate::num::*;
 use crate::point::{point3, Point3D};
+use crate::length::Length;
 use crate::scale::Scale;
 use crate::size::Size3D;
 use crate::vector::Vector3D;
@@ -233,6 +234,24 @@ where
     #[inline]
     pub fn depth(&self) -> T {
         self.max.z - self.min.z
+    }
+
+    /// Return this box's width as a strongly typed `Length`.
+    #[inline]
+    pub fn get_width(self) -> Length<T, U> {
+        Length::new(self.width())
+    }
+
+    /// Return this box's height as a strongly typed `Length`.
+    #[inline]
+    pub fn get_height(self) -> Length<T, U> {
+        Length::new(self.height())
+    }
+
+    /// Return this box's depth as a strongly typed `Length`.
+    #[inline]
+    pub fn get_depth(self) -> Length<T, U> {
+        Length::new(self.depth())
     }
 }
 
