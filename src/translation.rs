@@ -98,6 +98,18 @@ impl<T, Src, Dst> Translation2D<T, Src, Dst> {
         }
     }
 
+    #[inline]
+    pub fn splat(v: T) -> Self
+    where
+        T: Clone,
+    {
+        Translation2D {
+            x: v.clone(),
+            y: v,
+            _unit: PhantomData,
+        }
+    }
+
     /// Creates no-op translation (both `x` and `y` is `zero()`).
     #[inline]
     pub fn identity() -> Self
@@ -377,6 +389,19 @@ impl<T, Src, Dst> Translation3D<T, Src, Dst> {
             x,
             y,
             z,
+            _unit: PhantomData,
+        }
+    }
+
+    #[inline]
+    pub fn splat(v: T) -> Self
+    where
+        T: Clone,
+    {
+        Translation3D {
+            x: v.clone(),
+            y: v.clone(),
+            z: v,
             _unit: PhantomData,
         }
     }

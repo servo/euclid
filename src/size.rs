@@ -145,6 +145,19 @@ impl<T, U> Size2D<T, U> {
         Size2D::new(width.0, height.0)
     }
 
+    /// Constructor setting all components to the same value.
+    #[inline]
+    pub fn splat(v: T) -> Self
+    where
+        T: Clone,
+    {
+        Size2D {
+            width: v.clone(),
+            height: v,
+            _unit: PhantomData,
+        }
+    }
+
     /// Tag a unitless value with units.
     #[inline]
     pub fn from_untyped(p: Size2D<T, UnknownUnit>) -> Self {
@@ -1006,11 +1019,24 @@ impl<T, U> Size3D<T, U> {
             _unit: PhantomData,
         }
     }
-
     /// Constructor taking scalar strongly typed lengths.
     #[inline]
     pub fn from_lengths(width: Length<T, U>, height: Length<T, U>, depth: Length<T, U>) -> Self {
         Size3D::new(width.0, height.0, depth.0)
+    }
+
+    /// Constructor setting all components to the same value.
+    #[inline]
+    pub fn splat(v: T) -> Self
+    where
+        T: Clone,
+    {
+        Size3D {
+            width: v.clone(),
+            height: v.clone(),
+            depth: v,
+            _unit: PhantomData,
+        }
     }
 
     /// Tag a unitless value with units.
