@@ -228,6 +228,15 @@ impl<T, U> Vector2D<T, U> {
     {
         self.x * other.y - self.y * other.x
     }
+
+    /// Returns the component-wise multiplication of the two vectors.
+    #[inline]
+    pub fn component_mul(self, other: Self) -> Self
+    where
+        T: Mul<Output = T>,
+    {
+        vec2(self.x * other.x, self.y * other.y)
+    }
 }
 
 impl<T: Copy, U> Vector2D<T, U> {
@@ -1053,6 +1062,15 @@ impl<T: Copy, U> Vector3D<T, U> {
             self.z * other.x - self.x * other.z,
             self.x * other.y - self.y * other.x,
         )
+    }
+
+    /// Returns the component-wise multiplication of the two vectors.
+    #[inline]
+    pub fn component_mul(self, other: Self) -> Self
+    where
+        T: Mul<Output = T>,
+    {
+        vec3(self.x * other.x, self.y * other.y, self.z * other.z)
     }
 
     /// Cast this vector into a point.
