@@ -1931,7 +1931,7 @@ impl BoolVector3D {
 
 /// Convenience constructor.
 #[inline]
-pub fn vec2<T, U>(x: T, y: T) -> Vector2D<T, U> {
+pub const fn vec2<T, U>(x: T, y: T) -> Vector2D<T, U> {
     Vector2D {
         x,
         y,
@@ -1941,7 +1941,7 @@ pub fn vec2<T, U>(x: T, y: T) -> Vector2D<T, U> {
 
 /// Convenience constructor.
 #[inline]
-pub fn vec3<T, U>(x: T, y: T, z: T) -> Vector3D<T, U> {
+pub const fn vec3<T, U>(x: T, y: T, z: T) -> Vector3D<T, U> {
     Vector3D {
         x,
         y,
@@ -1952,13 +1952,13 @@ pub fn vec3<T, U>(x: T, y: T, z: T) -> Vector3D<T, U> {
 
 /// Shorthand for `BoolVector2D { x, y }`.
 #[inline]
-pub fn bvec2(x: bool, y: bool) -> BoolVector2D {
+pub const fn bvec2(x: bool, y: bool) -> BoolVector2D {
     BoolVector2D { x, y }
 }
 
 /// Shorthand for `BoolVector3D { x, y, z }`.
 #[inline]
-pub fn bvec3(x: bool, y: bool, z: bool) -> BoolVector3D {
+pub const fn bvec3(x: bool, y: bool, z: bool) -> BoolVector3D {
     BoolVector3D { x, y, z }
 }
 
