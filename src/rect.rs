@@ -54,6 +54,21 @@ pub struct Rect<T, U> {
     pub size: Size2D<T, U>,
 }
 
+#[cfg(feature = "arbitrary")]
+impl<'a, T, U> arbitrary::Arbitrary<'a> for Rect<T, U>
+where
+    T: arbitrary::Arbitrary<'a>,
+{
+    fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self>
+    {
+        let (origin, size) = arbitrary::Arbitrary::arbitrary(u)?;
+        Ok(Rect {
+            origin,
+            size,
+        })
+    }
+}
+
 impl<T: Hash, U> Hash for Rect<T, U> {
     fn hash<H: Hasher>(&self, h: &mut H) {
         self.origin.hash(h);

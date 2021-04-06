@@ -87,6 +87,22 @@ where
     }
 }
 
+#[cfg(feature = "arbitrary")]
+impl<'a, T, U> arbitrary::Arbitrary<'a> for Vector2D<T, U>
+where
+    T: arbitrary::Arbitrary<'a>,
+{
+    fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self>
+    {
+        let (x, y) = arbitrary::Arbitrary::arbitrary(u)?;
+        Ok(Vector2D {
+            x,
+            y,
+            _unit: PhantomData,
+        })
+    }
+}
+
 impl<T: Eq, U> Eq for Vector2D<T, U> {}
 
 impl<T: PartialEq, U> PartialEq for Vector2D<T, U> {
