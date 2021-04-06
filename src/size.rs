@@ -417,6 +417,12 @@ impl<T: PartialOrd, U> Size2D<T, U> {
         self.max(start).min(end)
     }
 
+    // Returns true if this size is larger or equal to the other size in all dimensions.
+    #[inline]
+    pub fn contains(self, other: Self) -> bool {
+        self.width >= other.width && self.height >= other.height
+    }
+
     /// Returns vector with results of "greater then" operation on each component.
     pub fn greater_than(self, other: Self) -> BoolVector2D {
         BoolVector2D {
@@ -1299,6 +1305,13 @@ impl<T: PartialOrd, U> Size3D<T, U> {
     {
         self.max(start).min(end)
     }
+
+    // Returns true if this size is larger or equal to the other size in all dimensions.
+    #[inline]
+    pub fn contains(self, other: Self) -> bool {
+        self.width >= other.width && self.height >= other.height && self.depth >= other.depth
+    }
+
 
     /// Returns vector with results of "greater than" operation on each component.
     pub fn greater_than(self, other: Self) -> BoolVector3D {
