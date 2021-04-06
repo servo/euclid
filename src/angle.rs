@@ -20,6 +20,7 @@ use serde::{Deserialize, Serialize};
 /// An angle in radians
 #[derive(Copy, Clone, Default, Debug, PartialEq, Eq, PartialOrd, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
 pub struct Angle<T> {
     pub radians: T,
 }

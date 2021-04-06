@@ -83,6 +83,22 @@ where
     }
 }
 
+#[cfg(feature = "arbitrary")]
+impl<'a, T, U> arbitrary::Arbitrary<'a> for Size2D<T, U>
+where
+    T: arbitrary::Arbitrary<'a>,
+{
+    fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self>
+    {
+        let (width, height) = arbitrary::Arbitrary::arbitrary(u)?;
+        Ok(Size2D {
+            width,
+            height,
+            _unit: PhantomData,
+        })
+    }
+}
+
 impl<T, U> Eq for Size2D<T, U> where T: Eq {}
 
 impl<T, U> PartialEq for Size2D<T, U>
