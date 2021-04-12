@@ -253,6 +253,15 @@ impl<T, U> Vector2D<T, U> {
     {
         vec2(self.x * other.x, self.y * other.y)
     }
+
+    /// Returns the component-wise division of the two vectors.
+    #[inline]
+    pub fn component_div(self, other: Self) -> Self
+    where
+        T: Div<Output = T>,
+    {
+        vec2(self.x / other.x, self.y / other.y)
+    }
 }
 
 impl<T: Copy, U> Vector2D<T, U> {
@@ -1087,6 +1096,15 @@ impl<T: Copy, U> Vector3D<T, U> {
         T: Mul<Output = T>,
     {
         vec3(self.x * other.x, self.y * other.y, self.z * other.z)
+    }
+
+    /// Returns the component-wise division of the two vectors.
+    #[inline]
+    pub fn component_div(self, other: Self) -> Self
+    where
+        T: Div<Output = T>,
+    {
+        vec3(self.x / other.x, self.y / other.y, self.z / other.z)
     }
 
     /// Cast this vector into a point.
