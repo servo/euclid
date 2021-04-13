@@ -27,7 +27,7 @@ use core::marker::PhantomData;
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 #[cfg(feature = "mint")]
 use mint;
-use num_traits::{Float, NumCast, Signed};
+use num_traits::{Float, NumCast, PrimInt, Signed};
 #[cfg(feature = "serde")]
 use serde;
 
@@ -136,6 +136,11 @@ impl<T: Default, U> Default for Vector2D<T, U> {
     fn default() -> Self {
         Vector2D::new(Default::default(), Default::default())
     }
+}
+
+#[inline]
+fn ceiling_div<T: PrimInt>(a: T, b: T) -> T {
+    (a + b - T::one()) / b
 }
 
 impl<T, U> Vector2D<T, U> {
@@ -261,6 +266,15 @@ impl<T, U> Vector2D<T, U> {
         T: Div<Output = T>,
     {
         vec2(self.x / other.x, self.y / other.y)
+    }
+
+    /// Returns the component-wise ceiling division of the two vectors.
+    #[inline]
+    pub fn component_ceiling_div(self, other: Self) -> Self
+    where
+        T: PrimInt + Div<Output = T>,
+    {
+        vec2(ceiling_div(self.x, other.x), ceiling_div(self.y, other.y))
     }
 }
 
@@ -1105,6 +1119,19 @@ impl<T: Copy, U> Vector3D<T, U> {
         T: Div<Output = T>,
     {
         vec3(self.x / other.x, self.y / other.y, self.z / other.z)
+    }
+
+    /// Returns the component-wise ceiling division of the two vectors.
+    #[inline]
+    pub fn component_ceiling_div(self, other: Self) -> Self
+    where
+        T: PrimInt + Div<Output = T>,
+    {
+        vec3(
+            ceiling_div(self.x, other.x),
+            ceiling_div(self.y, other.y),
+            ceiling_div(self.z, other.z),
+        )
     }
 
     /// Cast this vector into a point.
@@ -2015,6 +2042,18 @@ mod vector2d {
     }
 
     #[test]
+    pub fn test_component_ceiling_div() {
+        type Vec2 = default::Vector2D<u32>;
+
+        let p1: Vec2 = vec2(3, 8);
+        let p2: Vec2 = vec2(2, 3);
+
+        let result = p1.component_ceiling_div(p2);
+
+        assert_eq!(result, Vec2::new(2, 3));
+    }
+
+    #[test]
     pub fn test_dot() {
         let p1: Vec2 = vec2(2.0, 7.0);
         let p2: Vec2 = vec2(13.0, 11.0);
@@ -2250,6 +2289,18 @@ mod vector3d {
 
         assert_eq!(p1 + p2, vec3(5.0, 7.0, 9.0));
         assert_eq!(p1 + &p2, vec3(5.0, 7.0, 9.0));
+    }
+
+    #[test]
+    pub fn test_component_ceiling_div() {
+        type Vec3 = default::Vector3D<u32>;
+
+        let p1: Vec3 = vec3(3, 8, 13);
+        let p2: Vec3 = vec3(2, 3, 4);
+
+        let result = p1.component_ceiling_div(p2);
+
+        assert_eq!(result, Vec3::new(2, 3, 4));
     }
 
     #[test]
