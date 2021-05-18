@@ -114,6 +114,15 @@ impl<T, U> Box2D<T, U> {
             max: point2(size.width, size.height),
         }
     }
+
+    /// Creates a Box2D of the given size, at offset zero.
+    #[inline]
+    pub fn from_size(size: Size2D<T, U>) -> Self where T: Zero {
+        Box2D {
+            min: Point2D::zero(),
+            max: point2(size.width, size.height),
+        }
+    }
 }
 
 impl<T, U> Box2D<T, U>
@@ -295,14 +304,6 @@ impl<T, U> Box2D<T, U>
 where
     T: Copy + Zero + PartialOrd,
 {
-    /// Creates a Box2D of the given size, at offset zero.
-    #[inline]
-    pub fn from_size(size: Size2D<T, U>) -> Self {
-        let zero = Point2D::zero();
-        let point = size.to_vector().to_point();
-        Box2D::from_points(&[zero, point])
-    }
-
     /// Returns the smallest box containing all of the provided points.
     pub fn from_points<I>(points: I) -> Self
     where

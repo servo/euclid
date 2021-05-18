@@ -75,6 +75,15 @@ impl<T, U> Box3D<T, U> {
     pub const fn new(min: Point3D<T, U>, max: Point3D<T, U>) -> Self {
         Box3D { min, max }
     }
+
+    /// Creates a Box3D of the given size, at offset zero.
+    #[inline]
+    pub fn from_size(size: Size3D<T, U>) -> Self where T: Zero {
+        Box3D {
+            min: Point3D::zero(),
+            max: point3(size.width, size.height, size.depth),
+        }
+    }
 }
 
 impl<T, U> Box3D<T, U>
@@ -255,14 +264,6 @@ impl<T, U> Box3D<T, U>
 where
     T: Copy + Zero + PartialOrd,
 {
-    /// Creates a Box3D of the given size, at offset zero.
-    #[inline]
-    pub fn from_size(size: Size3D<T, U>) -> Self {
-        let zero = Point3D::zero();
-        let point = size.to_vector().to_point();
-        Box3D::from_points(&[zero, point])
-    }
-
     /// Returns the smallest box containing all of the provided points.
     pub fn from_points<I>(points: I) -> Self
     where
