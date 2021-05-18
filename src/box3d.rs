@@ -605,6 +605,15 @@ where
     }
 }
 
+impl<T: Default, U> Default for Box3D<T, U> {
+    fn default() -> Self {
+        Box3D {
+            min: Default::default(),
+            max: Default::default(),
+        }
+    }
+}
+
 /// Shorthand for `Box3D::new(Point3D::new(x1, y1, z1), Point3D::new(x2, y2, z2))`.
 pub fn box3d<T: Copy, U>(
     min_x: T,

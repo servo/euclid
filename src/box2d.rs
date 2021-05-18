@@ -602,6 +602,15 @@ where
     }
 }
 
+impl<T: Default, U> Default for Box2D<T, U> {
+    fn default() -> Self {
+        Box2D {
+            min: Default::default(),
+            max: Default::default(),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::default::Box2D;
