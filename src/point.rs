@@ -485,6 +485,14 @@ impl<T: NumCast + Copy, U> Point2D<T, U> {
     }
 }
 
+impl<T: Float, U> Point2D<T, U> {
+    /// Returns true if all members are finite.
+    #[inline]
+    pub fn is_finite(self) -> bool {
+        self.x.is_finite() && self.y.is_finite()
+    }
+}
+
 impl<T: Copy + Add<T, Output = T>, U> Point2D<T, U> {
     #[inline]
     pub fn add_size(self, other: &Size2D<T, U>) -> Self {
@@ -1194,6 +1202,14 @@ impl<T: NumCast + Copy, U> Point3D<T, U> {
     #[inline]
     pub fn to_i64(self) -> Point3D<i64, U> {
         self.cast()
+    }
+}
+
+impl<T: Float, U> Point3D<T, U> {
+    /// Returns true if all members are finite.
+    #[inline]
+    pub fn is_finite(self) -> bool {
+        self.x.is_finite() && self.y.is_finite() && self.z.is_finite()
     }
 }
 

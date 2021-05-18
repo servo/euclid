@@ -23,7 +23,7 @@ use core::hash::Hash;
 use core::iter::Sum;
 use core::marker::PhantomData;
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
-use num_traits::{NumCast, Signed};
+use num_traits::{NumCast, Signed, Float};
 #[cfg(feature = "serde")]
 use serde;
 
@@ -389,6 +389,14 @@ impl<T: NumCast + Copy, U> Size2D<T, U> {
     #[inline]
     pub fn to_i64(self) -> Size2D<i64, U> {
         self.cast()
+    }
+}
+
+impl<T: Float, U> Size2D<T, U> {
+    /// Returns true if all members are finite.
+    #[inline]
+    pub fn is_finite(self) -> bool {
+        self.width.is_finite() && self.height.is_finite()
     }
 }
 
@@ -1270,6 +1278,14 @@ impl<T: NumCast + Copy, U> Size3D<T, U> {
     #[inline]
     pub fn to_i64(self) -> Size3D<i64, U> {
         self.cast()
+    }
+}
+
+impl<T: Float, U> Size3D<T, U> {
+    /// Returns true if all members are finite.
+    #[inline]
+    pub fn is_finite(self) -> bool {
+        self.width.is_finite() && self.height.is_finite() && self.depth.is_finite()
     }
 }
 

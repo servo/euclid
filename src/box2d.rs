@@ -17,7 +17,7 @@ use crate::side_offsets::SideOffsets2D;
 use crate::size::Size2D;
 use crate::vector::{vec2, Vector2D};
 
-use num_traits::NumCast;
+use num_traits::{NumCast, Float};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -568,6 +568,14 @@ impl<T: NumCast + Copy, U> Box2D<T, U> {
     #[inline]
     pub fn to_i64(&self) -> Box2D<i64, U> {
         self.cast()
+    }
+}
+
+impl<T: Float, U> Box2D<T, U> {
+    /// Returns true if all members are finite.
+    #[inline]
+    pub fn is_finite(self) -> bool {
+        self.min.is_finite() && self.max.is_finite()
     }
 }
 
