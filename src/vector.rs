@@ -509,6 +509,12 @@ impl<T: Float, U> Vector2D<T, U> {
         debug_assert!(min <= max);
         self.with_min_length(min).with_max_length(max)
     }
+
+    /// Returns true if all members are finite.
+    #[inline]
+    pub fn is_finite(self) -> bool {
+        self.x.is_finite() && self.y.is_finite()
+    }
 }
 
 impl<T, U> Vector2D<T, U>
@@ -1352,6 +1358,12 @@ impl<T: Float, U> Vector3D<T, U> {
     pub fn clamp_length(self, min: T, max: T) -> Self {
         debug_assert!(min <= max);
         self.with_min_length(min).with_max_length(max)
+    }
+
+    /// Returns true if all members are finite.
+    #[inline]
+    pub fn is_finite(self) -> bool {
+        self.x.is_finite() && self.y.is_finite() && self.z.is_finite()
     }
 }
 

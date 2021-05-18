@@ -15,7 +15,7 @@ use crate::scale::Scale;
 use crate::size::Size3D;
 use crate::vector::Vector3D;
 
-use num_traits::NumCast;
+use num_traits::{NumCast, Float};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -565,6 +565,14 @@ impl<T: NumCast + Copy, U> Box3D<T, U> {
     #[inline]
     pub fn to_i64(&self) -> Box3D<i64, U> {
         self.cast()
+    }
+}
+
+impl<T: Float, U> Box3D<T, U> {
+    /// Returns true if all members are finite.
+    #[inline]
+    pub fn is_finite(self) -> bool {
+        self.min.is_finite() && self.max.is_finite()
     }
 }
 

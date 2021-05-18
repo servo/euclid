@@ -109,6 +109,12 @@ where
     pub fn sin_cos(self) -> (T, T) {
         self.radians.sin_cos()
     }
+
+    /// Returns true if the angle is a finite number.
+    #[inline]
+    pub fn is_finite(self) -> bool {
+        self.radians.is_finite()
+    }
 }
 
 impl<T> Angle<T>
