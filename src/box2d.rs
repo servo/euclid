@@ -25,7 +25,7 @@ use core::borrow::Borrow;
 use core::cmp::PartialOrd;
 use core::fmt;
 use core::hash::{Hash, Hasher};
-use core::ops::{Add, Div, DivAssign, Mul, MulAssign, Sub};
+use core::ops::{Add, Div, DivAssign, Mul, MulAssign, Sub, Range};
 
 /// A 2d axis aligned rectangle represented by its minimum and maximum coordinates.
 ///
@@ -453,6 +453,16 @@ impl<T, U> Box2D<T, U>
 where
     T: Copy,
 {
+    #[inline]
+    pub fn x_range(&self) -> Range<T> {
+        self.min.x..self.max.x
+    }
+
+    #[inline]
+    pub fn y_range(&self) -> Range<T> {
+        self.min.y..self.max.y
+    }
+
     /// Drop the units, preserving only the numeric value.
     #[inline]
     pub fn to_untyped(&self) -> Box2D<T, UnknownUnit> {

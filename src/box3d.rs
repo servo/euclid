@@ -23,7 +23,7 @@ use core::borrow::Borrow;
 use core::cmp::PartialOrd;
 use core::fmt;
 use core::hash::{Hash, Hasher};
-use core::ops::{Add, Div, DivAssign, Mul, MulAssign, Sub};
+use core::ops::{Add, Div, DivAssign, Mul, MulAssign, Sub, Range};
 
 /// An axis aligned 3D box represented by its minimum and maximum coordinates.
 #[repr(C)]
@@ -439,6 +439,21 @@ impl<T, U> Box3D<T, U>
 where
     T: Copy,
 {
+    #[inline]
+    pub fn x_range(&self) -> Range<T> {
+        self.min.x..self.max.x
+    }
+
+    #[inline]
+    pub fn y_range(&self) -> Range<T> {
+        self.min.y..self.max.y
+    }
+
+    #[inline]
+    pub fn z_range(&self) -> Range<T> {
+        self.min.z..self.max.z
+    }
+
     /// Drop the units, preserving only the numeric value.
     #[inline]
     pub fn to_untyped(&self) -> Box3D<T, UnknownUnit> {
