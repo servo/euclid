@@ -105,6 +105,15 @@ impl<T, U> Box2D<T, U> {
     pub const fn new(min: Point2D<T, U>, max: Point2D<T, U>) -> Self {
         Box2D { min, max }
     }
+
+    /// Constructor.
+    #[inline]
+    pub fn from_origin_and_size(origin: Point2D<T, U>, size: Size2D<T, U>) -> Self {
+        Box2D {
+            min: origin,
+            max: point2(size.width, size.height),
+        }
+    }
 }
 
 impl<T, U> Box2D<T, U>
