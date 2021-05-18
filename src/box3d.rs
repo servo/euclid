@@ -23,7 +23,7 @@ use core::borrow::Borrow;
 use core::cmp::PartialOrd;
 use core::fmt;
 use core::hash::{Hash, Hasher};
-use core::ops::{Add, Div, DivAssign, Mul, MulAssign, Sub};
+use core::ops::{Add, Div, DivAssign, Mul, MulAssign, Sub, Range};
 
 /// An axis aligned 3D box represented by its minimum and maximum coordinates.
 #[repr(C)]
@@ -74,6 +74,15 @@ impl<T, U> Box3D<T, U> {
     #[inline]
     pub const fn new(min: Point3D<T, U>, max: Point3D<T, U>) -> Self {
         Box3D { min, max }
+    }
+
+    /// Creates a Box3D of the given size, at offset zero.
+    #[inline]
+    pub fn from_size(size: Size3D<T, U>) -> Self where T: Zero {
+        Box3D {
+            min: Point3D::zero(),
+            max: point3(size.width, size.height, size.depth),
+        }
     }
 }
 
@@ -255,14 +264,6 @@ impl<T, U> Box3D<T, U>
 where
     T: Copy + Zero + PartialOrd,
 {
-    /// Creates a Box3D of the given size, at offset zero.
-    #[inline]
-    pub fn from_size(size: Size3D<T, U>) -> Self {
-        let zero = Point3D::zero();
-        let point = size.to_vector().to_point();
-        Box3D::from_points(&[zero, point])
-    }
-
     /// Returns the smallest box containing all of the provided points.
     pub fn from_points<I>(points: I) -> Self
     where
@@ -438,6 +439,21 @@ impl<T, U> Box3D<T, U>
 where
     T: Copy,
 {
+    #[inline]
+    pub fn x_range(&self) -> Range<T> {
+        self.min.x..self.max.x
+    }
+
+    #[inline]
+    pub fn y_range(&self) -> Range<T> {
+        self.min.y..self.max.y
+    }
+
+    #[inline]
+    pub fn z_range(&self) -> Range<T> {
+        self.min.z..self.max.z
+    }
+
     /// Drop the units, preserving only the numeric value.
     #[inline]
     pub fn to_untyped(&self) -> Box3D<T, UnknownUnit> {
@@ -602,6 +618,15 @@ where
 {
     fn from(b: Size3D<T, U>) -> Self {
         Self::from_size(b)
+    }
+}
+
+impl<T: Default, U> Default for Box3D<T, U> {
+    fn default() -> Self {
+        Box3D {
+            min: Default::default(),
+            max: Default::default(),
+        }
     }
 }
 
