@@ -368,13 +368,6 @@ where
 {
     #[inline]
     pub fn union(&self, other: &Self) -> Self {
-        if self.size == Zero::zero() {
-            return *other;
-        }
-        if other.size == Zero::zero() {
-            return *self;
-        }
-
         self.to_box2d().union(&other.to_box2d()).to_rect()
     }
 }

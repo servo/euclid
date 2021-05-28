@@ -213,8 +213,18 @@ where
         }
     }
 
+    /// Computes the union of two boxes.
+    ///
+    /// If either of the boxes is empty, the other one is returned.
     #[inline]
     pub fn union(&self, other: &Self) -> Self {
+        if other.is_empty() {
+            return *self;
+        }
+        if self.is_empty() {
+            return *other;
+        }
+
         Box2D {
             min: point2(min(self.min.x, other.min.x), min(self.min.y, other.min.y)),
             max: point2(max(self.max.x, other.max.x), max(self.max.y, other.max.y)),

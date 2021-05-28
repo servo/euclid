@@ -183,9 +183,18 @@ where
         Box3D::new(intersection_min, intersection_max)
     }
 
-    /// Returns the smallest box containing both of the provided boxes.
+    /// Computes the union of two boxes.
+    ///
+    /// If either of the boxes is empty, the other one is returned.
     #[inline]
     pub fn union(&self, other: &Self) -> Self {
+        if other.is_empty() {
+            return *self;
+        }
+        if self.is_empty() {
+            return *other;
+        }
+
         Box3D::new(
             Point3D::new(
                 min(self.min.x, other.min.x),
