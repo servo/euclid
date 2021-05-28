@@ -2207,7 +2207,6 @@ mod vector2d {
         ];
         let sum = Vector2DMm::new(9.0, 12.0);
         assert_eq!(vecs.iter().sum::<Vector2DMm<_>>(), sum);
-        assert_eq!(vecs.into_iter().sum::<Vector2DMm<_>>(), sum);
     }
 
     #[test]
@@ -2273,7 +2272,6 @@ mod vector3d {
         ];
         let sum = Vec3::new(12.0, 15.0, 18.0);
         assert_eq!(vecs.iter().sum::<Vec3>(), sum);
-        assert_eq!(vecs.into_iter().sum::<Vec3>(), sum);
     }
 
     #[test]

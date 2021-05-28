@@ -805,7 +805,6 @@ mod size2d {
             ];
             let sum = Size2D::new(3.0, 6.0);
             assert_eq!(sizes.iter().sum::<Size2D<_>>(), sum);
-            assert_eq!(sizes.into_iter().sum::<Size2D<_>>(), sum);
         }
 
         #[test]
@@ -1695,7 +1694,6 @@ mod size3d {
             ];
             let sum = Size3D::new(3.0, 6.0, 9.0);
             assert_eq!(sizes.iter().sum::<Size3D<_>>(), sum);
-            assert_eq!(sizes.into_iter().sum::<Size3D<_>>(), sum);
         }
 
         #[test]
