@@ -258,6 +258,14 @@ where
         (self.max - self.min).to_size()
     }
 
+    /// Change the size of the box by adjusting the max endpoint
+    /// without modifying the min endpoint.
+    #[inline]
+    pub fn set_size(&mut self, size: Size2D<T, U>) {
+        let diff = (self.size() - size).to_vector();
+        self.max -= diff;
+    }
+
     #[inline]
     pub fn width(&self) -> T {
         self.max.x - self.min.x
@@ -871,5 +879,17 @@ mod tests {
         let b = Box2D::from_origin_and_size(point2(1.0, 2.0), size2(3.0, 4.0));
         assert_eq!(b.min, point2(1.0, 2.0));
         assert_eq!(b.size(), size2(3.0, 4.0));
+    }
+
+    #[test]
+    fn test_set_size() {
+        let mut b = Box2D {
+            min: point2(1.0, 2.0),
+            max: point2(3.0, 4.0),
+        };
+        b.set_size(size2(5.0, 6.0));
+
+        assert_eq!(b.min, point2(1.0, 2.0));
+        assert_eq!(b.size(), size2(5.0, 6.0));
     }
 }
