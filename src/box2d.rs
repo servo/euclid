@@ -108,10 +108,13 @@ impl<T, U> Box2D<T, U> {
 
     /// Constructor.
     #[inline]
-    pub fn from_origin_and_size(origin: Point2D<T, U>, size: Size2D<T, U>) -> Self {
+    pub fn from_origin_and_size(origin: Point2D<T, U>, size: Size2D<T, U>) -> Self 
+    where
+        T: Copy + Add<T, Output = T>
+    {
         Box2D {
             min: origin,
-            max: point2(size.width, size.height),
+            max: point2(origin.x + size.width, origin.y + size.height),
         }
     }
 
@@ -861,5 +864,12 @@ mod tests {
         assert!(Box2D { min: point2(0.0, NAN), max: point2(1.0, 2.0) }.is_empty());
         assert!(Box2D { min: point2(1.0, -2.0), max: point2(NAN, 2.0) }.is_empty());
         assert!(Box2D { min: point2(1.0, -2.0), max: point2(0.0, NAN) }.is_empty());
+    }
+
+    #[test]
+    fn test_from_origin_and_size() {
+        let b = Box2D::from_origin_and_size(point2(1.0, 2.0), size2(3.0, 4.0));
+        assert_eq!(b.min, point2(1.0, 2.0));
+        assert_eq!(b.size(), size2(3.0, 4.0));
     }
 }
