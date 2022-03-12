@@ -16,7 +16,8 @@ use core::fmt;
 use core::hash::Hash;
 use core::marker::PhantomData;
 use core::ops::{Add, Mul, Neg, Sub};
-use num_traits::{Float, NumCast, One, Zero};
+use num_traits::real::Real;
+use num_traits::{NumCast, One, Zero};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -166,7 +167,7 @@ where
     }
 }
 
-impl<T: Float, Src, Dst> Rotation2D<T, Src, Dst> {
+impl<T: Real, Src, Dst> Rotation2D<T, Src, Dst> {
     /// Creates a 3d rotation (around the z axis) from this 2d rotation.
     #[inline]
     pub fn to_3d(&self) -> Rotation3D<T, Src, Dst> {
@@ -193,7 +194,7 @@ impl<T: Float, Src, Dst> Rotation2D<T, Src, Dst> {
     /// The input point must be use the unit Src, and the returned point has the unit Dst.
     #[inline]
     pub fn transform_point(&self, point: Point2D<T, Src>) -> Point2D<T, Dst> {
-        let (sin, cos) = Float::sin_cos(self.angle);
+        let (sin, cos) = Real::sin_cos(self.angle);
         point2(point.x * cos - point.y * sin, point.y * cos + point.x * sin)
     }
 
@@ -402,7 +403,7 @@ where
 
 impl<T, Src, Dst> Rotation3D<T, Src, Dst>
 where
-    T: Float,
+    T: Real,
 {
     /// Creates a rotation around from a quaternion representation and normalizes it.
     ///
@@ -456,9 +457,9 @@ where
     pub fn euler(roll: Angle<T>, pitch: Angle<T>, yaw: Angle<T>) -> Self {
         let half = T::one() / (T::one() + T::one());
 
-        let (sy, cy) = Float::sin_cos(half * yaw.get());
-        let (sp, cp) = Float::sin_cos(half * pitch.get());
-        let (sr, cr) = Float::sin_cos(half * roll.get());
+        let (sy, cy) = Real::sin_cos(half * yaw.get());
+        let (sp, cp) = Real::sin_cos(half * pitch.get());
+        let (sr, cr) = Real::sin_cos(half * roll.get());
 
         Self::quaternion(
             cy * sr * cp - sy * cr * sp,
@@ -537,14 +538,14 @@ where
         }
 
         // For robustness, stay within the domain of acos.
-        dot = Float::min(dot, one);
+        dot = Real::min(dot, one);
 
         // Angle between r1 and the result.
-        let theta = Float::acos(dot) * t;
+        let theta = Real::acos(dot) * t;
 
         // r1 and r3 form an orthonormal basis.
         let r3 = r2.sub(r1.mul(dot)).normalize();
-        let (sin, cos) = Float::sin_cos(theta);
+        let (sin, cos) = Real::sin_cos(theta);
         r1.mul(cos).add(r3.mul(sin))
     }
 

@@ -13,6 +13,7 @@ use core::cmp::{Eq, PartialEq};
 use core::hash::Hash;
 use core::iter::Sum;
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, Sub, SubAssign};
+use num_traits::real::Real;
 use num_traits::{Float, FloatConst, NumCast, One, Zero};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -105,15 +106,20 @@ impl<T> Angle<T>
 where
     T: Float,
 {
-    /// Returns (sin(self), cos(self)).
-    pub fn sin_cos(self) -> (T, T) {
-        self.radians.sin_cos()
-    }
-
     /// Returns true if the angle is a finite number.
     #[inline]
     pub fn is_finite(self) -> bool {
         self.radians.is_finite()
+    }
+}
+
+impl<T> Angle<T>
+where
+    T: Real,
+{
+    /// Returns (sin(self), cos(self)).
+    pub fn sin_cos(self) -> (T, T) {
+        self.radians.sin_cos()
     }
 }
 
