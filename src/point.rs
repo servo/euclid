@@ -22,6 +22,7 @@ use core::marker::PhantomData;
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 #[cfg(feature = "mint")]
 use mint;
+use num_traits::real::Real;
 use num_traits::{Float, NumCast};
 #[cfg(feature = "serde")]
 use serde;
@@ -510,7 +511,7 @@ impl<T: Copy + Add<T, Output = T>, U> Point2D<T, U> {
     }
 }
 
-impl<T: Float + Sub<T, Output = T>, U> Point2D<T, U> {
+impl<T: Real + Sub<T, Output = T>, U> Point2D<T, U> {
     #[inline]
     pub fn distance_to(self, other: Self) -> T {
         (self - other).length()
@@ -1240,7 +1241,7 @@ impl<T: Copy + Add<T, Output = T>, U> Point3D<T, U> {
     }
 }
 
-impl<T: Float + Sub<T, Output = T>, U> Point3D<T, U> {
+impl<T: Real + Sub<T, Output = T>, U> Point3D<T, U> {
     #[inline]
     pub fn distance_to(self, other: Self) -> T {
         (self - other).length()
