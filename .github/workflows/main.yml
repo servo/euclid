@@ -40,6 +40,9 @@ jobs:
         env:
           RUST_BACKTRACE: 1
 
+      - name: bytemuck
+        run: cargo check --features bytemuck
+
   build_result:
     name: homu build finished
     runs-on: ubuntu-latest

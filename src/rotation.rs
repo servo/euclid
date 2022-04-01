@@ -19,6 +19,8 @@ use core::ops::{Add, Mul, Neg, Sub};
 use num_traits::{Float, NumCast, One, Zero};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "bytemuck")]
+use bytemuck::{Zeroable, Pod};
 
 /// A transform that can represent rotations in 2d, represented as an angle in radians.
 #[repr(C)]
@@ -67,6 +69,12 @@ where
         self.angle.hash(h);
     }
 }
+
+#[cfg(feature = "bytemuck")]
+unsafe impl<T: Zeroable, Src, Dst> Zeroable for Rotation2D<T, Src, Dst> {}
+
+#[cfg(feature = "bytemuck")]
+unsafe impl<T: Pod, Src: 'static, Dst: 'static> Pod for Rotation2D<T, Src, Dst> {}
 
 impl<T, Src, Dst> Rotation2D<T, Src, Dst> {
     /// Creates a rotation from an angle in radians.
@@ -284,6 +292,12 @@ where
         self.r.hash(h);
     }
 }
+
+#[cfg(feature = "bytemuck")]
+unsafe impl<T: Zeroable, Src, Dst> Zeroable for Rotation3D<T, Src, Dst> {}
+
+#[cfg(feature = "bytemuck")]
+unsafe impl<T: Pod, Src: 'static, Dst: 'static> Pod for Rotation3D<T, Src, Dst> {}
 
 impl<T, Src, Dst> Rotation3D<T, Src, Dst> {
     /// Creates a rotation around from a quaternion representation.
