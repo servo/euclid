@@ -490,6 +490,13 @@ impl<T: Float, U> Vector2D<T, U> {
         }
     }
 
+    /// Return this vector scaled to fit the provided length.
+    #[inline]
+    pub fn with_length(self, length: T) -> Self {
+        self.normalize() * length
+    }
+
+
     /// Return this vector capped to a maximum length.
     #[inline]
     pub fn with_max_length(self, max_length: T) -> Self {
