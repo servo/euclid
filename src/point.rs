@@ -26,6 +26,9 @@ use num_traits::{Float, NumCast};
 #[cfg(feature = "serde")]
 use serde;
 
+#[cfg(feature = "bytemuck")]
+use bytemuck::{Zeroable, Pod};
+
 /// A 2d Point tagged with a unit.
 #[repr(C)]
 pub struct Point2D<T, U> {
@@ -93,6 +96,13 @@ where
         })
     }
 }
+
+#[cfg(feature = "bytemuck")]
+unsafe impl<T: Zeroable, U> Zeroable for Point2D<T, U> {}
+
+#[cfg(feature = "bytemuck")]
+unsafe impl<T: Pod, U: 'static> Pod for Point2D<T, U> {}
+
 impl<T, U> Eq for Point2D<T, U> where T: Eq {}
 
 impl<T, U> PartialEq for Point2D<T, U>
@@ -780,6 +790,12 @@ where
         (&self.x, &self.y, &self.z).serialize(serializer)
     }
 }
+
+#[cfg(feature = "bytemuck")]
+unsafe impl<T: Zeroable, U> Zeroable for Point3D<T, U> {}
+
+#[cfg(feature = "bytemuck")]
+unsafe impl<T: Pod, U: 'static> Pod for Point3D<T, U> {}
 
 impl<T, U> Eq for Point3D<T, U> where T: Eq {}
 

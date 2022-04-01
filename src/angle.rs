@@ -16,6 +16,8 @@ use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, Sub, S
 use num_traits::{Float, FloatConst, NumCast, One, Zero};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "bytemuck")]
+use bytemuck::{Zeroable, Pod};
 
 /// An angle in radians
 #[derive(Copy, Clone, Default, Debug, PartialEq, Eq, PartialOrd, Hash)]
@@ -24,6 +26,12 @@ use serde::{Deserialize, Serialize};
 pub struct Angle<T> {
     pub radians: T,
 }
+
+#[cfg(feature = "bytemuck")]
+unsafe impl<T: Zeroable> Zeroable for Angle<T> {}
+
+#[cfg(feature = "bytemuck")]
+unsafe impl<T: Pod> Pod for Angle<T> {}
 
 impl<T> Angle<T> {
     #[inline]

@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         features: ["", "--features serde", "--no-default-features --features libm"]
-        version: ["1.31.0", "stable", "beta", "nightly"]
+        version: ["1.34.0", "stable", "beta", "nightly"]
         include:
           - version: stable
             features: --features mint
@@ -39,6 +39,9 @@ jobs:
         run: cargo test ${{ matrix.features }}
         env:
           RUST_BACKTRACE: 1
+
+      - name: bytemuck
+        run: cargo check --features bytemuck
 
   build_result:
     name: homu build finished

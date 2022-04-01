@@ -21,6 +21,8 @@ use core::marker::PhantomData;
 use core::ops::{Add, Div, DivAssign, Mul, MulAssign, Neg};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "bytemuck")]
+use bytemuck::{Zeroable, Pod};
 
 /// A group of 2D side offsets, which correspond to top/right/bottom/left for borders, padding,
 /// and margins in CSS, optionally tagged with a unit.
@@ -56,6 +58,12 @@ where
         })
     }
 }
+
+#[cfg(feature = "bytemuck")]
+unsafe impl<T: Zeroable, U> Zeroable for SideOffsets2D<T, U> {}
+
+#[cfg(feature = "bytemuck")]
+unsafe impl<T: Pod, U: 'static> Pod for SideOffsets2D<T, U> {}
 
 impl<T: Copy, U> Copy for SideOffsets2D<T, U> {}
 

@@ -31,6 +31,9 @@ use num_traits::{Float, NumCast, Signed};
 #[cfg(feature = "serde")]
 use serde;
 
+#[cfg(feature = "bytemuck")]
+use bytemuck::{Zeroable, Pod};
+
 /// A 2d Vector tagged with a unit.
 #[repr(C)]
 pub struct Vector2D<T, U> {
@@ -102,6 +105,12 @@ where
         })
     }
 }
+
+#[cfg(feature = "bytemuck")]
+unsafe impl<T: Zeroable, U> Zeroable for Vector2D<T, U> {}
+
+#[cfg(feature = "bytemuck")]
+unsafe impl<T: Pod, U: 'static> Pod for Vector2D<T, U> {}
 
 impl<T: Eq, U> Eq for Vector2D<T, U> {}
 
@@ -947,6 +956,12 @@ where
         (&self.x, &self.y, &self.z).serialize(serializer)
     }
 }
+
+#[cfg(feature = "bytemuck")]
+unsafe impl<T: Zeroable, U> Zeroable for Vector3D<T, U> {}
+
+#[cfg(feature = "bytemuck")]
+unsafe impl<T: Pod, U: 'static> Pod for Vector3D<T, U> {}
 
 impl<T: Eq, U> Eq for Vector3D<T, U> {}
 
