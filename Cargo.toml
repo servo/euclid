@@ -1,6 +1,6 @@
 [package]
 name = "euclid"
-version = "0.22.7"
+version = "0.22.8"
 authors = ["The Servo Project Developers"]
 edition = "2018"
 description = "Geometry primitives"
