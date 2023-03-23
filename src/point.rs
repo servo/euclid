@@ -23,7 +23,7 @@ use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAss
 #[cfg(feature = "mint")]
 use mint;
 use num_traits::real::Real;
-use num_traits::{Float, NumCast};
+use num_traits::{Float, NumCast, Euclid};
 #[cfg(feature = "serde")]
 use serde;
 
@@ -708,6 +708,48 @@ impl<T: ApproxEq<T>, U> ApproxEq<Point2D<T, U>> for Point2D<T, U> {
     #[inline]
     fn approx_eq_eps(&self, other: &Self, eps: &Self) -> bool {
         self.x.approx_eq_eps(&other.x, &eps.x) && self.y.approx_eq_eps(&other.y, &eps.y)
+    }
+}
+
+impl<T: Euclid, U> Point2D<T, U> {
+    /// Calculates the least nonnegative remainder of `self (mod other)`.
+    /// 
+    /// # Example
+    /// 
+    /// ```rust
+    /// use euclid::point2;
+    /// use euclid::default::{Point2D, Size2D};
+    ///
+    /// let p = Point2D::new(7.0, -7.0);
+    /// let s = Size2D::new(4.0, -4.0);
+    ///
+    /// assert_eq!(p.rem_euclid(&s), point2(3.0, 1.0));
+    /// assert_eq!((-p).rem_euclid(&s), point2(1.0, 3.0));
+    /// assert_eq!(p.rem_euclid(&-s), point2(3.0, 1.0));
+    /// ```
+    #[inline]
+    pub fn rem_euclid(&self, other: &Size2D<T, U>) -> Self {
+        point2(self.x.rem_euclid(&other.width), self.y.rem_euclid(&other.height))
+    }
+
+    /// Calculates Euclidean division, the matching method for `rem_euclid`.
+    /// 
+    /// # Example
+    /// 
+    /// ```rust
+    /// use euclid::point2;
+    /// use euclid::default::{Point2D, Size2D};
+    ///
+    /// let p = Point2D::new(7.0, -7.0);
+    /// let s = Size2D::new(4.0, -4.0);
+    ///
+    /// assert_eq!(p.div_euclid(&s), point2(1.0, 2.0));
+    /// assert_eq!((-p).div_euclid(&s), point2(-2.0, -1.0));
+    /// assert_eq!(p.div_euclid(&-s), point2(-1.0, -2.0));
+    /// ```
+    #[inline]
+    pub fn div_euclid(&self, other: &Size2D<T, U>) -> Self {
+        point2(self.x.div_euclid(&other.width), self.y.div_euclid(&other.height))
     }
 }
 
@@ -1475,6 +1517,56 @@ impl<T: ApproxEq<T>, U> ApproxEq<Point3D<T, U>> for Point3D<T, U> {
     }
 }
 
+impl<T: Euclid, U> Point3D<T, U> {
+    /// Calculates the least nonnegative remainder of `self (mod other)`.
+    /// 
+    /// # Example
+    /// 
+    /// ```rust
+    /// use euclid::point3;
+    /// use euclid::default::{Point3D, Size3D};
+    ///
+    /// let p = Point3D::new(7.0, -7.0, 0.0);
+    /// let s = Size3D::new(4.0, -4.0, 12.0);
+
+    /// assert_eq!(p.rem_euclid(&s), point3(3.0, 1.0, 0.0));
+    /// assert_eq!((-p).rem_euclid(&s), point3(1.0, 3.0, 0.0));
+    /// assert_eq!(p.rem_euclid(&-s), point3(3.0, 1.0, 0.0));
+    /// ```
+    #[inline]
+    pub fn rem_euclid(&self, other: &Size3D<T, U>) -> Self {
+        point3(
+            self.x.rem_euclid(&other.width),
+            self.y.rem_euclid(&other.height),
+            self.z.rem_euclid(&other.depth),
+        )
+    }
+
+    /// Calculates Euclidean division, the matching method for `rem_euclid`.
+    /// 
+    /// # Example
+    /// 
+    /// ```rust
+    /// use euclid::point3;
+    /// use euclid::default::{Point3D, Size3D};
+    ///
+    /// let p = Point3D::new(7.0, -7.0, 0.0);
+    /// let s = Size3D::new(4.0, -4.0, 12.0);
+    ///
+    /// assert_eq!(p.div_euclid(&s), point3(1.0, 2.0, 0.0));
+    /// assert_eq!((-p).div_euclid(&s), point3(-2.0, -1.0, 0.0));
+    /// assert_eq!(p.div_euclid(&-s), point3(-1.0, -2.0, 0.0));
+    /// ```
+    #[inline]
+    pub fn div_euclid(&self, other: &Size3D<T, U>) -> Self {
+        point3(
+            self.x.div_euclid(&other.width),
+            self.y.div_euclid(&other.height),
+            self.z.div_euclid(&other.depth),
+        )
+    }
+}
+
 impl<T, U> Into<[T; 3]> for Point3D<T, U> {
     fn into(self) -> [T; 3] {
         [self.x, self.y, self.z]
@@ -1779,6 +1871,31 @@ mod point2d {
             assert_eq!(got, should_be);
         }
     }
+
+    mod euclid {
+        use crate::point2;
+        use crate::default::{Point2D, Size2D};
+
+        #[test]
+        pub fn test_rem_euclid() {
+            let p = Point2D::new(7.0, -7.0);
+            let s = Size2D::new(4.0, -4.0);
+
+            assert_eq!(p.rem_euclid(&s), point2(3.0, 1.0));
+            assert_eq!((-p).rem_euclid(&s), point2(1.0, 3.0));
+            assert_eq!(p.rem_euclid(&-s), point2(3.0, 1.0));
+        }
+
+        #[test]
+        pub fn test_div_euclid() {
+            let p = Point2D::new(7.0, -7.0);
+            let s = Size2D::new(4.0, -4.0);
+
+            assert_eq!(p.div_euclid(&s), point2(1.0, 2.0));
+            assert_eq!((-p).div_euclid(&s), point2(-2.0, -1.0));
+            assert_eq!(p.div_euclid(&-s), point2(-1.0, -2.0));
+        }
+    }
 }
 
 #[cfg(test)]
@@ -2036,6 +2153,31 @@ mod point3d {
             p1 /= scale;
 
             assert_eq!(p1, Point3DMm::new(1.0, 2.0, 3.0));
+        }
+    }
+
+    mod euclid {
+        use crate::point3;
+        use crate::default::{Point3D, Size3D};
+
+        #[test]
+        pub fn test_rem_euclid() {
+            let p = Point3D::new(7.0, -7.0, 0.0);
+            let s = Size3D::new(4.0, -4.0, 12.0);
+
+            assert_eq!(p.rem_euclid(&s), point3(3.0, 1.0, 0.0));
+            assert_eq!((-p).rem_euclid(&s), point3(1.0, 3.0, 0.0));
+            assert_eq!(p.rem_euclid(&-s), point3(3.0, 1.0, 0.0));
+        }
+
+        #[test]
+        pub fn test_div_euclid() {
+            let p = Point3D::new(7.0, -7.0, 0.0);
+            let s = Size3D::new(4.0, -4.0, 12.0);
+
+            assert_eq!(p.div_euclid(&s), point3(1.0, 2.0, 0.0));
+            assert_eq!((-p).div_euclid(&s), point3(-2.0, -1.0, 0.0));
+            assert_eq!(p.div_euclid(&-s), point3(-1.0, -2.0, 0.0));
         }
     }
 }
