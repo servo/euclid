@@ -876,9 +876,9 @@ impl<T: ApproxEq<T>, U> ApproxEq<Vector2D<T, U>> for Vector2D<T, U> {
     }
 }
 
-impl<T, U> Into<[T; 2]> for Vector2D<T, U> {
-    fn into(self) -> [T; 2] {
-        [self.x, self.y]
+impl<T, U> From<Vector2D<T, U>> for [T; 2] {
+    fn from(v: Vector2D<T, U>) -> Self {
+        [v.x, v.y]
     }
 }
 
@@ -888,9 +888,9 @@ impl<T, U> From<[T; 2]> for Vector2D<T, U> {
     }
 }
 
-impl<T, U> Into<(T, T)> for Vector2D<T, U> {
-    fn into(self) -> (T, T) {
-        (self.x, self.y)
+impl<T, U> From<Vector2D<T, U>> for (T, T) {
+    fn from(v: Vector2D<T, U>) -> Self {
+        (v.x, v.y)
     }
 }
 
@@ -901,8 +901,8 @@ impl<T, U> From<(T, T)> for Vector2D<T, U> {
 }
 
 impl<T, U> From<Size2D<T, U>> for Vector2D<T, U> {
-    fn from(size: Size2D<T, U>) -> Self {
-        vec2(size.width, size.height)
+    fn from(s: Size2D<T, U>) -> Self {
+        vec2(s.width, s.height)
     }
 }
 
@@ -1774,9 +1774,9 @@ impl<T: ApproxEq<T>, U> ApproxEq<Vector3D<T, U>> for Vector3D<T, U> {
     }
 }
 
-impl<T, U> Into<[T; 3]> for Vector3D<T, U> {
-    fn into(self) -> [T; 3] {
-        [self.x, self.y, self.z]
+impl<T, U> From<Vector3D<T, U>> for [T; 3] {
+    fn from(v: Vector3D<T, U>) -> Self {
+        [v.x, v.y, v.z]
     }
 }
 
@@ -1786,9 +1786,9 @@ impl<T, U> From<[T; 3]> for Vector3D<T, U> {
     }
 }
 
-impl<T, U> Into<(T, T, T)> for Vector3D<T, U> {
-    fn into(self) -> (T, T, T) {
-        (self.x, self.y, self.z)
+impl<T, U> From<Vector3D<T, U>> for (T, T, T) {
+    fn from(v: Vector3D<T, U>) -> Self {
+        (v.x, v.y, v.z)
     }
 }
 

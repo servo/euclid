@@ -753,9 +753,9 @@ impl<T: Euclid, U> Point2D<T, U> {
     }
 }
 
-impl<T, U> Into<[T; 2]> for Point2D<T, U> {
-    fn into(self) -> [T; 2] {
-        [self.x, self.y]
+impl<T, U> From<Point2D<T, U>> for [T; 2] {
+    fn from(p: Point2D<T, U>) -> Self {
+        [p.x, p.y]
     }
 }
 
@@ -765,9 +765,9 @@ impl<T, U> From<[T; 2]> for Point2D<T, U> {
     }
 }
 
-impl<T, U> Into<(T, T)> for Point2D<T, U> {
-    fn into(self) -> (T, T) {
-        (self.x, self.y)
+impl<T, U> From<Point2D<T, U>> for (T, T) {
+    fn from(p: Point2D<T, U>) -> Self {
+        (p.x, p.y)
     }
 }
 
@@ -1567,9 +1567,9 @@ impl<T: Euclid, U> Point3D<T, U> {
     }
 }
 
-impl<T, U> Into<[T; 3]> for Point3D<T, U> {
-    fn into(self) -> [T; 3] {
-        [self.x, self.y, self.z]
+impl<T, U> From<Point3D<T, U>> for [T; 3] {
+    fn from(p: Point3D<T, U>) -> Self {
+        [p.x, p.y, p.z]
     }
 }
 
@@ -1579,9 +1579,9 @@ impl<T, U> From<[T; 3]> for Point3D<T, U> {
     }
 }
 
-impl<T, U> Into<(T, T, T)> for Point3D<T, U> {
-    fn into(self) -> (T, T, T) {
-        (self.x, self.y, self.z)
+impl<T, U> From<Point3D<T, U>> for (T, T, T) {
+    fn from(p: Point3D<T, U>) -> Self {
+        (p.x, p.y, p.z)
     }
 }
 

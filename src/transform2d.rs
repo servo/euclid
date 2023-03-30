@@ -659,12 +659,12 @@ impl<T, Src, Dst> From<mint::RowMatrix3x2<T>> for Transform2D<T, Src, Dst> {
     }
 }
 #[cfg(feature = "mint")]
-impl<T, Src, Dst> Into<mint::RowMatrix3x2<T>> for Transform2D<T, Src, Dst> {
-    fn into(self) -> mint::RowMatrix3x2<T> {
+impl<T, Src, Dst> From<Transform2D<T, Src, Dst>> for mint::RowMatrix3x2<T> {
+    fn from(t: Transform2D<T, Src, Dst>) -> Self {
         mint::RowMatrix3x2 {
-            x: mint::Vector2 { x: self.m11, y: self.m12 },
-            y: mint::Vector2 { x: self.m21, y: self.m22 },
-            z: mint::Vector2 { x: self.m31, y: self.m32 },
+            x: mint::Vector2 { x: t.m11, y: t.m12 },
+            y: mint::Vector2 { x: t.m21, y: t.m22 },
+            z: mint::Vector2 { x: t.m31, y: t.m32 },
         }
     }
 }
