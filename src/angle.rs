@@ -23,7 +23,6 @@ use bytemuck::{Zeroable, Pod};
 /// An angle in radians
 #[derive(Copy, Clone, Default, Debug, PartialEq, Eq, PartialOrd, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
 pub struct Angle<T> {
     pub radians: T,
 }
@@ -33,6 +32,23 @@ unsafe impl<T: Zeroable> Zeroable for Angle<T> {}
 
 #[cfg(feature = "bytemuck")]
 unsafe impl<T: Pod> Pod for Angle<T> {}
+
+#[cfg(feature = "arbitrary")]
+impl<'a, T> arbitrary::Arbitrary<'a> for Angle<T>
+where
+    T: arbitrary::Arbitrary<'a>,
+{
+    // This implementation could be derived, but the derive would require an `extern crate std`.
+    fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self> {
+        Ok(Angle {
+            radians: arbitrary::Arbitrary::arbitrary(u)?,
+        })
+    }
+
+    fn size_hint(depth: usize) -> (usize, Option<usize>) {
+        <T as arbitrary::Arbitrary>::size_hint(depth)
+    }
+}
 
 impl<T> Angle<T> {
     #[inline]
