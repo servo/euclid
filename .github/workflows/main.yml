@@ -19,6 +19,10 @@ jobs:
         include:
           - version: stable
             features: --features mint
+          - version: stable
+            features: --features bytemuck
+          - version: stable
+            features: --features arbitrary
           - version: nightly
             features: --features unstable
           - version: nightly
@@ -39,9 +43,6 @@ jobs:
         run: cargo test ${{ matrix.features }}
         env:
           RUST_BACKTRACE: 1
-
-      - name: bytemuck
-        run: cargo check --features bytemuck
 
   build_result:
     name: Result
