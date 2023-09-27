@@ -14,8 +14,6 @@ use crate::num::*;
 use crate::scale::Scale;
 use crate::vector::{vec2, BoolVector2D, Vector2D};
 use crate::vector::{vec3, BoolVector3D, Vector3D};
-#[cfg(feature = "mint")]
-use mint;
 
 use core::cmp::{Eq, PartialEq};
 use core::fmt;
@@ -23,11 +21,14 @@ use core::hash::Hash;
 use core::iter::Sum;
 use core::marker::PhantomData;
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
-use num_traits::{NumCast, Signed, Float};
+
+#[cfg(feature = "bytemuck")]
+use bytemuck::{Pod, Zeroable};
+#[cfg(feature = "mint")]
+use mint;
+use num_traits::{Float, NumCast, Signed};
 #[cfg(feature = "serde")]
 use serde;
-#[cfg(feature = "bytemuck")]
-use bytemuck::{Zeroable, Pod};
 
 /// A 2d size tagged with a unit.
 #[repr(C)]
@@ -90,8 +91,7 @@ impl<'a, T, U> arbitrary::Arbitrary<'a> for Size2D<T, U>
 where
     T: arbitrary::Arbitrary<'a>,
 {
-    fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self>
-    {
+    fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self> {
         let (width, height) = arbitrary::Arbitrary::arbitrary(u)?;
         Ok(Size2D {
             width,
@@ -478,7 +478,7 @@ impl<T: PartialOrd, U> Size2D<T, U> {
     {
         let zero = T::zero();
         // The condition is experessed this way so that we return true in
-        // the presence of NaN. 
+        // the presence of NaN.
         !(self.width > zero && self.height > zero)
     }
 }
@@ -558,13 +558,13 @@ impl<T: Copy + Add<T, Output = T>, U> Add<&Self> for Size2D<T, U> {
 }
 
 impl<T: Add<Output = T> + Zero, U> Sum for Size2D<T, U> {
-    fn sum<I: Iterator<Item=Self>>(iter: I) -> Self {
+    fn sum<I: Iterator<Item = Self>>(iter: I) -> Self {
         iter.fold(Self::zero(), Add::add)
     }
 }
 
 impl<'a, T: 'a + Add<Output = T> + Copy + Zero, U: 'a> Sum<&'a Self> for Size2D<T, U> {
-    fn sum<I: Iterator<Item=&'a Self>>(iter: I) -> Self {
+    fn sum<I: Iterator<Item = &'a Self>>(iter: I) -> Self {
         iter.fold(Self::zero(), Add::add)
     }
 }
@@ -809,7 +809,7 @@ mod size2d {
             let sizes = [
                 Size2D::new(0.0, 1.0),
                 Size2D::new(1.0, 2.0),
-                Size2D::new(2.0, 3.0)
+                Size2D::new(2.0, 3.0),
             ];
             let sum = Size2D::new(3.0, 6.0);
             assert_eq!(sizes.iter().sum::<Size2D<_>>(), sum);
@@ -1357,7 +1357,6 @@ impl<T: PartialOrd, U> Size3D<T, U> {
         self.width >= other.width && self.height >= other.height && self.depth >= other.depth
     }
 
-
     /// Returns vector with results of "greater than" operation on each component.
     pub fn greater_than(self, other: Self) -> BoolVector3D {
         BoolVector3D {
@@ -1471,13 +1470,13 @@ impl<T: Copy + Add<T, Output = T>, U> Add<&Self> for Size3D<T, U> {
 }
 
 impl<T: Add<Output = T> + Zero, U> Sum for Size3D<T, U> {
-    fn sum<I: Iterator<Item=Self>>(iter: I) -> Self {
+    fn sum<I: Iterator<Item = Self>>(iter: I) -> Self {
         iter.fold(Self::zero(), Add::add)
     }
 }
 
 impl<'a, T: 'a + Add<Output = T> + Copy + Zero, U: 'a> Sum<&'a Self> for Size3D<T, U> {
-    fn sum<I: Iterator<Item=&'a Self>>(iter: I) -> Self {
+    fn sum<I: Iterator<Item = &'a Self>>(iter: I) -> Self {
         iter.fold(Self::zero(), Add::add)
     }
 }
@@ -1706,7 +1705,7 @@ mod size3d {
             let sizes = [
                 Size3D::new(0.0, 1.0, 2.0),
                 Size3D::new(1.0, 2.0, 3.0),
-                Size3D::new(2.0, 3.0, 4.0)
+                Size3D::new(2.0, 3.0, 4.0),
             ];
             let sum = Size3D::new(3.0, 6.0, 9.0);
             assert_eq!(sizes.iter().sum::<Size3D<_>>(), sum);

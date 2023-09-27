@@ -117,20 +117,22 @@ impl<T: Clone, Src, Dst> Clone for Transform2D<T, Src, Dst> {
 impl<T, Src, Dst> Eq for Transform2D<T, Src, Dst> where T: Eq {}
 
 impl<T, Src, Dst> PartialEq for Transform2D<T, Src, Dst>
-    where T: PartialEq
+where
+    T: PartialEq,
 {
     fn eq(&self, other: &Self) -> bool {
-        self.m11 == other.m11 &&
-            self.m12 == other.m12 &&
-            self.m21 == other.m21 &&
-            self.m22 == other.m22 &&
-            self.m31 == other.m31 &&
-            self.m32 == other.m32
+        self.m11 == other.m11
+            && self.m12 == other.m12
+            && self.m21 == other.m21
+            && self.m22 == other.m22
+            && self.m31 == other.m31
+            && self.m32 == other.m32
     }
 }
 
 impl<T, Src, Dst> Hash for Transform2D<T, Src, Dst>
-    where T: Hash
+where
+    T: Hash,
 {
     fn hash<H: core::hash::Hasher>(&self, h: &mut H) {
         self.m11.hash(h);
@@ -141,7 +143,6 @@ impl<T, Src, Dst> Hash for Transform2D<T, Src, Dst>
         self.m32.hash(h);
     }
 }
-
 
 impl<T, Src, Dst> Transform2D<T, Src, Dst> {
     /// Create a transform specifying its components in using the column-major-column-vector
@@ -191,7 +192,9 @@ impl<T, Src, Dst> Transform2D<T, Src, Dst> {
     /// [`ApproxEq::approx_eq_eps()`]: ./approxeq/trait.ApproxEq.html#method.approx_eq_eps
     #[inline]
     pub fn approx_eq_eps(&self, other: &Self, eps: &T) -> bool
-    where T : ApproxEq<T> {
+    where
+        T: ApproxEq<T>,
+    {
         <Self as ApproxEq<T>>::approx_eq_eps(&self, &other, &eps)
     }
 }

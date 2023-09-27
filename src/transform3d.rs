@@ -75,14 +75,12 @@ pub struct Transform3D<T, Src, Dst> {
     pub _unit: PhantomData<(Src, Dst)>,
 }
 
-
 #[cfg(feature = "arbitrary")]
 impl<'a, T, Src, Dst> arbitrary::Arbitrary<'a> for Transform3D<T, Src, Dst>
 where
     T: arbitrary::Arbitrary<'a>,
 {
-    fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self>
-    {
+    fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self> {
         let (m11, m12, m13, m14) = arbitrary::Arbitrary::arbitrary(u)?;
         let (m21, m22, m23, m24) = arbitrary::Arbitrary::arbitrary(u)?;
         let (m31, m32, m33, m34) = arbitrary::Arbitrary::arbitrary(u)?;
@@ -145,30 +143,32 @@ impl<T: Clone, Src, Dst> Clone for Transform3D<T, Src, Dst> {
 impl<T, Src, Dst> Eq for Transform3D<T, Src, Dst> where T: Eq {}
 
 impl<T, Src, Dst> PartialEq for Transform3D<T, Src, Dst>
-    where T: PartialEq
+where
+    T: PartialEq,
 {
     fn eq(&self, other: &Self) -> bool {
-        self.m11 == other.m11 &&
-            self.m12 == other.m12 &&
-            self.m13 == other.m13 &&
-            self.m14 == other.m14 &&
-            self.m21 == other.m21 &&
-            self.m22 == other.m22 &&
-            self.m23 == other.m23 &&
-            self.m24 == other.m24 &&
-            self.m31 == other.m31 &&
-            self.m32 == other.m32 &&
-            self.m33 == other.m33 &&
-            self.m34 == other.m34 &&
-            self.m41 == other.m41 &&
-            self.m42 == other.m42 &&
-            self.m43 == other.m43 &&
-            self.m44 == other.m44
+        self.m11 == other.m11
+            && self.m12 == other.m12
+            && self.m13 == other.m13
+            && self.m14 == other.m14
+            && self.m21 == other.m21
+            && self.m22 == other.m22
+            && self.m23 == other.m23
+            && self.m24 == other.m24
+            && self.m31 == other.m31
+            && self.m32 == other.m32
+            && self.m33 == other.m33
+            && self.m34 == other.m34
+            && self.m41 == other.m41
+            && self.m42 == other.m42
+            && self.m43 == other.m43
+            && self.m44 == other.m44
     }
 }
 
 impl<T, Src, Dst> Hash for Transform3D<T, Src, Dst>
-    where T: Hash
+where
+    T: Hash,
 {
     fn hash<H: core::hash::Hasher>(&self, h: &mut H) {
         self.m11.hash(h);
@@ -189,7 +189,6 @@ impl<T, Src, Dst> Hash for Transform3D<T, Src, Dst>
         self.m44.hash(h);
     }
 }
-
 
 impl<T, Src, Dst> Transform3D<T, Src, Dst> {
     /// Create a transform specifying all of it's component as a 4 by 4 matrix.
@@ -326,7 +325,7 @@ impl<T: Copy, Src, Dst> Transform3D<T, Src, Dst> {
             [self.m11, self.m12, self.m13, self.m14],
             [self.m21, self.m22, self.m23, self.m24],
             [self.m31, self.m32, self.m33, self.m34],
-            [self.m41, self.m42, self.m43, self.m44]
+            [self.m41, self.m42, self.m43, self.m44],
         ]
     }
 
@@ -339,7 +338,7 @@ impl<T: Copy, Src, Dst> Transform3D<T, Src, Dst> {
             [self.m11, self.m21, self.m31, self.m41],
             [self.m12, self.m22, self.m32, self.m42],
             [self.m13, self.m23, self.m33, self.m43],
-            [self.m14, self.m24, self.m34, self.m44]
+            [self.m14, self.m24, self.m34, self.m44],
         ]
     }
 
@@ -432,15 +431,11 @@ impl<T: Copy, Src, Dst> Transform3D<T, Src, Dst> {
     ///
     /// [`self.is_2d()`]: #method.is_2d
     pub fn to_2d(&self) -> Transform2D<T, Src, Dst> {
-        Transform2D::new(
-            self.m11, self.m12,
-            self.m21, self.m22,
-            self.m41, self.m42
-        )
+        Transform2D::new(self.m11, self.m12, self.m21, self.m22, self.m41, self.m42)
     }
 }
 
-impl <T, Src, Dst> Transform3D<T, Src, Dst>
+impl<T, Src, Dst> Transform3D<T, Src, Dst>
 where
     T: Zero + One,
 {
@@ -506,17 +501,28 @@ where
         let _1 = || T::one();
 
         Self::new(
-            _1(), _0(), _0(),  _0(),
-            _0(), _1(), _0(),  _0(),
-            _0(), _0(), _1(), -_1() / d,
-            _0(), _0(), _0(),  _1(),
+            _1(),
+            _0(),
+            _0(),
+            _0(),
+            _0(),
+            _1(),
+            _0(),
+            _0(),
+            _0(),
+            _0(),
+            _1(),
+            -_1() / d,
+            _0(),
+            _0(),
+            _0(),
+            _1(),
         )
     }
 }
 
-
 /// Methods for combining generic transformations
-impl <T, Src, Dst> Transform3D<T, Src, Dst>
+impl<T, Src, Dst> Transform3D<T, Src, Dst>
 where
     T: Copy + Add<Output = T> + Mul<Output = T>,
 {

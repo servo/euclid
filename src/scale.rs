@@ -11,17 +11,19 @@
 use crate::num::One;
 
 use crate::approxord::{max, min};
-use crate::{Point2D, Point3D, Rect, Size2D, Vector2D, Box2D, Box3D};
+use crate::{Box2D, Box3D, Point2D, Point3D, Rect, Size2D, Vector2D};
+
 use core::cmp::Ordering;
 use core::fmt;
 use core::hash::{Hash, Hasher};
 use core::marker::PhantomData;
 use core::ops::{Add, Div, Mul, Sub};
+
+#[cfg(feature = "bytemuck")]
+use bytemuck::{Pod, Zeroable};
 use num_traits::NumCast;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-#[cfg(feature = "bytemuck")]
-use bytemuck::{Zeroable, Pod};
 
 /// A scaling factor between two different units of measurement.
 ///
@@ -63,7 +65,7 @@ impl<T, Src, Dst> Scale<T, Src, Dst> {
     #[inline]
     pub fn identity() -> Self
     where
-        T: One
+        T: One,
     {
         Scale::new(T::one())
     }
@@ -264,7 +266,6 @@ impl<T: PartialOrd, Src, Dst> Scale<T, Src, Dst> {
         self.max(start).min(end)
     }
 }
-
 
 impl<T: NumCast, Src, Dst> Scale<T, Src, Dst> {
     /// Cast from one numeric representation to another, preserving the units.
