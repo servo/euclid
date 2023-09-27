@@ -210,6 +210,41 @@ impl<T, U> Vector2D<T, U> {
         vec2(p.x, p.y)
     }
 
+    /// Apply the function `f` to each component of this vector.
+    ///
+    /// # Example
+    ///
+    /// This may be used to perform unusual arithmetic which is not already offered as methods.
+    ///
+    /// ```
+    /// use euclid::default::Vector2D;
+    ///
+    /// let p = Vector2D::<u32>::new(5, 11);
+    /// assert_eq!(p.map(|coord| coord.saturating_sub(10)), Vector2D::new(0, 1));
+    /// ```
+    #[inline]
+    pub fn map<V, F: FnMut(T) -> V>(self, mut f: F) -> Vector2D<V, U> {
+        vec2(f(self.x), f(self.y))
+    }
+
+    /// Apply the function `f` to each pair of components of this point and `rhs`.
+    ///
+    /// # Example
+    ///
+    /// This may be used to perform unusual arithmetic which is not already offered as methods.
+    ///
+    /// ```
+    /// use euclid::default::Vector2D;
+    ///
+    /// let a: Vector2D<u8> = Vector2D::new(50, 200);
+    /// let b: Vector2D<u8> = Vector2D::new(100, 100);
+    /// assert_eq!(a.zip(b, u8::saturating_add), Vector2D::new(150, 255));
+    /// ```
+    #[inline]
+    pub fn zip<V, F: FnMut(T, T) -> V>(self, rhs: Self, mut f: F) -> Vector2D<V, U> {
+        vec2(f(self.x, rhs.x), f(self.y, rhs.y))
+    }
+
     /// Computes the vector with absolute values of each component.
     ///
     /// # Example
@@ -1065,6 +1100,41 @@ impl<T, U> Vector3D<T, U> {
     #[inline]
     pub fn from_untyped(p: Vector3D<T, UnknownUnit>) -> Self {
         vec3(p.x, p.y, p.z)
+    }
+
+    /// Apply the function `f` to each component of this vector.
+    ///
+    /// # Example
+    ///
+    /// This may be used to perform unusual arithmetic which is not already offered as methods.
+    ///
+    /// ```
+    /// use euclid::default::Vector3D;
+    ///
+    /// let p = Vector3D::<u32>::new(5, 11, 15);
+    /// assert_eq!(p.map(|coord| coord.saturating_sub(10)), Vector3D::new(0, 1, 5));
+    /// ```
+    #[inline]
+    pub fn map<V, F: FnMut(T) -> V>(self, mut f: F) -> Vector3D<V, U> {
+        vec3(f(self.x), f(self.y), f(self.z))
+    }
+
+    /// Apply the function `f` to each pair of components of this point and `rhs`.
+    ///
+    /// # Example
+    ///
+    /// This may be used to perform unusual arithmetic which is not already offered as methods.
+    ///
+    /// ```
+    /// use euclid::default::Vector3D;
+    ///
+    /// let a: Vector3D<u8> = Vector3D::new(50, 200, 10);
+    /// let b: Vector3D<u8> = Vector3D::new(100, 100, 0);
+    /// assert_eq!(a.zip(b, u8::saturating_add), Vector3D::new(150, 255, 10));
+    /// ```
+    #[inline]
+    pub fn zip<V, F: FnMut(T, T) -> V>(self, rhs: Self, mut f: F) -> Vector3D<V, U> {
+        vec3(f(self.x, rhs.x), f(self.y, rhs.y), f(self.z, rhs.z))
     }
 
     /// Computes the vector with absolute values of each component.
