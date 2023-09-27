@@ -44,6 +44,14 @@ jobs:
         env:
           RUST_BACKTRACE: 1
 
+  fmt:
+    name: Check code formatting
+    runs-on: ubuntu-latest
+    steps:
+      # GitHub runners already have a usable version of cargo & rustfmt, so an install is not needed
+      - uses: actions/checkout@v3
+      - run: cargo fmt --check
+
   build_result:
     name: Result
     runs-on: ubuntu-latest
