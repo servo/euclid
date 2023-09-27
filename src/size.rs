@@ -1517,6 +1517,7 @@ impl<T: Copy + Mul, U> Mul<T> for Size3D<T, U> {
     type Output = Size3D<T::Output, U>;
 
     #[inline]
+    #[rustfmt::skip]
     fn mul(self, scale: T) -> Self::Output {
         Size3D::new(
             self.width * scale,
@@ -1559,6 +1560,7 @@ impl<T: Copy + Div, U> Div<T> for Size3D<T, U> {
     type Output = Size3D<T::Output, U>;
 
     #[inline]
+    #[rustfmt::skip]
     fn div(self, scale: T) -> Self::Output {
         Size3D::new(
             self.width / scale,

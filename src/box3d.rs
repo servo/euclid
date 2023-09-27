@@ -919,6 +919,7 @@ mod tests {
     }
 
     #[test]
+    #[rustfmt::skip]
     fn test_nan_empty_or_negative() {
         use std::f32::NAN;
         assert!(Box3D { min: point3(NAN, 2.0, 1.0), max: point3(1.0, 3.0, 5.0) }.is_empty());

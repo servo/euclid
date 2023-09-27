@@ -624,6 +624,7 @@ where
 
     /// Returns the matrix representation of this rotation.
     #[inline]
+    #[rustfmt::skip]
     pub fn to_transform(&self) -> Transform3D<T, Src, Dst>
     where
         T: ApproxEq<T>,
@@ -826,18 +827,12 @@ fn pre_post() {
     // Check that the order of transformations is correct (corresponds to what
     // we do in Transform3D).
     let p1 = r1.then(&r2).then(&r3).transform_point3d(p);
-    let p2 = t1
-        .then(&t2)
-        .then(&t3)
-        .transform_point3d(p);
+    let p2 = t1.then(&t2).then(&t3).transform_point3d(p);
 
     assert!(p1.approx_eq(&p2.unwrap()));
 
     // Check that changing the order indeed matters.
-    let p3 = t3
-        .then(&t1)
-        .then(&t2)
-        .transform_point3d(p);
+    let p3 = t3.then(&t1).then(&t2).transform_point3d(p);
     assert!(!p1.approx_eq(&p3.unwrap()));
 }
 
