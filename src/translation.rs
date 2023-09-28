@@ -16,6 +16,7 @@ use core::fmt;
 use core::hash::Hash;
 use core::marker::PhantomData;
 use core::ops::{Add, AddAssign, Neg, Sub, SubAssign};
+use num_traits::NumCast;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "bytemuck")]
@@ -251,6 +252,84 @@ impl<T: Copy, Src, Dst> Translation2D<T, Src, Dst> {
         T: Neg,
     {
         Translation2D::new(-self.x, -self.y)
+    }
+}
+
+impl<T: NumCast + Copy, Src, Dst> Translation2D<T, Src, Dst> {
+    /// Cast from one numeric representation to another, preserving the units.
+    ///
+    /// When casting from floating vector to integer coordinates, the decimals are truncated
+    /// as one would expect from a simple cast, but this behavior does not always make sense
+    /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
+    #[inline]
+    pub fn cast<NewT: NumCast>(self) -> Translation2D<NewT, Src, Dst> {
+        self.try_cast().unwrap()
+    }
+
+    /// Fallible cast from one numeric representation to another, preserving the units.
+    ///
+    /// When casting from floating vector to integer coordinates, the decimals are truncated
+    /// as one would expect from a simple cast, but this behavior does not always make sense
+    /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
+    pub fn try_cast<NewT: NumCast>(self) -> Option<Translation2D<NewT, Src, Dst>> {
+        match (NumCast::from(self.x), NumCast::from(self.y)) {
+            (Some(x), Some(y)) => Some(Translation2D::new(x, y)),
+            _ => None,
+        }
+    }
+
+    // Convenience functions for common casts.
+
+    /// Cast into an `f32` vector.
+    #[inline]
+    pub fn to_f32(self) -> Translation2D<f32, Src, Dst> {
+        self.cast()
+    }
+
+    /// Cast into an `f64` vector.
+    #[inline]
+    pub fn to_f64(self) -> Translation2D<f64, Src, Dst> {
+        self.cast()
+    }
+
+    /// Cast into an `usize` vector, truncating decimals if any.
+    ///
+    /// When casting from floating vector vectors, it is worth considering whether
+    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
+    /// the desired conversion behavior.
+    #[inline]
+    pub fn to_usize(self) -> Translation2D<usize, Src, Dst> {
+        self.cast()
+    }
+
+    /// Cast into an `u32` vector, truncating decimals if any.
+    ///
+    /// When casting from floating vector vectors, it is worth considering whether
+    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
+    /// the desired conversion behavior.
+    #[inline]
+    pub fn to_u32(self) -> Translation2D<u32, Src, Dst> {
+        self.cast()
+    }
+
+    /// Cast into an i32 vector, truncating decimals if any.
+    ///
+    /// When casting from floating vector vectors, it is worth considering whether
+    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
+    /// the desired conversion behavior.
+    #[inline]
+    pub fn to_i32(self) -> Translation2D<i32, Src, Dst> {
+        self.cast()
+    }
+
+    /// Cast into an i64 vector, truncating decimals if any.
+    ///
+    /// When casting from floating vector vectors, it is worth considering whether
+    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
+    /// the desired conversion behavior.
+    #[inline]
+    pub fn to_i64(self) -> Translation2D<i64, Src, Dst> {
+        self.cast()
     }
 }
 
@@ -577,6 +656,84 @@ impl<T: Copy, Src, Dst> Translation3D<T, Src, Dst> {
         T: Neg,
     {
         Translation3D::new(-self.x, -self.y, -self.z)
+    }
+}
+
+impl<T: NumCast + Copy, Src, Dst> Translation3D<T, Src, Dst> {
+    /// Cast from one numeric representation to another, preserving the units.
+    ///
+    /// When casting from floating vector to integer coordinates, the decimals are truncated
+    /// as one would expect from a simple cast, but this behavior does not always make sense
+    /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
+    #[inline]
+    pub fn cast<NewT: NumCast>(self) -> Translation3D<NewT, Src, Dst> {
+        self.try_cast().unwrap()
+    }
+
+    /// Fallible cast from one numeric representation to another, preserving the units.
+    ///
+    /// When casting from floating vector to integer coordinates, the decimals are truncated
+    /// as one would expect from a simple cast, but this behavior does not always make sense
+    /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
+    pub fn try_cast<NewT: NumCast>(self) -> Option<Translation3D<NewT, Src, Dst>> {
+        match (NumCast::from(self.x), NumCast::from(self.y), NumCast::from(self.z)) {
+            (Some(x), Some(y), Some(z)) => Some(Translation3D::new(x, y, z)),
+            _ => None,
+        }
+    }
+
+    // Convenience functions for common casts.
+
+    /// Cast into an `f32` vector.
+    #[inline]
+    pub fn to_f32(self) -> Translation3D<f32, Src, Dst> {
+        self.cast()
+    }
+
+    /// Cast into an `f64` vector.
+    #[inline]
+    pub fn to_f64(self) -> Translation3D<f64, Src, Dst> {
+        self.cast()
+    }
+
+    /// Cast into an `usize` vector, truncating decimals if any.
+    ///
+    /// When casting from floating vector vectors, it is worth considering whether
+    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
+    /// the desired conversion behavior.
+    #[inline]
+    pub fn to_usize(self) -> Translation3D<usize, Src, Dst> {
+        self.cast()
+    }
+
+    /// Cast into an `u32` vector, truncating decimals if any.
+    ///
+    /// When casting from floating vector vectors, it is worth considering whether
+    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
+    /// the desired conversion behavior.
+    #[inline]
+    pub fn to_u32(self) -> Translation3D<u32, Src, Dst> {
+        self.cast()
+    }
+
+    /// Cast into an i32 vector, truncating decimals if any.
+    ///
+    /// When casting from floating vector vectors, it is worth considering whether
+    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
+    /// the desired conversion behavior.
+    #[inline]
+    pub fn to_i32(self) -> Translation3D<i32, Src, Dst> {
+        self.cast()
+    }
+
+    /// Cast into an i64 vector, truncating decimals if any.
+    ///
+    /// When casting from floating vector vectors, it is worth considering whether
+    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
+    /// the desired conversion behavior.
+    #[inline]
+    pub fn to_i64(self) -> Translation3D<i64, Src, Dst> {
+        self.cast()
     }
 }
 
