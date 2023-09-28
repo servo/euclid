@@ -192,6 +192,41 @@ impl<T, U> Point2D<T, U> {
     pub fn from_untyped(p: Point2D<T, UnknownUnit>) -> Self {
         point2(p.x, p.y)
     }
+
+    /// Apply the function `f` to each component of this point.
+    ///
+    /// # Example
+    ///
+    /// This may be used to perform unusual arithmetic which is not already offered as methods.
+    ///
+    /// ```
+    /// use euclid::default::Point2D;
+    ///
+    /// let p = Point2D::<u32>::new(5, 15);
+    /// assert_eq!(p.map(|coord| coord.saturating_sub(10)), Point2D::new(0, 5));
+    /// ```
+    #[inline]
+    pub fn map<V, F: FnMut(T) -> V>(self, mut f: F) -> Point2D<V, U> {
+        point2(f(self.x), f(self.y))
+    }
+
+    /// Apply the function `f` to each pair of components of this point and `rhs`.
+    ///
+    /// # Example
+    ///
+    /// This may be used to perform unusual arithmetic which is not already offered as methods.
+    ///
+    /// ```
+    /// use euclid::{default::{Point2D, Vector2D}, point2};
+    ///
+    /// let a: Point2D<u32> = point2(50, 200);
+    /// let b: Point2D<u32> = point2(100, 100);
+    /// assert_eq!(a.zip(b, u32::saturating_sub), Vector2D::new(0, 100));
+    /// ```
+    #[inline]
+    pub fn zip<V, F: FnMut(T, T) -> V>(self, rhs: Self, mut f: F) -> Vector2D<V, U> {
+        vec2(f(self.x, rhs.x), f(self.y, rhs.y))
+    }
 }
 
 impl<T: Copy, U> Point2D<T, U> {
@@ -932,6 +967,41 @@ impl<T, U> Point3D<T, U> {
     #[inline]
     pub fn from_untyped(p: Point3D<T, UnknownUnit>) -> Self {
         point3(p.x, p.y, p.z)
+    }
+
+    /// Apply the function `f` to each component of this point.
+    ///
+    /// # Example
+    ///
+    /// This may be used to perform unusual arithmetic which is not already offered as methods.
+    ///
+    /// ```
+    /// use euclid::default::Point3D;
+    ///
+    /// let p = Point3D::<u32>::new(5, 11, 15);
+    /// assert_eq!(p.map(|coord| coord.saturating_sub(10)), Point3D::new(0, 1, 5));
+    /// ```
+    #[inline]
+    pub fn map<V, F: FnMut(T) -> V>(self, mut f: F) -> Point3D<V, U> {
+        point3(f(self.x), f(self.y), f(self.z))
+    }
+
+    /// Apply the function `f` to each pair of components of this point and `rhs`.
+    ///
+    /// # Example
+    ///
+    /// This may be used to perform unusual arithmetic which is not already offered as methods.
+    ///
+    /// ```
+    /// use euclid::{default::{Point3D, Vector3D}, point2};
+    ///
+    /// let a: Point3D<u32> = Point3D::new(50, 200, 400);
+    /// let b: Point3D<u32> = Point3D::new(100, 100, 150);
+    /// assert_eq!(a.zip(b, u32::saturating_sub), Vector3D::new(0, 100, 250));
+    /// ```
+    #[inline]
+    pub fn zip<V, F: FnMut(T, T) -> V>(self, rhs: Self, mut f: F) -> Vector3D<V, U> {
+        vec3(f(self.x, rhs.x), f(self.y, rhs.y), f(self.z, rhs.z))
     }
 }
 
