@@ -291,17 +291,39 @@ where
     /// Subtracts the side offsets from all sides. The horizontal and vertical
     /// offsets must not be larger than the original side length.
     /// This method assumes y oriented downward.
+    ///
+    /// # Panics
+    ///
+    /// Panics if debug assertions are enabled and the width and/or height of
+    /// the result underflows.
     pub fn inner_rect(&self, offsets: SideOffsets2D<T, U>) -> Self {
-        let rect = Rect::new(
+        let result = self.compute_inner_rect(offsets);
+        debug_assert!(result.size.width >= Zero::zero());
+        debug_assert!(result.size.height >= Zero::zero());
+        result
+    }
+
+    /// Calculate the size and position of an inner rectangle, returning None if
+    /// the width or height of the result would underflow.
+    ///
+    /// See [`Self::inner_rect`] for more details.
+    pub fn try_inner_rect(&self, offsets: SideOffsets2D<T, U>) -> Option<Self> {
+        let result = self.compute_inner_rect(offsets);
+        if result.size.width >= Zero::zero() && result.size.height >= Zero::zero() {
+            Some(result)
+        } else {
+            None
+        }
+    }
+
+    fn compute_inner_rect(&self, offsets: SideOffsets2D<T, U>) -> Self {
+        Rect::new(
             Point2D::new(self.origin.x + offsets.left, self.origin.y + offsets.top),
             Size2D::new(
                 self.size.width - offsets.horizontal(),
                 self.size.height - offsets.vertical(),
             ),
-        );
-        debug_assert!(rect.size.width >= Zero::zero());
-        debug_assert!(rect.size.height >= Zero::zero());
-        rect
+        )
     }
 }
 
@@ -671,6 +693,7 @@ pub const fn rect<T, U>(x: T, y: T, w: T, h: T) -> Rect<T, U> {
 #[cfg(test)]
 mod tests {
     use crate::default::{Point2D, Rect, Size2D};
+    use crate::num::Zero;
     use crate::side_offsets::SideOffsets2D;
     use crate::{point2, rect, size2, vec2};
 
@@ -845,6 +868,29 @@ mod tests {
         assert_eq!(outer_rect.size.width, 100);
         assert_eq!(outer_rect.size.height, 130);
         assert_eq!(outer_rect.inner_rect(offsets), inner_rect);
+    }
+
+    #[test]
+    #[cfg_attr(debug_assertions, should_panic)]
+    fn test_inner_rect_panic() {
+        let rect = Rect::new(Zero::zero(), size2(1, 1));
+        let result = rect.inner_rect(SideOffsets2D::new(1, 0, 1, 0));
+        assert_eq!(result.width(), 1);
+        assert_eq!(result.height(), -1);
+        let result = rect.inner_rect(SideOffsets2D::new(0, 1, 0, 1));
+        assert_eq!(result.width(), -1);
+        assert_eq!(result.height(), 1);
+    }
+
+    #[test]
+    fn test_try_inner_rect() {
+        let rect = Rect::new(Zero::zero(), size2(1, 1));
+        let result = rect.try_inner_rect(SideOffsets2D::new(1, 0, 0, 1));
+        assert_eq!(result, Some(Rect::new(point2(1, 1), size2(0, 0))));
+        let result = rect.try_inner_rect(SideOffsets2D::new(1, 0, 1, 0));
+        assert_eq!(result, None);
+        let result = rect.try_inner_rect(SideOffsets2D::new(0, 1, 0, 1));
+        assert_eq!(result, None);
     }
 
     #[test]
