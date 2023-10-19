@@ -11,16 +11,18 @@ use crate::num::*;
 use crate::UnknownUnit;
 use crate::{point2, point3, vec2, vec3, Box2D, Box3D, Rect, Size2D};
 use crate::{Point2D, Point3D, Transform2D, Transform3D, Vector2D, Vector3D};
+
 use core::cmp::{Eq, PartialEq};
 use core::fmt;
 use core::hash::Hash;
 use core::marker::PhantomData;
 use core::ops::{Add, AddAssign, Neg, Sub, SubAssign};
+
+#[cfg(feature = "bytemuck")]
+use bytemuck::{Pod, Zeroable};
 use num_traits::NumCast;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-#[cfg(feature = "bytemuck")]
-use bytemuck::{Zeroable, Pod};
 
 /// A 2d transformation from a space to another that can only express translations.
 ///
@@ -63,8 +65,7 @@ impl<'a, T, Src, Dst> arbitrary::Arbitrary<'a> for Translation2D<T, Src, Dst>
 where
     T: arbitrary::Arbitrary<'a>,
 {
-    fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self>
-    {
+    fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self> {
         let (x, y) = arbitrary::Arbitrary::arbitrary(u)?;
         Ok(Translation2D {
             x,
@@ -676,7 +677,11 @@ impl<T: NumCast + Copy, Src, Dst> Translation3D<T, Src, Dst> {
     /// as one would expect from a simple cast, but this behavior does not always make sense
     /// geometrically. Consider using `round()`, `ceil()` or `floor()` before casting.
     pub fn try_cast<NewT: NumCast>(self) -> Option<Translation3D<NewT, Src, Dst>> {
-        match (NumCast::from(self.x), NumCast::from(self.y), NumCast::from(self.z)) {
+        match (
+            NumCast::from(self.x),
+            NumCast::from(self.y),
+            NumCast::from(self.z),
+        ) {
             (Some(x), Some(y), Some(z)) => Some(Translation3D::new(x, y, z)),
             _ => None,
         }

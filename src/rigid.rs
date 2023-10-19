@@ -8,11 +8,11 @@ use crate::{Rotation3D, Transform3D, UnknownUnit, Vector3D};
 
 use core::{fmt, hash};
 
+#[cfg(feature = "bytemuck")]
+use bytemuck::{Pod, Zeroable};
 use num_traits::real::Real;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-#[cfg(feature = "bytemuck")]
-use bytemuck::{Zeroable, Pod};
 
 /// A rigid transformation. All lengths are preserved under such a transformation.
 ///
@@ -165,7 +165,9 @@ impl<T: Real + ApproxEq<T>, Src, Dst> RigidTransform3D<T, Src, Dst> {
     where
         T: Trig,
     {
-        self.rotation.to_transform().then(&self.translation.to_transform())
+        self.rotation
+            .to_transform()
+            .then(&self.translation.to_transform())
     }
 
     /// Drop the units, preserving only the numeric value.
@@ -252,14 +254,14 @@ mod test {
         let rotation = Rotation3D::unit_quaternion(0.5, -7.8, 2.2, 4.3);
 
         let rigid = RigidTransform3D::new(rotation, translation);
-        assert!(rigid.to_transform().approx_eq(
-            &rotation.to_transform().then(&translation.to_transform())
-        ));
+        assert!(rigid
+            .to_transform()
+            .approx_eq(&rotation.to_transform().then(&translation.to_transform())));
 
         let rigid = RigidTransform3D::new_from_reversed(translation, rotation);
-        assert!(rigid.to_transform().approx_eq(
-            &translation.to_transform().then(&rotation.to_transform())
-        ));
+        assert!(rigid
+            .to_transform()
+            .approx_eq(&translation.to_transform().then(&rotation.to_transform())));
     }
 
     #[test]

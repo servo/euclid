@@ -15,17 +15,17 @@ use crate::scale::Scale;
 use crate::size::Size3D;
 use crate::vector::Vector3D;
 
-use num_traits::{NumCast, Float};
+#[cfg(feature = "bytemuck")]
+use bytemuck::{Pod, Zeroable};
+use num_traits::{Float, NumCast};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-#[cfg(feature = "bytemuck")]
-use bytemuck::{Zeroable, Pod};
 
 use core::borrow::Borrow;
 use core::cmp::PartialOrd;
 use core::fmt;
 use core::hash::{Hash, Hasher};
-use core::ops::{Add, Div, DivAssign, Mul, MulAssign, Sub, Range};
+use core::ops::{Add, Div, DivAssign, Mul, MulAssign, Range, Sub};
 
 /// An axis aligned 3D box represented by its minimum and maximum coordinates.
 #[repr(C)]
@@ -86,7 +86,10 @@ impl<T, U> Box3D<T, U> {
 
     /// Creates a Box3D of the given size, at offset zero.
     #[inline]
-    pub fn from_size(size: Size3D<T, U>) -> Self where T: Zero {
+    pub fn from_size(size: Size3D<T, U>) -> Self
+    where
+        T: Zero,
+    {
         Box3D {
             min: Point3D::zero(),
             max: point3(size.width, size.height, size.depth),
@@ -919,6 +922,7 @@ mod tests {
     }
 
     #[test]
+    #[rustfmt::skip]
     fn test_nan_empty_or_negative() {
         use std::f32::NAN;
         assert!(Box3D { min: point3(NAN, 2.0, 1.0), max: point3(1.0, 3.0, 5.0) }.is_empty());

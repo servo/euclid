@@ -23,12 +23,12 @@ use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAss
 #[cfg(feature = "mint")]
 use mint;
 use num_traits::real::Real;
-use num_traits::{Float, NumCast, Euclid};
+use num_traits::{Euclid, Float, NumCast};
 #[cfg(feature = "serde")]
 use serde;
 
 #[cfg(feature = "bytemuck")]
-use bytemuck::{Zeroable, Pod};
+use bytemuck::{Pod, Zeroable};
 
 /// A 2d Point tagged with a unit.
 #[repr(C)]
@@ -87,8 +87,7 @@ impl<'a, T, U> arbitrary::Arbitrary<'a> for Point2D<T, U>
 where
     T: arbitrary::Arbitrary<'a>,
 {
-    fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self>
-    {
+    fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self> {
         let (x, y) = arbitrary::Arbitrary::arbitrary(u)?;
         Ok(Point2D {
             x,
@@ -748,9 +747,9 @@ impl<T: ApproxEq<T>, U> ApproxEq<Point2D<T, U>> for Point2D<T, U> {
 
 impl<T: Euclid, U> Point2D<T, U> {
     /// Calculates the least nonnegative remainder of `self (mod other)`.
-    /// 
+    ///
     /// # Example
-    /// 
+    ///
     /// ```rust
     /// use euclid::point2;
     /// use euclid::default::{Point2D, Size2D};
@@ -764,13 +763,16 @@ impl<T: Euclid, U> Point2D<T, U> {
     /// ```
     #[inline]
     pub fn rem_euclid(&self, other: &Size2D<T, U>) -> Self {
-        point2(self.x.rem_euclid(&other.width), self.y.rem_euclid(&other.height))
+        point2(
+            self.x.rem_euclid(&other.width),
+            self.y.rem_euclid(&other.height),
+        )
     }
 
     /// Calculates Euclidean division, the matching method for `rem_euclid`.
-    /// 
+    ///
     /// # Example
-    /// 
+    ///
     /// ```rust
     /// use euclid::point2;
     /// use euclid::default::{Point2D, Size2D};
@@ -784,7 +786,10 @@ impl<T: Euclid, U> Point2D<T, U> {
     /// ```
     #[inline]
     pub fn div_euclid(&self, other: &Size2D<T, U>) -> Self {
-        point2(self.x.div_euclid(&other.width), self.y.div_euclid(&other.height))
+        point2(
+            self.x.div_euclid(&other.width),
+            self.y.div_euclid(&other.height),
+        )
     }
 }
 
@@ -1459,11 +1464,7 @@ impl<T: Copy + Mul, U> Mul<T> for Point3D<T, U> {
 
     #[inline]
     fn mul(self, scale: T) -> Self::Output {
-        point3(
-            self.x * scale,
-            self.y * scale,
-            self.z * scale,
-        )
+        point3(self.x * scale, self.y * scale, self.z * scale)
     }
 }
 
@@ -1481,11 +1482,7 @@ impl<T: Copy + Mul, U1, U2> Mul<Scale<T, U1, U2>> for Point3D<T, U1> {
 
     #[inline]
     fn mul(self, scale: Scale<T, U1, U2>) -> Self::Output {
-        point3(
-            self.x * scale.0,
-            self.y * scale.0,
-            self.z * scale.0,
-        )
+        point3(self.x * scale.0, self.y * scale.0, self.z * scale.0)
     }
 }
 
@@ -1501,11 +1498,7 @@ impl<T: Copy + Div, U> Div<T> for Point3D<T, U> {
 
     #[inline]
     fn div(self, scale: T) -> Self::Output {
-        point3(
-            self.x / scale,
-            self.y / scale,
-            self.z / scale,
-        )
+        point3(self.x / scale, self.y / scale, self.z / scale)
     }
 }
 
@@ -1523,11 +1516,7 @@ impl<T: Copy + Div, U1, U2> Div<Scale<T, U1, U2>> for Point3D<T, U2> {
 
     #[inline]
     fn div(self, scale: Scale<T, U1, U2>) -> Self::Output {
-        point3(
-            self.x / scale.0,
-            self.y / scale.0,
-            self.z / scale.0,
-        )
+        point3(self.x / scale.0, self.y / scale.0, self.z / scale.0)
     }
 }
 
@@ -1589,9 +1578,9 @@ impl<T: ApproxEq<T>, U> ApproxEq<Point3D<T, U>> for Point3D<T, U> {
 
 impl<T: Euclid, U> Point3D<T, U> {
     /// Calculates the least nonnegative remainder of `self (mod other)`.
-    /// 
+    ///
     /// # Example
-    /// 
+    ///
     /// ```rust
     /// use euclid::point3;
     /// use euclid::default::{Point3D, Size3D};
@@ -1613,9 +1602,9 @@ impl<T: Euclid, U> Point3D<T, U> {
     }
 
     /// Calculates Euclidean division, the matching method for `rem_euclid`.
-    /// 
+    ///
     /// # Example
-    /// 
+    ///
     /// ```rust
     /// use euclid::point3;
     /// use euclid::default::{Point3D, Size3D};
@@ -1943,8 +1932,8 @@ mod point2d {
     }
 
     mod euclid {
-        use crate::point2;
         use crate::default::{Point2D, Size2D};
+        use crate::point2;
 
         #[test]
         pub fn test_rem_euclid() {
@@ -2227,8 +2216,8 @@ mod point3d {
     }
 
     mod euclid {
-        use crate::point3;
         use crate::default::{Point3D, Size3D};
+        use crate::point3;
 
         #[test]
         pub fn test_rem_euclid() {

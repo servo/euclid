@@ -17,17 +17,17 @@ use crate::side_offsets::SideOffsets2D;
 use crate::size::Size2D;
 use crate::vector::{vec2, Vector2D};
 
-use num_traits::{NumCast, Float};
+#[cfg(feature = "bytemuck")]
+use bytemuck::{Pod, Zeroable};
+use num_traits::{Float, NumCast};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-#[cfg(feature = "bytemuck")]
-use bytemuck::{Zeroable, Pod};
 
 use core::borrow::Borrow;
 use core::cmp::PartialOrd;
 use core::fmt;
 use core::hash::{Hash, Hasher};
-use core::ops::{Add, Div, DivAssign, Mul, MulAssign, Sub, Range};
+use core::ops::{Add, Div, DivAssign, Mul, MulAssign, Range, Sub};
 
 /// A 2d axis aligned rectangle represented by its minimum and maximum coordinates.
 ///
@@ -116,9 +116,9 @@ impl<T, U> Box2D<T, U> {
 
     /// Constructor.
     #[inline]
-    pub fn from_origin_and_size(origin: Point2D<T, U>, size: Size2D<T, U>) -> Self 
+    pub fn from_origin_and_size(origin: Point2D<T, U>, size: Size2D<T, U>) -> Self
     where
-        T: Copy + Add<T, Output = T>
+        T: Copy + Add<T, Output = T>,
     {
         Box2D {
             min: origin,
@@ -128,7 +128,10 @@ impl<T, U> Box2D<T, U> {
 
     /// Creates a Box2D of the given size, at offset zero.
     #[inline]
-    pub fn from_size(size: Size2D<T, U>) -> Self where T: Zero {
+    pub fn from_size(size: Size2D<T, U>) -> Self
+    where
+        T: Zero,
+    {
         Box2D {
             min: Point2D::zero(),
             max: point2(size.width, size.height),
@@ -874,6 +877,7 @@ mod tests {
     }
 
     #[test]
+    #[rustfmt::skip]
     fn test_nan_empty() {
         use std::f32::NAN;
         assert!(Box2D { min: point2(NAN, 2.0), max: point2(1.0, 3.0) }.is_empty());

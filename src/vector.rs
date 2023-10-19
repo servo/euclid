@@ -33,7 +33,7 @@ use num_traits::{Float, NumCast, Signed};
 use serde;
 
 #[cfg(feature = "bytemuck")]
-use bytemuck::{Zeroable, Pod};
+use bytemuck::{Pod, Zeroable};
 
 /// A 2d Vector tagged with a unit.
 #[repr(C)]
@@ -96,8 +96,7 @@ impl<'a, T, U> arbitrary::Arbitrary<'a> for Vector2D<T, U>
 where
     T: arbitrary::Arbitrary<'a>,
 {
-    fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self>
-    {
+    fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self> {
         let (x, y) = arbitrary::Arbitrary::arbitrary(u)?;
         Ok(Vector2D {
             x,
@@ -775,13 +774,13 @@ impl<T: Add + Copy, U> Add<&Self> for Vector2D<T, U> {
 }
 
 impl<T: Add<Output = T> + Zero, U> Sum for Vector2D<T, U> {
-    fn sum<I: Iterator<Item=Self>>(iter: I) -> Self {
+    fn sum<I: Iterator<Item = Self>>(iter: I) -> Self {
         iter.fold(Self::zero(), Add::add)
     }
 }
 
 impl<'a, T: 'a + Add<Output = T> + Copy + Zero, U: 'a> Sum<&'a Self> for Vector2D<T, U> {
-    fn sum<I: Iterator<Item=&'a Self>>(iter: I) -> Self {
+    fn sum<I: Iterator<Item = &'a Self>>(iter: I) -> Self {
         iter.fold(Self::zero(), Add::add)
     }
 }
@@ -1684,13 +1683,13 @@ impl<'a, T: 'a + Add + Copy, U: 'a> Add<&Self> for Vector3D<T, U> {
 }
 
 impl<T: Add<Output = T> + Zero, U> Sum for Vector3D<T, U> {
-    fn sum<I: Iterator<Item=Self>>(iter: I) -> Self {
+    fn sum<I: Iterator<Item = Self>>(iter: I) -> Self {
         iter.fold(Self::zero(), Add::add)
     }
 }
 
 impl<'a, T: 'a + Add<Output = T> + Copy + Zero, U: 'a> Sum<&'a Self> for Vector3D<T, U> {
-    fn sum<I: Iterator<Item=&'a Self>>(iter: I) -> Self {
+    fn sum<I: Iterator<Item = &'a Self>>(iter: I) -> Self {
         iter.fold(Self::zero(), Add::add)
     }
 }
@@ -1723,11 +1722,7 @@ impl<T: Copy + Mul, U> Mul<T> for Vector3D<T, U> {
 
     #[inline]
     fn mul(self, scale: T) -> Self::Output {
-        vec3(
-            self.x * scale,
-            self.y * scale,
-            self.z * scale,
-        )
+        vec3(self.x * scale, self.y * scale, self.z * scale)
     }
 }
 
@@ -1743,11 +1738,7 @@ impl<T: Copy + Mul, U1, U2> Mul<Scale<T, U1, U2>> for Vector3D<T, U1> {
 
     #[inline]
     fn mul(self, scale: Scale<T, U1, U2>) -> Self::Output {
-        vec3(
-            self.x * scale.0,
-            self.y * scale.0,
-            self.z * scale.0,
-        )
+        vec3(self.x * scale.0, self.y * scale.0, self.z * scale.0)
     }
 }
 
@@ -1765,11 +1756,7 @@ impl<T: Copy + Div, U> Div<T> for Vector3D<T, U> {
 
     #[inline]
     fn div(self, scale: T) -> Self::Output {
-        vec3(
-            self.x / scale,
-            self.y / scale,
-            self.z / scale,
-        )
+        vec3(self.x / scale, self.y / scale, self.z / scale)
     }
 }
 
@@ -1785,11 +1772,7 @@ impl<T: Copy + Div, U1, U2> Div<Scale<T, U1, U2>> for Vector3D<T, U2> {
 
     #[inline]
     fn div(self, scale: Scale<T, U1, U2>) -> Self::Output {
-        vec3(
-            self.x / scale.0,
-            self.y / scale.0,
-            self.z / scale.0,
-        )
+        vec3(self.x / scale.0, self.y / scale.0, self.z / scale.0)
     }
 }
 
@@ -2299,7 +2282,7 @@ mod vector2d {
         let vecs = [
             Vector2DMm::new(1.0, 2.0),
             Vector2DMm::new(3.0, 4.0),
-            Vector2DMm::new(5.0, 6.0)
+            Vector2DMm::new(5.0, 6.0),
         ];
         let sum = Vector2DMm::new(9.0, 12.0);
         assert_eq!(vecs.iter().sum::<Vector2DMm<_>>(), sum);
@@ -2364,7 +2347,7 @@ mod vector3d {
         let vecs = [
             Vec3::new(1.0, 2.0, 3.0),
             Vec3::new(4.0, 5.0, 6.0),
-            Vec3::new(7.0, 8.0, 9.0)
+            Vec3::new(7.0, 8.0, 9.0),
         ];
         let sum = Vec3::new(12.0, 15.0, 18.0);
         assert_eq!(vecs.iter().sum::<Vec3>(), sum);
