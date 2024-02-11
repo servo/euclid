@@ -230,7 +230,7 @@ impl<T, Src, Dst> Transform3D<T, Src, Dst> {
     /// of a 2 by 3 matrix transformation.
     ///
     /// Components follow the column-major-column-vector notation (m41 and m42
-    /// representating the translation terms).
+    /// representing the translation terms).
     ///
     /// ```text
     /// m11  m12   0   0

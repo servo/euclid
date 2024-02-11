@@ -2297,7 +2297,7 @@ mod vector2d {
     }
 
     #[test]
-    pub fn test_tpyed_scalar_mul() {
+    pub fn test_typed_scalar_mul() {
         let p1 = Vector2DMm::new(1.0, 2.0);
         let cm_per_mm = Scale::<f32, Mm, Cm>::new(0.1);
 
