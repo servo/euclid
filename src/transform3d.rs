@@ -7,7 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#![cfg_attr(feature = "cargo-clippy", allow(just_underscores_and_digits))]
+#![allow(clippy::just_underscores_and_digits)]
 
 use super::{Angle, UnknownUnit};
 use crate::approxeq::ApproxEq;
@@ -209,7 +209,7 @@ impl<T, Src, Dst> Transform3D<T, Src, Dst> {
     /// );
     /// ```
     #[inline]
-    #[cfg_attr(feature = "cargo-clippy", allow(too_many_arguments))]
+    #[allow(clippy::too_many_arguments)]
     #[rustfmt::skip]
     pub const fn new(
         m11: T, m12: T, m13: T, m14: T,
