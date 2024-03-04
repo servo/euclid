@@ -477,7 +477,7 @@ impl<T: PartialOrd, U> Size2D<T, U> {
         T: Zero,
     {
         let zero = T::zero();
-        // The condition is experessed this way so that we return true in
+        // The condition is expressed this way so that we return true in
         // the presence of NaN.
         !(self.width > zero && self.height > zero)
     }
