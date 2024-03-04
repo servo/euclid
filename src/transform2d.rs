@@ -7,7 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#![cfg_attr(feature = "cargo-clippy", allow(just_underscores_and_digits))]
+#![allow(clippy::just_underscores_and_digits)]
 
 use super::{Angle, UnknownUnit};
 use crate::approxeq::ApproxEq;
