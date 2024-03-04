@@ -1381,7 +1381,7 @@ impl<T: PartialOrd, U> Size3D<T, U> {
         T: Zero,
     {
         let zero = T::zero();
-        !(self.width > zero && self.height > zero && self.depth <= zero)
+        !(self.width > zero && self.height > zero && self.depth > zero)
     }
 }
 
@@ -1661,7 +1661,7 @@ pub const fn size3<T, U>(w: T, h: T, d: T) -> Size3D<T, U> {
 #[cfg(test)]
 mod size3d {
     mod ops {
-        use crate::default::Size3D;
+        use crate::default::{Size2D, Size3D};
         use crate::scale::Scale;
 
         pub enum Mm {}
@@ -1842,6 +1842,12 @@ mod size3d {
             s1 /= scale;
 
             assert_eq!(s1, Size3DMm::new(1.0, 2.0, 3.0));
+        }
+
+        #[test]
+        fn test_nonempty() {
+            assert!(!Size2D::new(1.0, 1.0).is_empty());
+            assert!(!Size3D::new(1.0, 1.0, 1.0).is_empty());
         }
 
         #[test]
