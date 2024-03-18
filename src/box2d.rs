@@ -167,12 +167,19 @@ where
             && self.max.y > other.min.y
     }
 
-    /// Returns `true` if this box contains the point. Points are considered
-    /// in the box if they are on the front, left or top faces, but outside if they
-    /// are on the back, right or bottom faces.
+    /// Returns `true` if this box2d contains the point `p`. A point is considered
+    /// in the box2d if it lies on the left or top edges, but outside if it lies
+    /// on the right or bottom edges.
     #[inline]
     pub fn contains(&self, p: Point2D<T, U>) -> bool {
         self.min.x <= p.x && p.x < self.max.x && self.min.y <= p.y && p.y < self.max.y
+    }
+
+    /// Returns `true` if this box contains the point `p`. A point is considered
+    /// in the box2d if it lies on any edge of the box2d.
+    #[inline]
+    pub fn contains_inclusive(&self, p: Point2D<T, U>) -> bool {
+        self.min.x <= p.x && p.x <= self.max.x && self.min.y <= p.y && p.y <= self.max.y
     }
 
     /// Returns `true` if this box contains the interior of the other box. Always
