@@ -142,9 +142,9 @@ where
             && self.max.z > other.min.z
     }
 
-    /// Returns `true` if this box3d contains the point. Points are considered
-    /// in the box3d if they are on the front, left or top faces, but outside if they
-    /// are on the back, right or bottom faces.
+    /// Returns `true` if this box3d contains the point `p`. A point is considered
+    /// in the box3d if it lies on the front, left or top faces, but outside if it lies
+    /// on the back, right or bottom faces.
     #[inline]
     pub fn contains(&self, other: Point3D<T, U>) -> bool {
         self.min.x <= other.x
@@ -153,6 +153,18 @@ where
             && other.y < self.max.y
             && self.min.z <= other.z
             && other.z < self.max.z
+    }
+
+    /// Returns `true` if this box3d contains the point `p`. A point is considered
+    /// in the box3d if it lies on any face of the box3d.
+    #[inline]
+    pub fn contains_inclusive(&self, other: Point3D<T, U>) -> bool {
+        self.min.x <= other.x
+            && other.x <= self.max.x
+            && self.min.y <= other.y
+            && other.y <= self.max.y
+            && self.min.z <= other.z
+            && other.z <= self.max.z
     }
 
     /// Returns `true` if this box3d contains the interior of the other box3d. Always
