@@ -84,6 +84,22 @@ impl<T, U> Box3D<T, U> {
         Box3D { min, max }
     }
 
+    /// Constructor.
+    #[inline]
+    pub fn from_origin_and_size(origin: Point3D<T, U>, size: Size3D<T, U>) -> Self
+    where
+        T: Copy + Add<T, Output = T>,
+    {
+        Box3D {
+            min: origin,
+            max: point3(
+                origin.x + size.width,
+                origin.y + size.height,
+                origin.z + size.depth,
+            ),
+        }
+    }
+
     /// Creates a Box3D of the given size, at offset zero.
     #[inline]
     pub fn from_size(size: Size3D<T, U>) -> Self
