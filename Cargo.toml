@@ -1,6 +1,6 @@
 [package]
 name = "euclid"
-version = "0.22.9"
+version = "0.22.10"
 authors = ["The Servo Project Developers"]
 edition = "2021"
 rust-version = "1.56.0"
