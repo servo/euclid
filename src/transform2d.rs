@@ -49,9 +49,9 @@ use serde::{Deserialize, Serialize};
 /// transformations we are interested in implicitly defined:
 ///
 /// ```text
-///  | m11 m12 0 |   |x|   |x'|
-///  | m21 m22 0 | x |y| = |y'|
-///  | m31 m32 1 |   |1|   |w |
+///  | m11 m21 m31 |   |x|   |x'|
+///  | m12 m22 m32 | x |y| = |y'|
+///  |   0   0   1 |   |1|   |1 |
 /// ```
 ///
 /// When translating Transform2D into general matrix representations, consider that the
