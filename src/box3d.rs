@@ -147,24 +147,24 @@ where
     /// on the back, right or bottom faces.
     #[inline]
     pub fn contains(&self, other: Point3D<T, U>) -> bool {
-        self.min.x <= other.x
-            && other.x < self.max.x
-            && self.min.y <= other.y
-            && other.y < self.max.y
-            && self.min.z <= other.z
-            && other.z < self.max.z
+        (self.min.x <= other.x)
+            & (other.x < self.max.x)
+            & (self.min.y <= other.y)
+            & (other.y < self.max.y)
+            & (self.min.z <= other.z)
+            & (other.z < self.max.z)
     }
 
     /// Returns `true` if this box3d contains the point `p`. A point is considered
     /// in the box3d if it lies on any face of the box3d.
     #[inline]
     pub fn contains_inclusive(&self, other: Point3D<T, U>) -> bool {
-        self.min.x <= other.x
-            && other.x <= self.max.x
-            && self.min.y <= other.y
-            && other.y <= self.max.y
-            && self.min.z <= other.z
-            && other.z <= self.max.z
+        (self.min.x <= other.x)
+            & (other.x <= self.max.x)
+            & (self.min.y <= other.y)
+            & (other.y <= self.max.y)
+            & (self.min.z <= other.z)
+            & (other.z <= self.max.z)
     }
 
     /// Returns `true` if this box3d contains the interior of the other box3d. Always
@@ -173,12 +173,12 @@ where
     #[inline]
     pub fn contains_box(&self, other: &Self) -> bool {
         other.is_empty()
-            || (self.min.x <= other.min.x
-                && other.max.x <= self.max.x
-                && self.min.y <= other.min.y
-                && other.max.y <= self.max.y
-                && self.min.z <= other.min.z
-                && other.max.z <= self.max.z)
+            || ((self.min.x <= other.min.x)
+                & (other.max.x <= self.max.x)
+                & (self.min.y <= other.min.y)
+                & (other.max.y <= self.max.y)
+                & (self.min.z <= other.min.z)
+                & (other.max.z <= self.max.z))
     }
 }
 
