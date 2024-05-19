@@ -191,10 +191,10 @@ where
     #[inline]
     pub fn contains_box(&self, other: &Self) -> bool {
         other.is_empty()
-            || (self.min.x <= other.min.x
-                && other.max.x <= self.max.x
-                && self.min.y <= other.min.y
-                && other.max.y <= self.max.y)
+            || ((self.min.x <= other.min.x)
+                & (other.max.x <= self.max.x)
+                & (self.min.y <= other.min.y)
+                & (other.max.y <= self.max.y))
     }
 }
 
