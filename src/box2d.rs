@@ -161,10 +161,11 @@ where
     /// Returns `true` if the two boxes intersect.
     #[inline]
     pub fn intersects(&self, other: &Self) -> bool {
-        self.min.x < other.max.x
-            && self.max.x > other.min.x
-            && self.min.y < other.max.y
-            && self.max.y > other.min.y
+        // Use bitwise and instead of && to avoid emitting branches.
+        (self.min.x < other.max.x)
+            & (self.max.x > other.min.x)
+            & (self.min.y < other.max.y)
+            & (self.max.y > other.min.y)
     }
 
     /// Returns `true` if this box2d contains the point `p`. A point is considered
@@ -172,14 +173,16 @@ where
     /// on the right or bottom edges.
     #[inline]
     pub fn contains(&self, p: Point2D<T, U>) -> bool {
-        self.min.x <= p.x && p.x < self.max.x && self.min.y <= p.y && p.y < self.max.y
+        // Use bitwise and instead of && to avoid emitting branches.
+        (self.min.x <= p.x) & (p.x < self.max.x) & (self.min.y <= p.y) & (p.y < self.max.y)
     }
 
     /// Returns `true` if this box contains the point `p`. A point is considered
     /// in the box2d if it lies on any edge of the box2d.
     #[inline]
     pub fn contains_inclusive(&self, p: Point2D<T, U>) -> bool {
-        self.min.x <= p.x && p.x <= self.max.x && self.min.y <= p.y && p.y <= self.max.y
+        // Use bitwise and instead of && to avoid emitting branches.
+        (self.min.x <= p.x) & (p.x <= self.max.x) & (self.min.y <= p.y) & (p.y <= self.max.y)
     }
 
     /// Returns `true` if this box contains the interior of the other box. Always
@@ -188,10 +191,10 @@ where
     #[inline]
     pub fn contains_box(&self, other: &Self) -> bool {
         other.is_empty()
-            || (self.min.x <= other.min.x
-                && other.max.x <= self.max.x
-                && self.min.y <= other.min.y
-                && other.max.y <= self.max.y)
+            || ((self.min.x <= other.min.x)
+                & (other.max.x <= self.max.x)
+                & (self.min.y <= other.min.y)
+                & (other.max.y <= self.max.y))
     }
 }
 
