@@ -225,6 +225,25 @@ where
     }
 }
 
+impl<T: fmt::Debug, Src, Dst> fmt::Debug for Rotation2D<T, Src, Dst> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Rotation({:?} rad)", self.angle)
+    }
+}
+
+impl<T, Src, Dst> ApproxEq<T> for Rotation2D<T, Src, Dst>
+where
+    T: Copy + Neg<Output = T> + ApproxEq<T>,
+{
+    fn approx_epsilon() -> T {
+        T::approx_epsilon()
+    }
+
+    fn approx_eq_eps(&self, other: &Self, eps: &T) -> bool {
+        self.angle.approx_eq_eps(&other.angle, eps)
+    }
+}
+
 /// A transform that can represent rotations in 3d, represented as a quaternion.
 ///
 /// Most methods expect the quaternion to be normalized.
