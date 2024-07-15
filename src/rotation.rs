@@ -73,6 +73,16 @@ where
     }
 }
 
+#[cfg(feature = "arbitrary")]
+impl<'a, T, Src, Dst> arbitrary::Arbitrary<'a> for Rotation2D<T, Src, Dst>
+where
+    T: arbitrary::Arbitrary<'a>,
+{
+    fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self> {
+        Ok(Rotation2D::new(arbitrary::Arbitrary::arbitrary(u)?))
+    }
+}
+
 #[cfg(feature = "bytemuck")]
 unsafe impl<T: Zeroable, Src, Dst> Zeroable for Rotation2D<T, Src, Dst> {}
 
@@ -309,6 +319,20 @@ where
         self.j.hash(h);
         self.k.hash(h);
         self.r.hash(h);
+    }
+}
+
+/// Note: the quaternions produced by this implementation are not normalized
+/// (nor even necessarily finite). That is, this is not appropriate to use to
+/// choose an actual “arbitrary rotation”, at least not without postprocessing.
+#[cfg(feature = "arbitrary")]
+impl<'a, T, Src, Dst> arbitrary::Arbitrary<'a> for Rotation3D<T, Src, Dst>
+where
+    T: arbitrary::Arbitrary<'a>,
+{
+    fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self> {
+        let (i, j, k, r) = arbitrary::Arbitrary::arbitrary(u)?;
+        Ok(Rotation3D::quaternion(i, j, k, r))
     }
 }
 

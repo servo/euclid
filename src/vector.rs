@@ -1000,6 +1000,22 @@ where
     }
 }
 
+#[cfg(feature = "arbitrary")]
+impl<'a, T, U> arbitrary::Arbitrary<'a> for Vector3D<T, U>
+where
+    T: arbitrary::Arbitrary<'a>,
+{
+    fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self> {
+        let (x, y, z) = arbitrary::Arbitrary::arbitrary(u)?;
+        Ok(Vector3D {
+            x,
+            y,
+            z,
+            _unit: PhantomData,
+        })
+    }
+}
+
 #[cfg(feature = "bytemuck")]
 unsafe impl<T: Zeroable, U> Zeroable for Vector3D<T, U> {}
 
@@ -2051,6 +2067,27 @@ impl BoolVector3D {
             x: self.y,
             y: self.z,
         }
+    }
+}
+
+#[cfg(feature = "arbitrary")]
+impl<'a> arbitrary::Arbitrary<'a> for BoolVector2D {
+    fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self> {
+        Ok(BoolVector2D {
+            x: arbitrary::Arbitrary::arbitrary(u)?,
+            y: arbitrary::Arbitrary::arbitrary(u)?,
+        })
+    }
+}
+
+#[cfg(feature = "arbitrary")]
+impl<'a> arbitrary::Arbitrary<'a> for BoolVector3D {
+    fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self> {
+        Ok(BoolVector3D {
+            x: arbitrary::Arbitrary::arbitrary(u)?,
+            y: arbitrary::Arbitrary::arbitrary(u)?,
+            z: arbitrary::Arbitrary::arbitrary(u)?,
+        })
     }
 }
 

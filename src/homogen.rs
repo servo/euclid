@@ -80,6 +80,23 @@ where
     }
 }
 
+#[cfg(feature = "arbitrary")]
+impl<'a, T, U> arbitrary::Arbitrary<'a> for HomogeneousVector<T, U>
+where
+    T: arbitrary::Arbitrary<'a>,
+{
+    fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self> {
+        let (x, y, z, w) = arbitrary::Arbitrary::arbitrary(u)?;
+        Ok(HomogeneousVector {
+            x,
+            y,
+            z,
+            w,
+            _unit: PhantomData,
+        })
+    }
+}
+
 #[cfg(feature = "bytemuck")]
 unsafe impl<T: Zeroable, U> Zeroable for HomogeneousVector<T, U> {}
 
