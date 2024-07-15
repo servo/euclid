@@ -223,6 +223,19 @@ impl<T: Clone, Src, Dst> Clone for RigidTransform3D<T, Src, Dst> {
     }
 }
 
+#[cfg(feature = "arbitrary")]
+impl<'a, T, Src, Dst> arbitrary::Arbitrary<'a> for RigidTransform3D<T, Src, Dst>
+where
+    T: arbitrary::Arbitrary<'a>,
+{
+    fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self> {
+        Ok(RigidTransform3D {
+            rotation: arbitrary::Arbitrary::arbitrary(u)?,
+            translation: arbitrary::Arbitrary::arbitrary(u)?,
+        })
+    }
+}
+
 #[cfg(feature = "bytemuck")]
 unsafe impl<T: Zeroable, Src, Dst> Zeroable for RigidTransform3D<T, Src, Dst> {}
 

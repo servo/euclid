@@ -71,6 +71,19 @@ impl<T: fmt::Debug, U> fmt::Debug for Box3D<T, U> {
     }
 }
 
+#[cfg(feature = "arbitrary")]
+impl<'a, T, U> arbitrary::Arbitrary<'a> for Box3D<T, U>
+where
+    T: arbitrary::Arbitrary<'a>,
+{
+    fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self> {
+        Ok(Box3D::new(
+            arbitrary::Arbitrary::arbitrary(u)?,
+            arbitrary::Arbitrary::arbitrary(u)?,
+        ))
+    }
+}
+
 #[cfg(feature = "bytemuck")]
 unsafe impl<T: Zeroable, U> Zeroable for Box3D<T, U> {}
 

@@ -419,6 +419,22 @@ pub struct Translation3D<T, Src, Dst> {
     pub _unit: PhantomData<(Src, Dst)>,
 }
 
+#[cfg(feature = "arbitrary")]
+impl<'a, T, Src, Dst> arbitrary::Arbitrary<'a> for Translation3D<T, Src, Dst>
+where
+    T: arbitrary::Arbitrary<'a>,
+{
+    fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self> {
+        let (x, y, z) = arbitrary::Arbitrary::arbitrary(u)?;
+        Ok(Translation3D {
+            x,
+            y,
+            z,
+            _unit: PhantomData,
+        })
+    }
+}
+
 impl<T: Copy, Src, Dst> Copy for Translation3D<T, Src, Dst> {}
 
 impl<T: Clone, Src, Dst> Clone for Translation3D<T, Src, Dst> {

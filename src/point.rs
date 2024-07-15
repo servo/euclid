@@ -874,6 +874,22 @@ where
     }
 }
 
+#[cfg(feature = "arbitrary")]
+impl<'a, T, U> arbitrary::Arbitrary<'a> for Point3D<T, U>
+where
+    T: arbitrary::Arbitrary<'a>,
+{
+    fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self> {
+        let (x, y, z) = arbitrary::Arbitrary::arbitrary(u)?;
+        Ok(Point3D {
+            x,
+            y,
+            z,
+            _unit: PhantomData,
+        })
+    }
+}
+
 #[cfg(feature = "bytemuck")]
 unsafe impl<T: Zeroable, U> Zeroable for Point3D<T, U> {}
 
