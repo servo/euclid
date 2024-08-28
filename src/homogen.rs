@@ -143,7 +143,7 @@ impl<T, U> HomogeneousVector<T, U> {
 impl<T: Copy + Div<T, Output = T> + Zero + PartialOrd, U> HomogeneousVector<T, U> {
     /// Convert into Cartesian 2D point.
     ///
-    /// Returns None if the point is on or behind the W=0 hemisphere.
+    /// Returns `None` if the point is on or behind the W=0 hemisphere.
     #[inline]
     pub fn to_point2d(self) -> Option<Point2D<T, U>> {
         if self.w > T::zero() {
@@ -155,7 +155,7 @@ impl<T: Copy + Div<T, Output = T> + Zero + PartialOrd, U> HomogeneousVector<T, U
 
     /// Convert into Cartesian 3D point.
     ///
-    /// Returns None if the point is on or behind the W=0 hemisphere.
+    /// Returns `None` if the point is on or behind the W=0 hemisphere.
     #[inline]
     pub fn to_point3d(self) -> Option<Point3D<T, U>> {
         if self.w > T::zero() {

@@ -54,10 +54,10 @@ use serde::{Deserialize, Serialize};
 ///  |   0   0   1 |   |1|   |1 |
 /// ```
 ///
-/// When translating Transform2D into general matrix representations, consider that the
+/// When translating `Transform2D` into general matrix representations, consider that the
 /// representation follows the column-major notation with column vectors.
 ///
-/// The translation terms are m31 and m32.
+/// The translation terms are `m31` and `m32`.
 #[repr(C)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(
@@ -170,12 +170,10 @@ impl<T, Src, Dst> Transform2D<T, Src, Dst> {
         }
     }
 
-    /// Returns true is this transform is approximately equal to the other one, using
-    /// T's default epsilon value.
+    /// Returns `true` if this transform is approximately equal to the other one, using
+    /// `T`'s default epsilon value.
     ///
-    /// The same as [`ApproxEq::approx_eq()`] but available without importing trait.
-    ///
-    /// [`ApproxEq::approx_eq()`]: ./approxeq/trait.ApproxEq.html#method.approx_eq
+    /// The same as [`ApproxEq::approx_eq`] but available without importing trait.
     #[inline]
     pub fn approx_eq(&self, other: &Self) -> bool
     where
@@ -184,12 +182,10 @@ impl<T, Src, Dst> Transform2D<T, Src, Dst> {
         <Self as ApproxEq<T>>::approx_eq(&self, &other)
     }
 
-    /// Returns true is this transform is approximately equal to the other one, using
+    /// Returns `true` if this transform is approximately equal to the other one, using
     /// a provided epsilon value.
     ///
-    /// The same as [`ApproxEq::approx_eq_eps()`] but available without importing trait.
-    ///
-    /// [`ApproxEq::approx_eq_eps()`]: ./approxeq/trait.ApproxEq.html#method.approx_eq_eps
+    /// The same as [`ApproxEq::approx_eq_eps`] but available without importing trait.
     #[inline]
     pub fn approx_eq_eps(&self, other: &Self, eps: &T) -> bool
     where
@@ -203,7 +199,7 @@ impl<T: Copy, Src, Dst> Transform2D<T, Src, Dst> {
     /// Returns an array containing this transform's terms.
     ///
     /// The terms are laid out in the same order as they are
-    /// specified in `Transform2D::new`, that is following the
+    /// specified in [`Transform2D::new`], that is following the
     /// column-major-column-vector matrix notation.
     ///
     /// For example the translation terms are found in the
@@ -641,7 +637,7 @@ impl<T, Src, Dst> Default for Transform2D<T, Src, Dst>
 where
     T: Zero + One,
 {
-    /// Returns the [identity transform](#method.identity).
+    /// Returns the [identity transform](Transform2D::identity).
     fn default() -> Self {
         Self::identity()
     }
@@ -653,7 +649,7 @@ impl<T: ApproxEq<T>, Src, Dst> ApproxEq<T> for Transform2D<T, Src, Dst> {
         T::approx_epsilon()
     }
 
-    /// Returns true is this transform is approximately equal to the other one, using
+    /// Returns `true` if this transform is approximately equal to the other one, using
     /// a provided epsilon value.
     fn approx_eq_eps(&self, other: &Self, eps: &T) -> bool {
         self.m11.approx_eq_eps(&other.m11, eps)
