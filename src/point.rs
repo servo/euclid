@@ -148,7 +148,7 @@ impl<T, U> Point2D<T, U> {
         point2(Zero::zero(), Zero::zero())
     }
 
-    /// The same as [`origin()`](#method.origin).
+    /// The same as [`Point2D::origin`].
     #[inline]
     pub fn zero() -> Self
     where
@@ -509,7 +509,7 @@ impl<T: NumCast + Copy, U> Point2D<T, U> {
         self.cast()
     }
 
-    /// Cast into an i32 point, truncating decimals if any.
+    /// Cast into an `i32` point, truncating decimals if any.
     ///
     /// When casting from floating point points, it is worth considering whether
     /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
@@ -519,7 +519,7 @@ impl<T: NumCast + Copy, U> Point2D<T, U> {
         self.cast()
     }
 
-    /// Cast into an i64 point, truncating decimals if any.
+    /// Cast into an `i64` point, truncating decimals if any.
     ///
     /// When casting from floating point points, it is worth considering whether
     /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
@@ -531,7 +531,7 @@ impl<T: NumCast + Copy, U> Point2D<T, U> {
 }
 
 impl<T: Float, U> Point2D<T, U> {
-    /// Returns true if all members are finite.
+    /// Returns `true` if all members are finite.
     #[inline]
     pub fn is_finite(self) -> bool {
         self.x.is_finite() && self.y.is_finite()
@@ -710,7 +710,7 @@ impl<T: Zero, U> Zero for Point2D<T, U> {
 }
 
 impl<T: Round, U> Round for Point2D<T, U> {
-    /// See [Point2D::round()](#method.round)
+    /// See [`Point2D::round`].
     #[inline]
     fn round(self) -> Self {
         self.round()
@@ -718,7 +718,7 @@ impl<T: Round, U> Round for Point2D<T, U> {
 }
 
 impl<T: Ceil, U> Ceil for Point2D<T, U> {
-    /// See [Point2D::ceil()](#method.ceil)
+    /// See [`Point2D::ceil`].
     #[inline]
     fn ceil(self) -> Self {
         self.ceil()
@@ -726,7 +726,7 @@ impl<T: Ceil, U> Ceil for Point2D<T, U> {
 }
 
 impl<T: Floor, U> Floor for Point2D<T, U> {
-    /// See [Point2D::floor()](#method.floor)
+    /// See [`Point2D::floor`].
     #[inline]
     fn floor(self) -> Self {
         self.floor()
@@ -944,7 +944,7 @@ impl<T, U> Point3D<T, U> {
         point3(Zero::zero(), Zero::zero(), Zero::zero())
     }
 
-    /// The same as [`origin()`](#method.origin).
+    /// The same as [`Point3D::origin`].
     #[inline]
     pub fn zero() -> Self
     where
@@ -1356,7 +1356,7 @@ impl<T: NumCast + Copy, U> Point3D<T, U> {
 }
 
 impl<T: Float, U> Point3D<T, U> {
-    /// Returns true if all members are finite.
+    /// Returns `true` if all members are finite.
     #[inline]
     pub fn is_finite(self) -> bool {
         self.x.is_finite() && self.y.is_finite() && self.z.is_finite()
@@ -1551,7 +1551,7 @@ impl<T: Zero, U> Zero for Point3D<T, U> {
 }
 
 impl<T: Round, U> Round for Point3D<T, U> {
-    /// See [Point3D::round()](#method.round)
+    /// See [`Point3D::round`].
     #[inline]
     fn round(self) -> Self {
         self.round()
@@ -1559,7 +1559,7 @@ impl<T: Round, U> Round for Point3D<T, U> {
 }
 
 impl<T: Ceil, U> Ceil for Point3D<T, U> {
-    /// See [Point3D::ceil()](#method.ceil)
+    /// See [`Point3D::ceil`].
     #[inline]
     fn ceil(self) -> Self {
         self.ceil()
@@ -1567,7 +1567,7 @@ impl<T: Ceil, U> Ceil for Point3D<T, U> {
 }
 
 impl<T: Floor, U> Floor for Point3D<T, U> {
-    /// See [Point3D::floor()](#method.floor)
+    /// See [`Point3D::floor`].
     #[inline]
     fn floor(self) -> Self {
         self.floor()

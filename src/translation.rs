@@ -26,8 +26,8 @@ use serde::{Deserialize, Serialize};
 
 /// A 2d transformation from a space to another that can only express translations.
 ///
-/// The main benefit of this type over a Vector2D is the ability to cast
-/// between a source and a destination spaces.
+/// The main benefit of this type over a [`Vector2D`] is the ability to cast
+/// between source and destination spaces.
 ///
 /// Example:
 ///
@@ -408,8 +408,8 @@ impl<T: fmt::Debug, Src, Dst> fmt::Debug for Translation2D<T, Src, Dst> {
 
 /// A 3d transformation from a space to another that can only express translations.
 ///
-/// The main benefit of this type over a Vector3D is the ability to cast
-/// between a source and a destination spaces.
+/// The main benefit of this type over a [`Vector3D`] is the ability to cast
+/// between source and destination spaces.
 #[repr(C)]
 pub struct Translation3D<T, Src, Dst> {
     pub x: T,

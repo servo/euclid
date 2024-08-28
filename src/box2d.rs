@@ -53,11 +53,10 @@ use core::ops::{Add, Div, DivAssign, Mul, MulAssign, Range, Sub};
 /// - it's area is negative (`min.x > max.x` or `min.y > max.y`),
 /// - it contains NaNs.
 ///
-/// [`Rect`]: struct.Rect.html
-/// [`intersection`]: #method.intersection
-/// [`is_empty`]: #method.is_empty
-/// [`union`]: #method.union
-/// [`size`]: #method.size
+/// [`intersection`]: Self::intersection
+/// [`is_empty`]: Self::is_empty
+/// [`union`]: Self::union
+/// [`size`]: Self::size
 #[repr(C)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(
@@ -139,7 +138,7 @@ impl<T, U> Box2D<T, U> {
         }
     }
 
-    /// Creates a Box2D of the given size, at offset zero.
+    /// Creates a `Box2D` of the given size, at offset zero.
     #[inline]
     pub fn from_size(size: Size2D<T, U>) -> Self
     where
@@ -156,7 +155,7 @@ impl<T, U> Box2D<T, U>
 where
     T: PartialOrd,
 {
-    /// Returns true if the box has a negative area.
+    /// Returns `true` if the box has a negative area.
     ///
     /// The common interpretation for a negative box is to consider it empty. It can be obtained
     /// by calculating the intersection of two boxes that do not intersect.
@@ -165,7 +164,7 @@ where
         self.max.x < self.min.x || self.max.y < self.min.y
     }
 
-    /// Returns true if the size is zero, negative or NaN.
+    /// Returns `true` if the size is zero, negative or NaN.
     #[inline]
     pub fn is_empty(&self) -> bool {
         !(self.max.x > self.min.x && self.max.y > self.min.y)
@@ -240,7 +239,7 @@ where
     ///
     /// The result is a negative box if the boxes do not intersect.
     /// This can be useful for computing the intersection of more than two boxes, as
-    /// it is possible to chain multiple intersection_unchecked calls and check for
+    /// it is possible to chain multiple `intersection_unchecked` calls and check for
     /// empty/negative result at the end.
     #[inline]
     pub fn intersection_unchecked(&self, other: &Self) -> Self {
@@ -553,7 +552,11 @@ impl<T: NumCast + Copy, U> Box2D<T, U> {
     ///
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
-    /// geometrically. Consider using round(), round_in or round_out() before casting.
+    /// geometrically. Consider using [`round`], [`round_in`] or [`round_out`] before casting.
+    ///
+    /// [`round`]: Self::round
+    /// [`round_in`]: Self::round_in
+    /// [`round_out`]: Self::round_out
     #[inline]
     pub fn cast<NewT: NumCast>(&self) -> Box2D<NewT, U> {
         Box2D::new(self.min.cast(), self.max.cast())
@@ -563,7 +566,11 @@ impl<T: NumCast + Copy, U> Box2D<T, U> {
     ///
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
-    /// geometrically. Consider using round(), round_in or round_out() before casting.
+    /// geometrically. Consider using [`round`], [`round_in`] or [`round_out`] before casting.
+    ///
+    /// [`round`]: Self::round
+    /// [`round_in`]: Self::round_in
+    /// [`round_out`]: Self::round_out
     pub fn try_cast<NewT: NumCast>(&self) -> Option<Box2D<NewT, U>> {
         match (self.min.try_cast(), self.max.try_cast()) {
             (Some(a), Some(b)) => Some(Box2D::new(a, b)),
@@ -627,7 +634,7 @@ impl<T: NumCast + Copy, U> Box2D<T, U> {
 }
 
 impl<T: Float, U> Box2D<T, U> {
-    /// Returns true if all members are finite.
+    /// Returns `true` if all members are finite.
     #[inline]
     pub fn is_finite(self) -> bool {
         self.min.is_finite() && self.max.is_finite()

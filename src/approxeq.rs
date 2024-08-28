@@ -12,12 +12,12 @@ pub trait ApproxEq<Eps> {
     /// Default epsilon value
     fn approx_epsilon() -> Eps;
 
-    /// Returns `true` is this object is approximately equal to the other one, using
+    /// Returns `true` if this object is approximately equal to the other one, using
     /// a provided epsilon value.
     fn approx_eq_eps(&self, other: &Self, approx_epsilon: &Eps) -> bool;
 
-    /// Returns `true` is this object is approximately equal to the other one, using
-    /// the `approx_epsilon()` epsilon value.
+    /// Returns `true` if this object is approximately equal to the other one, using
+    /// the [`approx_epsilon`](ApproxEq::approx_epsilon) epsilon value.
     fn approx_eq(&self, other: &Self) -> bool {
         self.approx_eq_eps(other, &Self::approx_epsilon())
     }

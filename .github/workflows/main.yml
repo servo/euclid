@@ -29,7 +29,7 @@ jobs:
             features: --features unstable,serde
         
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install toolchain
         uses: dtolnay/rust-toolchain@v1
@@ -49,7 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # GitHub runners already have a usable version of cargo & rustfmt, so an install is not needed
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: cargo fmt --check
 
   build_result:
