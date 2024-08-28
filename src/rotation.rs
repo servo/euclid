@@ -257,12 +257,15 @@ where
 /// A transform that can represent rotations in 3d, represented as a quaternion.
 ///
 /// Most methods expect the quaternion to be normalized.
-/// When in doubt, use `unit_quaternion` instead of `quaternion` to create
+/// When in doubt, use [`unit_quaternion`] instead of [`quaternion`] to create
 /// a rotation as the former will ensure that its result is normalized.
 ///
 /// Some people use the `x, y, z, w` (or `w, x, y, z`) notations. The equivalence is
 /// as follows: `x -> i`, `y -> j`, `z -> k`, `w -> r`.
 /// The memory layout of this type corresponds to the `x, y, z, w` notation
+///
+/// [`quaternion`]: Self::quaternion
+/// [`unit_quaternion`]: Self::unit_quaternion
 #[repr(C)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(
@@ -351,7 +354,7 @@ impl<T, Src, Dst> Rotation3D<T, Src, Dst> {
     ///
     /// The resulting quaternion is not necessarily normalized. See [`unit_quaternion`].
     ///
-    /// [`unit_quaternion`]: #method.unit_quaternion
+    /// [`unit_quaternion`]: Self::unit_quaternion
     #[inline]
     pub fn quaternion(a: T, b: T, c: T, r: T) -> Self {
         Rotation3D {
@@ -553,7 +556,7 @@ where
 
     /// Returns `true` if [norm] of this quaternion is (approximately) one.
     ///
-    /// [norm]: #method.norm
+    /// [norm]: Self::norm
     #[inline]
     pub fn is_normalized(&self) -> bool
     where

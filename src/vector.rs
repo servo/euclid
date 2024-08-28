@@ -497,7 +497,7 @@ impl<T: Float, U> Vector2D<T, U> {
         }
     }
 
-    /// Returns true if all members are finite.
+    /// Returns `true` if all members are finite.
     #[inline]
     pub fn is_finite(self) -> bool {
         self.x.is_finite() && self.y.is_finite()
@@ -520,7 +520,7 @@ impl<T: Real, U> Vector2D<T, U> {
 
     /// Returns the vector with length of one unit.
     ///
-    /// Unlike [`Vector2D::normalize`](#method.normalize), this returns None in the case that the
+    /// Unlike [`Vector2D::normalize`], this returns `None` in the case that the
     /// length of the vector is zero.
     #[inline]
     #[must_use]
@@ -875,7 +875,7 @@ impl<T: Copy + DivAssign, U> DivAssign<Scale<T, U, U>> for Vector2D<T, U> {
 }
 
 impl<T: Round, U> Round for Vector2D<T, U> {
-    /// See [`Vector2D::round()`](#method.round)
+    /// See [`Vector2D::round`].
     #[inline]
     fn round(self) -> Self {
         self.round()
@@ -883,7 +883,7 @@ impl<T: Round, U> Round for Vector2D<T, U> {
 }
 
 impl<T: Ceil, U> Ceil for Vector2D<T, U> {
-    /// See [`Vector2D::ceil()`](#method.ceil)
+    /// See [`Vector2D::ceil`].
     #[inline]
     fn ceil(self) -> Self {
         self.ceil()
@@ -891,7 +891,7 @@ impl<T: Ceil, U> Ceil for Vector2D<T, U> {
 }
 
 impl<T: Floor, U> Floor for Vector2D<T, U> {
-    /// See [`Vector2D::floor()`](#method.floor)
+    /// See [`Vector2D::floor`].
     #[inline]
     fn floor(self) -> Self {
         self.floor()
@@ -1399,7 +1399,7 @@ impl<T: Float, U> Vector3D<T, U> {
         }
     }
 
-    /// Returns true if all members are finite.
+    /// Returns `true` if all members are finite.
     #[inline]
     pub fn is_finite(self) -> bool {
         self.x.is_finite() && self.y.is_finite() && self.z.is_finite()
@@ -1435,7 +1435,7 @@ impl<T: Real, U> Vector3D<T, U> {
 
     /// Returns the vector with length of one unit.
     ///
-    /// Unlike [`Vector2D::normalize`](#method.normalize), this returns None in the case that the
+    /// Unlike [`Vector2D::normalize`], this returns `None` in the case that the
     /// length of the vector is zero.
     #[inline]
     #[must_use]
@@ -1802,7 +1802,7 @@ impl<T: Copy + DivAssign, U> DivAssign<Scale<T, U, U>> for Vector3D<T, U> {
 }
 
 impl<T: Round, U> Round for Vector3D<T, U> {
-    /// See [`Vector3D::round()`](#method.round)
+    /// See [`Vector3D::round`].
     #[inline]
     fn round(self) -> Self {
         self.round()
@@ -1810,7 +1810,7 @@ impl<T: Round, U> Round for Vector3D<T, U> {
 }
 
 impl<T: Ceil, U> Ceil for Vector3D<T, U> {
-    /// See [`Vector3D::ceil()`](#method.ceil)
+    /// See [`Vector3D::ceil`].
     #[inline]
     fn ceil(self) -> Self {
         self.ceil()
@@ -1818,7 +1818,7 @@ impl<T: Ceil, U> Ceil for Vector3D<T, U> {
 }
 
 impl<T: Floor, U> Floor for Vector3D<T, U> {
-    /// See [`Vector3D::floor()`](#method.floor)
+    /// See [`Vector3D::floor`].
     #[inline]
     fn floor(self) -> Self {
         self.floor()

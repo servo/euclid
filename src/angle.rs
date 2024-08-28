@@ -132,7 +132,7 @@ impl<T> Angle<T>
 where
     T: Float,
 {
-    /// Returns true if the angle is a finite number.
+    /// Returns `true` if the angle is a finite number.
     #[inline]
     pub fn is_finite(self) -> bool {
         self.radians.is_finite()
@@ -143,7 +143,7 @@ impl<T> Angle<T>
 where
     T: Real,
 {
-    /// Returns (sin(self), cos(self)).
+    /// Returns `(sin(self), cos(self))`.
     pub fn sin_cos(self) -> (T, T) {
         self.radians.sin_cos()
     }

@@ -36,10 +36,8 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 /// expression that requires a different unit.  It may be a type without values, such as an empty
 /// enum.
 ///
-/// You can multiply a `Length` by a `scale::Scale` to convert it from one unit to
+/// You can multiply a `Length` by a [`Scale`] to convert it from one unit to
 /// another. See the [`Scale`] docs for an example.
-///
-/// [`Scale`]: struct.Scale.html
 #[repr(C)]
 pub struct Length<T, Unit>(pub T, #[doc(hidden)] pub PhantomData<Unit>);
 

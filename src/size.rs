@@ -143,9 +143,9 @@ impl<T: Default, U> Default for Size2D<T, U> {
 }
 
 impl<T, U> Size2D<T, U> {
-    /// The same as [`Zero::zero()`] but available without importing trait.
+    /// The same as [`Zero::zero`] but available without importing trait.
     ///
-    /// [`Zero::zero()`]: ./num/trait.Zero.html#tymethod.zero
+    /// [`Zero::zero`]: crate::num::Zero::zero
     #[inline]
     pub fn zero() -> Self
     where
@@ -401,7 +401,7 @@ impl<T: NumCast + Copy, U> Size2D<T, U> {
 }
 
 impl<T: Float, U> Size2D<T, U> {
-    /// Returns true if all members are finite.
+    /// Returns `true` if all members are finite.
     #[inline]
     pub fn is_finite(self) -> bool {
         self.width.is_finite() && self.height.is_finite()
@@ -502,7 +502,7 @@ impl<T: PartialEq, U> Size2D<T, U> {
 }
 
 impl<T: Round, U> Round for Size2D<T, U> {
-    /// See [`Size2D::round()`](#method.round).
+    /// See [`Size2D::round`].
     #[inline]
     fn round(self) -> Self {
         self.round()
@@ -510,7 +510,7 @@ impl<T: Round, U> Round for Size2D<T, U> {
 }
 
 impl<T: Ceil, U> Ceil for Size2D<T, U> {
-    /// See [`Size2D::ceil()`](#method.ceil).
+    /// See [`Size2D::ceil`].
     #[inline]
     fn ceil(self) -> Self {
         self.ceil()
@@ -518,7 +518,7 @@ impl<T: Ceil, U> Ceil for Size2D<T, U> {
 }
 
 impl<T: Floor, U> Floor for Size2D<T, U> {
-    /// See [`Size2D::floor()`](#method.floor).
+    /// See [`Size2D::floor`].
     #[inline]
     fn floor(self) -> Self {
         self.floor()
@@ -1058,9 +1058,9 @@ impl<T: Default, U> Default for Size3D<T, U> {
 }
 
 impl<T, U> Size3D<T, U> {
-    /// The same as [`Zero::zero()`] but available without importing trait.
+    /// The same as [`Zero::zero`] but available without importing trait.
     ///
-    /// [`Zero::zero()`]: ./num/trait.Zero.html#tymethod.zero
+    /// [`Zero::zero`]: crate::num::Zero::zero
     pub fn zero() -> Self
     where
         T: Zero,
@@ -1311,7 +1311,7 @@ impl<T: NumCast + Copy, U> Size3D<T, U> {
 }
 
 impl<T: Float, U> Size3D<T, U> {
-    /// Returns true if all members are finite.
+    /// Returns `true` if all members are finite.
     #[inline]
     pub fn is_finite(self) -> bool {
         self.width.is_finite() && self.height.is_finite() && self.depth.is_finite()
@@ -1422,7 +1422,7 @@ impl<T: PartialEq, U> Size3D<T, U> {
 }
 
 impl<T: Round, U> Round for Size3D<T, U> {
-    /// See [`Size3D::round()`](#method.round).
+    /// See [`Size3D::round`].
     #[inline]
     fn round(self) -> Self {
         self.round()
@@ -1430,7 +1430,7 @@ impl<T: Round, U> Round for Size3D<T, U> {
 }
 
 impl<T: Ceil, U> Ceil for Size3D<T, U> {
-    /// See [`Size3D::ceil()`](#method.ceil).
+    /// See [`Size3D::ceil`].
     #[inline]
     fn ceil(self) -> Self {
         self.ceil()
@@ -1438,7 +1438,7 @@ impl<T: Ceil, U> Ceil for Size3D<T, U> {
 }
 
 impl<T: Floor, U> Floor for Size3D<T, U> {
-    /// See [`Size3D::floor()`](#method.floor).
+    /// See [`Size3D::floor`].
     #[inline]
     fn floor(self) -> Self {
         self.floor()

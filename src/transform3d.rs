@@ -48,7 +48,7 @@ use serde::{Deserialize, Serialize};
 /// applied before the rest of the transformation, while post-transformations (`then_*`
 /// methods) add an operation that is applied after.
 ///
-/// When translating Transform3D into general matrix representations, consider that the
+/// When translating `Transform3D` into general matrix representations, consider that the
 /// representation follows the column major notation with column vectors.
 ///
 /// ```text
@@ -58,7 +58,7 @@ use serde::{Deserialize, Serialize};
 ///  |w |   | m41 m42 m43 m44 |   |1|
 /// ```
 ///
-/// The translation terms are m41, m42 and m43.
+/// The translation terms are `m41`, `m42` and `m43`.
 #[repr(C)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(
@@ -427,9 +427,9 @@ impl<T: Copy, Src, Dst> Transform3D<T, Src, Dst> {
     /// Create a 2D transform picking the relevant terms from this transform.
     ///
     /// This method assumes that self represents a 2d transformation, callers
-    /// should check that [`self.is_2d()`] returns `true` beforehand.
+    /// should check that [`is_2d`] returns `true` beforehand.
     ///
-    /// [`self.is_2d()`]: #method.is_2d
+    /// [`is_2d`]: Self::is_2d
     pub fn to_2d(&self) -> Transform2D<T, Src, Dst> {
         Transform2D::new(self.m11, self.m12, self.m21, self.m22, self.m41, self.m42)
     }
@@ -1110,23 +1110,19 @@ impl<T: NumCast + Copy, Src, Dst> Transform3D<T, Src, Dst> {
 }
 
 impl<T: ApproxEq<T>, Src, Dst> Transform3D<T, Src, Dst> {
-    /// Returns true is this transform is approximately equal to the other one, using
-    /// T's default epsilon value.
+    /// Returns `true` if this transform is approximately equal to the other one, using
+    /// `T`'s default epsilon value.
     ///
-    /// The same as [`ApproxEq::approx_eq()`] but available without importing trait.
-    ///
-    /// [`ApproxEq::approx_eq()`]: ./approxeq/trait.ApproxEq.html#method.approx_eq
+    /// The same as [`ApproxEq::approx_eq`] but available without importing trait.
     #[inline]
     pub fn approx_eq(&self, other: &Self) -> bool {
         <Self as ApproxEq<T>>::approx_eq(&self, &other)
     }
 
-    /// Returns true is this transform is approximately equal to the other one, using
+    /// Returns `true` if this transform is approximately equal to the other one, using
     /// a provided epsilon value.
     ///
-    /// The same as [`ApproxEq::approx_eq_eps()`] but available without importing trait.
-    ///
-    /// [`ApproxEq::approx_eq_eps()`]: ./approxeq/trait.ApproxEq.html#method.approx_eq_eps
+    /// The same as [`ApproxEq::approx_eq_eps`] but available without importing trait.
     #[inline]
     pub fn approx_eq_eps(&self, other: &Self, eps: &T) -> bool {
         <Self as ApproxEq<T>>::approx_eq_eps(&self, &other, &eps)
@@ -1156,7 +1152,7 @@ impl<T, Src, Dst> Default for Transform3D<T, Src, Dst>
 where
     T: Zero + One,
 {
-    /// Returns the [identity transform](#method.identity).
+    /// Returns the [identity transform](Self::identity).
     fn default() -> Self {
         Self::identity()
     }

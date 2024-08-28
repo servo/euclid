@@ -113,7 +113,7 @@ impl<T, U> Box3D<T, U> {
         }
     }
 
-    /// Creates a Box3D of the given size, at offset zero.
+    /// Creates a `Box3D` of the given size, at offset zero.
     #[inline]
     pub fn from_size(size: Size3D<T, U>) -> Self
     where
@@ -130,7 +130,7 @@ impl<T, U> Box3D<T, U>
 where
     T: PartialOrd,
 {
-    /// Returns true if the box has a negative volume.
+    /// Returns `true` if the box has a negative volume.
     ///
     /// The common interpretation for a negative box is to consider it empty. It can be obtained
     /// by calculating the intersection of two boxes that do not intersect.
@@ -139,7 +139,7 @@ where
         self.max.x < self.min.x || self.max.y < self.min.y || self.max.z < self.min.z
     }
 
-    /// Returns true if the size is zero, negative or NaN.
+    /// Returns `true` if the size is zero, negative or NaN.
     #[inline]
     pub fn is_empty(&self) -> bool {
         !(self.max.x > self.min.x && self.max.y > self.min.y && self.max.z > self.min.z)
@@ -556,7 +556,11 @@ impl<T: NumCast + Copy, U> Box3D<T, U> {
     ///
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
-    /// geometrically. Consider using round(), round_in or round_out() before casting.
+    /// geometrically. Consider using [`round`], [`round_in`] or [`round_out`] before casting.
+    ///
+    /// [`round`]: Self::round
+    /// [`round_in`]: Self::round_in
+    /// [`round_out`]: Self::round_out
     #[inline]
     pub fn cast<NewT: NumCast>(&self) -> Box3D<NewT, U> {
         Box3D::new(self.min.cast(), self.max.cast())
@@ -566,7 +570,11 @@ impl<T: NumCast + Copy, U> Box3D<T, U> {
     ///
     /// When casting from floating point to integer coordinates, the decimals are truncated
     /// as one would expect from a simple cast, but this behavior does not always make sense
-    /// geometrically. Consider using round(), round_in or round_out() before casting.
+    /// geometrically. Consider using [`round`], [`round_in`] or [`round_out`] before casting.
+    ///
+    /// [`round`]: Self::round
+    /// [`round_in`]: Self::round_in
+    /// [`round_out`]: Self::round_out
     pub fn try_cast<NewT: NumCast>(&self) -> Option<Box3D<NewT, U>> {
         match (self.min.try_cast(), self.max.try_cast()) {
             (Some(a), Some(b)) => Some(Box3D::new(a, b)),
@@ -630,7 +638,7 @@ impl<T: NumCast + Copy, U> Box3D<T, U> {
 }
 
 impl<T: Float, U> Box3D<T, U> {
-    /// Returns true if all members are finite.
+    /// Returns `true` if all members are finite.
     #[inline]
     pub fn is_finite(self) -> bool {
         self.min.is_finite() && self.max.is_finite()
