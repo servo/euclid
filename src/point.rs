@@ -590,7 +590,7 @@ impl<T: Add, U> Add<Vector2D<T, U>> for Point2D<T, U> {
 impl<T: Copy + Add<T, Output = T>, U> AddAssign<Vector2D<T, U>> for Point2D<T, U> {
     #[inline]
     fn add_assign(&mut self, other: Vector2D<T, U>) {
-        *self = *self + other
+        *self = *self + other;
     }
 }
 
@@ -632,7 +632,7 @@ impl<T: Sub, U> Sub<Vector2D<T, U>> for Point2D<T, U> {
 impl<T: Copy + Sub<T, Output = T>, U> SubAssign<Vector2D<T, U>> for Point2D<T, U> {
     #[inline]
     fn sub_assign(&mut self, other: Vector2D<T, U>) {
-        *self = *self - other
+        *self = *self - other;
     }
 }
 
@@ -648,7 +648,7 @@ impl<T: Copy + Mul, U> Mul<T> for Point2D<T, U> {
 impl<T: Copy + Mul<T, Output = T>, U> MulAssign<T> for Point2D<T, U> {
     #[inline]
     fn mul_assign(&mut self, scale: T) {
-        *self = *self * scale
+        *self = *self * scale;
     }
 }
 
@@ -681,7 +681,7 @@ impl<T: Copy + Div, U> Div<T> for Point2D<T, U> {
 impl<T: Copy + Div<T, Output = T>, U> DivAssign<T> for Point2D<T, U> {
     #[inline]
     fn div_assign(&mut self, scale: T) {
-        *self = *self / scale
+        *self = *self / scale;
     }
 }
 
@@ -1424,7 +1424,7 @@ impl<T: Add, U> Add<Vector3D<T, U>> for Point3D<T, U> {
 impl<T: Copy + Add<T, Output = T>, U> AddAssign<Vector3D<T, U>> for Point3D<T, U> {
     #[inline]
     fn add_assign(&mut self, other: Vector3D<T, U>) {
-        *self = *self + other
+        *self = *self + other;
     }
 }
 
@@ -1471,7 +1471,7 @@ impl<T: Sub, U> Sub<Vector3D<T, U>> for Point3D<T, U> {
 impl<T: Copy + Sub<T, Output = T>, U> SubAssign<Vector3D<T, U>> for Point3D<T, U> {
     #[inline]
     fn sub_assign(&mut self, other: Vector3D<T, U>) {
-        *self = *self - other
+        *self = *self - other;
     }
 }
 

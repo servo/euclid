@@ -416,7 +416,7 @@ impl<T: Default, Src, Dst> Default for Scale<T, Src, Dst> {
 
 impl<T: Hash, Src, Dst> Hash for Scale<T, Src, Dst> {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        self.0.hash(state)
+        self.0.hash(state);
     }
 }
 
