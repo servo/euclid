@@ -788,7 +788,7 @@ impl<'a, T: 'a + Add<Output = T> + Copy + Zero, U: 'a> Sum<&'a Self> for Vector2
 impl<T: Copy + Add<T, Output = T>, U> AddAssign for Vector2D<T, U> {
     #[inline]
     fn add_assign(&mut self, other: Self) {
-        *self = *self + other
+        *self = *self + other;
     }
 }
 
@@ -804,7 +804,7 @@ impl<T: Sub, U> Sub for Vector2D<T, U> {
 impl<T: Copy + Sub<T, Output = T>, U> SubAssign<Vector2D<T, U>> for Vector2D<T, U> {
     #[inline]
     fn sub_assign(&mut self, other: Self) {
-        *self = *self - other
+        *self = *self - other;
     }
 }
 
@@ -820,7 +820,7 @@ impl<T: Copy + Mul, U> Mul<T> for Vector2D<T, U> {
 impl<T: Copy + Mul<T, Output = T>, U> MulAssign<T> for Vector2D<T, U> {
     #[inline]
     fn mul_assign(&mut self, scale: T) {
-        *self = *self * scale
+        *self = *self * scale;
     }
 }
 
@@ -853,7 +853,7 @@ impl<T: Copy + Div, U> Div<T> for Vector2D<T, U> {
 impl<T: Copy + Div<T, Output = T>, U> DivAssign<T> for Vector2D<T, U> {
     #[inline]
     fn div_assign(&mut self, scale: T) {
-        *self = *self / scale
+        *self = *self / scale;
     }
 }
 
@@ -1713,7 +1713,7 @@ impl<'a, T: 'a + Add<Output = T> + Copy + Zero, U: 'a> Sum<&'a Self> for Vector3
 impl<T: Copy + Add<T, Output = T>, U> AddAssign for Vector3D<T, U> {
     #[inline]
     fn add_assign(&mut self, other: Self) {
-        *self = *self + other
+        *self = *self + other;
     }
 }
 
@@ -1729,7 +1729,7 @@ impl<T: Sub, U> Sub for Vector3D<T, U> {
 impl<T: Copy + Sub<T, Output = T>, U> SubAssign<Vector3D<T, U>> for Vector3D<T, U> {
     #[inline]
     fn sub_assign(&mut self, other: Self) {
-        *self = *self - other
+        *self = *self - other;
     }
 }
 
@@ -1745,7 +1745,7 @@ impl<T: Copy + Mul, U> Mul<T> for Vector3D<T, U> {
 impl<T: Copy + Mul<T, Output = T>, U> MulAssign<T> for Vector3D<T, U> {
     #[inline]
     fn mul_assign(&mut self, scale: T) {
-        *self = *self * scale
+        *self = *self * scale;
     }
 }
 
@@ -1779,7 +1779,7 @@ impl<T: Copy + Div, U> Div<T> for Vector3D<T, U> {
 impl<T: Copy + Div<T, Output = T>, U> DivAssign<T> for Vector3D<T, U> {
     #[inline]
     fn div_assign(&mut self, scale: T) {
-        *self = *self / scale
+        *self = *self / scale;
     }
 }
 

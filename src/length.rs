@@ -273,7 +273,7 @@ impl<T: Mul, U> Mul<T> for Length<T, U> {
 impl<T: Copy + Mul<T, Output = T>, U> MulAssign<T> for Length<T, U> {
     #[inline]
     fn mul_assign(&mut self, scale: T) {
-        *self = *self * scale
+        *self = *self * scale;
     }
 }
 
@@ -291,7 +291,7 @@ impl<T: Div, U> Div<T> for Length<T, U> {
 impl<T: Copy + Div<T, Output = T>, U> DivAssign<T> for Length<T, U> {
     #[inline]
     fn div_assign(&mut self, scale: T) {
-        *self = *self / scale
+        *self = *self / scale;
     }
 }
 

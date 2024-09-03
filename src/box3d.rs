@@ -342,22 +342,22 @@ where
         for point in points {
             let p = point.borrow();
             if p.x < min_x {
-                min_x = p.x
+                min_x = p.x;
             }
             if p.x > max_x {
-                max_x = p.x
+                max_x = p.x;
             }
             if p.y < min_y {
-                min_y = p.y
+                min_y = p.y;
             }
             if p.y > max_y {
-                max_y = p.y
+                max_y = p.y;
             }
             if p.z < min_z {
-                min_z = p.z
+                min_z = p.z;
             }
             if p.z > max_z {
-                max_z = p.z
+                max_z = p.z;
             }
         }
 

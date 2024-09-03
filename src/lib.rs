@@ -39,6 +39,7 @@
 //! foreign function interfaces (provided the underlying scalar type is also `repr(C)`).
 //!
 #![deny(unconditional_recursion)]
+#![warn(clippy::semicolon_if_nothing_returned)]
 
 pub use crate::angle::Angle;
 pub use crate::box2d::Box2D;
