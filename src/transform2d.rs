@@ -179,7 +179,7 @@ impl<T, Src, Dst> Transform2D<T, Src, Dst> {
     where
         T: ApproxEq<T>,
     {
-        <Self as ApproxEq<T>>::approx_eq(&self, &other)
+        <Self as ApproxEq<T>>::approx_eq(self, other)
     }
 
     /// Returns `true` if this transform is approximately equal to the other one, using
@@ -191,7 +191,7 @@ impl<T, Src, Dst> Transform2D<T, Src, Dst> {
     where
         T: ApproxEq<T>,
     {
-        <Self as ApproxEq<T>>::approx_eq_eps(&self, &other, &eps)
+        <Self as ApproxEq<T>>::approx_eq_eps(self, other, eps)
     }
 }
 

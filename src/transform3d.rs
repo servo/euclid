@@ -1116,7 +1116,7 @@ impl<T: ApproxEq<T>, Src, Dst> Transform3D<T, Src, Dst> {
     /// The same as [`ApproxEq::approx_eq`] but available without importing trait.
     #[inline]
     pub fn approx_eq(&self, other: &Self) -> bool {
-        <Self as ApproxEq<T>>::approx_eq(&self, &other)
+        <Self as ApproxEq<T>>::approx_eq(self, other)
     }
 
     /// Returns `true` if this transform is approximately equal to the other one, using
@@ -1125,7 +1125,7 @@ impl<T: ApproxEq<T>, Src, Dst> Transform3D<T, Src, Dst> {
     /// The same as [`ApproxEq::approx_eq_eps`] but available without importing trait.
     #[inline]
     pub fn approx_eq_eps(&self, other: &Self, eps: &T) -> bool {
-        <Self as ApproxEq<T>>::approx_eq_eps(&self, &other, &eps)
+        <Self as ApproxEq<T>>::approx_eq_eps(self, other, eps)
     }
 }
 
