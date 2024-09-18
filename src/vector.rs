@@ -715,6 +715,16 @@ impl<T: NumCast + Copy, U> Vector2D<T, U> {
         self.cast()
     }
 
+    /// Cast into an `isize` vector, truncating decimals if any.
+    ///
+    /// When casting from floating vector vectors, it is worth considering whether
+    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
+    /// the desired conversion behavior.
+    #[inline]
+    pub fn to_isize(self) -> Vector2D<isize, U> {
+        self.cast()
+    }
+
     /// Cast into an `u32` vector, truncating decimals if any.
     ///
     /// When casting from floating vector vectors, it is worth considering whether
@@ -1637,6 +1647,16 @@ impl<T: NumCast + Copy, U> Vector3D<T, U> {
     /// the desired conversion behavior.
     #[inline]
     pub fn to_usize(self) -> Vector3D<usize, U> {
+        self.cast()
+    }
+
+    /// Cast into an `isize` vector, truncating decimals if any.
+    ///
+    /// When casting from floating vector vectors, it is worth considering whether
+    /// to `round()`, `ceil()` or `floor()` before the cast in order to obtain
+    /// the desired conversion behavior.
+    #[inline]
+    pub fn to_isize(self) -> Vector3D<isize, U> {
         self.cast()
     }
 
