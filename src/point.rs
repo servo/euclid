@@ -1603,7 +1603,7 @@ impl<T: Euclid, U> Point3D<T, U> {
     ///
     /// let p = Point3D::new(7.0, -7.0, 0.0);
     /// let s = Size3D::new(4.0, -4.0, 12.0);
-
+    ///
     /// assert_eq!(p.rem_euclid(&s), point3(3.0, 1.0, 0.0));
     /// assert_eq!((-p).rem_euclid(&s), point3(1.0, 3.0, 0.0));
     /// assert_eq!(p.rem_euclid(&-s), point3(3.0, 1.0, 0.0));
