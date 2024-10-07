@@ -32,12 +32,17 @@ use serde;
 
 /// A 2d size tagged with a unit.
 #[repr(C)]
+#[cfg_attr(
+    feature = "rkyv",
+    derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize)
+)]
 pub struct Size2D<T, U> {
     /// The extent of the element in the `U` units along the `x` axis (usually horizontal).
     pub width: T,
     /// The extent of the element in the `U` units along the `y` axis (usually vertical).
     pub height: T,
     #[doc(hidden)]
+    #[cfg_attr(feature = "rkyv", rkyv(omit_bounds))]
     pub _unit: PhantomData<U>,
 }
 

@@ -64,12 +64,17 @@ use serde::{Deserialize, Serialize};
     feature = "serde",
     serde(bound(serialize = "T: Serialize", deserialize = "T: Deserialize<'de>"))
 )]
+#[cfg_attr(
+    feature = "rkyv",
+    derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize)
+)]
 #[rustfmt::skip]
 pub struct Transform2D<T, Src, Dst> {
     pub m11: T, pub m12: T,
     pub m21: T, pub m22: T,
     pub m31: T, pub m32: T,
     #[doc(hidden)]
+    #[cfg_attr(feature = "rkyv", rkyv(omit_bounds))]
     pub _unit: PhantomData<(Src, Dst)>,
 }
 

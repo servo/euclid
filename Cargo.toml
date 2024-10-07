@@ -19,10 +19,13 @@ libm = ["num-traits/libm"]
 
 [dependencies]
 num-traits = { version = "0.2.15", default-features = false }
-serde = { version = "1.0", default-features = false, features = ["serde_derive"], optional = true }
+serde = { version = "1.0", default-features = false, features = [
+    "serde_derive",
+], optional = true }
 mint = { version = "0.5.1", optional = true }
 arbitrary = { version = "1", optional = true }
 bytemuck = { version = "1.9", optional = true }
+rkyv = { version = "=0.8.0-rc.1", optional = true }
 
 [dev-dependencies]
 serde_test = "1.0"

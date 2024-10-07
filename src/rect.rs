@@ -50,6 +50,10 @@ use core::ops::{Add, Div, DivAssign, Mul, MulAssign, Range, Sub};
     feature = "serde",
     serde(bound(serialize = "T: Serialize", deserialize = "T: Deserialize<'de>"))
 )]
+#[cfg_attr(
+    feature = "rkyv",
+    derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize)
+)]
 pub struct Rect<T, U> {
     pub origin: Point2D<T, U>,
     pub size: Size2D<T, U>,

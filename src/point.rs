@@ -32,10 +32,15 @@ use bytemuck::{Pod, Zeroable};
 
 /// A 2d Point tagged with a unit.
 #[repr(C)]
+#[cfg_attr(
+    feature = "rkyv",
+    derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize)
+)]
 pub struct Point2D<T, U> {
     pub x: T,
     pub y: T,
     #[doc(hidden)]
+    #[cfg_attr(feature = "rkyv", rkyv(omit_bounds))]
     pub _unit: PhantomData<U>,
 }
 

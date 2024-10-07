@@ -24,6 +24,8 @@ jobs:
           - version: stable
             features: --features arbitrary
           - version: nightly
+            features: --features rkyv
+          - version: nightly
             features: --features unstable
           - version: nightly
             features: --features unstable,serde

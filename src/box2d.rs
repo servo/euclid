@@ -63,6 +63,10 @@ use core::ops::{Add, Div, DivAssign, Mul, MulAssign, Range, Sub};
     feature = "serde",
     serde(bound(serialize = "T: Serialize", deserialize = "T: Deserialize<'de>"))
 )]
+#[cfg_attr(
+    feature = "rkyv",
+    derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize)
+)]
 pub struct Box2D<T, U> {
     pub min: Point2D<T, U>,
     pub max: Point2D<T, U>,
