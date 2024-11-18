@@ -328,10 +328,12 @@ where
     ///
     /// Note: This function has a behavior that can be surprising because
     /// the right-most and bottom-most points are exactly on the edge
-    /// of the rectangle while the `contains` function is has exclusive
+    /// of the rectangle while the [`Rect::contains`] function is has exclusive
     /// semantic on these edges. This means that the right-most and bottom-most
-    /// points provided to `from_points` will count as not contained by the rect.
+    /// points provided to [`Rect::from_points`] will count as not contained by the rect.
     /// This behavior may change in the future.
+    ///
+    /// See [`Box2D::from_points`] for more details.
     pub fn from_points<I>(points: I) -> Self
     where
         I: IntoIterator,
