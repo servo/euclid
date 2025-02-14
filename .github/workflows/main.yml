@@ -23,6 +23,8 @@ jobs:
             features: --features bytemuck
           - version: stable
             features: --features arbitrary
+          - version: stable
+            features: --features malloc_size_of
           - version: nightly
             features: --features unstable
           - version: nightly
