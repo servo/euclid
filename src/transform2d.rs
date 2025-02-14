@@ -26,6 +26,8 @@ use core::ops::{Add, Div, Mul, Sub};
 
 #[cfg(feature = "bytemuck")]
 use bytemuck::{Pod, Zeroable};
+#[cfg(feature = "malloc_size_of")]
+use malloc_size_of::{MallocSizeOf, MallocSizeOfOps};
 #[cfg(feature = "mint")]
 use mint;
 use num_traits::NumCast;
@@ -97,6 +99,18 @@ unsafe impl<T: Zeroable, Src, Dst> Zeroable for Transform2D<T, Src, Dst> {}
 
 #[cfg(feature = "bytemuck")]
 unsafe impl<T: Pod, Src: 'static, Dst: 'static> Pod for Transform2D<T, Src, Dst> {}
+
+#[cfg(feature = "malloc_size_of")]
+impl<T: MallocSizeOf, Src, Dst> MallocSizeOf for Transform2D<T, Src, Dst> {
+    fn size_of(&self, ops: &mut MallocSizeOfOps) -> usize {
+        self.m11.size_of(ops)
+            + self.m12.size_of(ops)
+            + self.m21.size_of(ops)
+            + self.m22.size_of(ops)
+            + self.m31.size_of(ops)
+            + self.m32.size_of(ops)
+    }
+}
 
 impl<T: Copy, Src, Dst> Copy for Transform2D<T, Src, Dst> {}
 

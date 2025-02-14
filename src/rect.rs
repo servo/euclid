@@ -18,6 +18,8 @@ use crate::vector::Vector2D;
 
 #[cfg(feature = "bytemuck")]
 use bytemuck::{Pod, Zeroable};
+#[cfg(feature = "malloc_size_of")]
+use malloc_size_of::{MallocSizeOf, MallocSizeOfOps};
 use num_traits::{Float, NumCast};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -76,6 +78,13 @@ impl<T: Hash, U> Hash for Rect<T, U> {
     fn hash<H: Hasher>(&self, h: &mut H) {
         self.origin.hash(h);
         self.size.hash(h);
+    }
+}
+
+#[cfg(feature = "malloc_size_of")]
+impl<T: MallocSizeOf, U> MallocSizeOf for Rect<T, U> {
+    fn size_of(&self, ops: &mut MallocSizeOfOps) -> usize {
+        self.origin.size_of(ops) + self.size.size_of(ops)
     }
 }
 
