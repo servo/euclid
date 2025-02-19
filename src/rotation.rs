@@ -20,6 +20,8 @@ use core::ops::{Add, Mul, Neg, Sub};
 
 #[cfg(feature = "bytemuck")]
 use bytemuck::{Pod, Zeroable};
+#[cfg(feature = "malloc_size_of")]
+use malloc_size_of::{MallocSizeOf, MallocSizeOfOps};
 use num_traits::real::Real;
 use num_traits::{NumCast, One, Zero};
 #[cfg(feature = "serde")]
@@ -88,6 +90,13 @@ unsafe impl<T: Zeroable, Src, Dst> Zeroable for Rotation2D<T, Src, Dst> {}
 
 #[cfg(feature = "bytemuck")]
 unsafe impl<T: Pod, Src: 'static, Dst: 'static> Pod for Rotation2D<T, Src, Dst> {}
+
+#[cfg(feature = "malloc_size_of")]
+impl<T: MallocSizeOf, Src, Dst> MallocSizeOf for Rotation2D<T, Src, Dst> {
+    fn size_of(&self, ops: &mut MallocSizeOfOps) -> usize {
+        self.angle.size_of(ops)
+    }
+}
 
 impl<T, Src, Dst> Rotation2D<T, Src, Dst> {
     /// Creates a rotation from an angle in radians.
@@ -344,6 +353,13 @@ unsafe impl<T: Zeroable, Src, Dst> Zeroable for Rotation3D<T, Src, Dst> {}
 
 #[cfg(feature = "bytemuck")]
 unsafe impl<T: Pod, Src: 'static, Dst: 'static> Pod for Rotation3D<T, Src, Dst> {}
+
+#[cfg(feature = "malloc_size_of")]
+impl<T: MallocSizeOf, Src, Dst> MallocSizeOf for Rotation3D<T, Src, Dst> {
+    fn size_of(&self, ops: &mut MallocSizeOfOps) -> usize {
+        self.i.size_of(ops) + self.j.size_of(ops) + self.k.size_of(ops) + self.r.size_of(ops)
+    }
+}
 
 impl<T, Src, Dst> Rotation3D<T, Src, Dst> {
     /// Creates a rotation around from a quaternion representation.

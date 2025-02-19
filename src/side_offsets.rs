@@ -23,6 +23,8 @@ use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAss
 
 #[cfg(feature = "bytemuck")]
 use bytemuck::{Pod, Zeroable};
+#[cfg(feature = "malloc_size_of")]
+use malloc_size_of::{MallocSizeOf, MallocSizeOfOps};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -65,6 +67,16 @@ unsafe impl<T: Zeroable, U> Zeroable for SideOffsets2D<T, U> {}
 
 #[cfg(feature = "bytemuck")]
 unsafe impl<T: Pod, U: 'static> Pod for SideOffsets2D<T, U> {}
+
+#[cfg(feature = "malloc_size_of")]
+impl<T: MallocSizeOf, U> MallocSizeOf for SideOffsets2D<T, U> {
+    fn size_of(&self, ops: &mut MallocSizeOfOps) -> usize {
+        self.top.size_of(ops)
+            + self.right.size_of(ops)
+            + self.bottom.size_of(ops)
+            + self.left.size_of(ops)
+    }
+}
 
 impl<T: Copy, U> Copy for SideOffsets2D<T, U> {}
 

@@ -24,6 +24,8 @@ use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAss
 
 #[cfg(feature = "bytemuck")]
 use bytemuck::{Pod, Zeroable};
+#[cfg(feature = "malloc_size_of")]
+use malloc_size_of::{MallocSizeOf, MallocSizeOfOps};
 #[cfg(feature = "mint")]
 use mint;
 use num_traits::{Float, NumCast, Signed};
@@ -106,6 +108,13 @@ unsafe impl<T: Zeroable, U> Zeroable for Size2D<T, U> {}
 
 #[cfg(feature = "bytemuck")]
 unsafe impl<T: Pod, U: 'static> Pod for Size2D<T, U> {}
+
+#[cfg(feature = "malloc_size_of")]
+impl<T: MallocSizeOf, U> MallocSizeOf for Size2D<T, U> {
+    fn size_of(&self, ops: &mut MallocSizeOfOps) -> usize {
+        self.width.size_of(ops) + self.height.size_of(ops)
+    }
+}
 
 impl<T, U> Eq for Size2D<T, U> where T: Eq {}
 
@@ -1018,6 +1027,13 @@ unsafe impl<T: Zeroable, U> Zeroable for Size3D<T, U> {}
 
 #[cfg(feature = "bytemuck")]
 unsafe impl<T: Pod, U: 'static> Pod for Size3D<T, U> {}
+
+#[cfg(feature = "malloc_size_of")]
+impl<T: MallocSizeOf, U> MallocSizeOf for Size3D<T, U> {
+    fn size_of(&self, ops: &mut MallocSizeOfOps) -> usize {
+        self.width.size_of(ops) + self.height.size_of(ops) + self.depth.size_of(ops)
+    }
+}
 
 impl<T, U> Eq for Size3D<T, U> where T: Eq {}
 

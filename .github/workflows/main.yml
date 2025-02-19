@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         features: ["", "--features serde", "--no-default-features --features libm"]
-        version: ["1.56.0", "stable", "beta", "nightly"]
+        version: ["1.63.0", "stable", "beta", "nightly"]
         include:
           - version: stable
             features: --features mint
@@ -23,6 +23,8 @@ jobs:
             features: --features bytemuck
           - version: stable
             features: --features arbitrary
+          - version: stable
+            features: --features malloc_size_of
           - version: nightly
             features: --features unstable
           - version: nightly

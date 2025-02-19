@@ -30,6 +30,8 @@ use core::ops::{Add, Div, Mul, Neg, Sub};
 
 #[cfg(feature = "bytemuck")]
 use bytemuck::{Pod, Zeroable};
+#[cfg(feature = "malloc_size_of")]
+use malloc_size_of::{MallocSizeOf, MallocSizeOfOps};
 #[cfg(feature = "mint")]
 use mint;
 use num_traits::NumCast;
@@ -113,6 +115,28 @@ unsafe impl<T: Zeroable, Src, Dst> Zeroable for Transform3D<T, Src, Dst> {}
 
 #[cfg(feature = "bytemuck")]
 unsafe impl<T: Pod, Src: 'static, Dst: 'static> Pod for Transform3D<T, Src, Dst> {}
+
+#[cfg(feature = "malloc_size_of")]
+impl<T: MallocSizeOf, Src, Dst> MallocSizeOf for Transform3D<T, Src, Dst> {
+    fn size_of(&self, ops: &mut MallocSizeOfOps) -> usize {
+        self.m11.size_of(ops)
+            + self.m12.size_of(ops)
+            + self.m13.size_of(ops)
+            + self.m14.size_of(ops)
+            + self.m21.size_of(ops)
+            + self.m22.size_of(ops)
+            + self.m23.size_of(ops)
+            + self.m24.size_of(ops)
+            + self.m31.size_of(ops)
+            + self.m32.size_of(ops)
+            + self.m33.size_of(ops)
+            + self.m34.size_of(ops)
+            + self.m41.size_of(ops)
+            + self.m42.size_of(ops)
+            + self.m43.size_of(ops)
+            + self.m44.size_of(ops)
+    }
+}
 
 impl<T: Copy, Src, Dst> Copy for Transform3D<T, Src, Dst> {}
 
