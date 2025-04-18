@@ -21,7 +21,7 @@ use crate::vector::{vec2, Vector2D};
 use bytemuck::{Pod, Zeroable};
 #[cfg(feature = "malloc_size_of")]
 use malloc_size_of::{MallocSizeOf, MallocSizeOfOps};
-use num_traits::{Float, NumCast};
+use num_traits::NumCast;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -728,14 +728,6 @@ impl<T: NumCast + Copy, U> Box2D<T, U> {
     }
 }
 
-impl<T: Float, U> Box2D<T, U> {
-    /// Returns `true` if all members are finite.
-    #[inline]
-    pub fn is_finite(self) -> bool {
-        self.min.is_finite() && self.max.is_finite()
-    }
-}
-
 impl<T, U> Box2D<T, U>
 where
     T: Round,
@@ -797,6 +789,7 @@ impl<T: Default, U> Default for Box2D<T, U> {
 }
 
 #[cfg(test)]
+#[cfg(any(feature = "std", feature = "libm"))]
 mod tests {
     use crate::default::Box2D;
     use crate::side_offsets::SideOffsets2D;
@@ -1028,5 +1021,19 @@ mod tests {
 
         assert_eq!(b.min, point2(1.0, 2.0));
         assert_eq!(b.size(), size2(5.0, 6.0));
+    }
+}
+
+#[cfg(any(feature = "std", feature = "libm"))]
+mod float {
+    use super::Box2D;
+    use num_traits::Float;
+
+    impl<T: Float, U> Box2D<T, U> {
+        /// Returns `true` if all members are finite.
+        #[inline]
+        pub fn is_finite(self) -> bool {
+            self.min.is_finite() && self.max.is_finite()
+        }
     }
 }

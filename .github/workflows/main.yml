@@ -29,7 +29,7 @@ jobs:
             features: --features unstable
           - version: nightly
             features: --features unstable,serde
-        
+
     steps:
       - uses: actions/checkout@v4
 
@@ -45,6 +45,13 @@ jobs:
         run: cargo test ${{ matrix.features }}
         env:
           RUST_BACKTRACE: 1
+
+  minimal-no-std:
+    name: Check that no-std builds (with a reduced featureset) without libm
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: cargo check --no-default-features
 
   fmt:
     name: Check code formatting

@@ -20,7 +20,9 @@ use crate::vector::Vector2D;
 use bytemuck::{Pod, Zeroable};
 #[cfg(feature = "malloc_size_of")]
 use malloc_size_of::{MallocSizeOf, MallocSizeOfOps};
-use num_traits::{Float, NumCast};
+#[cfg(any(feature = "std", feature = "libm"))]
+use num_traits::Float;
+use num_traits::NumCast;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -609,6 +611,7 @@ impl<T: NumCast + Copy, U> Rect<T, U> {
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T: Float, U> Rect<T, U> {
     /// Returns `true` if all members are finite.
     #[inline]
@@ -677,6 +680,7 @@ pub const fn rect<T, U>(x: T, y: T, w: T, h: T) -> Rect<T, U> {
 }
 
 #[cfg(test)]
+#[cfg(any(feature = "std", feature = "libm"))]
 mod tests {
     use crate::default::{Point2D, Rect, Size2D};
     use crate::side_offsets::SideOffsets2D;

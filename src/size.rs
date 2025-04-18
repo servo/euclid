@@ -28,7 +28,10 @@ use bytemuck::{Pod, Zeroable};
 use malloc_size_of::{MallocSizeOf, MallocSizeOfOps};
 #[cfg(feature = "mint")]
 use mint;
-use num_traits::{Float, NumCast, Signed};
+#[cfg(any(feature = "std", feature = "libm"))]
+use num_traits::Float;
+use num_traits::{NumCast, Signed};
+
 #[cfg(feature = "serde")]
 use serde;
 
@@ -409,6 +412,7 @@ impl<T: NumCast + Copy, U> Size2D<T, U> {
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T: Float, U> Size2D<T, U> {
     /// Returns `true` if all members are finite.
     #[inline]
@@ -1326,6 +1330,7 @@ impl<T: NumCast + Copy, U> Size3D<T, U> {
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T: Float, U> Size3D<T, U> {
     /// Returns `true` if all members are finite.
     #[inline]
@@ -1691,6 +1696,7 @@ pub const fn size3<T, U>(w: T, h: T, d: T) -> Size3D<T, U> {
 }
 
 #[cfg(test)]
+#[cfg(any(feature = "std", feature = "libm"))]
 mod size3d {
     mod ops {
         use crate::default::{Size2D, Size3D};

@@ -10,6 +10,7 @@
 #![allow(clippy::just_underscores_and_digits)]
 
 use super::{Angle, UnknownUnit};
+#[cfg(any(feature = "std", feature = "libm"))]
 use crate::approxeq::ApproxEq;
 use crate::box2d::Box2D;
 use crate::box3d::Box3D;
@@ -19,6 +20,7 @@ use crate::point::{point2, point3, Point2D, Point3D};
 use crate::rect::Rect;
 use crate::scale::Scale;
 use crate::transform2d::Transform2D;
+#[cfg(any(feature = "std", feature = "libm"))]
 use crate::trig::Trig;
 use crate::vector::{vec2, vec3, Vector2D, Vector3D};
 
@@ -487,6 +489,7 @@ where
         *self == Self::identity()
     }
 
+    #[cfg(any(feature = "std", feature = "libm"))]
     /// Create a 2d skew transform.
     ///
     /// See <https://drafts.csswg.org/css-transforms/#funcdef-skew>
@@ -627,6 +630,7 @@ where
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
 /// Methods for creating and combining rotation transformations
 impl<T, Src, Dst> Transform3D<T, Src, Dst>
 where
@@ -1133,6 +1137,7 @@ impl<T: NumCast + Copy, Src, Dst> Transform3D<T, Src, Dst> {
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T: ApproxEq<T>, Src, Dst> Transform3D<T, Src, Dst> {
     /// Returns `true` if this transform is approximately equal to the other one, using
     /// `T`'s default epsilon value.
@@ -1153,6 +1158,7 @@ impl<T: ApproxEq<T>, Src, Dst> Transform3D<T, Src, Dst> {
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T: ApproxEq<T>, Src, Dst> ApproxEq<T> for Transform3D<T, Src, Dst> {
     #[inline]
     fn approx_epsilon() -> T {
@@ -1222,6 +1228,7 @@ impl<T, Src, Dst> From<Transform3D<T, Src, Dst>> for mint::RowMatrix4<T> {
 }
 
 #[cfg(test)]
+#[cfg(any(feature = "std", feature = "libm"))]
 mod tests {
     use super::*;
     use crate::approxeq::ApproxEq;

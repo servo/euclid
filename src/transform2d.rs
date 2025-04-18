@@ -10,12 +10,14 @@
 #![allow(clippy::just_underscores_and_digits)]
 
 use super::{Angle, UnknownUnit};
+#[cfg(any(feature = "std", feature = "libm"))]
 use crate::approxeq::ApproxEq;
 use crate::box2d::Box2D;
 use crate::num::{One, Zero};
 use crate::point::{point2, Point2D};
 use crate::rect::Rect;
 use crate::transform3d::Transform3D;
+#[cfg(any(feature = "std", feature = "libm"))]
 use crate::trig::Trig;
 use crate::vector::{vec2, Vector2D};
 use core::cmp::{Eq, PartialEq};
@@ -183,7 +185,10 @@ impl<T, Src, Dst> Transform2D<T, Src, Dst> {
             _unit: PhantomData,
         }
     }
+}
 
+#[cfg(any(feature = "std", feature = "libm"))]
+impl<T, Src, Dst> Transform2D<T, Src, Dst> {
     /// Returns `true` if this transform is approximately equal to the other one, using
     /// `T`'s default epsilon value.
     ///
@@ -464,6 +469,7 @@ where
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
 /// Methods for creating and combining rotation transformations
 impl<T, Src, Dst> Transform2D<T, Src, Dst>
 where
@@ -657,6 +663,7 @@ where
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T: ApproxEq<T>, Src, Dst> ApproxEq<T> for Transform2D<T, Src, Dst> {
     #[inline]
     fn approx_epsilon() -> T {
@@ -712,6 +719,7 @@ impl<T, Src, Dst> From<Transform2D<T, Src, Dst>> for mint::RowMatrix3x2<T> {
 }
 
 #[cfg(test)]
+#[cfg(any(feature = "std", feature = "libm"))]
 mod test {
     use super::*;
     use crate::approxeq::ApproxEq;
