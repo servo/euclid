@@ -8,6 +8,7 @@
 // except according to those terms.
 
 use super::UnknownUnit;
+#[cfg(any(feature = "std", feature = "libm"))]
 use crate::approxeq::ApproxEq;
 use crate::approxord::{max, min};
 use crate::length::Length;
@@ -17,7 +18,9 @@ use crate::scale::Scale;
 use crate::size::{size2, size3, Size2D, Size3D};
 use crate::transform2d::Transform2D;
 use crate::transform3d::Transform3D;
+#[cfg(any(feature = "std", feature = "libm"))]
 use crate::trig::Trig;
+#[cfg(any(feature = "std", feature = "libm"))]
 use crate::Angle;
 use core::cmp::{Eq, PartialEq};
 use core::fmt;
@@ -25,12 +28,13 @@ use core::hash::Hash;
 use core::iter::Sum;
 use core::marker::PhantomData;
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
-#[cfg(feature = "malloc_size_of")]
-use malloc_size_of::{MallocSizeOf, MallocSizeOfOps};
 #[cfg(feature = "mint")]
 use mint;
+#[cfg(any(feature = "std", feature = "libm"))]
 use num_traits::real::Real;
-use num_traits::{Float, NumCast, Signed};
+#[cfg(any(feature = "std", feature = "libm"))]
+use num_traits::Float;
+use num_traits::{NumCast, Signed};
 #[cfg(feature = "serde")]
 use serde;
 
@@ -59,13 +63,6 @@ impl<T: Clone, U> Clone for Vector2D<T, U> {
             y: self.y.clone(),
             _unit: PhantomData,
         }
-    }
-}
-
-#[cfg(feature = "malloc_size_of")]
-impl<T: MallocSizeOf, U> MallocSizeOf for Vector2D<T, U> {
-    fn size_of(&self, ops: &mut MallocSizeOfOps) -> usize {
-        self.x.size_of(ops) + self.y.size_of(ops)
     }
 }
 
@@ -196,14 +193,6 @@ impl<T, U> Vector2D<T, U> {
             y: v,
             _unit: PhantomData,
         }
-    }
-
-    /// Constructor taking angle and length
-    pub fn from_angle_and_length(angle: Angle<T>, length: T) -> Self
-    where
-        T: Trig + Mul<Output = T> + Copy,
-    {
-        vec2(length * angle.radians.cos(), length * angle.radians.sin())
     }
 
     /// Constructor taking properly  Lengths instead of scalar values.
@@ -438,18 +427,6 @@ impl<T: Copy, U> Vector2D<T, U> {
         vec2(self.x.floor(), self.y.floor())
     }
 
-    /// Returns the signed angle between this vector and the x axis.
-    /// Positive values counted counterclockwise, where 0 is `+x` axis, `PI/2`
-    /// is `+y` axis.
-    ///
-    /// The returned angle is between -PI and PI.
-    pub fn angle_from_x_axis(self) -> Angle<T>
-    where
-        T: Trig,
-    {
-        Angle::radians(Trig::fast_atan2(self.y, self.x))
-    }
-
     /// Creates translation by this vector in vector units.
     #[inline]
     pub fn to_transform(self) -> Transform2D<T, U, U>
@@ -480,18 +457,9 @@ where
     {
         onto * (self.dot(onto) / onto.square_length())
     }
-
-    /// Returns the signed angle between this vector and another vector.
-    ///
-    /// The returned angle is between -PI and PI.
-    pub fn angle_to(self, other: Self) -> Angle<T>
-    where
-        T: Sub<Output = T> + Trig,
-    {
-        Angle::radians(Trig::fast_atan2(self.cross(other), self.dot(other)))
-    }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T: Float, U> Vector2D<T, U> {
     /// Return the normalized vector even if the length is larger than the max value of Float.
     #[inline]
@@ -506,13 +474,14 @@ impl<T: Float, U> Vector2D<T, U> {
         }
     }
 
-    /// Returns `true` if all members are finite.
+    /// Returns true if all members are finite.
     #[inline]
     pub fn is_finite(self) -> bool {
         self.x.is_finite() && self.y.is_finite()
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T: Real, U> Vector2D<T, U> {
     /// Returns the vector length.
     #[inline]
@@ -529,7 +498,7 @@ impl<T: Real, U> Vector2D<T, U> {
 
     /// Returns the vector with length of one unit.
     ///
-    /// Unlike [`Vector2D::normalize`], this returns `None` in the case that the
+    /// Unlike [`Vector2D::normalize`](#method.normalize), this returns None in the case that the
     /// length of the vector is zero.
     #[inline]
     #[must_use]
@@ -917,6 +886,7 @@ impl<T: Floor, U> Floor for Vector2D<T, U> {
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T: ApproxEq<T>, U> ApproxEq<Vector2D<T, U>> for Vector2D<T, U> {
     #[inline]
     fn approx_epsilon() -> Self {
@@ -1040,6 +1010,9 @@ unsafe impl<T: Zeroable, U> Zeroable for Vector3D<T, U> {}
 
 #[cfg(feature = "bytemuck")]
 unsafe impl<T: Pod, U: 'static> Pod for Vector3D<T, U> {}
+
+#[cfg(feature = "malloc_size_of")]
+use malloc_size_of::{MallocSizeOf, MallocSizeOfOps};
 
 #[cfg(feature = "malloc_size_of")]
 impl<T: MallocSizeOf, U> MallocSizeOf for Vector3D<T, U> {
@@ -1411,6 +1384,7 @@ where
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T: Float, U> Vector3D<T, U> {
     /// Return the normalized vector even if the length is larger than the max value of Float.
     #[inline]
@@ -1425,13 +1399,14 @@ impl<T: Float, U> Vector3D<T, U> {
         }
     }
 
-    /// Returns `true` if all members are finite.
+    /// Returns true if all members are finite.
     #[inline]
     pub fn is_finite(self) -> bool {
         self.x.is_finite() && self.y.is_finite() && self.z.is_finite()
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T: Real, U> Vector3D<T, U> {
     /// Returns the positive angle between this vector and another vector.
     ///
@@ -1501,6 +1476,39 @@ impl<T: Real, U> Vector3D<T, U> {
     pub fn clamp_length(self, min: T, max: T) -> Self {
         debug_assert!(min <= max);
         self.with_min_length(min).with_max_length(max)
+    }
+}
+
+#[cfg(any(feature = "std", feature = "libm"))]
+impl<T, U> Vector2D<T, U> {
+    /// Constructor taking angle and length
+    pub fn from_angle_and_length(angle: Angle<T>, length: T) -> Self
+    where
+        T: Trig + Mul<Output = T> + Copy,
+    {
+        vec2(length * angle.radians.cos(), length * angle.radians.sin())
+    }
+
+    /// Returns the signed angle between this vector and the x axis.
+    /// Positive values counted counterclockwise, where 0 is `+x` axis, `PI/2`
+    /// is `+y` axis.
+    ///
+    /// The returned angle is between -PI and PI.
+    pub fn angle_from_x_axis(self) -> Angle<T>
+    where
+        T: Trig,
+    {
+        Angle::radians(Trig::fast_atan2(self.y, self.x))
+    }
+
+    /// Returns the signed angle between this vector and another vector.
+    ///
+    /// The returned angle is between -PI and PI.
+    pub fn angle_to(self, other: Self) -> Angle<T>
+    where
+        T: Copy + Add<Output = T> + Sub<Output = T> + Mul<Output = T> + Trig,
+    {
+        Angle::radians(Trig::fast_atan2(self.cross(other), self.dot(other)))
     }
 }
 
@@ -1861,6 +1869,7 @@ impl<T: Floor, U> Floor for Vector3D<T, U> {
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T: ApproxEq<T>, U> ApproxEq<Vector3D<T, U>> for Vector3D<T, U> {
     #[inline]
     fn approx_epsilon() -> Self {
@@ -2161,6 +2170,7 @@ pub const fn bvec3(x: bool, y: bool, z: bool) -> BoolVector3D {
 }
 
 #[cfg(test)]
+#[cfg(any(feature = "std", feature = "libm"))]
 mod vector2d {
     use crate::scale::Scale;
     use crate::{default, vec2};
@@ -2398,6 +2408,7 @@ mod vector2d {
 }
 
 #[cfg(test)]
+#[cfg(any(feature = "std", feature = "libm"))]
 mod vector3d {
     use crate::scale::Scale;
     use crate::{default, vec2, vec3};
@@ -2620,6 +2631,7 @@ mod vector3d {
 }
 
 #[cfg(test)]
+#[cfg(any(feature = "std", feature = "libm"))]
 mod bool_vector {
     use super::*;
     use crate::default;

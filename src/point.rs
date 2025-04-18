@@ -8,6 +8,7 @@
 // except according to those terms.
 
 use super::UnknownUnit;
+#[cfg(any(feature = "std", feature = "libm"))]
 use crate::approxeq::ApproxEq;
 use crate::approxord::{max, min};
 use crate::length::Length;
@@ -24,8 +25,12 @@ use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAss
 use malloc_size_of::{MallocSizeOf, MallocSizeOfOps};
 #[cfg(feature = "mint")]
 use mint;
+#[cfg(any(feature = "std", feature = "libm"))]
 use num_traits::real::Real;
-use num_traits::{Euclid, Float, NumCast};
+#[cfg(any(feature = "std", feature = "libm"))]
+use num_traits::Float;
+use num_traits::{Euclid, NumCast};
+
 #[cfg(feature = "serde")]
 use serde;
 
@@ -539,6 +544,7 @@ impl<T: NumCast + Copy, U> Point2D<T, U> {
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T: Float, U> Point2D<T, U> {
     /// Returns `true` if all members are finite.
     #[inline]
@@ -554,6 +560,7 @@ impl<T: Copy + Add<T, Output = T>, U> Point2D<T, U> {
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T: Real + Sub<T, Output = T>, U> Point2D<T, U> {
     #[inline]
     pub fn distance_to(self, other: Self) -> T {
@@ -742,6 +749,7 @@ impl<T: Floor, U> Floor for Point2D<T, U> {
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T: ApproxEq<T>, U> ApproxEq<Point2D<T, U>> for Point2D<T, U> {
     #[inline]
     fn approx_epsilon() -> Self {
@@ -1371,6 +1379,7 @@ impl<T: NumCast + Copy, U> Point3D<T, U> {
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T: Float, U> Point3D<T, U> {
     /// Returns `true` if all members are finite.
     #[inline]
@@ -1390,6 +1399,7 @@ impl<T: Copy + Add<T, Output = T>, U> Point3D<T, U> {
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T: Real + Sub<T, Output = T>, U> Point3D<T, U> {
     #[inline]
     pub fn distance_to(self, other: Self) -> T {
@@ -1590,6 +1600,7 @@ impl<T: Floor, U> Floor for Point3D<T, U> {
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T: ApproxEq<T>, U> ApproxEq<Point3D<T, U>> for Point3D<T, U> {
     #[inline]
     fn approx_epsilon() -> Self {
@@ -1704,6 +1715,7 @@ pub const fn point3<T, U>(x: T, y: T, z: T) -> Point3D<T, U> {
 }
 
 #[cfg(test)]
+#[cfg(any(feature = "std", feature = "libm"))]
 mod point2d {
     use crate::default::Point2D;
     use crate::point2;
@@ -1990,6 +2002,7 @@ mod point2d {
 }
 
 #[cfg(test)]
+#[cfg(any(feature = "std", feature = "libm"))]
 mod point3d {
     use crate::default;
     use crate::default::Point3D;

@@ -9,7 +9,7 @@
 
 #![allow(clippy::just_underscores_and_digits)]
 
-use super::{Angle, UnknownUnit};
+#[cfg(any(feature = "std", feature = "libm"))]
 use crate::approxeq::ApproxEq;
 use crate::box2d::Box2D;
 use crate::num::{One, Zero};
@@ -18,9 +18,12 @@ use crate::rect::Rect;
 use crate::scale::Scale;
 use crate::transform3d::Transform3D;
 use crate::translation::Translation2D;
+#[cfg(any(feature = "std", feature = "libm"))]
 use crate::trig::Trig;
 use crate::vector::{vec2, Vector2D};
-use crate::Rotation2D;
+use crate::UnknownUnit;
+#[cfg(any(feature = "std", feature = "libm"))]
+use crate::{Angle, Rotation2D};
 use core::cmp::{Eq, PartialEq};
 use core::fmt;
 use core::hash::Hash;
@@ -186,7 +189,10 @@ impl<T, Src, Dst> Transform2D<T, Src, Dst> {
             _unit: PhantomData,
         }
     }
+}
 
+#[cfg(any(feature = "std", feature = "libm"))]
+impl<T, Src, Dst> Transform2D<T, Src, Dst> {
     /// Returns `true` if this transform is approximately equal to the other one, using
     /// `T`'s default epsilon value.
     ///
@@ -346,6 +352,7 @@ impl<T: Copy, Src, Dst> Transform2D<T, Src, Dst> {
 
     /// Returns true if self can be represented as a 2d scale+offset
     /// transform, using `T`'s default epsilon value.
+    #[cfg(any(feature = "std", feature = "libm"))]
     #[inline]
     pub fn is_scale_offset(&self) -> bool
     where
@@ -498,6 +505,7 @@ where
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
 /// Methods for creating and combining rotation transformations
 impl<T, Src, Dst> Transform2D<T, Src, Dst>
 where
@@ -691,6 +699,7 @@ where
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T: ApproxEq<T>, Src, Dst> ApproxEq<T> for Transform2D<T, Src, Dst> {
     #[inline]
     fn approx_epsilon() -> T {
@@ -745,6 +754,7 @@ impl<T, Src, Dst> From<Transform2D<T, Src, Dst>> for mint::RowMatrix3x2<T> {
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T, Src, Dst> From<Rotation2D<T, Src, Dst>> for Transform2D<T, Src, Dst>
 where
     T: Copy + Add<Output = T> + Sub<Output = T> + Mul<Output = T> + Zero + Trig,
@@ -841,6 +851,7 @@ impl<T, Src, Dst> ScaleOffset2D<T, Src, Dst> {
 
     /// Returns true if self is an identity transform, using `T`'s
     /// default epsilon value.
+    #[cfg(any(feature = "std", feature = "libm"))]
     #[inline]
     pub fn is_identity(&self) -> bool
     where
@@ -850,6 +861,7 @@ impl<T, Src, Dst> ScaleOffset2D<T, Src, Dst> {
     }
 
     /// Returns true if self is an identity transform.
+    #[cfg(any(feature = "std", feature = "libm"))]
     #[inline]
     pub fn is_identity_eps(&self, epsilon: T) -> bool
     where
@@ -1129,6 +1141,7 @@ where
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T: ApproxEq<T>, Src, Dst> ApproxEq<T> for ScaleOffset2D<T, Src, Dst> {
     #[inline]
     fn approx_epsilon() -> T {
@@ -1145,6 +1158,7 @@ impl<T: ApproxEq<T>, Src, Dst> ApproxEq<T> for ScaleOffset2D<T, Src, Dst> {
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T, Src, Dst> fmt::Debug for ScaleOffset2D<T, Src, Dst>
 where
     T: Copy + fmt::Debug + PartialEq + One + Zero + ApproxEq<T>,
@@ -1195,6 +1209,7 @@ impl<T: MallocSizeOf, Src, Dst> MallocSizeOf for ScaleOffset2D<T, Src, Dst> {
 }
 
 #[cfg(test)]
+#[cfg(any(feature = "std", feature = "libm"))]
 mod test {
     use super::*;
     use crate::approxeq::ApproxEq;

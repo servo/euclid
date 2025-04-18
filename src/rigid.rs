@@ -2,9 +2,13 @@
 //! i.e. a vector `v` is transformed with `v * T`, and if you want to apply `T1`
 //! before `T2` you use `T1 * T2`
 
+#[cfg(any(feature = "std", feature = "libm"))]
 use crate::approxeq::ApproxEq;
+#[cfg(any(feature = "std", feature = "libm"))]
 use crate::trig::Trig;
-use crate::{Rotation3D, Transform3D, UnknownUnit, Vector3D};
+use crate::{Rotation3D, Vector3D};
+#[cfg(any(feature = "std", feature = "libm"))]
+use crate::{Transform3D, UnknownUnit};
 
 use core::{fmt, hash};
 
@@ -12,6 +16,7 @@ use core::{fmt, hash};
 use bytemuck::{Pod, Zeroable};
 #[cfg(feature = "malloc_size_of")]
 use malloc_size_of::{MallocSizeOf, MallocSizeOfOps};
+#[cfg(any(feature = "std", feature = "libm"))]
 use num_traits::real::Real;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -51,6 +56,7 @@ impl<T: Copy, Src, Dst> RigidTransform3D<T, Src, Dst> {
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T: Real + ApproxEq<T>, Src, Dst> RigidTransform3D<T, Src, Dst> {
     /// Construct an identity transform
     #[inline]
@@ -251,6 +257,7 @@ impl<T: MallocSizeOf, Src, Dst> MallocSizeOf for RigidTransform3D<T, Src, Dst> {
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T: Real + ApproxEq<T>, Src, Dst> From<Rotation3D<T, Src, Dst>>
     for RigidTransform3D<T, Src, Dst>
 {
@@ -259,6 +266,7 @@ impl<T: Real + ApproxEq<T>, Src, Dst> From<Rotation3D<T, Src, Dst>>
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T: Real + ApproxEq<T>, Src, Dst> From<Vector3D<T, Dst>> for RigidTransform3D<T, Src, Dst> {
     fn from(t: Vector3D<T, Dst>) -> Self {
         Self::from_translation(t)
@@ -266,6 +274,7 @@ impl<T: Real + ApproxEq<T>, Src, Dst> From<Vector3D<T, Dst>> for RigidTransform3
 }
 
 #[cfg(test)]
+#[cfg(any(feature = "std", feature = "libm"))]
 mod test {
     use super::RigidTransform3D;
     use crate::default::{Rotation3D, Transform3D, Vector3D};

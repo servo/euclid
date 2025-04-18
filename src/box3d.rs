@@ -19,7 +19,9 @@ use crate::vector::Vector3D;
 use bytemuck::{Pod, Zeroable};
 #[cfg(feature = "malloc_size_of")]
 use malloc_size_of::{MallocSizeOf, MallocSizeOfOps};
-use num_traits::{Float, NumCast};
+#[cfg(any(feature = "std", feature = "libm"))]
+use num_traits::Float;
+use num_traits::NumCast;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -738,6 +740,7 @@ impl<T: NumCast + Copy, U> Box3D<T, U> {
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T: Float, U> Box3D<T, U> {
     /// Returns `true` if all members are finite.
     #[inline]
@@ -824,6 +827,7 @@ pub fn box3d<T: Copy, U>(
 }
 
 #[cfg(test)]
+#[cfg(any(feature = "std", feature = "libm"))]
 mod tests {
     use crate::default::{Box3D, Point3D};
     use crate::{point3, size3, vec3};

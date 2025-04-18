@@ -219,6 +219,7 @@ impl<T: fmt::Debug, U> fmt::Debug for HomogeneousVector<T, U> {
 }
 
 #[cfg(test)]
+#[cfg(any(feature = "std", feature = "libm"))]
 mod homogeneous {
     use super::HomogeneousVector;
     use crate::default::{Point2D, Point3D};
