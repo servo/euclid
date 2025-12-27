@@ -21,6 +21,7 @@ use crate::scale::Scale;
 use crate::transform2d::Transform2D;
 use crate::trig::Trig;
 use crate::vector::{vec2, vec3, Vector2D, Vector3D};
+use crate::ScaleOffset2D;
 
 use core::cmp::{Eq, PartialEq};
 use core::fmt;
@@ -34,7 +35,7 @@ use bytemuck::{Pod, Zeroable};
 use malloc_size_of::{MallocSizeOf, MallocSizeOfOps};
 #[cfg(feature = "mint")]
 use mint;
-use num_traits::NumCast;
+use num_traits::{NumCast, Signed};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -456,6 +457,53 @@ impl<T: Copy, Src, Dst> Transform3D<T, Src, Dst> {
     /// [`is_2d`]: Self::is_2d
     pub fn to_2d(&self) -> Transform2D<T, Src, Dst> {
         Transform2D::new(self.m11, self.m12, self.m21, self.m22, self.m41, self.m42)
+    }
+
+    /// Returns true if self can be represented as a 2d scale+offset
+    /// transform, using `T`'s default epsilon value.
+    pub fn is_scale_offset_2d(&self) -> bool
+    where
+        T: Signed + PartialOrd + ApproxEq<T>,
+    {
+        self.is_scale_offset_2d_eps(T::approx_epsilon())
+    }
+
+    /// Returns true if self can be represented as a 2d scale+offset
+    /// transform.
+    pub fn is_scale_offset_2d_eps(&self, epsilon: T) -> bool
+    where
+        T: Signed + PartialOrd,
+    {
+        (self.m12.abs() < epsilon)
+            & (self.m13.abs() < epsilon)
+            & (self.m14.abs() < epsilon)
+            & (self.m21.abs() < epsilon)
+            & (self.m23.abs() < epsilon)
+            & (self.m24.abs() < epsilon)
+            & (self.m31.abs() < epsilon)
+            & (self.m32.abs() < epsilon)
+            & ((self.m33 - T::one()).abs() < epsilon)
+            & (self.m34.abs() < epsilon)
+            & (self.m43.abs() < epsilon)
+            & ((self.m44 - T::one()).abs() < epsilon)
+    }
+
+    /// Creates a 2D scale+offset transform from the current transform.
+    ///
+    /// This method assumes that self can be represented as a 2d scale+offset
+    /// transformation, callers should check that [`is_scale_offset_2d`] or
+    /// [`is_scale_offset_2d_eps`] returns `true` beforehand.
+    pub fn to_scale_offset2d(&self) -> Option<ScaleOffset2D<T, Src, Dst>>
+    where
+        T: Signed + One + PartialOrd,
+    {
+        Some(ScaleOffset2D {
+            sx: self.m11,
+            sy: self.m22,
+            tx: self.m41,
+            ty: self.m42,
+            _unit: PhantomData,
+        })
     }
 }
 
