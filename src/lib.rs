@@ -47,7 +47,7 @@ pub use crate::homogen::HomogeneousVector;
 pub use crate::length::Length;
 pub use crate::point::{point2, point3, Point2D, Point3D};
 pub use crate::scale::Scale;
-pub use crate::transform2d::Transform2D;
+pub use crate::transform2d::{ScaleOffset2D, Transform2D};
 pub use crate::transform3d::Transform3D;
 pub use crate::vector::{bvec2, bvec3, BoolVector2D, BoolVector3D};
 pub use crate::vector::{vec2, vec3, Vector2D, Vector3D};
@@ -113,4 +113,5 @@ pub mod default {
     pub type Translation3D<T> = super::Translation3D<T, UnknownUnit, UnknownUnit>;
     pub type Scale<T> = super::Scale<T, UnknownUnit, UnknownUnit>;
     pub type RigidTransform3D<T> = super::RigidTransform3D<T, UnknownUnit, UnknownUnit>;
+    pub type ScaleOffset2D<T> = super::ScaleOffset2D<T, UnknownUnit, UnknownUnit>;
 }
