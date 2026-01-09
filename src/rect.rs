@@ -671,6 +671,15 @@ where
     }
 }
 
+impl<T, U> From<Box2D<T, U>> for Rect<T, U>
+where
+    T: Copy + Sub<T, Output = T>,
+{
+    fn from(b: Box2D<T, U>) -> Self {
+        b.to_rect()
+    }
+}
+
 /// Shorthand for `Rect::new(Point2D::new(x, y), Size2D::new(w, h))`.
 pub const fn rect<T, U>(x: T, y: T, w: T, h: T) -> Rect<T, U> {
     Rect::new(Point2D::new(x, y), Size2D::new(w, h))

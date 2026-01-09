@@ -15,9 +15,12 @@ use crate::box2d::Box2D;
 use crate::num::{One, Zero};
 use crate::point::{point2, Point2D};
 use crate::rect::Rect;
+use crate::scale::Scale;
 use crate::transform3d::Transform3D;
+use crate::translation::Translation2D;
 use crate::trig::Trig;
 use crate::vector::{vec2, Vector2D};
+use crate::Rotation2D;
 use core::cmp::{Eq, PartialEq};
 use core::fmt;
 use core::hash::Hash;
@@ -742,6 +745,27 @@ impl<T, Src, Dst> From<Transform2D<T, Src, Dst>> for mint::RowMatrix3x2<T> {
     }
 }
 
+impl<T, Src, Dst> From<Rotation2D<T, Src, Dst>> for Transform2D<T, Src, Dst>
+where
+    T: Copy + Add<Output = T> + Sub<Output = T> + Mul<Output = T> + Zero + Trig,
+{
+    fn from(r: Rotation2D<T, Src, Dst>) -> Self {
+        r.to_transform()
+    }
+}
+
+impl<T: Copy + Zero, Src, Dst> From<ScaleOffset2D<T, Src, Dst>> for Transform2D<T, Src, Dst> {
+    fn from(t: ScaleOffset2D<T, Src, Dst>) -> Self {
+        t.to_transform2d()
+    }
+}
+
+impl<T: Copy + Zero, Src, Dst> From<Scale<T, Src, Dst>> for Transform2D<T, Src, Dst> {
+    fn from(s: Scale<T, Src, Dst>) -> Self {
+        Transform2D::scale(s.0, s.0)
+    }
+}
+
 #[repr(C)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(
@@ -1131,6 +1155,18 @@ where
         } else {
             self.to_array().fmt(f)
         }
+    }
+}
+
+impl<T: Copy + Zero, Src, Dst> From<Scale<T, Src, Dst>> for ScaleOffset2D<T, Src, Dst> {
+    fn from(s: Scale<T, Src, Dst>) -> Self {
+        ScaleOffset2D::scale(s.0, s.0)
+    }
+}
+
+impl<T: Copy + One, Src, Dst> From<Translation2D<T, Src, Dst>> for ScaleOffset2D<T, Src, Dst> {
+    fn from(t: Translation2D<T, Src, Dst>) -> Self {
+        ScaleOffset2D::offset(t.x, t.y)
     }
 }
 

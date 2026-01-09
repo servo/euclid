@@ -1269,6 +1269,18 @@ impl<T, Src, Dst> From<Transform3D<T, Src, Dst>> for mint::RowMatrix4<T> {
     }
 }
 
+impl<T: Copy + Zero + One, Src, Dst> From<Transform2D<T, Src, Dst>> for Transform3D<T, Src, Dst> {
+    fn from(t: Transform2D<T, Src, Dst>) -> Self {
+        t.to_3d()
+    }
+}
+
+impl<T: Copy + Zero + One, Src, Dst> From<Scale<T, Src, Dst>> for Transform3D<T, Src, Dst> {
+    fn from(s: Scale<T, Src, Dst>) -> Self {
+        Transform3D::scale(s.get(), s.get(), s.get())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
