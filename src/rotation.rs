@@ -8,6 +8,7 @@
 // except according to those terms.
 
 use crate::approxeq::ApproxEq;
+use crate::num::{One, Zero};
 use crate::trig::Trig;
 use crate::{point2, point3, vec3, Angle, Point2D, Point3D, Vector2D, Vector3D};
 use crate::{Transform2D, Transform3D, UnknownUnit};
@@ -23,7 +24,7 @@ use bytemuck::{Pod, Zeroable};
 #[cfg(feature = "malloc_size_of")]
 use malloc_size_of::{MallocSizeOf, MallocSizeOfOps};
 use num_traits::real::Real;
-use num_traits::{NumCast, One, Zero};
+use num_traits::NumCast;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -804,6 +805,15 @@ where
                 && self.j.approx_eq_eps(&-other.j, eps)
                 && self.k.approx_eq_eps(&-other.k, eps)
                 && self.r.approx_eq_eps(&-other.r, eps))
+    }
+}
+
+impl<T, Src, Dst> From<Rotation3D<T, Src, Dst>> for Transform3D<T, Src, Dst>
+where
+    T: Real + ApproxEq<T>,
+{
+    fn from(r: Rotation3D<T, Src, Dst>) -> Self {
+        r.to_transform()
     }
 }
 

@@ -787,6 +787,15 @@ where
     }
 }
 
+impl<T, U> From<Rect<T, U>> for Box2D<T, U>
+where
+    T: Copy + Add<T, Output = T>,
+{
+    fn from(r: Rect<T, U>) -> Self {
+        r.to_box2d()
+    }
+}
+
 impl<T: Default, U> Default for Box2D<T, U> {
     fn default() -> Self {
         Box2D {
