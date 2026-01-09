@@ -7,7 +7,9 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+#[cfg(any(feature = "std", feature = "libm"))]
 use crate::approxeq::ApproxEq;
+#[cfg(any(feature = "std", feature = "libm"))]
 use crate::trig::Trig;
 use crate::{point2, point3, vec3, Angle, Point2D, Point3D, Vector2D, Vector3D};
 use crate::{Transform2D, Transform3D, UnknownUnit};
@@ -22,6 +24,7 @@ use core::ops::{Add, Mul, Neg, Sub};
 use bytemuck::{Pod, Zeroable};
 #[cfg(feature = "malloc_size_of")]
 use malloc_size_of::{MallocSizeOf, MallocSizeOfOps};
+#[cfg(any(feature = "std", feature = "libm"))]
 use num_traits::real::Real;
 use num_traits::{NumCast, One, Zero};
 #[cfg(feature = "serde")]
@@ -196,6 +199,7 @@ where
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T: Real, Src, Dst> Rotation2D<T, Src, Dst> {
     /// Creates a 3d rotation (around the z axis) from this 2d rotation.
     #[inline]
@@ -233,6 +237,7 @@ impl<T: Real, Src, Dst> Rotation2D<T, Src, Dst> {
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T, Src, Dst> Rotation2D<T, Src, Dst>
 where
     T: Copy + Add<Output = T> + Sub<Output = T> + Mul<Output = T> + Zero + Trig,
@@ -250,6 +255,7 @@ impl<T: fmt::Debug, Src, Dst> fmt::Debug for Rotation2D<T, Src, Dst> {
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T, Src, Dst> ApproxEq<T> for Rotation2D<T, Src, Dst>
 where
     T: Copy + Neg<Output = T> + ApproxEq<T>,
@@ -476,6 +482,7 @@ where
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T, Src, Dst> Rotation3D<T, Src, Dst>
 where
     T: Real,
@@ -787,6 +794,7 @@ impl<T: fmt::Debug, Src, Dst> fmt::Debug for Rotation3D<T, Src, Dst> {
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<T, Src, Dst> ApproxEq<T> for Rotation3D<T, Src, Dst>
 where
     T: Copy + Neg<Output = T> + ApproxEq<T>,
@@ -807,261 +815,268 @@ where
     }
 }
 
-#[test]
-fn simple_rotation_2d() {
-    use crate::default::Rotation2D;
-    use core::f32::consts::{FRAC_PI_2, PI};
+#[cfg(test)]
+#[cfg(any(feature = "std", feature = "libm"))]
+mod tests {
+    use crate::approxeq::ApproxEq;
+    use crate::{point2, point3, Angle};
 
-    let ri = Rotation2D::identity();
-    let r90 = Rotation2D::radians(FRAC_PI_2);
-    let rm90 = Rotation2D::radians(-FRAC_PI_2);
-    let r180 = Rotation2D::radians(PI);
+    #[test]
+    fn simple_rotation_2d() {
+        use crate::default::Rotation2D;
+        use core::f32::consts::{FRAC_PI_2, PI};
 
-    assert!(ri
-        .transform_point(point2(1.0, 2.0))
-        .approx_eq(&point2(1.0, 2.0)));
-    assert!(r90
-        .transform_point(point2(1.0, 2.0))
-        .approx_eq(&point2(-2.0, 1.0)));
-    assert!(rm90
-        .transform_point(point2(1.0, 2.0))
-        .approx_eq(&point2(2.0, -1.0)));
-    assert!(r180
-        .transform_point(point2(1.0, 2.0))
-        .approx_eq(&point2(-1.0, -2.0)));
+        let ri = Rotation2D::identity();
+        let r90 = Rotation2D::radians(FRAC_PI_2);
+        let rm90 = Rotation2D::radians(-FRAC_PI_2);
+        let r180 = Rotation2D::radians(PI);
 
-    assert!(r90
-        .inverse()
-        .inverse()
-        .transform_point(point2(1.0, 2.0))
-        .approx_eq(&r90.transform_point(point2(1.0, 2.0))));
-}
+        assert!(ri
+            .transform_point(point2(1.0, 2.0))
+            .approx_eq(&point2(1.0, 2.0)));
+        assert!(r90
+            .transform_point(point2(1.0, 2.0))
+            .approx_eq(&point2(-2.0, 1.0)));
+        assert!(rm90
+            .transform_point(point2(1.0, 2.0))
+            .approx_eq(&point2(2.0, -1.0)));
+        assert!(r180
+            .transform_point(point2(1.0, 2.0))
+            .approx_eq(&point2(-1.0, -2.0)));
 
-#[test]
-fn simple_rotation_3d_in_2d() {
-    use crate::default::Rotation3D;
-    use core::f32::consts::{FRAC_PI_2, PI};
+        assert!(r90
+            .inverse()
+            .inverse()
+            .transform_point(point2(1.0, 2.0))
+            .approx_eq(&r90.transform_point(point2(1.0, 2.0))));
+    }
 
-    let ri = Rotation3D::identity();
-    let r90 = Rotation3D::around_z(Angle::radians(FRAC_PI_2));
-    let rm90 = Rotation3D::around_z(Angle::radians(-FRAC_PI_2));
-    let r180 = Rotation3D::around_z(Angle::radians(PI));
+    #[test]
+    fn simple_rotation_3d_in_2d() {
+        use crate::default::Rotation3D;
+        use core::f32::consts::{FRAC_PI_2, PI};
 
-    assert!(ri
-        .transform_point2d(point2(1.0, 2.0))
-        .approx_eq(&point2(1.0, 2.0)));
-    assert!(r90
-        .transform_point2d(point2(1.0, 2.0))
-        .approx_eq(&point2(-2.0, 1.0)));
-    assert!(rm90
-        .transform_point2d(point2(1.0, 2.0))
-        .approx_eq(&point2(2.0, -1.0)));
-    assert!(r180
-        .transform_point2d(point2(1.0, 2.0))
-        .approx_eq(&point2(-1.0, -2.0)));
+        let ri = Rotation3D::identity();
+        let r90 = Rotation3D::around_z(Angle::radians(FRAC_PI_2));
+        let rm90 = Rotation3D::around_z(Angle::radians(-FRAC_PI_2));
+        let r180 = Rotation3D::around_z(Angle::radians(PI));
 
-    assert!(r90
-        .inverse()
-        .inverse()
-        .transform_point2d(point2(1.0, 2.0))
-        .approx_eq(&r90.transform_point2d(point2(1.0, 2.0))));
-}
+        assert!(ri
+            .transform_point2d(point2(1.0, 2.0))
+            .approx_eq(&point2(1.0, 2.0)));
+        assert!(r90
+            .transform_point2d(point2(1.0, 2.0))
+            .approx_eq(&point2(-2.0, 1.0)));
+        assert!(rm90
+            .transform_point2d(point2(1.0, 2.0))
+            .approx_eq(&point2(2.0, -1.0)));
+        assert!(r180
+            .transform_point2d(point2(1.0, 2.0))
+            .approx_eq(&point2(-1.0, -2.0)));
 
-#[test]
-fn pre_post() {
-    use crate::default::Rotation3D;
-    use core::f32::consts::FRAC_PI_2;
+        assert!(r90
+            .inverse()
+            .inverse()
+            .transform_point2d(point2(1.0, 2.0))
+            .approx_eq(&r90.transform_point2d(point2(1.0, 2.0))));
+    }
 
-    let r1 = Rotation3D::around_x(Angle::radians(FRAC_PI_2));
-    let r2 = Rotation3D::around_y(Angle::radians(FRAC_PI_2));
-    let r3 = Rotation3D::around_z(Angle::radians(FRAC_PI_2));
+    #[test]
+    fn pre_post() {
+        use crate::default::Rotation3D;
+        use core::f32::consts::FRAC_PI_2;
 
-    let t1 = r1.to_transform();
-    let t2 = r2.to_transform();
-    let t3 = r3.to_transform();
+        let r1 = Rotation3D::around_x(Angle::radians(FRAC_PI_2));
+        let r2 = Rotation3D::around_y(Angle::radians(FRAC_PI_2));
+        let r3 = Rotation3D::around_z(Angle::radians(FRAC_PI_2));
 
-    let p = point3(1.0, 2.0, 3.0);
+        let t1 = r1.to_transform();
+        let t2 = r2.to_transform();
+        let t3 = r3.to_transform();
 
-    // Check that the order of transformations is correct (corresponds to what
-    // we do in Transform3D).
-    let p1 = r1.then(&r2).then(&r3).transform_point3d(p);
-    let p2 = t1.then(&t2).then(&t3).transform_point3d(p);
+        let p = point3(1.0, 2.0, 3.0);
 
-    assert!(p1.approx_eq(&p2.unwrap()));
+        // Check that the order of transformations is correct (corresponds to what
+        // we do in Transform3D).
+        let p1 = r1.then(&r2).then(&r3).transform_point3d(p);
+        let p2 = t1.then(&t2).then(&t3).transform_point3d(p);
 
-    // Check that changing the order indeed matters.
-    let p3 = t3.then(&t1).then(&t2).transform_point3d(p);
-    assert!(!p1.approx_eq(&p3.unwrap()));
-}
+        assert!(p1.approx_eq(&p2.unwrap()));
 
-#[test]
-fn to_transform3d() {
-    use crate::default::Rotation3D;
+        // Check that changing the order indeed matters.
+        let p3 = t3.then(&t1).then(&t2).transform_point3d(p);
+        assert!(!p1.approx_eq(&p3.unwrap()));
+    }
 
-    use core::f32::consts::{FRAC_PI_2, PI};
-    let rotations = [
-        Rotation3D::identity(),
-        Rotation3D::around_x(Angle::radians(FRAC_PI_2)),
-        Rotation3D::around_x(Angle::radians(-FRAC_PI_2)),
-        Rotation3D::around_x(Angle::radians(PI)),
-        Rotation3D::around_y(Angle::radians(FRAC_PI_2)),
-        Rotation3D::around_y(Angle::radians(-FRAC_PI_2)),
-        Rotation3D::around_y(Angle::radians(PI)),
-        Rotation3D::around_z(Angle::radians(FRAC_PI_2)),
-        Rotation3D::around_z(Angle::radians(-FRAC_PI_2)),
-        Rotation3D::around_z(Angle::radians(PI)),
-    ];
+    #[test]
+    fn to_transform3d() {
+        use crate::default::Rotation3D;
 
-    let points = [
-        point3(0.0, 0.0, 0.0),
-        point3(1.0, 2.0, 3.0),
-        point3(-5.0, 3.0, -1.0),
-        point3(-0.5, -1.0, 1.5),
-    ];
+        use core::f32::consts::{FRAC_PI_2, PI};
+        let rotations = [
+            Rotation3D::identity(),
+            Rotation3D::around_x(Angle::radians(FRAC_PI_2)),
+            Rotation3D::around_x(Angle::radians(-FRAC_PI_2)),
+            Rotation3D::around_x(Angle::radians(PI)),
+            Rotation3D::around_y(Angle::radians(FRAC_PI_2)),
+            Rotation3D::around_y(Angle::radians(-FRAC_PI_2)),
+            Rotation3D::around_y(Angle::radians(PI)),
+            Rotation3D::around_z(Angle::radians(FRAC_PI_2)),
+            Rotation3D::around_z(Angle::radians(-FRAC_PI_2)),
+            Rotation3D::around_z(Angle::radians(PI)),
+        ];
 
-    for rotation in &rotations {
-        for &point in &points {
-            let p1 = rotation.transform_point3d(point);
-            let p2 = rotation.to_transform().transform_point3d(point);
-            assert!(p1.approx_eq(&p2.unwrap()));
+        let points = [
+            point3(0.0, 0.0, 0.0),
+            point3(1.0, 2.0, 3.0),
+            point3(-5.0, 3.0, -1.0),
+            point3(-0.5, -1.0, 1.5),
+        ];
+
+        for rotation in &rotations {
+            for &point in &points {
+                let p1 = rotation.transform_point3d(point);
+                let p2 = rotation.to_transform().transform_point3d(point);
+                assert!(p1.approx_eq(&p2.unwrap()));
+            }
         }
     }
-}
 
-#[test]
-fn slerp() {
-    use crate::default::Rotation3D;
+    #[test]
+    fn slerp() {
+        use crate::default::Rotation3D;
 
-    let q1 = Rotation3D::quaternion(1.0, 0.0, 0.0, 0.0);
-    let q2 = Rotation3D::quaternion(0.0, 1.0, 0.0, 0.0);
-    let q3 = Rotation3D::quaternion(0.0, 0.0, -1.0, 0.0);
+        let q1 = Rotation3D::quaternion(1.0, 0.0, 0.0, 0.0);
+        let q2 = Rotation3D::quaternion(0.0, 1.0, 0.0, 0.0);
+        let q3 = Rotation3D::quaternion(0.0, 0.0, -1.0, 0.0);
 
-    // The values below can be obtained with a python program:
-    // import numpy
-    // import quaternion
-    // q1 = numpy.quaternion(1, 0, 0, 0)
-    // q2 = numpy.quaternion(0, 1, 0, 0)
-    // quaternion.slerp_evaluate(q1, q2, 0.2)
+        // The values below can be obtained with a python program:
+        // import numpy
+        // import quaternion
+        // q1 = numpy.quaternion(1, 0, 0, 0)
+        // q2 = numpy.quaternion(0, 1, 0, 0)
+        // quaternion.slerp_evaluate(q1, q2, 0.2)
 
-    assert!(q1.slerp(&q2, 0.0).approx_eq(&q1));
-    assert!(q1.slerp(&q2, 0.2).approx_eq(&Rotation3D::quaternion(
-        0.951056516295154,
-        0.309016994374947,
-        0.0,
-        0.0
-    )));
-    assert!(q1.slerp(&q2, 0.4).approx_eq(&Rotation3D::quaternion(
-        0.809016994374947,
-        0.587785252292473,
-        0.0,
-        0.0
-    )));
-    assert!(q1.slerp(&q2, 0.6).approx_eq(&Rotation3D::quaternion(
-        0.587785252292473,
-        0.809016994374947,
-        0.0,
-        0.0
-    )));
-    assert!(q1.slerp(&q2, 0.8).approx_eq(&Rotation3D::quaternion(
-        0.309016994374947,
-        0.951056516295154,
-        0.0,
-        0.0
-    )));
-    assert!(q1.slerp(&q2, 1.0).approx_eq(&q2));
+        assert!(q1.slerp(&q2, 0.0).approx_eq(&q1));
+        assert!(q1.slerp(&q2, 0.2).approx_eq(&Rotation3D::quaternion(
+            0.951056516295154,
+            0.309016994374947,
+            0.0,
+            0.0
+        )));
+        assert!(q1.slerp(&q2, 0.4).approx_eq(&Rotation3D::quaternion(
+            0.809016994374947,
+            0.587785252292473,
+            0.0,
+            0.0
+        )));
+        assert!(q1.slerp(&q2, 0.6).approx_eq(&Rotation3D::quaternion(
+            0.587785252292473,
+            0.809016994374947,
+            0.0,
+            0.0
+        )));
+        assert!(q1.slerp(&q2, 0.8).approx_eq(&Rotation3D::quaternion(
+            0.309016994374947,
+            0.951056516295154,
+            0.0,
+            0.0
+        )));
+        assert!(q1.slerp(&q2, 1.0).approx_eq(&q2));
 
-    assert!(q1.slerp(&q3, 0.0).approx_eq(&q1));
-    assert!(q1.slerp(&q3, 0.2).approx_eq(&Rotation3D::quaternion(
-        0.951056516295154,
-        0.0,
-        -0.309016994374947,
-        0.0
-    )));
-    assert!(q1.slerp(&q3, 0.4).approx_eq(&Rotation3D::quaternion(
-        0.809016994374947,
-        0.0,
-        -0.587785252292473,
-        0.0
-    )));
-    assert!(q1.slerp(&q3, 0.6).approx_eq(&Rotation3D::quaternion(
-        0.587785252292473,
-        0.0,
-        -0.809016994374947,
-        0.0
-    )));
-    assert!(q1.slerp(&q3, 0.8).approx_eq(&Rotation3D::quaternion(
-        0.309016994374947,
-        0.0,
-        -0.951056516295154,
-        0.0
-    )));
-    assert!(q1.slerp(&q3, 1.0).approx_eq(&q3));
-}
+        assert!(q1.slerp(&q3, 0.0).approx_eq(&q1));
+        assert!(q1.slerp(&q3, 0.2).approx_eq(&Rotation3D::quaternion(
+            0.951056516295154,
+            0.0,
+            -0.309016994374947,
+            0.0
+        )));
+        assert!(q1.slerp(&q3, 0.4).approx_eq(&Rotation3D::quaternion(
+            0.809016994374947,
+            0.0,
+            -0.587785252292473,
+            0.0
+        )));
+        assert!(q1.slerp(&q3, 0.6).approx_eq(&Rotation3D::quaternion(
+            0.587785252292473,
+            0.0,
+            -0.809016994374947,
+            0.0
+        )));
+        assert!(q1.slerp(&q3, 0.8).approx_eq(&Rotation3D::quaternion(
+            0.309016994374947,
+            0.0,
+            -0.951056516295154,
+            0.0
+        )));
+        assert!(q1.slerp(&q3, 1.0).approx_eq(&q3));
+    }
 
-#[test]
-fn around_axis() {
-    use crate::default::Rotation3D;
-    use core::f32::consts::{FRAC_PI_2, PI};
+    #[test]
+    fn around_axis() {
+        use crate::default::Rotation3D;
+        use core::f32::consts::{FRAC_PI_2, PI};
 
-    // Two sort of trivial cases:
-    let r1 = Rotation3D::around_axis(vec3(1.0, 1.0, 0.0), Angle::radians(PI));
-    let r2 = Rotation3D::around_axis(vec3(1.0, 1.0, 0.0), Angle::radians(FRAC_PI_2));
-    assert!(r1
-        .transform_point3d(point3(1.0, 2.0, 0.0))
-        .approx_eq(&point3(2.0, 1.0, 0.0)));
-    assert!(r2
-        .transform_point3d(point3(1.0, 0.0, 0.0))
-        .approx_eq(&point3(0.5, 0.5, -0.5.sqrt())));
+        // Two sort of trivial cases:
+        let r1 = Rotation3D::around_axis(vec3(1.0, 1.0, 0.0), Angle::radians(PI));
+        let r2 = Rotation3D::around_axis(vec3(1.0, 1.0, 0.0), Angle::radians(FRAC_PI_2));
+        assert!(r1
+            .transform_point3d(point3(1.0, 2.0, 0.0))
+            .approx_eq(&point3(2.0, 1.0, 0.0)));
+        assert!(r2
+            .transform_point3d(point3(1.0, 0.0, 0.0))
+            .approx_eq(&point3(0.5, 0.5, -0.5.sqrt())));
 
-    // A more arbitrary test (made up with numpy):
-    let r3 = Rotation3D::around_axis(vec3(0.5, 1.0, 2.0), Angle::radians(2.291288));
-    assert!(r3
-        .transform_point3d(point3(1.0, 0.0, 0.0))
-        .approx_eq(&point3(-0.58071821, 0.81401868, -0.01182979)));
-}
+        // A more arbitrary test (made up with numpy):
+        let r3 = Rotation3D::around_axis(vec3(0.5, 1.0, 2.0), Angle::radians(2.291288));
+        assert!(r3
+            .transform_point3d(point3(1.0, 0.0, 0.0))
+            .approx_eq(&point3(-0.58071821, 0.81401868, -0.01182979)));
+    }
 
-#[test]
-fn from_euler() {
-    use crate::default::Rotation3D;
-    use core::f32::consts::FRAC_PI_2;
+    #[test]
+    fn from_euler() {
+        use crate::default::Rotation3D;
+        use core::f32::consts::FRAC_PI_2;
 
-    // First test simple separate yaw pitch and roll rotations, because it is easy to come
-    // up with the corresponding quaternion.
-    // Since several quaternions can represent the same transformation we compare the result
-    // of transforming a point rather than the values of each quaternions.
-    let p = point3(1.0, 2.0, 3.0);
+        // First test simple separate yaw pitch and roll rotations, because it is easy to come
+        // up with the corresponding quaternion.
+        // Since several quaternions can represent the same transformation we compare the result
+        // of transforming a point rather than the values of each quaternions.
+        let p = point3(1.0, 2.0, 3.0);
 
-    let angle = Angle::radians(FRAC_PI_2);
-    let zero = Angle::radians(0.0);
+        let angle = Angle::radians(FRAC_PI_2);
+        let zero = Angle::radians(0.0);
 
-    // roll
-    let roll_re = Rotation3D::euler(angle, zero, zero);
-    let roll_rq = Rotation3D::around_x(angle);
-    let roll_pe = roll_re.transform_point3d(p);
-    let roll_pq = roll_rq.transform_point3d(p);
+        // roll
+        let roll_re = Rotation3D::euler(angle, zero, zero);
+        let roll_rq = Rotation3D::around_x(angle);
+        let roll_pe = roll_re.transform_point3d(p);
+        let roll_pq = roll_rq.transform_point3d(p);
 
-    // pitch
-    let pitch_re = Rotation3D::euler(zero, angle, zero);
-    let pitch_rq = Rotation3D::around_y(angle);
-    let pitch_pe = pitch_re.transform_point3d(p);
-    let pitch_pq = pitch_rq.transform_point3d(p);
+        // pitch
+        let pitch_re = Rotation3D::euler(zero, angle, zero);
+        let pitch_rq = Rotation3D::around_y(angle);
+        let pitch_pe = pitch_re.transform_point3d(p);
+        let pitch_pq = pitch_rq.transform_point3d(p);
 
-    // yaw
-    let yaw_re = Rotation3D::euler(zero, zero, angle);
-    let yaw_rq = Rotation3D::around_z(angle);
-    let yaw_pe = yaw_re.transform_point3d(p);
-    let yaw_pq = yaw_rq.transform_point3d(p);
+        // yaw
+        let yaw_re = Rotation3D::euler(zero, zero, angle);
+        let yaw_rq = Rotation3D::around_z(angle);
+        let yaw_pe = yaw_re.transform_point3d(p);
+        let yaw_pq = yaw_rq.transform_point3d(p);
 
-    assert!(roll_pe.approx_eq(&roll_pq));
-    assert!(pitch_pe.approx_eq(&pitch_pq));
-    assert!(yaw_pe.approx_eq(&yaw_pq));
+        assert!(roll_pe.approx_eq(&roll_pq));
+        assert!(pitch_pe.approx_eq(&pitch_pq));
+        assert!(yaw_pe.approx_eq(&yaw_pq));
 
-    // Now check that the yaw pitch and roll transformations when combined are applied in
-    // the proper order: roll -> pitch -> yaw.
-    let ypr_e = Rotation3D::euler(angle, angle, angle);
-    let ypr_q = roll_rq.then(&pitch_rq).then(&yaw_rq);
-    let ypr_pe = ypr_e.transform_point3d(p);
-    let ypr_pq = ypr_q.transform_point3d(p);
+        // Now check that the yaw pitch and roll transformations when combined are applied in
+        // the proper order: roll -> pitch -> yaw.
+        let ypr_e = Rotation3D::euler(angle, angle, angle);
+        let ypr_q = roll_rq.then(&pitch_rq).then(&yaw_rq);
+        let ypr_pe = ypr_e.transform_point3d(p);
+        let ypr_pq = ypr_q.transform_point3d(p);
 
-    assert!(ypr_pe.approx_eq(&ypr_pq));
+        assert!(ypr_pe.approx_eq(&ypr_pq));
+    }
 }

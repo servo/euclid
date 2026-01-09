@@ -19,7 +19,7 @@ use crate::vector::Vector3D;
 use bytemuck::{Pod, Zeroable};
 #[cfg(feature = "malloc_size_of")]
 use malloc_size_of::{MallocSizeOf, MallocSizeOfOps};
-use num_traits::{Float, NumCast};
+use num_traits::NumCast;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -738,14 +738,6 @@ impl<T: NumCast + Copy, U> Box3D<T, U> {
     }
 }
 
-impl<T: Float, U> Box3D<T, U> {
-    /// Returns `true` if all members are finite.
-    #[inline]
-    pub fn is_finite(self) -> bool {
-        self.min.is_finite() && self.max.is_finite()
-    }
-}
-
 impl<T, U> Box3D<T, U>
 where
     T: Round,
@@ -824,6 +816,7 @@ pub fn box3d<T: Copy, U>(
 }
 
 #[cfg(test)]
+#[cfg(any(feature = "std", feature = "libm"))]
 mod tests {
     use crate::default::{Box3D, Point3D};
     use crate::{point3, size3, vec3};
@@ -1081,5 +1074,19 @@ mod tests {
         assert!(Box3D { min: point3(1.0, -2.0, 1.0), max: point3(NAN, 2.0, 5.0) }.is_empty());
         assert!(Box3D { min: point3(1.0, -2.0, 1.0), max: point3(0.0, NAN, 5.0) }.is_empty());
         assert!(Box3D { min: point3(1.0, -2.0, 1.0), max: point3(0.0, 1.0, NAN) }.is_empty());
+    }
+}
+
+#[cfg(any(feature = "std", feature = "libm"))]
+mod float {
+    use super::Box3D;
+    use num_traits::Float;
+
+    impl<T: Float, U> Box3D<T, U> {
+        /// Returns `true` if all members are finite.
+        #[inline]
+        pub fn is_finite(self) -> bool {
+            self.min.is_finite() && self.max.is_finite()
+        }
     }
 }
