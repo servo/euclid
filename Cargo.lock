@@ -22,7 +22,7 @@ checksum = "a2ef034f05691a48569bd920a96c81b9d91bbad1ab5ac7c4616c1f6ef36cb79f"
 
 [[package]]
 name = "euclid"
-version = "0.22.12"
+version = "0.22.13"
 dependencies = [
  "arbitrary",
  "bytemuck",
