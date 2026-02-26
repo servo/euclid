@@ -9,10 +9,6 @@
 
 #![allow(clippy::just_underscores_and_digits)]
 
-#[cfg(any(feature = "std", feature = "libm"))]
-use super::Angle;
-#[cfg(any(feature = "std", feature = "libm"))]
-use crate::approxeq::ApproxEq;
 use crate::box2d::Box2D;
 use crate::box3d::Box3D;
 use crate::homogen::HomogeneousVector;
@@ -21,8 +17,6 @@ use crate::point::{point2, point3, Point2D, Point3D};
 use crate::rect::Rect;
 use crate::scale::Scale;
 use crate::transform2d::Transform2D;
-#[cfg(any(feature = "std", feature = "libm"))]
-use crate::trig::Trig;
 use crate::vector::{vec2, vec3, Vector2D, Vector3D};
 use crate::ScaleOffset2D;
 use crate::UnknownUnit;
@@ -464,16 +458,6 @@ impl<T: Copy, Src, Dst> Transform3D<T, Src, Dst> {
     }
 
     /// Returns true if self can be represented as a 2d scale+offset
-    /// transform, using `T`'s default epsilon value.
-    #[cfg(any(feature = "std", feature = "libm"))]
-    pub fn is_scale_offset_2d(&self) -> bool
-    where
-        T: Signed + PartialOrd + ApproxEq<T>,
-    {
-        self.is_scale_offset_2d_eps(T::approx_epsilon())
-    }
-
-    /// Returns true if self can be represented as a 2d scale+offset
     /// transform.
     pub fn is_scale_offset_2d_eps(&self, epsilon: T) -> bool
     where
@@ -538,27 +522,6 @@ where
         T: PartialEq,
     {
         *self == Self::identity()
-    }
-
-    #[cfg(any(feature = "std", feature = "libm"))]
-    /// Create a 2d skew transform.
-    ///
-    /// See <https://drafts.csswg.org/css-transforms/#funcdef-skew>
-    #[rustfmt::skip]
-    pub fn skew(alpha: Angle<T>, beta: Angle<T>) -> Self
-    where
-        T: Trig,
-    {
-        let _0 = || T::zero();
-        let _1 = || T::one();
-        let (sx, sy) = (beta.radians.tan(), alpha.radians.tan());
-
-        Self::new(
-            _1(), sx,   _0(), _0(),
-            sy,   _1(), _0(), _0(),
-            _0(), _0(), _1(), _0(),
-            _0(), _0(), _0(), _1(),
-        )
     }
 
     /// Create a simple perspective transform, projecting to the plane `z = -d`.
@@ -678,71 +641,6 @@ where
         T: Copy + Add<Output = T> + Mul<Output = T>,
     {
         self.then(&Transform3D::translation(v.x, v.y, v.z))
-    }
-}
-
-#[cfg(any(feature = "std", feature = "libm"))]
-/// Methods for creating and combining rotation transformations
-impl<T, Src, Dst> Transform3D<T, Src, Dst>
-where
-    T: Copy
-        + Add<Output = T>
-        + Sub<Output = T>
-        + Mul<Output = T>
-        + Div<Output = T>
-        + Zero
-        + One
-        + Trig,
-{
-    /// Create a 3d rotation transform from an angle / axis.
-    /// The supplied axis must be normalized.
-    #[rustfmt::skip]
-    pub fn rotation(x: T, y: T, z: T, theta: Angle<T>) -> Self {
-        let (_0, _1): (T, T) = (Zero::zero(), One::one());
-        let _2 = _1 + _1;
-
-        let xx = x * x;
-        let yy = y * y;
-        let zz = z * z;
-
-        let half_theta = theta.get() / _2;
-        let sc = half_theta.sin() * half_theta.cos();
-        let sq = half_theta.sin() * half_theta.sin();
-
-        Transform3D::new(
-            _1 - _2 * (yy + zz) * sq,
-            _2 * (x * y * sq + z * sc),
-            _2 * (x * z * sq - y * sc),
-            _0,
-
-
-            _2 * (x * y * sq - z * sc),
-            _1 - _2 * (xx + zz) * sq,
-            _2 * (y * z * sq + x * sc),
-            _0,
-
-            _2 * (x * z * sq + y * sc),
-            _2 * (y * z * sq - x * sc),
-            _1 - _2 * (xx + yy) * sq,
-            _0,
-
-            _0,
-            _0,
-            _0,
-            _1
-        )
-    }
-
-    /// Returns a transform with a rotation applied after self's transformation.
-    #[must_use]
-    pub fn then_rotate(&self, x: T, y: T, z: T, theta: Angle<T>) -> Self {
-        self.then(&Transform3D::rotation(x, y, z, theta))
-    }
-
-    /// Returns a transform with a rotation applied before self's transformation.
-    #[must_use]
-    pub fn pre_rotate(&self, x: T, y: T, z: T, theta: Angle<T>) -> Self {
-        Transform3D::rotation(x, y, z, theta).then(self)
     }
 }
 
@@ -1188,47 +1086,6 @@ impl<T: NumCast + Copy, Src, Dst> Transform3D<T, Src, Dst> {
     }
 }
 
-#[cfg(any(feature = "std", feature = "libm"))]
-impl<T: ApproxEq<T>, Src, Dst> Transform3D<T, Src, Dst> {
-    /// Returns `true` if this transform is approximately equal to the other one, using
-    /// `T`'s default epsilon value.
-    ///
-    /// The same as [`ApproxEq::approx_eq`] but available without importing trait.
-    #[inline]
-    pub fn approx_eq(&self, other: &Self) -> bool {
-        <Self as ApproxEq<T>>::approx_eq(self, other)
-    }
-
-    /// Returns `true` if this transform is approximately equal to the other one, using
-    /// a provided epsilon value.
-    ///
-    /// The same as [`ApproxEq::approx_eq_eps`] but available without importing trait.
-    #[inline]
-    pub fn approx_eq_eps(&self, other: &Self, eps: &T) -> bool {
-        <Self as ApproxEq<T>>::approx_eq_eps(self, other, eps)
-    }
-}
-
-#[cfg(any(feature = "std", feature = "libm"))]
-impl<T: ApproxEq<T>, Src, Dst> ApproxEq<T> for Transform3D<T, Src, Dst> {
-    #[inline]
-    fn approx_epsilon() -> T {
-        T::approx_epsilon()
-    }
-
-    #[rustfmt::skip]
-    fn approx_eq_eps(&self, other: &Self, eps: &T) -> bool {
-        self.m11.approx_eq_eps(&other.m11, eps) && self.m12.approx_eq_eps(&other.m12, eps) &&
-        self.m13.approx_eq_eps(&other.m13, eps) && self.m14.approx_eq_eps(&other.m14, eps) &&
-        self.m21.approx_eq_eps(&other.m21, eps) && self.m22.approx_eq_eps(&other.m22, eps) &&
-        self.m23.approx_eq_eps(&other.m23, eps) && self.m24.approx_eq_eps(&other.m24, eps) &&
-        self.m31.approx_eq_eps(&other.m31, eps) && self.m32.approx_eq_eps(&other.m32, eps) &&
-        self.m33.approx_eq_eps(&other.m33, eps) && self.m34.approx_eq_eps(&other.m34, eps) &&
-        self.m41.approx_eq_eps(&other.m41, eps) && self.m42.approx_eq_eps(&other.m42, eps) &&
-        self.m43.approx_eq_eps(&other.m43, eps) && self.m44.approx_eq_eps(&other.m44, eps)
-    }
-}
-
 impl<T, Src, Dst> Default for Transform3D<T, Src, Dst>
 where
     T: Zero + One,
@@ -1290,12 +1147,155 @@ impl<T: Copy + Zero + One, Src, Dst> From<Scale<T, Src, Dst>> for Transform3D<T,
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
+mod float {
+    use super::Transform3D;
+    use crate::num::{One, Zero};
+    use crate::{approxeq::ApproxEq, Angle, Trig};
+    use core::ops::{Add, Div, Mul, Sub};
+    use num_traits::Signed;
+
+    impl<T, Src, Dst> Transform3D<T, Src, Dst> {
+        /// Returns true if self can be represented as a 2d scale+offset
+        /// transform, using `T`'s default epsilon value.
+        pub fn is_scale_offset_2d(&self) -> bool
+        where
+            T: Copy + Signed + PartialOrd + ApproxEq<T>,
+        {
+            self.is_scale_offset_2d_eps(T::approx_epsilon())
+        }
+
+        /// Create a 2d skew transform.
+        ///
+        /// See <https://drafts.csswg.org/css-transforms/#funcdef-skew>
+        #[rustfmt::skip]
+        pub fn skew(alpha: Angle<T>, beta: Angle<T>) -> Self
+        where
+            T: Trig + Zero + One,
+        {
+            let _0 = || T::zero();
+            let _1 = || T::one();
+            let (sx, sy) = (beta.radians.tan(), alpha.radians.tan());
+
+            Self::new(
+                _1(), sx,   _0(), _0(),
+                sy,   _1(), _0(), _0(),
+                _0(), _0(), _1(), _0(),
+                _0(), _0(), _0(), _1(),
+            )
+        }
+    }
+
+    /// Methods for creating and combining rotation transformations
+    impl<T, Src, Dst> Transform3D<T, Src, Dst>
+    where
+        T: Copy
+            + Add<Output = T>
+            + Sub<Output = T>
+            + Mul<Output = T>
+            + Div<Output = T>
+            + Zero
+            + One
+            + Trig,
+    {
+        /// Create a 3d rotation transform from an angle / axis.
+        /// The supplied axis must be normalized.
+        #[rustfmt::skip]
+        pub fn rotation(x: T, y: T, z: T, theta: Angle<T>) -> Self {
+            let (_0, _1): (T, T) = (Zero::zero(), One::one());
+            let _2 = _1 + _1;
+
+            let xx = x * x;
+            let yy = y * y;
+            let zz = z * z;
+
+            let half_theta = theta.get() / _2;
+            let sc = half_theta.sin() * half_theta.cos();
+            let sq = half_theta.sin() * half_theta.sin();
+
+            Transform3D::new(
+                _1 - _2 * (yy + zz) * sq,
+                _2 * (x * y * sq + z * sc),
+                _2 * (x * z * sq - y * sc),
+                _0,
+
+
+                _2 * (x * y * sq - z * sc),
+                _1 - _2 * (xx + zz) * sq,
+                _2 * (y * z * sq + x * sc),
+                _0,
+
+                _2 * (x * z * sq + y * sc),
+                _2 * (y * z * sq - x * sc),
+                _1 - _2 * (xx + yy) * sq,
+                _0,
+
+                _0,
+                _0,
+                _0,
+                _1
+            )
+        }
+
+        /// Returns a transform with a rotation applied after self's transformation.
+        #[must_use]
+        pub fn then_rotate(&self, x: T, y: T, z: T, theta: Angle<T>) -> Self {
+            self.then(&Transform3D::rotation(x, y, z, theta))
+        }
+
+        /// Returns a transform with a rotation applied before self's transformation.
+        #[must_use]
+        pub fn pre_rotate(&self, x: T, y: T, z: T, theta: Angle<T>) -> Self {
+            Transform3D::rotation(x, y, z, theta).then(self)
+        }
+    }
+
+    impl<T: ApproxEq<T>, Src, Dst> Transform3D<T, Src, Dst> {
+        /// Returns `true` if this transform is approximately equal to the other one, using
+        /// `T`'s default epsilon value.
+        ///
+        /// The same as [`ApproxEq::approx_eq`] but available without importing trait.
+        #[inline]
+        pub fn approx_eq(&self, other: &Self) -> bool {
+            <Self as ApproxEq<T>>::approx_eq(self, other)
+        }
+
+        /// Returns `true` if this transform is approximately equal to the other one, using
+        /// a provided epsilon value.
+        ///
+        /// The same as [`ApproxEq::approx_eq_eps`] but available without importing trait.
+        #[inline]
+        pub fn approx_eq_eps(&self, other: &Self, eps: &T) -> bool {
+            <Self as ApproxEq<T>>::approx_eq_eps(self, other, eps)
+        }
+    }
+
+    impl<T: ApproxEq<T>, Src, Dst> ApproxEq<T> for Transform3D<T, Src, Dst> {
+        #[inline]
+        fn approx_epsilon() -> T {
+            T::approx_epsilon()
+        }
+
+        #[rustfmt::skip]
+        fn approx_eq_eps(&self, other: &Self, eps: &T) -> bool {
+            self.m11.approx_eq_eps(&other.m11, eps) && self.m12.approx_eq_eps(&other.m12, eps) &&
+            self.m13.approx_eq_eps(&other.m13, eps) && self.m14.approx_eq_eps(&other.m14, eps) &&
+            self.m21.approx_eq_eps(&other.m21, eps) && self.m22.approx_eq_eps(&other.m22, eps) &&
+            self.m23.approx_eq_eps(&other.m23, eps) && self.m24.approx_eq_eps(&other.m24, eps) &&
+            self.m31.approx_eq_eps(&other.m31, eps) && self.m32.approx_eq_eps(&other.m32, eps) &&
+            self.m33.approx_eq_eps(&other.m33, eps) && self.m34.approx_eq_eps(&other.m34, eps) &&
+            self.m41.approx_eq_eps(&other.m41, eps) && self.m42.approx_eq_eps(&other.m42, eps) &&
+            self.m43.approx_eq_eps(&other.m43, eps) && self.m44.approx_eq_eps(&other.m44, eps)
+        }
+    }
+}
+
 #[cfg(test)]
 #[cfg(any(feature = "std", feature = "libm"))]
 mod tests {
     use super::*;
     use crate::approxeq::ApproxEq;
-    use crate::default;
+    use crate::{default, Angle};
     use crate::{point2, point3};
 
     use core::f32::consts::{FRAC_PI_2, PI};

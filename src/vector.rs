@@ -8,8 +8,6 @@
 // except according to those terms.
 
 use super::UnknownUnit;
-#[cfg(any(feature = "std", feature = "libm"))]
-use crate::approxeq::ApproxEq;
 use crate::approxord::{max, min};
 use crate::length::Length;
 use crate::num::*;
@@ -18,10 +16,6 @@ use crate::scale::Scale;
 use crate::size::{size2, size3, Size2D, Size3D};
 use crate::transform2d::Transform2D;
 use crate::transform3d::Transform3D;
-#[cfg(any(feature = "std", feature = "libm"))]
-use crate::trig::Trig;
-#[cfg(any(feature = "std", feature = "libm"))]
-use crate::Angle;
 use core::cmp::{Eq, PartialEq};
 use core::fmt;
 use core::hash::Hash;
@@ -30,10 +24,6 @@ use core::marker::PhantomData;
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 #[cfg(feature = "mint")]
 use mint;
-#[cfg(any(feature = "std", feature = "libm"))]
-use num_traits::real::Real;
-#[cfg(any(feature = "std", feature = "libm"))]
-use num_traits::Float;
 use num_traits::{NumCast, Signed};
 #[cfg(feature = "serde")]
 use serde;
@@ -460,90 +450,141 @@ where
 }
 
 #[cfg(any(feature = "std", feature = "libm"))]
-impl<T: Float, U> Vector2D<T, U> {
-    /// Return the normalized vector even if the length is larger than the max value of Float.
-    #[inline]
-    #[must_use]
-    pub fn robust_normalize(self) -> Self {
-        let length = self.length();
-        if length.is_infinite() {
-            let scaled = self / T::max_value();
-            scaled / scaled.length()
-        } else {
-            self / length
+mod vector2d_float {
+    use super::{vec2, Vector2D};
+    use crate::approxeq::ApproxEq;
+    use crate::{Angle, Trig};
+    use core::ops::{Add, Mul, Sub};
+    use num_traits::{real::Real, Float};
+
+    impl<T: Float, U> Vector2D<T, U> {
+        /// Return the normalized vector even if the length is larger than the max value of Float.
+        #[inline]
+        #[must_use]
+        pub fn robust_normalize(self) -> Self {
+            let length = self.length();
+            if length.is_infinite() {
+                let scaled = self / T::max_value();
+                scaled / scaled.length()
+            } else {
+                self / length
+            }
+        }
+
+        /// Returns true if all members are finite.
+        #[inline]
+        pub fn is_finite(self) -> bool {
+            self.x.is_finite() && self.y.is_finite()
         }
     }
 
-    /// Returns true if all members are finite.
-    #[inline]
-    pub fn is_finite(self) -> bool {
-        self.x.is_finite() && self.y.is_finite()
-    }
-}
+    impl<T: Real, U> Vector2D<T, U> {
+        /// Returns the vector length.
+        #[inline]
+        pub fn length(self) -> T {
+            self.square_length().sqrt()
+        }
 
-#[cfg(any(feature = "std", feature = "libm"))]
-impl<T: Real, U> Vector2D<T, U> {
-    /// Returns the vector length.
-    #[inline]
-    pub fn length(self) -> T {
-        self.square_length().sqrt()
-    }
+        /// Returns the vector with length of one unit.
+        #[inline]
+        #[must_use]
+        pub fn normalize(self) -> Self {
+            self / self.length()
+        }
 
-    /// Returns the vector with length of one unit.
-    #[inline]
-    #[must_use]
-    pub fn normalize(self) -> Self {
-        self / self.length()
-    }
+        /// Returns the vector with length of one unit.
+        ///
+        /// Unlike [`Vector2D::normalize`](#method.normalize), this returns None in the case that the
+        /// length of the vector is zero.
+        #[inline]
+        #[must_use]
+        pub fn try_normalize(self) -> Option<Self> {
+            let len = self.length();
+            if len == T::zero() {
+                None
+            } else {
+                Some(self / len)
+            }
+        }
 
-    /// Returns the vector with length of one unit.
-    ///
-    /// Unlike [`Vector2D::normalize`](#method.normalize), this returns None in the case that the
-    /// length of the vector is zero.
-    #[inline]
-    #[must_use]
-    pub fn try_normalize(self) -> Option<Self> {
-        let len = self.length();
-        if len == T::zero() {
-            None
-        } else {
-            Some(self / len)
+        /// Return this vector scaled to fit the provided length.
+        #[inline]
+        pub fn with_length(self, length: T) -> Self {
+            self.normalize() * length
+        }
+
+        /// Return this vector capped to a maximum length.
+        #[inline]
+        pub fn with_max_length(self, max_length: T) -> Self {
+            let square_length = self.square_length();
+            if square_length > max_length * max_length {
+                return self * (max_length / square_length.sqrt());
+            }
+
+            self
+        }
+
+        /// Return this vector with a minimum length applied.
+        #[inline]
+        pub fn with_min_length(self, min_length: T) -> Self {
+            let square_length = self.square_length();
+            if square_length < min_length * min_length {
+                return self * (min_length / square_length.sqrt());
+            }
+
+            self
+        }
+
+        /// Return this vector with minimum and maximum lengths applied.
+        #[inline]
+        pub fn clamp_length(self, min: T, max: T) -> Self {
+            debug_assert!(min <= max);
+            self.with_min_length(min).with_max_length(max)
         }
     }
 
-    /// Return this vector scaled to fit the provided length.
-    #[inline]
-    pub fn with_length(self, length: T) -> Self {
-        self.normalize() * length
-    }
-
-    /// Return this vector capped to a maximum length.
-    #[inline]
-    pub fn with_max_length(self, max_length: T) -> Self {
-        let square_length = self.square_length();
-        if square_length > max_length * max_length {
-            return self * (max_length / square_length.sqrt());
+    impl<T, U> Vector2D<T, U> {
+        /// Constructor taking angle and length
+        pub fn from_angle_and_length(angle: Angle<T>, length: T) -> Self
+        where
+            T: Trig + Mul<Output = T> + Copy,
+        {
+            vec2(length * angle.radians.cos(), length * angle.radians.sin())
         }
 
-        self
-    }
-
-    /// Return this vector with a minimum length applied.
-    #[inline]
-    pub fn with_min_length(self, min_length: T) -> Self {
-        let square_length = self.square_length();
-        if square_length < min_length * min_length {
-            return self * (min_length / square_length.sqrt());
+        /// Returns the signed angle between this vector and the x axis.
+        /// Positive values counted counterclockwise, where 0 is `+x` axis, `PI/2`
+        /// is `+y` axis.
+        ///
+        /// The returned angle is between -PI and PI.
+        pub fn angle_from_x_axis(self) -> Angle<T>
+        where
+            T: Trig,
+        {
+            Angle::radians(Trig::fast_atan2(self.y, self.x))
         }
 
-        self
+        /// Returns the signed angle between this vector and another vector.
+        ///
+        /// The returned angle is between -PI and PI.
+        pub fn angle_to(self, other: Self) -> Angle<T>
+        where
+            T: Copy + Add<Output = T> + Sub<Output = T> + Mul<Output = T> + Trig,
+        {
+            Angle::radians(Trig::fast_atan2(self.cross(other), self.dot(other)))
+        }
     }
 
-    /// Return this vector with minimum and maximum lengths applied.
-    #[inline]
-    pub fn clamp_length(self, min: T, max: T) -> Self {
-        debug_assert!(min <= max);
-        self.with_min_length(min).with_max_length(max)
+    impl<T: ApproxEq<T>, U> ApproxEq<Vector2D<T, U>> for Vector2D<T, U> {
+        #[inline]
+        fn approx_epsilon() -> Self {
+            vec2(T::approx_epsilon(), T::approx_epsilon())
+        }
+
+        #[inline]
+        fn approx_eq_eps(&self, other: &Self, eps: &Self) -> bool {
+            self.x.approx_eq_eps(&other.x, &eps.x) && self.y.approx_eq_eps(&other.y, &eps.y)
+        }
     }
 }
 
@@ -883,19 +924,6 @@ impl<T: Floor, U> Floor for Vector2D<T, U> {
     #[inline]
     fn floor(self) -> Self {
         self.floor()
-    }
-}
-
-#[cfg(any(feature = "std", feature = "libm"))]
-impl<T: ApproxEq<T>, U> ApproxEq<Vector2D<T, U>> for Vector2D<T, U> {
-    #[inline]
-    fn approx_epsilon() -> Self {
-        vec2(T::approx_epsilon(), T::approx_epsilon())
-    }
-
-    #[inline]
-    fn approx_eq_eps(&self, other: &Self, eps: &Self) -> bool {
-        self.x.approx_eq_eps(&other.x, &eps.x) && self.y.approx_eq_eps(&other.y, &eps.y)
     }
 }
 
@@ -1385,130 +1413,121 @@ where
 }
 
 #[cfg(any(feature = "std", feature = "libm"))]
-impl<T: Float, U> Vector3D<T, U> {
-    /// Return the normalized vector even if the length is larger than the max value of Float.
-    #[inline]
-    #[must_use]
-    pub fn robust_normalize(self) -> Self {
-        let length = self.length();
-        if length.is_infinite() {
-            let scaled = self / T::max_value();
-            scaled / scaled.length()
-        } else {
-            self / length
+mod vector3d_float {
+    use super::{vec3, Vector3D};
+    use crate::approxeq::ApproxEq;
+    use crate::{Angle, Trig};
+    use num_traits::{real::Real, Float};
+
+    impl<T: Float, U> Vector3D<T, U> {
+        /// Return the normalized vector even if the length is larger than the max value of Float.
+        #[inline]
+        #[must_use]
+        pub fn robust_normalize(self) -> Self {
+            let length = self.length();
+            if length.is_infinite() {
+                let scaled = self / T::max_value();
+                scaled / scaled.length()
+            } else {
+                self / length
+            }
+        }
+
+        /// Returns true if all members are finite.
+        #[inline]
+        pub fn is_finite(self) -> bool {
+            self.x.is_finite() && self.y.is_finite() && self.z.is_finite()
         }
     }
 
-    /// Returns true if all members are finite.
-    #[inline]
-    pub fn is_finite(self) -> bool {
-        self.x.is_finite() && self.y.is_finite() && self.z.is_finite()
-    }
-}
+    impl<T: Real, U> Vector3D<T, U> {
+        /// Returns the positive angle between this vector and another vector.
+        ///
+        /// The returned angle is between 0 and PI.
+        pub fn angle_to(self, other: Self) -> Angle<T>
+        where
+            T: Trig,
+        {
+            Angle::radians(Trig::fast_atan2(
+                self.cross(other).length(),
+                self.dot(other),
+            ))
+        }
 
-#[cfg(any(feature = "std", feature = "libm"))]
-impl<T: Real, U> Vector3D<T, U> {
-    /// Returns the positive angle between this vector and another vector.
-    ///
-    /// The returned angle is between 0 and PI.
-    pub fn angle_to(self, other: Self) -> Angle<T>
-    where
-        T: Trig,
-    {
-        Angle::radians(Trig::fast_atan2(
-            self.cross(other).length(),
-            self.dot(other),
-        ))
-    }
+        /// Returns the vector length.
+        #[inline]
+        pub fn length(self) -> T {
+            self.square_length().sqrt()
+        }
 
-    /// Returns the vector length.
-    #[inline]
-    pub fn length(self) -> T {
-        self.square_length().sqrt()
-    }
+        /// Returns the vector with length of one unit
+        #[inline]
+        #[must_use]
+        pub fn normalize(self) -> Self {
+            self / self.length()
+        }
 
-    /// Returns the vector with length of one unit
-    #[inline]
-    #[must_use]
-    pub fn normalize(self) -> Self {
-        self / self.length()
-    }
+        /// Returns the vector with length of one unit.
+        ///
+        /// Unlike [`Vector2D::normalize`], this returns `None` in the case that the
+        /// length of the vector is zero.
+        #[inline]
+        #[must_use]
+        pub fn try_normalize(self) -> Option<Self> {
+            let len = self.length();
+            if len == T::zero() {
+                None
+            } else {
+                Some(self / len)
+            }
+        }
 
-    /// Returns the vector with length of one unit.
-    ///
-    /// Unlike [`Vector2D::normalize`], this returns `None` in the case that the
-    /// length of the vector is zero.
-    #[inline]
-    #[must_use]
-    pub fn try_normalize(self) -> Option<Self> {
-        let len = self.length();
-        if len == T::zero() {
-            None
-        } else {
-            Some(self / len)
+        /// Return this vector capped to a maximum length.
+        #[inline]
+        pub fn with_max_length(self, max_length: T) -> Self {
+            let square_length = self.square_length();
+            if square_length > max_length * max_length {
+                return self * (max_length / square_length.sqrt());
+            }
+
+            self
+        }
+
+        /// Return this vector with a minimum length applied.
+        #[inline]
+        pub fn with_min_length(self, min_length: T) -> Self {
+            let square_length = self.square_length();
+            if square_length < min_length * min_length {
+                return self * (min_length / square_length.sqrt());
+            }
+
+            self
+        }
+
+        /// Return this vector with minimum and maximum lengths applied.
+        #[inline]
+        pub fn clamp_length(self, min: T, max: T) -> Self {
+            debug_assert!(min <= max);
+            self.with_min_length(min).with_max_length(max)
         }
     }
 
-    /// Return this vector capped to a maximum length.
-    #[inline]
-    pub fn with_max_length(self, max_length: T) -> Self {
-        let square_length = self.square_length();
-        if square_length > max_length * max_length {
-            return self * (max_length / square_length.sqrt());
+    impl<T: ApproxEq<T>, U> ApproxEq<Vector3D<T, U>> for Vector3D<T, U> {
+        #[inline]
+        fn approx_epsilon() -> Self {
+            vec3(
+                T::approx_epsilon(),
+                T::approx_epsilon(),
+                T::approx_epsilon(),
+            )
         }
 
-        self
-    }
-
-    /// Return this vector with a minimum length applied.
-    #[inline]
-    pub fn with_min_length(self, min_length: T) -> Self {
-        let square_length = self.square_length();
-        if square_length < min_length * min_length {
-            return self * (min_length / square_length.sqrt());
+        #[inline]
+        fn approx_eq_eps(&self, other: &Self, eps: &Self) -> bool {
+            self.x.approx_eq_eps(&other.x, &eps.x)
+                && self.y.approx_eq_eps(&other.y, &eps.y)
+                && self.z.approx_eq_eps(&other.z, &eps.z)
         }
-
-        self
-    }
-
-    /// Return this vector with minimum and maximum lengths applied.
-    #[inline]
-    pub fn clamp_length(self, min: T, max: T) -> Self {
-        debug_assert!(min <= max);
-        self.with_min_length(min).with_max_length(max)
-    }
-}
-
-#[cfg(any(feature = "std", feature = "libm"))]
-impl<T, U> Vector2D<T, U> {
-    /// Constructor taking angle and length
-    pub fn from_angle_and_length(angle: Angle<T>, length: T) -> Self
-    where
-        T: Trig + Mul<Output = T> + Copy,
-    {
-        vec2(length * angle.radians.cos(), length * angle.radians.sin())
-    }
-
-    /// Returns the signed angle between this vector and the x axis.
-    /// Positive values counted counterclockwise, where 0 is `+x` axis, `PI/2`
-    /// is `+y` axis.
-    ///
-    /// The returned angle is between -PI and PI.
-    pub fn angle_from_x_axis(self) -> Angle<T>
-    where
-        T: Trig,
-    {
-        Angle::radians(Trig::fast_atan2(self.y, self.x))
-    }
-
-    /// Returns the signed angle between this vector and another vector.
-    ///
-    /// The returned angle is between -PI and PI.
-    pub fn angle_to(self, other: Self) -> Angle<T>
-    where
-        T: Copy + Add<Output = T> + Sub<Output = T> + Mul<Output = T> + Trig,
-    {
-        Angle::radians(Trig::fast_atan2(self.cross(other), self.dot(other)))
     }
 }
 
@@ -1866,25 +1885,6 @@ impl<T: Floor, U> Floor for Vector3D<T, U> {
     #[inline]
     fn floor(self) -> Self {
         self.floor()
-    }
-}
-
-#[cfg(any(feature = "std", feature = "libm"))]
-impl<T: ApproxEq<T>, U> ApproxEq<Vector3D<T, U>> for Vector3D<T, U> {
-    #[inline]
-    fn approx_epsilon() -> Self {
-        vec3(
-            T::approx_epsilon(),
-            T::approx_epsilon(),
-            T::approx_epsilon(),
-        )
-    }
-
-    #[inline]
-    fn approx_eq_eps(&self, other: &Self, eps: &Self) -> bool {
-        self.x.approx_eq_eps(&other.x, &eps.x)
-            && self.y.approx_eq_eps(&other.y, &eps.y)
-            && self.z.approx_eq_eps(&other.z, &eps.z)
     }
 }
 
