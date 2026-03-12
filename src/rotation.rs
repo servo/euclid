@@ -395,6 +395,19 @@ impl<T, Src, Dst> Rotation3D<T, Src, Dst> {
 
 impl<T, Src, Dst> Rotation3D<T, Src, Dst>
 where
+    T: Copy + Real,
+{
+    #[inline]
+    /// Returns the angle of rotation about the stored axis.
+    pub fn get_angle(&self) -> Angle<T> {
+        let two = T::one() + T::one();
+        let angle = two * self.r.acos();
+        return Angle::radians(angle);
+    }
+}
+
+impl<T, Src, Dst> Rotation3D<T, Src, Dst>
+where
     T: Copy,
 {
     /// Returns the vector part (i, j, k) of this quaternion.
@@ -1074,4 +1087,34 @@ fn from_euler() {
     let ypr_pq = ypr_q.transform_point3d(p);
 
     assert!(ypr_pe.approx_eq(&ypr_pq));
+}
+
+#[test]
+fn rotation3d_get_angle() {
+    use crate::default::Rotation3D;
+    use core::f32::consts::FRAC_PI_2;
+
+    // This is a arbitrarily chosen input angle in degrees.
+    let angle_of_rotation: f32 = FRAC_PI_2;
+    // Create the rotation from angle-axis rotation with the given axis-vector and supply that degree angle to it.
+    let rot1: Rotation3D<f32> = Rotation3D::around_axis(
+        Vector3D::<f32, UnknownUnit>::new(3.0, 5.0, -7.0),
+        Angle::radians(angle_of_rotation),
+    );
+
+    // Using the get_angle() function, obtain the value of the rotation
+    let new_obtained_angle: f32 = rot1.get_angle().radians;
+    assert!(new_obtained_angle.approx_eq(&angle_of_rotation));
+
+    // This is a arbitrarily chosen input angle in degrees.
+    let angle_of_rotation2: f32 = 2.042376;
+    // Create the rotation from angle-axis rotation with the given axis-vector and supply that degree angle to it.
+    let rot2: Rotation3D<f32> = Rotation3D::around_axis(
+        Vector3D::<f32, UnknownUnit>::new(0.01, 9.0, -0.3),
+        Angle::radians(angle_of_rotation2),
+    );
+
+    // Using the get_angle() function, obtain the value of the rotation
+    let new_obtained_angle2: f32 = rot2.get_angle().radians;
+    assert!(new_obtained_angle2.approx_eq(&angle_of_rotation2));
 }
