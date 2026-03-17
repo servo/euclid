@@ -807,9 +807,14 @@ mod rotation3d_float {
         #[inline]
         /// Returns the angle of rotation about the stored axis.
         pub fn get_angle(&self) -> Angle<T> {
-            let two = T::one() + T::one();
-            let angle = two * self.r.acos();
-            return Angle::radians(angle);
+            let one = T::one();
+            let two = one + one;
+            // Clamp r to acos's safe range [-1, 1] to avoid NaNs if float precision
+            // causes the value to be slightly out of range.
+            let r = self.r.max(-one).min(one);
+            let angle = two * r.acos();
+
+            Angle::radians(angle)
         }
     }
 
