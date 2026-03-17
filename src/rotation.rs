@@ -405,6 +405,8 @@ where
     T: Copy,
 {
     /// Returns the vector part (i, j, k) of this quaternion.
+    ///
+    /// The vector part represents the axis of the rotation.
     #[inline]
     pub fn vector_part(&self) -> Vector3D<T, UnknownUnit> {
         vec3(self.i, self.j, self.k)
