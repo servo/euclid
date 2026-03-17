@@ -136,7 +136,7 @@ mod float {
             //        = R' * T' * T2
             //        = R' * T''
             //
-            // (R2^-1 * T2 * R2^) = T' = T2 rotated by R2
+            // (R2^-1 * T1 * R2) = T' = T2 rotated by R2
             // R1 * R2  = R'
             // T' * T2 = T'' = vector addition of translations T2 and T'
 
