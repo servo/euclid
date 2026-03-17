@@ -55,7 +55,7 @@ use serde::{Deserialize, Serialize};
 /// ```text
 ///  |x'|   | m11 m12 m13 m14 |   |x|
 ///  |y'|   | m21 m22 m23 m24 |   |y|
-///  |z'| = | m31 m32 m33 m34 | x |y|
+///  |z'| = | m31 m32 m33 m34 | x |z|
 ///  |w |   | m41 m42 m43 m44 |   |1|
 /// ```
 ///
