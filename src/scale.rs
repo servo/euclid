@@ -449,6 +449,7 @@ impl<T: One, Src, Dst> One for Scale<T, Src, Dst> {
 }
 
 #[cfg(test)]
+#[cfg(any(feature = "std", feature = "libm"))]
 mod tests {
     use super::Scale;
 

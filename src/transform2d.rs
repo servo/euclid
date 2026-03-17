@@ -9,8 +9,6 @@
 
 #![allow(clippy::just_underscores_and_digits)]
 
-use super::{Angle, UnknownUnit};
-use crate::approxeq::ApproxEq;
 use crate::box2d::Box2D;
 use crate::num::{One, Zero};
 use crate::point::{point2, Point2D};
@@ -18,9 +16,8 @@ use crate::rect::Rect;
 use crate::scale::Scale;
 use crate::transform3d::Transform3D;
 use crate::translation::Translation2D;
-use crate::trig::Trig;
 use crate::vector::{vec2, Vector2D};
-use crate::Rotation2D;
+use crate::UnknownUnit;
 use core::cmp::{Eq, PartialEq};
 use core::fmt;
 use core::hash::Hash;
@@ -186,30 +183,6 @@ impl<T, Src, Dst> Transform2D<T, Src, Dst> {
             _unit: PhantomData,
         }
     }
-
-    /// Returns `true` if this transform is approximately equal to the other one, using
-    /// `T`'s default epsilon value.
-    ///
-    /// The same as [`ApproxEq::approx_eq`] but available without importing trait.
-    #[inline]
-    pub fn approx_eq(&self, other: &Self) -> bool
-    where
-        T: ApproxEq<T>,
-    {
-        <Self as ApproxEq<T>>::approx_eq(self, other)
-    }
-
-    /// Returns `true` if this transform is approximately equal to the other one, using
-    /// a provided epsilon value.
-    ///
-    /// The same as [`ApproxEq::approx_eq_eps`] but available without importing trait.
-    #[inline]
-    pub fn approx_eq_eps(&self, other: &Self, eps: &T) -> bool
-    where
-        T: ApproxEq<T>,
-    {
-        <Self as ApproxEq<T>>::approx_eq_eps(self, other, eps)
-    }
 }
 
 impl<T: Copy, Src, Dst> Transform2D<T, Src, Dst> {
@@ -342,16 +315,6 @@ impl<T: Copy, Src, Dst> Transform2D<T, Src, Dst> {
         T: Zero + One,
     {
         Transform3D::new_2d(self.m11, self.m12, self.m21, self.m22, self.m31, self.m32)
-    }
-
-    /// Returns true if self can be represented as a 2d scale+offset
-    /// transform, using `T`'s default epsilon value.
-    #[inline]
-    pub fn is_scale_offset(&self) -> bool
-    where
-        T: Signed + One + PartialOrd + ApproxEq<T>,
-    {
-        self.is_scale_offset_eps(T::approx_epsilon())
     }
 
     /// Returns true if self can be represented as a 2d scale+offset
@@ -495,40 +458,6 @@ where
         T: Copy + Add<Output = T> + Mul<Output = T>,
     {
         Transform2D::translation(v.x, v.y).then(self)
-    }
-}
-
-/// Methods for creating and combining rotation transformations
-impl<T, Src, Dst> Transform2D<T, Src, Dst>
-where
-    T: Copy + Add<Output = T> + Sub<Output = T> + Mul<Output = T> + Zero + Trig,
-{
-    /// Returns a rotation transform.fn pre_translate
-    #[inline]
-    #[rustfmt::skip]
-    pub fn rotation(theta: Angle<T>) -> Self {
-        let _0 = Zero::zero();
-        let cos = theta.get().cos();
-        let sin = theta.get().sin();
-        Transform2D::new(
-            cos, sin,
-            _0 - sin, cos,
-            _0, _0
-        )
-    }
-
-    /// Applies a rotation after self's transformation and returns the resulting transform.
-    #[inline]
-    #[must_use]
-    pub fn then_rotate(&self, theta: Angle<T>) -> Self {
-        self.then(&Transform2D::rotation(theta))
-    }
-
-    /// Applies a rotation before self's transformation and returns the resulting transform.
-    #[inline]
-    #[must_use]
-    pub fn pre_rotate(&self, theta: Angle<T>) -> Self {
-        Transform2D::rotation(theta).then(self)
     }
 }
 
@@ -691,24 +620,6 @@ where
     }
 }
 
-impl<T: ApproxEq<T>, Src, Dst> ApproxEq<T> for Transform2D<T, Src, Dst> {
-    #[inline]
-    fn approx_epsilon() -> T {
-        T::approx_epsilon()
-    }
-
-    /// Returns `true` if this transform is approximately equal to the other one, using
-    /// a provided epsilon value.
-    fn approx_eq_eps(&self, other: &Self, eps: &T) -> bool {
-        self.m11.approx_eq_eps(&other.m11, eps)
-            && self.m12.approx_eq_eps(&other.m12, eps)
-            && self.m21.approx_eq_eps(&other.m21, eps)
-            && self.m22.approx_eq_eps(&other.m22, eps)
-            && self.m31.approx_eq_eps(&other.m31, eps)
-            && self.m32.approx_eq_eps(&other.m32, eps)
-    }
-}
-
 impl<T, Src, Dst> fmt::Debug for Transform2D<T, Src, Dst>
 where
     T: Copy + fmt::Debug + PartialEq + One + Zero,
@@ -745,15 +656,6 @@ impl<T, Src, Dst> From<Transform2D<T, Src, Dst>> for mint::RowMatrix3x2<T> {
     }
 }
 
-impl<T, Src, Dst> From<Rotation2D<T, Src, Dst>> for Transform2D<T, Src, Dst>
-where
-    T: Copy + Add<Output = T> + Sub<Output = T> + Mul<Output = T> + Zero + Trig,
-{
-    fn from(r: Rotation2D<T, Src, Dst>) -> Self {
-        r.to_transform()
-    }
-}
-
 impl<T: Copy + Zero, Src, Dst> From<ScaleOffset2D<T, Src, Dst>> for Transform2D<T, Src, Dst> {
     fn from(t: ScaleOffset2D<T, Src, Dst>) -> Self {
         t.to_transform2d()
@@ -763,6 +665,113 @@ impl<T: Copy + Zero, Src, Dst> From<ScaleOffset2D<T, Src, Dst>> for Transform2D<
 impl<T: Copy + Zero, Src, Dst> From<Scale<T, Src, Dst>> for Transform2D<T, Src, Dst> {
     fn from(s: Scale<T, Src, Dst>) -> Self {
         Transform2D::scale(s.0, s.0)
+    }
+}
+
+#[cfg(any(feature = "std", feature = "libm"))]
+mod transform2d_float {
+    use super::Transform2D;
+    use crate::approxeq::ApproxEq;
+    use crate::num::{One, Zero};
+    use crate::{Angle, Rotation2D, Trig};
+    use core::ops::{Add, Mul, Sub};
+    use num_traits::Signed;
+
+    impl<T, Src, Dst> Transform2D<T, Src, Dst> {
+        /// Returns `true` if this transform is approximately equal to the other one, using
+        /// `T`'s default epsilon value.
+        ///
+        /// The same as [`ApproxEq::approx_eq`] but available without importing trait.
+        #[inline]
+        pub fn approx_eq(&self, other: &Self) -> bool
+        where
+            T: ApproxEq<T>,
+        {
+            <Self as ApproxEq<T>>::approx_eq(self, other)
+        }
+
+        /// Returns `true` if this transform is approximately equal to the other one, using
+        /// a provided epsilon value.
+        ///
+        /// The same as [`ApproxEq::approx_eq_eps`] but available without importing trait.
+        #[inline]
+        pub fn approx_eq_eps(&self, other: &Self, eps: &T) -> bool
+        where
+            T: ApproxEq<T>,
+        {
+            <Self as ApproxEq<T>>::approx_eq_eps(self, other, eps)
+        }
+
+        /// Returns true if self can be represented as a 2d scale+offset
+        /// transform, using `T`'s default epsilon value.
+        #[inline]
+        pub fn is_scale_offset(&self) -> bool
+        where
+            T: Copy + Signed + One + PartialOrd + ApproxEq<T>,
+        {
+            self.is_scale_offset_eps(T::approx_epsilon())
+        }
+    }
+
+    /// Methods for creating and combining rotation transformations
+    impl<T, Src, Dst> Transform2D<T, Src, Dst>
+    where
+        T: Copy + Add<Output = T> + Sub<Output = T> + Mul<Output = T> + Zero + Trig,
+    {
+        /// Returns a rotation transform.fn pre_translate
+        #[inline]
+        #[rustfmt::skip]
+        pub fn rotation(theta: Angle<T>) -> Self {
+            let _0 = Zero::zero();
+            let cos = theta.get().cos();
+            let sin = theta.get().sin();
+            Transform2D::new(
+                cos, sin,
+                _0 - sin, cos,
+                _0, _0
+            )
+        }
+
+        /// Applies a rotation after self's transformation and returns the resulting transform.
+        #[inline]
+        #[must_use]
+        pub fn then_rotate(&self, theta: Angle<T>) -> Self {
+            self.then(&Transform2D::rotation(theta))
+        }
+
+        /// Applies a rotation before self's transformation and returns the resulting transform.
+        #[inline]
+        #[must_use]
+        pub fn pre_rotate(&self, theta: Angle<T>) -> Self {
+            Transform2D::rotation(theta).then(self)
+        }
+    }
+
+    impl<T: ApproxEq<T>, Src, Dst> ApproxEq<T> for Transform2D<T, Src, Dst> {
+        #[inline]
+        fn approx_epsilon() -> T {
+            T::approx_epsilon()
+        }
+
+        /// Returns `true` if this transform is approximately equal to the other one, using
+        /// a provided epsilon value.
+        fn approx_eq_eps(&self, other: &Self, eps: &T) -> bool {
+            self.m11.approx_eq_eps(&other.m11, eps)
+                && self.m12.approx_eq_eps(&other.m12, eps)
+                && self.m21.approx_eq_eps(&other.m21, eps)
+                && self.m22.approx_eq_eps(&other.m22, eps)
+                && self.m31.approx_eq_eps(&other.m31, eps)
+                && self.m32.approx_eq_eps(&other.m32, eps)
+        }
+    }
+
+    impl<T, Src, Dst> From<Rotation2D<T, Src, Dst>> for Transform2D<T, Src, Dst>
+    where
+        T: Copy + Add<Output = T> + Sub<Output = T> + Mul<Output = T> + Zero + Trig,
+    {
+        fn from(r: Rotation2D<T, Src, Dst>) -> Self {
+            r.to_transform()
+        }
     }
 }
 
@@ -837,28 +846,6 @@ impl<T, Src, Dst> ScaleOffset2D<T, Src, Dst> {
             ty,
             _unit: PhantomData,
         }
-    }
-
-    /// Returns true if self is an identity transform, using `T`'s
-    /// default epsilon value.
-    #[inline]
-    pub fn is_identity(&self) -> bool
-    where
-        T: One + Zero + ApproxEq<T>,
-    {
-        self.is_identity_eps(T::approx_epsilon())
-    }
-
-    /// Returns true if self is an identity transform.
-    #[inline]
-    pub fn is_identity_eps(&self, epsilon: T) -> bool
-    where
-        T: One + Zero + ApproxEq<T>,
-    {
-        self.sx.approx_eq_eps(&T::one(), &epsilon)
-            & self.sy.approx_eq_eps(&T::one(), &epsilon)
-            & self.tx.approx_eq_eps(&T::zero(), &epsilon)
-            & self.ty.approx_eq_eps(&T::zero(), &epsilon)
     }
 }
 
@@ -1129,35 +1116,6 @@ where
     }
 }
 
-impl<T: ApproxEq<T>, Src, Dst> ApproxEq<T> for ScaleOffset2D<T, Src, Dst> {
-    #[inline]
-    fn approx_epsilon() -> T {
-        T::approx_epsilon()
-    }
-
-    /// Returns `true` if this transform is approximately equal to the other one, using
-    /// a provided epsilon value.
-    fn approx_eq_eps(&self, other: &Self, eps: &T) -> bool {
-        self.sx.approx_eq_eps(&other.sx, eps)
-            && self.sy.approx_eq_eps(&other.sy, eps)
-            && self.tx.approx_eq_eps(&other.tx, eps)
-            && self.ty.approx_eq_eps(&other.ty, eps)
-    }
-}
-
-impl<T, Src, Dst> fmt::Debug for ScaleOffset2D<T, Src, Dst>
-where
-    T: Copy + fmt::Debug + PartialEq + One + Zero + ApproxEq<T>,
-{
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        if self.is_identity() {
-            write!(f, "[I]")
-        } else {
-            self.to_array().fmt(f)
-        }
-    }
-}
-
 impl<T: Copy + Zero, Src, Dst> From<Scale<T, Src, Dst>> for ScaleOffset2D<T, Src, Dst> {
     fn from(s: Scale<T, Src, Dst>) -> Self {
         ScaleOffset2D::scale(s.0, s.0)
@@ -1194,11 +1152,75 @@ impl<T: MallocSizeOf, Src, Dst> MallocSizeOf for ScaleOffset2D<T, Src, Dst> {
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
+mod scaleoffset_float {
+    use super::ScaleOffset2D;
+    use crate::{
+        approxeq::ApproxEq,
+        num::{One, Zero},
+    };
+    use core::fmt;
+
+    impl<T: Copy, Src, Dst> ScaleOffset2D<T, Src, Dst> {
+        /// Returns true if self is an identity transform, using `T`'s
+        /// default epsilon value.
+        #[inline]
+        pub fn is_identity(&self) -> bool
+        where
+            T: One + Zero + ApproxEq<T>,
+        {
+            self.is_identity_eps(T::approx_epsilon())
+        }
+
+        /// Returns true if self is an identity transform.
+        #[inline]
+        pub fn is_identity_eps(&self, epsilon: T) -> bool
+        where
+            T: One + Zero + ApproxEq<T>,
+        {
+            self.sx.approx_eq_eps(&T::one(), &epsilon)
+                & self.sy.approx_eq_eps(&T::one(), &epsilon)
+                & self.tx.approx_eq_eps(&T::zero(), &epsilon)
+                & self.ty.approx_eq_eps(&T::zero(), &epsilon)
+        }
+    }
+
+    impl<T: ApproxEq<T>, Src, Dst> ApproxEq<T> for ScaleOffset2D<T, Src, Dst> {
+        #[inline]
+        fn approx_epsilon() -> T {
+            T::approx_epsilon()
+        }
+
+        /// Returns `true` if this transform is approximately equal to the other one, using
+        /// a provided epsilon value.
+        fn approx_eq_eps(&self, other: &Self, eps: &T) -> bool {
+            self.sx.approx_eq_eps(&other.sx, eps)
+                && self.sy.approx_eq_eps(&other.sy, eps)
+                && self.tx.approx_eq_eps(&other.tx, eps)
+                && self.ty.approx_eq_eps(&other.ty, eps)
+        }
+    }
+
+    impl<T, Src, Dst> fmt::Debug for ScaleOffset2D<T, Src, Dst>
+    where
+        T: Copy + fmt::Debug + PartialEq + One + Zero + ApproxEq<T>,
+    {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            if self.is_identity() {
+                write!(f, "[I]")
+            } else {
+                self.to_array().fmt(f)
+            }
+        }
+    }
+}
+
 #[cfg(test)]
+#[cfg(any(feature = "std", feature = "libm"))]
 mod test {
     use super::*;
     use crate::approxeq::ApproxEq;
-    use crate::default;
+    use crate::{default, Angle};
     #[cfg(feature = "mint")]
     use mint;
     type ScaleOffset = crate::default::ScaleOffset2D<f32>;

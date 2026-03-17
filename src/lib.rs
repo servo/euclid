@@ -59,12 +59,14 @@ pub use crate::rotation::{Rotation2D, Rotation3D};
 pub use crate::side_offsets::SideOffsets2D;
 pub use crate::size::{size2, size3, Size2D, Size3D};
 pub use crate::translation::{Translation2D, Translation3D};
+#[cfg(any(feature = "std", feature = "libm"))]
 pub use crate::trig::Trig;
 
 #[macro_use]
 mod macros;
 
 mod angle;
+#[cfg(any(feature = "std", feature = "libm"))]
 pub mod approxeq;
 pub mod approxord;
 mod box2d;
@@ -82,6 +84,7 @@ mod size;
 mod transform2d;
 mod transform3d;
 mod translation;
+#[cfg(any(feature = "std", feature = "libm"))]
 mod trig;
 mod vector;
 

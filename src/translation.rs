@@ -849,6 +849,7 @@ impl<T: fmt::Debug, Src, Dst> fmt::Debug for Translation3D<T, Src, Dst> {
 }
 
 #[cfg(test)]
+#[cfg(any(feature = "std", feature = "libm"))]
 mod _2d {
     #[test]
     fn simple() {
@@ -955,6 +956,7 @@ mod _2d {
 }
 
 #[cfg(test)]
+#[cfg(any(feature = "std", feature = "libm"))]
 mod _3d {
     #[test]
     fn simple() {

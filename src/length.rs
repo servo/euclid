@@ -8,6 +8,7 @@
 // except according to those terms.
 //! A one-dimensional length, tagged with its units.
 
+#[cfg(any(feature = "std", feature = "libm"))]
 use crate::approxeq::ApproxEq;
 use crate::approxord::{max, min};
 use crate::num::Zero;
@@ -361,6 +362,7 @@ impl<T: Zero, U> Zero for Length<T, U> {
     }
 }
 
+#[cfg(any(feature = "std", feature = "libm"))]
 impl<U, T: ApproxEq<T>> ApproxEq<T> for Length<T, U> {
     #[inline]
     fn approx_epsilon() -> T {
@@ -374,6 +376,7 @@ impl<U, T: ApproxEq<T>> ApproxEq<T> for Length<T, U> {
 }
 
 #[cfg(test)]
+#[cfg(any(feature = "std", feature = "libm"))]
 mod tests {
     use super::Length;
     use crate::num::Zero;
