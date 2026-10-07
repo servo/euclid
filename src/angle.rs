@@ -110,6 +110,10 @@ mod float {
             if a < T::zero() {
                 a = a + two_pi;
             }
+            // A tiny negative remainder plus two_pi can land on exactly two_pi.
+            if a >= two_pi {
+                a = T::zero();
+            }
             Angle::radians(a)
         }
 
@@ -370,6 +374,28 @@ mod float {
         assert!(Angle::radians(-2.0 * PI).signed().approx_eq(&Angle::zero()));
         assert!(Angle::radians(-PI).signed().approx_eq(&Angle::pi()));
         assert!(Angle::radians(PI).signed().approx_eq(&Angle::pi()));
+    }
+
+    #[test]
+    fn wrap_angles_stay_inside_documented_ranges() {
+        let two_pi = 2.0 * core::f64::consts::PI;
+        let pi = core::f64::consts::PI;
+
+        let just_below_zero = Angle::radians(-f64::EPSILON);
+        let positive = just_below_zero.positive();
+        assert!(
+            positive.radians >= 0.0 && positive.radians < two_pi,
+            "positive() must stay in [0, 2*PI), got {}",
+            positive.radians
+        );
+
+        let just_above_pi = Angle::radians(f64::from_bits(pi.to_bits() + 1));
+        let signed = just_above_pi.signed();
+        assert!(
+            signed.radians > -pi && signed.radians <= pi,
+            "signed() must stay in (-PI, PI], got {}",
+            signed.radians
+        );
     }
 
     #[test]
